@@ -192,51 +192,51 @@ def main():
 STOP BLOCKED: Validation report required before stopping
 ======================================================================
 
-Before authorizing stop, you MUST complete ALL of the following:
+Before authorizing stop, you MUST:
 
-1. LIST ALL USER REQUESTS from this session:
-   - Review the conversation and list each task/request
-   - Mark each as ✅ DONE or ❌ INCOMPLETE
+1. LIST each user request and confirm completion:
+   ## User Requests
+   - [ ] Request 1: [description] - ✅ DONE or ❌ INCOMPLETE
+   - [ ] Request 2: [description] - ✅ DONE or ❌ INCOMPLETE
+   (List ALL requests made during this session)
 
-2. RUN VALIDATION COMMANDS (at least one):
+2. RUN validation commands and show PROOF:
    - Tests: npm test, pytest, cargo test, jest
    - Build: npm run build, tsc, cargo build
    - Lint: eslint, flake8, mypy
 
-3. VERIFY PRE-COMMIT HOOKS exist:
-   - Check for .pre-commit-config.yaml OR .husky/ directory
-   - If missing, create comprehensive pre-commit hooks
-   - Hooks should check: secrets, linting, formatting, tests
-
-4. COMMIT AND PUSH all changes:
-   - Run: git status (check for uncommitted changes)
+3. COMMIT and PUSH all changes:
+   - Run: git status (show clean working tree or staged changes)
    - Run: git add . && git commit -m "descriptive message"
    - Run: git push
-   - Verify: "nothing to commit, working tree clean"
+   - Show proof that push succeeded
 
-5. PRESENT a validation report showing PROOF:
+4. VERIFY pre-commit hooks exist:
+   - Check for .pre-commit-config.yaml OR .husky/ directory
+   - If missing, CREATE pre-commit hooks before stopping
+
+5. PRESENT validation report:
 
    ## Validation Report
 
-   ### User Requests Completed:
-   - [x] Request 1: [description]
-   - [x] Request 2: [description]
-   - [ ] Request 3: [description] (if incomplete, explain why)
+   ### User Requests Completed
+   - [x] Request 1 - ✅ DONE
+   - [x] Request 2 - ✅ DONE
 
-   ### Validation:
-   **Command:** `npm test` (or other validation)
-   **Result:** ✅ PASS (or ❌ FAIL)
-   **Output:** [key lines from actual output]
+   ### Validation
+   **Command:** `npm test`
+   **Result:** ✅ PASS
+   **Output:** [actual output]
 
-   ### Pre-commit Hooks:
-   **Status:** ✅ Configured (.pre-commit-config.yaml exists)
+   ### Git Status
+   **Committed:** ✅ YES
+   **Pushed:** ✅ YES
+   **Output:** [git push output]
 
-   ### Git Status:
-   **Command:** `git status`
-   **Result:** ✅ Clean (nothing to commit, working tree clean)
-   **Last Commit:** [commit hash and message]
+   ### Pre-commit Hooks
+   **Present:** ✅ YES (.pre-commit-config.yaml or .husky/)
 
-6. Only AFTER showing the complete report, authorize with:
+6. Only AFTER completing ALL above, authorize with:
    bash {auth_script}
 
 The user is a critical thinker - show proof, not claims.
@@ -254,7 +254,7 @@ The user is a critical thinker - show proof, not claims.
             pass  # Fail silently if can't reset
 
         # Stop authorized - no additional instruction needed
-        # The agent has already presented validation report
+        pass
 
         # Parse command line arguments
         parser = argparse.ArgumentParser()

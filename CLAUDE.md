@@ -181,33 +181,15 @@ Linting autofix: `npm run lint:fix` (use when possible, never blocks work)
 
 ## 📋 STOP AUTHORIZATION QUICK REFERENCE
 
-### Before Stopping Checklist
-
-1. **List all user requests** - Mark each ✅ DONE or ❌ INCOMPLETE
-2. **Run validation** - Tests, build, or lint commands
-3. **Verify pre-commit hooks** - `.pre-commit-config.yaml` or `.husky/` must exist
-4. **Commit and push** - All changes committed, working tree clean
-
 ### Validation Report Format
+
+Before authorizing stop, present a validation report:
 
 ```markdown
 ## Validation Report
-
-### User Requests Completed:
-- [x] Request 1: [description]
-- [x] Request 2: [description]
-
-### Validation:
-**Command:** `npm test`
+**Command:** `npm test` (or pytest, cargo test, etc.)
 **Result:** ✅ PASS
-**Output:** [key lines]
-
-### Pre-commit Hooks:
-**Status:** ✅ Configured
-
-### Git Status:
-**Result:** ✅ Clean (nothing to commit)
-**Last Commit:** [hash] [message]
+**Output:** [key lines from actual output]
 ```
 
 ### Authorization Command
@@ -225,7 +207,7 @@ Or use slash command: `/authorize-stop`
 3. After validation, run `/authorize-stop` → sets `authorized: true`
 4. Stop succeeds, authorization resets to `false` (one-time use)
 
-**Stop only when:** All requests done + validation passed + changes pushed
+**Stop only when:** All work done + tests pass + validation proof shown
 
 ---
 
