@@ -192,21 +192,51 @@ def main():
 STOP BLOCKED: Validation report required before stopping
 ======================================================================
 
-Before authorizing stop, you MUST:
+Before authorizing stop, you MUST complete ALL of the following:
 
-1. RUN at least one validation command:
+1. LIST ALL USER REQUESTS from this session:
+   - Review the conversation and list each task/request
+   - Mark each as ✅ DONE or ❌ INCOMPLETE
+
+2. RUN VALIDATION COMMANDS (at least one):
    - Tests: npm test, pytest, cargo test, jest
    - Build: npm run build, tsc, cargo build
    - Lint: eslint, flake8, mypy
 
-2. PRESENT a validation report showing PROOF:
+3. VERIFY PRE-COMMIT HOOKS exist:
+   - Check for .pre-commit-config.yaml OR .husky/ directory
+   - If missing, create comprehensive pre-commit hooks
+   - Hooks should check: secrets, linting, formatting, tests
+
+4. COMMIT AND PUSH all changes:
+   - Run: git status (check for uncommitted changes)
+   - Run: git add . && git commit -m "descriptive message"
+   - Run: git push
+   - Verify: "nothing to commit, working tree clean"
+
+5. PRESENT a validation report showing PROOF:
 
    ## Validation Report
-   **Command:** `npm test`
+
+   ### User Requests Completed:
+   - [x] Request 1: [description]
+   - [x] Request 2: [description]
+   - [ ] Request 3: [description] (if incomplete, explain why)
+
+   ### Validation:
+   **Command:** `npm test` (or other validation)
    **Result:** ✅ PASS (or ❌ FAIL)
    **Output:** [key lines from actual output]
 
-3. Only AFTER showing the report, authorize with:
+   ### Pre-commit Hooks:
+   **Status:** ✅ Configured (.pre-commit-config.yaml exists)
+
+   ### Git Status:
+   **Command:** `git status`
+   **Result:** ✅ Clean (nothing to commit, working tree clean)
+   **Last Commit:** [commit hash and message]
+
+6. Only AFTER showing the complete report, authorize with:
    bash {auth_script}
 
 The user is a critical thinker - show proof, not claims.
@@ -223,37 +253,8 @@ The user is a critical thinker - show proof, not claims.
         except Exception:
             pass  # Fail silently if can't reset
 
-        # Instruct the agent to validate before authorizing stop
-        validation_instruction = """
-======================================================================
-STOP INSTRUCTION: Present validation report before authorizing stop
-======================================================================
-
-You must validate your work and PRESENT A REPORT showing proof.
-
-VALIDATION METHODS (use at least ONE):
-  - Tests: npm test, pytest, cargo test, jest
-  - Build: npm run build, tsc, cargo build
-  - Lint: eslint, flake8, mypy
-  - Runtime: console.log/print verification
-  - Logs: Check application/server logs
-  - E2E: Puppeteer, Playwright, Cypress
-  - Visual: Screenshots of UI changes
-
-REQUIRED REPORT FORMAT:
-
-## Validation Report
-**Command:** `[command you ran]`
-**Result:** ✅ PASS (or ❌ FAIL)
-**Output:** [key lines from actual output]
-
-Show proof. The user is a critical thinker - not empty claims.
-
-After presenting the report, authorize with:
-  bash /Users/jeremyparker/.claude/commands/authorize-stop.sh
-======================================================================
-"""
-        print(validation_instruction, file=sys.stderr)
+        # Stop authorized - no additional instruction needed
+        # The agent has already presented validation report
 
         # Parse command line arguments
         parser = argparse.ArgumentParser()
