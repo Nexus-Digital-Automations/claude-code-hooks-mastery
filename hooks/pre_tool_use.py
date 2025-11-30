@@ -49,7 +49,11 @@ def get_context_injection(cwd, tool_name):
     if current_task:
         injections.append(f"📌 CURRENT TASK: {current_task}")
 
-    # 2. Inject tool-specific context if exists
+    # 2. Security reminder for Write/Edit operations
+    if tool_name in ['Write', 'Edit', 'MultiEdit']:
+        injections.append("🔐 SECURITY: Never write secrets (API keys, passwords, tokens) outside of .env files or gitignored files")
+
+    # 3. Inject tool-specific context if exists
     tool_map = {
         'Bash': 'bash.md',
         'Edit': 'edit.md',
@@ -125,27 +129,13 @@ def main():
             }
             print(json.dumps(output))
 
-        # Ensure log directory exists
-        log_dir = Path.cwd() / 'logs'
+        # Log to JSONL file (append-only, safe for concurrent access)
+        log_dir = Path.home() / '.claude' / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = log_dir / 'pre_tool_use.json'
-        
-        # Read existing log data or initialize empty list
-        if log_path.exists():
-            with open(log_path, 'r') as f:
-                try:
-                    log_data = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    log_data = []
-        else:
-            log_data = []
-        
-        # Append new data
-        log_data.append(input_data)
-        
-        # Write back to file with formatting
-        with open(log_path, 'w') as f:
-            json.dump(log_data, f, indent=2)
+        log_path = log_dir / 'pre_tool_use.jsonl'
+
+        with open(log_path, 'a') as f:
+            f.write(json.dumps(input_data) + '\n')
         
         sys.exit(0)
         

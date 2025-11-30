@@ -12,27 +12,13 @@ def main():
         # Read JSON input from stdin
         input_data = json.load(sys.stdin)
 
-        # Ensure log directory exists
-        log_dir = Path.cwd() / 'logs'
+        # Log to JSONL file (append-only, safe for concurrent access)
+        log_dir = Path.home() / '.claude' / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = log_dir / 'post_tool_use.json'
+        log_path = log_dir / 'post_tool_use.jsonl'
 
-        # Read existing log data or initialize empty list
-        if log_path.exists():
-            with open(log_path, 'r') as f:
-                try:
-                    log_data = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    log_data = []
-        else:
-            log_data = []
-
-        # Append new data
-        log_data.append(input_data)
-
-        # Write back to file with formatting
-        with open(log_path, 'w') as f:
-            json.dump(log_data, f, indent=2)
+        with open(log_path, 'a') as f:
+            f.write(json.dumps(input_data) + '\n')
 
         sys.exit(0)
 
