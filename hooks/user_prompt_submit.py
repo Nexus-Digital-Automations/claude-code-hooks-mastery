@@ -117,6 +117,101 @@ def manage_session_data(session_id, prompt, name_agent=False):
         pass
 
 
+def categorize_prompt(prompt):
+    """
+    Categorize prompt into: bug, feature, question, command, or other.
+    Returns tuple: (category, is_trackable)
+    """
+    prompt_lower = prompt.lower().strip()
+
+    # Skip non-trackable prompts
+    skip_patterns = ['ok', 'continue', 'yes', 'no', 'thanks', 'got it', 'sounds good',
+                     'perfect', 'great', 'nice', 'cool', 'done', 'good', 'fine']
+    if prompt_lower in skip_patterns or len(prompt_lower) < 10:
+        return ('other', False)
+
+    # Categorize based on keywords
+    if any(kw in prompt_lower for kw in ['bug', 'fix', 'error', 'broken', 'issue', 'crash', 'failing', 'wrong']):
+        return ('bug', True)
+    elif any(kw in prompt_lower for kw in ['add', 'create', 'implement', 'build', 'feature', 'new', 'make', 'update', 'modify', 'change']):
+        return ('feature', True)
+    elif prompt_lower.startswith(('what', 'how', 'why', 'where', 'when', 'can you explain', 'could you', 'is there')):
+        return ('question', True)
+    elif prompt_lower.startswith('/') or prompt_lower.startswith('@'):
+        return ('command', False)
+    else:
+        return ('request', True)  # General request
+
+
+def update_user_requests(cwd, prompt, category, session_id):
+    """Append categorized request to USER_REQUESTS.md"""
+    docs_dir = Path(cwd) / "docs" / "development"
+    docs_dir.mkdir(parents=True, exist_ok=True)
+
+    requests_file = docs_dir / "USER_REQUESTS.md"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    # Create file with header if doesn't exist
+    if not requests_file.exists():
+        header = """# User Requests Log
+
+Automatically tracked by Claude Code UserPromptSubmit hook.
+
+## Categories
+- **bug**: Bug reports and fixes
+- **feature**: Feature requests
+- **question**: Questions and clarifications
+- **request**: General requests
+
+---
+
+"""
+        requests_file.write_text(header)
+
+    # Append new entry
+    entry = f"\n### [{category.upper()}] {timestamp}\n"
+    entry += f"**Session:** `{session_id[:8]}...`\n"
+    entry += f"**Request:** {prompt[:500]}{'...' if len(prompt) > 500 else ''}\n"
+    entry += f"**Status:** [ ] Pending\n"
+
+    with open(requests_file, 'a') as f:
+        f.write(entry)
+
+
+def update_features(cwd, prompt, session_id):
+    """Add feature request to FEATURES.md"""
+    docs_dir = Path(cwd) / "docs" / "development"
+    docs_dir.mkdir(parents=True, exist_ok=True)
+
+    features_file = docs_dir / "FEATURES.md"
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    # Create file with header if doesn't exist
+    if not features_file.exists():
+        header = """# Features Tracker
+
+Automatically tracked by Claude Code UserPromptSubmit hook.
+
+## Status Legend
+- [ ] Requested - Feature has been requested
+- [~] In Progress - Currently being implemented
+- [x] Completed - Feature implemented and verified
+
+---
+
+## Requested Features
+
+"""
+        features_file.write_text(header)
+
+    # Append new feature entry
+    entry = f"\n### {timestamp} - Session `{session_id[:8]}...`\n"
+    entry += f"- [ ] {prompt[:200]}{'...' if len(prompt) > 200 else ''}\n"
+
+    with open(features_file, 'a') as f:
+        f.write(entry)
+
+
 def validate_prompt(prompt):
     """
     Validate the user prompt for security or policy violations.
@@ -160,10 +255,26 @@ def main():
         
         # Log the user prompt
         log_user_prompt(session_id, input_data)
-        
+
         # Manage session data with JSON structure
         if args.store_last_prompt or args.name_agent:
             manage_session_data(session_id, prompt, name_agent=args.name_agent)
+
+        # Track requests in docs/development/ if cwd is available
+        cwd = input_data.get('cwd', '')
+        if cwd and args.store_last_prompt:
+            try:
+                category, is_trackable = categorize_prompt(prompt)
+
+                if is_trackable:
+                    update_user_requests(cwd, prompt, category, session_id)
+
+                    # Also track in FEATURES.md if it's a feature request
+                    if category == 'feature':
+                        update_features(cwd, prompt, session_id)
+            except Exception:
+                # Don't block on tracking errors
+                pass
         
         # Validate prompt if requested and not in log-only mode
         if args.validate and not args.log_only:

@@ -215,7 +215,12 @@ Before authorizing stop, you MUST:
    - Check for .pre-commit-config.yaml OR .husky/ directory
    - If missing, CREATE pre-commit hooks before stopping
 
-5. PRESENT validation report:
+5. UPDATE docs/development/ files:
+   - Mark completed tasks in FEATURES.md with [x]
+   - Mark completed requests in USER_REQUESTS.md with [x]
+   - First [ ] in FEATURES.md = current task (auto-injected by PreToolUse)
+
+6. PRESENT validation report:
 
    ## Validation Report
 
@@ -236,7 +241,11 @@ Before authorizing stop, you MUST:
    ### Pre-commit Hooks
    **Present:** ✅ YES (.pre-commit-config.yaml or .husky/)
 
-6. Only AFTER completing ALL above, authorize with:
+   ### Documentation Updated
+   **FEATURES.md:** All completed tasks marked [x]
+   **USER_REQUESTS.md:** All completed requests marked [x]
+
+7. Only AFTER completing ALL above, authorize with:
    bash {auth_script}
 
 The user is a critical thinker - show proof, not claims.

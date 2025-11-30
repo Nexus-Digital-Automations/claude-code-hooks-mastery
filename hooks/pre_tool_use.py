@@ -14,6 +14,62 @@ for var in ['PYTHONHOME', 'PYTHONPATH']:
     if var in os.environ:
         del os.environ[var]
 
+def get_current_focus(cwd):
+    """
+    Find the first unfinished task in FEATURES.md.
+    Returns the task text or None if no unfinished tasks.
+    """
+    features_file = Path(cwd) / "docs" / "development" / "FEATURES.md"
+
+    if not features_file.exists():
+        return None
+
+    try:
+        content = features_file.read_text()
+        # Find first unchecked item: - [ ] task description
+        match = re.search(r'^- \[ \] (.+)$', content, re.MULTILINE)
+        if match:
+            return match.group(1).strip()
+    except Exception:
+        pass
+
+    return None  # All tasks complete or file unreadable
+
+
+def get_context_injection(cwd, tool_name):
+    """
+    Build context injection from FEATURES.md and tool-specific files.
+    """
+    docs_dir = Path(cwd) / "docs" / "development"
+    hooks_dir = docs_dir / "hooks"
+    injections = []
+
+    # 1. Auto-derive focus from first unfinished task in FEATURES.md
+    current_task = get_current_focus(cwd)
+    if current_task:
+        injections.append(f"📌 CURRENT TASK: {current_task}")
+
+    # 2. Inject tool-specific context if exists
+    tool_map = {
+        'Bash': 'bash.md',
+        'Edit': 'edit.md',
+        'Write': 'edit.md',
+        'MultiEdit': 'edit.md',
+    }
+
+    if tool_name in tool_map:
+        tool_file = hooks_dir / tool_map[tool_name]
+        if tool_file.exists():
+            try:
+                content = tool_file.read_text().strip()
+                if content:
+                    injections.append(f"🔧 {tool_name}: {content[:150]}")
+            except Exception:
+                pass
+
+    return "\n".join(injections) if injections else None
+
+
 def is_env_file_access(tool_name, tool_input):
     """
     Check if any tool is trying to access .env files containing sensitive data.
@@ -57,6 +113,17 @@ def main():
             print("BLOCKED: Access to .env files containing sensitive data is prohibited", file=sys.stderr)
             print("Use .env.sample for template files instead", file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
+
+        # Inject context from FEATURES.md (current task reminder)
+        cwd = input_data.get('cwd', os.getcwd())
+        context = get_context_injection(cwd, tool_name)
+        if context:
+            output = {
+                "hookSpecificOutput": {
+                    "additionalContext": context
+                }
+            }
+            print(json.dumps(output))
 
         # Ensure log directory exists
         log_dir = Path.cwd() / 'logs'
