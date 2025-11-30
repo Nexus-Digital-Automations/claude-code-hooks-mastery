@@ -87,3 +87,10 @@ it should also have a particular structure for the tasks in the file it stores i
 **Request:** Fix UserPromptSubmit hook errors - Ollama not working for agent naming
 **Status:** [x] Complete - Pulled llama3.2:3b model, updated ollama.py default model
 -----
+
+-----
+### [BUG] 2025-11-30 14:07
+**Session:** `13c65364...`
+**Request:** check that it doesn't give an error anymore
+**Status:** [ ] Pending
+-----

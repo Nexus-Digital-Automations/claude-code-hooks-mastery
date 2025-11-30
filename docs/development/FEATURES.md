@@ -22,3 +22,9 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
 - [x] Connect repo to GitHub (Nexus-Digital-Automations/claude-code-hooks-mastery)
 - [x] Push all files to remote
 - [x] Fix PreToolUse:Edit hook error (race condition in JSON file logging)
+
+### 2025-11-30 10:54 - Session `87a65b56...`
+- [ ] okay now please add to the userprompt submit. I want the agent to make sure it knows and elaborates on any ambiguity in the user's requests so it can get it exactly right. It should ask questions to r...
+
+### 2025-11-30 10:56 - Session `87a65b56...`
+- [ ] don't specify the format for the questioning. It will know how to do that. just have it add "[Recommended]" to one of the answers

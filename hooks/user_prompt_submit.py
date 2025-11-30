@@ -8,7 +8,6 @@
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -168,11 +167,13 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
 """
         requests_file.write_text(header)
 
-    # Append new entry
-    entry = f"\n### [{category.upper()}] {timestamp}\n"
+    # Append new entry with delimiter structure
+    entry = "\n-----\n"
+    entry += f"### [{category.upper()}] {timestamp}\n"
     entry += f"**Session:** `{session_id[:8]}...`\n"
     entry += f"**Request:** {prompt[:500]}{'...' if len(prompt) > 500 else ''}\n"
-    entry += f"**Status:** [ ] Pending\n"
+    entry += "**Status:** [ ] Pending\n"
+    entry += "-----\n"
 
     with open(requests_file, 'a') as f:
         f.write(entry)
@@ -204,12 +205,32 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
 """
         features_file.write_text(header)
 
-    # Append new feature entry
-    entry = f"\n### {timestamp} - Session `{session_id[:8]}...`\n"
-    entry += f"- [ ] {prompt[:200]}{'...' if len(prompt) > 200 else ''}\n"
+    # Append new feature entry with delimiter structure
+    entry = "\n-----\n"
+    entry += f"### [FEATURE] {timestamp}\n"
+    entry += f"**Session:** `{session_id[:8]}...`\n"
+    entry += f"**Request:** {prompt[:200]}{'...' if len(prompt) > 200 else ''}\n"
+    entry += "- [ ] Pending\n"
+    entry += "-----\n"
 
     with open(features_file, 'a') as f:
         f.write(entry)
+
+
+def inject_ambiguity_prompt(prompt):
+    """
+    Inject context telling agent to resolve ambiguities.
+    Only for substantial requests (not simple confirmations).
+    """
+    prompt_lower = prompt.lower().strip()
+
+    # Skip for simple responses
+    skip_patterns = ['ok', 'yes', 'no', 'continue', 'thanks', 'got it', 'sounds good',
+                     'perfect', 'great', 'nice', 'cool', 'done', 'good', 'fine']
+    if prompt_lower in skip_patterns or len(prompt_lower) < 20:
+        return None
+
+    return """🔍 BEFORE STARTING: If this request has any ambiguity or multiple valid approaches, ask clarifying questions first. Mark your recommended answer with [Recommended]."""
 
 
 def validate_prompt(prompt):
@@ -283,11 +304,17 @@ def main():
                 # Exit code 2 blocks the prompt with error message
                 print(f"Prompt blocked: {reason}", file=sys.stderr)
                 sys.exit(2)
-        
-        # Add context information (optional)
-        # You can print additional context that will be added to the prompt
-        # Example: print(f"Current time: {datetime.now()}")
-        
+
+        # Inject ambiguity detection context for substantial requests
+        ambiguity_context = inject_ambiguity_prompt(prompt)
+        if ambiguity_context:
+            output = {
+                "hookSpecificOutput": {
+                    "additionalContext": ambiguity_context
+                }
+            }
+            print(json.dumps(output))
+
         # Success - prompt will be processed
         sys.exit(0)
         
