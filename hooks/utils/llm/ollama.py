@@ -35,8 +35,8 @@ def prompt_llm(prompt_text):
             api_key="ollama",  # required, but unused
         )
 
-        # Default to 20b model, can override with OLLAMA_MODEL env var
-        model = os.getenv("OLLAMA_MODEL", "gpt-oss:20b")
+        # Default to llama3.2:3b, can override with OLLAMA_MODEL env var
+        model = os.getenv("OLLAMA_MODEL", "llama3.2:3b")
 
         response = client.chat.completions.create(
             model=model,
@@ -173,8 +173,6 @@ Name:"""
 
 def main():
     """Command line interface for testing."""
-    import json
-
     if len(sys.argv) > 1:
         if sys.argv[1] == "--completion":
             message = generate_completion_message()
