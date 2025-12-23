@@ -9,10 +9,49 @@ import sys
 import re
 from pathlib import Path
 
+# Add hooks directory to path for utils imports
+sys.path.insert(0, str(Path(__file__).parent))
+
 # Fix Python environment warnings
 for var in ['PYTHONHOME', 'PYTHONPATH']:
     if var in os.environ:
         del os.environ[var]
+
+def get_pattern_context():
+    """
+    Query patterns from Claude-Mem and PatternLearner.
+    Returns context string or empty string if no patterns.
+    """
+    context_parts = []
+
+    # 1. Query Claude-Mem for recent patterns
+    try:
+        from utils.claude_mem import ClaudeMemClient
+        client = ClaudeMemClient()
+        patterns = client.retrieve('recent_patterns', [])
+        if patterns:
+            context_parts.append("--- Recent Learned Patterns ---")
+            for p in patterns[-3:]:
+                context_parts.append(f"- {p.get('summary', 'Pattern')}")
+    except Exception:
+        pass  # Graceful degradation
+
+    # 2. Query PatternLearner for strategies
+    try:
+        from utils.pattern_learner import PatternLearner
+        learner = PatternLearner()
+        strategies = learner.get_recommended_strategies(limit=2)
+        if strategies:
+            context_parts.append("--- Recommended Strategies ---")
+            for s in strategies:
+                desc = s.get('description', s.get('pattern_key', ''))
+                if desc:
+                    context_parts.append(f"- {desc}")
+    except Exception:
+        pass  # Graceful degradation
+
+    return "\n".join(context_parts) if context_parts else ""
+
 
 def get_current_focus(cwd):
     """
@@ -71,37 +110,44 @@ def get_context_injection(cwd, tool_name):
             except Exception:
                 pass
 
+    # 4. Query patterns from Claude-Mem and PatternLearner
+    pattern_ctx = get_pattern_context()
+    if pattern_ctx:
+        injections.append(pattern_ctx)
+
     return "\n".join(injections) if injections else None
 
 
-def is_env_file_access(tool_name, tool_input):
+def is_env_file_write(tool_name, tool_input):
     """
-    Check if any tool is trying to access .env files containing sensitive data.
+    Check if any tool is trying to WRITE/EDIT .env files containing sensitive data.
+    Reading .env files is allowed; only modifications are blocked.
     """
-    if tool_name in ['Read', 'Edit', 'MultiEdit', 'Write', 'Bash']:
-        # Check file paths for file-based tools
-        if tool_name in ['Read', 'Edit', 'MultiEdit', 'Write']:
-            file_path = tool_input.get('file_path', '')
-            if '.env' in file_path and not file_path.endswith('.env.sample'):
+    # Only block write/edit operations, not reads
+    if tool_name in ['Edit', 'MultiEdit', 'Write']:
+        file_path = tool_input.get('file_path', '')
+        if '.env' in file_path and not file_path.endswith('.env.sample'):
+            return True
+
+    # Check bash commands for .env file modifications (but allow cat/reading)
+    elif tool_name == 'Bash':
+        command = tool_input.get('command', '')
+        # Pattern to detect .env file WRITE operations (not reads)
+        env_write_patterns = [
+            r'echo\s+.*>\s*\.env\b(?!\.sample)',  # echo > .env
+            r'touch\s+.*\.env\b(?!\.sample)',  # touch .env
+            r'cp\s+.*\.env\b(?!\.sample)',  # cp .env
+            r'mv\s+.*\.env\b(?!\.sample)',  # mv .env
+            r'>\s*\.env\b(?!\.sample)',  # redirect to .env
+            r'>>\s*\.env\b(?!\.sample)',  # append to .env
+            r'rm\s+.*\.env\b(?!\.sample)',  # rm .env
+            r'sed\s+-i.*\.env\b(?!\.sample)',  # sed -i .env (in-place edit)
+        ]
+
+        for pattern in env_write_patterns:
+            if re.search(pattern, command):
                 return True
-        
-        # Check bash commands for .env file access
-        elif tool_name == 'Bash':
-            command = tool_input.get('command', '')
-            # Pattern to detect .env file access (but allow .env.sample)
-            env_patterns = [
-                r'\b\.env\b(?!\.sample)',  # .env but not .env.sample
-                r'cat\s+.*\.env\b(?!\.sample)',  # cat .env
-                r'echo\s+.*>\s*\.env\b(?!\.sample)',  # echo > .env
-                r'touch\s+.*\.env\b(?!\.sample)',  # touch .env
-                r'cp\s+.*\.env\b(?!\.sample)',  # cp .env
-                r'mv\s+.*\.env\b(?!\.sample)',  # mv .env
-            ]
-            
-            for pattern in env_patterns:
-                if re.search(pattern, command):
-                    return True
-    
+
     return False
 
 def main():
@@ -112,10 +158,10 @@ def main():
         tool_name = input_data.get('tool_name', '')
         tool_input = input_data.get('tool_input', {})
         
-        # Check for .env file access (blocks access to sensitive environment files)
-        if is_env_file_access(tool_name, tool_input):
-            print("BLOCKED: Access to .env files containing sensitive data is prohibited", file=sys.stderr)
-            print("Use .env.sample for template files instead", file=sys.stderr)
+        # Check for .env file writes (blocks modifications to sensitive environment files)
+        if is_env_file_write(tool_name, tool_input):
+            print("BLOCKED: Writing/editing .env files is prohibited", file=sys.stderr)
+            print("Reading .env is allowed; use .env.sample for templates", file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
 
         # Inject context from FEATURES.md (current task reminder)
