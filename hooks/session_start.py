@@ -14,6 +14,9 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
+# Add hooks directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+
 # Fix Python environment warnings
 for var in ['PYTHONHOME', 'PYTHONPATH']:
     if var in os.environ:
@@ -169,6 +172,17 @@ YOU ARE NOT ALLOWED TO STOP until you have:
 This is not optional - it is a requirement. Run the validation commands yourself.
 """
     context_parts.append(validation_instructions)
+
+    # Add autonomous execution guidance
+    autonomous_execution = """
+--- AUTONOMOUS EXECUTION ---
+DO NOT ASK: "Should I fix this?" / "Should I continue?" / "Want me to proceed?"
+Just fix it. Just continue. Just proceed.
+Errors = fix immediately and continue.
+Ambiguity = resolve UPFRONT ONLY, not mid-task.
+KEEP WORKING until ALL requested features are complete.
+"""
+    context_parts.append(autonomous_execution)
     
     # Add git information
     branch, changes = get_git_status()
@@ -201,8 +215,41 @@ This is not optional - it is a requirement. Run the validation commands yourself
     if issues:
         context_parts.append("\n--- Recent GitHub Issues ---")
         context_parts.append(issues)
-    
+
     return "\n".join(context_parts)
+
+
+def load_reasoning_context() -> str:
+    """Load patterns and strategies from Claude-Mem and PatternLearner."""
+    context_parts = []
+
+    # Try to load from Claude-Mem
+    try:
+        from utils.claude_mem import load_recent_patterns
+        patterns = load_recent_patterns(limit=3)
+        if patterns:
+            context_parts.append("--- Recent Session Patterns ---")
+            for p in patterns:
+                summary = p.get('summary', 'Unknown pattern')
+                context_parts.append(f"- {summary}")
+    except Exception:
+        pass  # Graceful degradation
+
+    # Try to load from PatternLearner
+    try:
+        from utils.pattern_learner import PatternLearner
+        learner = PatternLearner()
+        strategies = learner.get_recommended_strategies(limit=3)
+        if strategies:
+            context_parts.append("--- Recommended Strategies ---")
+            for s in strategies:
+                desc = s.get('description', s.get('pattern_key', 'Unknown'))
+                rate = s.get('success_rate', 0)
+                context_parts.append(f"- {desc} ({rate:.0%} success)")
+    except Exception:
+        pass  # Graceful degradation
+
+    return "\n".join(context_parts) if context_parts else ""
 
 
 def main():
@@ -219,15 +266,19 @@ def main():
         input_data = json.loads(sys.stdin.read())
         
         # Extract fields
-        session_id = input_data.get('session_id', 'unknown')
+        _session_id = input_data.get('session_id', 'unknown')  # Reserved for future use
         source = input_data.get('source', 'unknown')  # "startup", "resume", or "clear"
-        
+
         # Log the session start event
         log_session_start(input_data)
-        
+
         # Load development context if requested
         if args.load_context:
             context = load_development_context(source)
+            # Add reasoning context (patterns, strategies)
+            reasoning_ctx = load_reasoning_context()
+            if reasoning_ctx:
+                context = context + "\n\n" + reasoning_ctx if context else reasoning_ctx
             if context:
                 # Using JSON output to add context
                 output = {

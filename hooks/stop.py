@@ -13,7 +13,9 @@ import sys
 import random
 import subprocess
 from pathlib import Path
-from datetime import datetime
+
+# Add hooks directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
 
 # Fix Python environment warnings
 for var in ['PYTHONHOME', 'PYTHONPATH']:
@@ -189,66 +191,27 @@ def main():
 
             blocked_msg = f"""
 ======================================================================
-STOP BLOCKED: Validation report required before stopping
+STOP BLOCKED - VALIDATION REQUIRED
 ======================================================================
 
-Before authorizing stop, you MUST:
+VALIDATION METHODS (execute 3+):
+□ Unit tests: npm test, pytest, cargo test, go test
+□ Build/compile: npm run build, tsc --noEmit, cargo build
+□ Lint check: eslint, flake8, mypy, clippy
+□ Console.log: add logs, run app, verify output
+□ App logs: review logs/ for errors/warnings
+□ Puppeteer: screenshot UI, test interactions
+□ API tests: curl endpoints, verify responses
+□ Runtime: start app, confirm no crashes
 
-1. LIST each user request and confirm completion:
-   ## User Requests
-   - [ ] Request 1: [description] - ✅ DONE or ❌ INCOMPLETE
-   - [ ] Request 2: [description] - ✅ DONE or ❌ INCOMPLETE
-   (List ALL requests made during this session)
+BEFORE STOPPING:
+1. Complete ALL user requests
+2. Execute 3+ validation methods above
+3. Present validation report with ACTUAL OUTPUT
+4. Commit completed work: git add . && git commit -m "..."
+5. Push to remote: git push
 
-2. RUN validation commands and show PROOF:
-   - Tests: npm test, pytest, cargo test, jest
-   - Build: npm run build, tsc, cargo build
-   - Lint: eslint, flake8, mypy
-
-3. COMMIT and PUSH all changes:
-   - Run: git status (show clean working tree or staged changes)
-   - Run: git add . && git commit -m "descriptive message"
-   - Run: git push
-   - Show proof that push succeeded
-
-4. VERIFY pre-commit hooks exist:
-   - Check for .pre-commit-config.yaml OR .husky/ directory
-   - If missing, CREATE pre-commit hooks before stopping
-
-5. UPDATE docs/development/ files:
-   - Mark completed tasks in FEATURES.md with [x]
-   - Mark completed requests in USER_REQUESTS.md with [x]
-   - First [ ] in FEATURES.md = current task (auto-injected by PreToolUse)
-
-6. PRESENT validation report:
-
-   ## Validation Report
-
-   ### User Requests Completed
-   - [x] Request 1 - ✅ DONE
-   - [x] Request 2 - ✅ DONE
-
-   ### Validation
-   **Command:** `npm test`
-   **Result:** ✅ PASS
-   **Output:** [actual output]
-
-   ### Git Status
-   **Committed:** ✅ YES
-   **Pushed:** ✅ YES
-   **Output:** [git push output]
-
-   ### Pre-commit Hooks
-   **Present:** ✅ YES (.pre-commit-config.yaml or .husky/)
-
-   ### Documentation Updated
-   **FEATURES.md:** All completed tasks marked [x]
-   **USER_REQUESTS.md:** All completed requests marked [x]
-
-7. Only AFTER completing ALL above, authorize with:
-   bash {auth_script}
-
-The user is a critical thinker - show proof, not claims.
+To authorize stop, run: bash {auth_script}
 ======================================================================
 """
             print(blocked_msg, file=sys.stderr)
@@ -262,9 +225,6 @@ The user is a critical thinker - show proof, not claims.
         except Exception:
             pass  # Fail silently if can't reset
 
-        # Stop authorized - no additional instruction needed
-        pass
-
         # Parse command line arguments
         parser = argparse.ArgumentParser()
         parser.add_argument('--chat', action='store_true', help='Copy transcript to chat.json')
@@ -276,7 +236,14 @@ The user is a critical thinker - show proof, not claims.
 
         # Extract required fields
         session_id = input_data.get("session_id", "")
-        stop_hook_active = input_data.get("stop_hook_active", False)
+        _stop_hook_active = input_data.get("stop_hook_active", False)  # Reserved
+
+        # Persist session learnings to Claude-Mem (non-blocking)
+        try:
+            from utils.claude_mem import persist_session_learnings
+            persist_session_learnings(session_id, input_data)
+        except Exception:
+            pass  # Graceful degradation - never block stop
 
         # Ensure log directory exists
         log_dir = os.path.join(os.getcwd(), "logs")

@@ -61,7 +61,7 @@ class PatternLearner:
 
             with open(self.storage_path, 'w') as f:
                 json.dump(self.patterns, f, indent=2)
-        except Exception as e:
+        except Exception:
             # Fail silently - don't break hooks
             pass
 
@@ -312,6 +312,143 @@ class PatternLearner:
             }
 
         return stats
+
+    # =========================================================================
+    # ReasoningBank Extensions - Adaptive Learning from Sessions
+    # =========================================================================
+
+    def record_experience(self, tool: str, outcome: Dict[str, Any]):
+        """
+        Record a tool usage experience for learning.
+
+        Args:
+            tool: Tool name (Write, Edit, Bash, etc.)
+            outcome: Outcome data including success status
+        """
+        # Initialize experiences storage if not exists
+        if '_experiences' not in self.patterns:
+            self.patterns['_experiences'] = []
+
+        experience = {
+            'tool': tool,
+            'success': outcome.get('success', True),
+            'context': outcome.get('context', {}),
+            'timestamp': datetime.now().isoformat()
+        }
+
+        self.patterns['_experiences'].append(experience)
+
+        # Keep last 500 experiences
+        self.patterns['_experiences'] = self.patterns['_experiences'][-500:]
+
+        self._save_patterns()
+
+    def get_recommended_strategies(self, context: Dict[str, Any] = None,
+                                   limit: int = 3) -> list:
+        """
+        Get recommended strategies based on past successes.
+
+        Args:
+            context: Current context for matching
+            limit: Maximum number of strategies to return
+
+        Returns:
+            List of strategy recommendations
+        """
+        strategies = self.patterns.get('_strategies', [])
+
+        if not strategies:
+            return []
+
+        # Sort by success rate
+        sorted_strategies = sorted(
+            strategies,
+            key=lambda s: s.get('success_rate', 0),
+            reverse=True
+        )
+
+        return sorted_strategies[:limit]
+
+    def learn_pattern(self, pattern: Dict[str, Any]):
+        """
+        Learn a new pattern from successful session completion.
+
+        Args:
+            pattern: Pattern data to learn (tools used, task type, outcome)
+        """
+        # Initialize strategies storage if not exists
+        if '_strategies' not in self.patterns:
+            self.patterns['_strategies'] = []
+
+        # Check if similar pattern exists
+        pattern_key = pattern.get('pattern_key', '')
+        existing = None
+        for i, s in enumerate(self.patterns['_strategies']):
+            if s.get('pattern_key') == pattern_key:
+                existing = i
+                break
+
+        if existing is not None:
+            # Update existing pattern
+            strategy = self.patterns['_strategies'][existing]
+            strategy['occurrences'] = strategy.get('occurrences', 1) + 1
+            if pattern.get('success'):
+                strategy['successes'] = strategy.get('successes', 0) + 1
+            strategy['success_rate'] = (
+                strategy['successes'] / strategy['occurrences']
+            )
+            strategy['last_seen'] = datetime.now().isoformat()
+        else:
+            # Add new pattern
+            new_strategy = {
+                'pattern_key': pattern_key,
+                'description': pattern.get('description', ''),
+                'tools_used': pattern.get('tools_used', []),
+                'occurrences': 1,
+                'successes': 1 if pattern.get('success') else 0,
+                'success_rate': 1.0 if pattern.get('success') else 0.0,
+                'learned_at': datetime.now().isoformat(),
+                'last_seen': datetime.now().isoformat()
+            }
+            self.patterns['_strategies'].append(new_strategy)
+
+            # Keep last 100 strategies
+            self.patterns['_strategies'] = self.patterns['_strategies'][-100:]
+
+        self._save_patterns()
+
+    def get_experiences_summary(self) -> Dict[str, Any]:
+        """
+        Get summary of recorded experiences.
+
+        Returns:
+            Summary statistics of tool experiences
+        """
+        experiences = self.patterns.get('_experiences', [])
+
+        if not experiences:
+            return {'total': 0, 'by_tool': {}}
+
+        # Count by tool
+        by_tool = {}
+        for exp in experiences:
+            tool = exp.get('tool', 'unknown')
+            if tool not in by_tool:
+                by_tool[tool] = {'total': 0, 'success': 0}
+            by_tool[tool]['total'] += 1
+            if exp.get('success'):
+                by_tool[tool]['success'] += 1
+
+        # Calculate success rates
+        for tool in by_tool:
+            total = by_tool[tool]['total']
+            success = by_tool[tool]['success']
+            by_tool[tool]['success_rate'] = success / total if total > 0 else 0
+
+        return {
+            'total': len(experiences),
+            'by_tool': by_tool
+        }
 
 
 if __name__ == '__main__':
