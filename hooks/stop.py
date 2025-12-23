@@ -245,6 +245,17 @@ To authorize stop, run: bash {auth_script}
         except Exception:
             pass  # Graceful degradation - never block stop
 
+        # Persist session learnings to ReasoningBank via Claude Flow (non-blocking)
+        try:
+            from utils.claude_flow import store_session_learning
+            store_session_learning(session_id, {
+                "completed_at": input_data.get("timestamp", ""),
+                "tool_count": len(input_data.get("tool_calls", [])),
+                "summary": f"Session {session_id[:8]}... completed"
+            })
+        except Exception:
+            pass  # Graceful degradation - never block stop
+
         # Ensure log directory exists
         log_dir = os.path.join(os.getcwd(), "logs")
         os.makedirs(log_dir, exist_ok=True)

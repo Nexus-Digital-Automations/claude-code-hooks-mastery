@@ -220,18 +220,15 @@ KEEP WORKING until ALL requested features are complete.
 
 
 def load_reasoning_context() -> str:
-    """Load patterns and strategies from Claude-Mem and PatternLearner."""
+    """Load patterns and strategies from Claude-Mem, PatternLearner, and ReasoningBank."""
     context_parts = []
 
-    # Try to load from Claude-Mem
+    # Try to load from Claude-Mem (port 37777)
     try:
-        from utils.claude_mem import load_recent_patterns
-        patterns = load_recent_patterns(limit=3)
-        if patterns:
-            context_parts.append("--- Recent Session Patterns ---")
-            for p in patterns:
-                summary = p.get('summary', 'Unknown pattern')
-                context_parts.append(f"- {summary}")
+        from utils.claude_mem import load_recent_context
+        context_str = load_recent_context()
+        if context_str:
+            context_parts.append(context_str)
     except Exception:
         pass  # Graceful degradation
 
@@ -246,6 +243,17 @@ def load_reasoning_context() -> str:
                 desc = s.get('description', s.get('pattern_key', 'Unknown'))
                 rate = s.get('success_rate', 0)
                 context_parts.append(f"- {desc} ({rate:.0%} success)")
+    except Exception:
+        pass  # Graceful degradation
+
+    # Try to load from Claude Flow ReasoningBank
+    try:
+        from utils.claude_flow import ClaudeFlowClient
+        cf = ClaudeFlowClient()
+        rb_context = cf.memory_query("session patterns", namespace="sessions", limit=3)
+        if rb_context:
+            context_parts.append("--- ReasoningBank Patterns ---")
+            context_parts.append(rb_context[:500])  # Limit output
     except Exception:
         pass  # Graceful degradation
 

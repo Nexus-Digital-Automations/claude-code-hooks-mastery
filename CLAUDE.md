@@ -271,12 +271,110 @@ For multi-step development work, follow SPARC phases:
 4. **R**efinement - TDD cycles (test → implement → refactor)
 5. **C**ompletion - Validate, document, authorize stop
 
-### Claude-Mem (Persistent Memory)
+---
 
-Cross-session memory via HTTP API (port 37777):
-- Automatically stores session learnings on stop
-- Loads relevant patterns on session start
-- Fallback: `.claude/data/memory/` JSON files
+## Claude Flow Integration (Swarm Orchestration)
+
+Multi-agent swarm coordination for complex tasks.
+
+### Swarm Commands
+```bash
+npx claude-flow@alpha swarm "task description"      # Full swarm execution
+npx claude-flow@alpha sparc tdd "feature name"      # TDD workflow
+npx claude-flow@alpha hive-mind spawn "project"     # Collective intelligence
+```
+
+### ReasoningBank (Pattern Memory)
+Persistent pattern storage with confidence scoring:
+```bash
+npx claude-flow@alpha memory query "pattern"        # Search patterns
+npx claude-flow@alpha memory store key value        # Store pattern
+npx claude-flow@alpha memory consolidate            # Prune low-confidence
+```
+
+**Automatic integration:**
+- Pre-tool hook queries ReasoningBank for relevant patterns
+- Stop hook persists successful patterns to ReasoningBank
+- Session start loads recent patterns for context injection
+
+### Swarm Topologies
+- **Hierarchical**: Queen-led coordination with specialized workers
+- **Mesh**: Peer-to-peer distributed decision making
+- **Adaptive**: Dynamic topology switching based on task
+- **Collective**: Consensus-based group intelligence
+
+### Agent Types (54+ available)
+```
+coder       → Implementation specialist
+reviewer    → Code review and QA
+tester      → Comprehensive testing
+researcher  → Deep research and analysis
+architect   → System design
+debugger    → Error analysis and fixes
+```
+
+---
+
+## Claude-Mem (Persistent Memory Service)
+
+HTTP-based memory system with FTS5 full-text search.
+
+### Service Info
+- **Port:** 37777
+- **Web viewer:** http://localhost:37777
+- **Fallback:** `.claude/data/memory/` JSON files (when service unavailable)
+
+### API Endpoints
+```
+GET  /api/context/recent          # Load recent context
+POST /api/sessions/observations   # Store tool observations
+POST /api/sessions/summarize      # Generate session summary
+GET  /api/search?query=...        # FTS5 full-text search
+GET  /api/stats                   # Database statistics
+POST /api/sessions/complete       # Mark session complete
+```
+
+### Hook Integration
+| Hook | Claude-Mem Action |
+|------|-------------------|
+| SessionStart | Loads recent context via `/api/context/recent` |
+| PreToolUse | Queries patterns for context injection |
+| PostToolUse | Stores observations via `/api/sessions/observations` |
+| Stop | Generates summary, marks session complete |
+
+### Search Examples
+```bash
+curl "http://localhost:37777/api/search?query=authentication"
+curl "http://localhost:37777/api/search?query=bugfix&type=feature"
+```
+
+---
+
+## Integrated Memory Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│                    Session Lifecycle                      │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  SessionStart                                            │
+│     ├─→ Claude-Mem: GET /api/context/recent             │
+│     ├─→ PatternLearner: get_recommended_strategies()    │
+│     └─→ ReasoningBank: memory query "session patterns"  │
+│                                                          │
+│  PreToolUse (every operation)                            │
+│     ├─→ FEATURES.md: current task injection             │
+│     ├─→ PatternLearner: recent patterns                 │
+│     └─→ ReasoningBank: tool-specific patterns           │
+│                                                          │
+│  Stop                                                    │
+│     ├─→ Claude-Mem: persist_session_learnings()         │
+│     └─→ ReasoningBank: store_session_learning()         │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Graceful degradation:** All systems fail silently with local fallbacks.
 
 ---
 
@@ -290,4 +388,4 @@ You provide:
 
 **Do good work. Be honest about tradeoffs. Keep learning.**
 
-**Version:** 5.3 (Humble Engineer + SPARC)
+**Version:** 5.4 (Humble Engineer + Claude Flow + Claude-Mem)

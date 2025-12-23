@@ -115,6 +115,15 @@ def get_context_injection(cwd, tool_name):
     if pattern_ctx:
         injections.append(pattern_ctx)
 
+    # 5. Query ReasoningBank via Claude Flow
+    try:
+        from utils.claude_flow import query_reasoning_patterns
+        rb_patterns = query_reasoning_patterns(tool_name, namespace='debugging')
+        if rb_patterns:
+            injections.append(f"--- ReasoningBank ---\n{rb_patterns[:300]}")
+    except Exception:
+        pass  # Graceful degradation
+
     return "\n".join(injections) if injections else None
 
 
