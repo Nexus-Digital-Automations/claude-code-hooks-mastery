@@ -115,12 +115,34 @@ def get_context_injection(cwd, tool_name):
     if pattern_ctx:
         injections.append(pattern_ctx)
 
-    # 5. Query ReasoningBank via Claude Flow
+    # 5. Query ReasoningBank via Claude Flow - tool-specific patterns
     try:
-        from utils.claude_flow import query_reasoning_patterns
-        rb_patterns = query_reasoning_patterns(tool_name, namespace='debugging')
-        if rb_patterns:
-            injections.append(f"--- ReasoningBank ---\n{rb_patterns[:300]}")
+        from utils.claude_flow import ClaudeFlowClient, get_tool_patterns, query_reasoning_patterns
+        cf = ClaudeFlowClient(timeout=5.0)  # Shorter timeout for pre-tool queries
+
+        # Only query if ReasoningBank is available
+        if cf.is_reasoningbank_available():
+            # Get tool-specific patterns first
+            tool_patterns = get_tool_patterns(tool_name)
+            if tool_patterns:
+                injections.append(f"--- {tool_name} Patterns ---\n{tool_patterns[:200]}")
+            # Also get general debugging patterns
+            rb_patterns = query_reasoning_patterns(tool_name, namespace='debugging')
+            if rb_patterns:
+                injections.append(f"--- ReasoningBank ---\n{rb_patterns[:200]}")
+    except Exception:
+        pass  # Graceful degradation
+
+    # 6. Query Claude-Mem for tool-specific observations
+    try:
+        from utils.claude_mem import get_patterns_for_tool
+        mem_patterns = get_patterns_for_tool(tool_name)
+        if mem_patterns and len(mem_patterns) > 0:
+            injections.append(f"--- Claude-Mem {tool_name} History ---")
+            for p in mem_patterns[:2]:
+                response = p.get('tool_response', '')[:100]
+                if response:
+                    injections.append(f"• {response}")
     except Exception:
         pass  # Graceful degradation
 

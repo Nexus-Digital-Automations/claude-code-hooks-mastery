@@ -25,21 +25,56 @@ from typing import Any, Optional
 
 
 class ClaudeFlowClient:
-    """Client for Claude Flow CLI operations."""
+    """Client for Claude Flow CLI operations with MCP fallback."""
 
-    def __init__(self, timeout: float = 3.0):
+    def __init__(self, timeout: float = 10.0):
         """
         Initialize the client.
 
         Args:
-            timeout: Command timeout in seconds (keep short for non-blocking)
+            timeout: Command timeout in seconds (increased to 10s for reliability)
         """
         self.timeout = timeout
         self.cli_prefix = ["npx", "claude-flow@alpha"]
+        self._log_enabled = True
+
+    def _log(self, level: str, message: str, **kwargs):
+        """Log messages to .claude/logs/claude_flow.json if enabled."""
+        if not self._log_enabled:
+            return
+        try:
+            import os
+            from datetime import datetime
+            log_dir = os.path.join(os.path.expanduser("~"), ".claude", "logs")
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = os.path.join(log_dir, "claude_flow.json")
+
+            entry = {
+                "timestamp": datetime.now().isoformat(),
+                "level": level,
+                "message": message,
+                **kwargs
+            }
+
+            logs = []
+            if os.path.exists(log_file):
+                try:
+                    with open(log_file, 'r') as f:
+                        logs = json.load(f)
+                except (json.JSONDecodeError, IOError):
+                    logs = []
+
+            logs.append(entry)
+            logs = logs[-100:]  # Keep last 100 entries
+
+            with open(log_file, 'w') as f:
+                json.dump(logs, f, indent=2)
+        except (IOError, OSError):
+            pass  # Silent failure for logging
 
     def _run_command(self, args: list, input_data: str = None) -> Optional[str]:
         """
-        Run a Claude Flow CLI command.
+        Run a Claude Flow CLI command with error logging.
 
         Args:
             args: Command arguments
@@ -48,6 +83,7 @@ class ClaudeFlowClient:
         Returns:
             Command output or None on failure
         """
+        cmd_str = " ".join(self.cli_prefix + args)
         try:
             result = subprocess.run(
                 self.cli_prefix + args,
@@ -57,10 +93,95 @@ class ClaudeFlowClient:
                 input=input_data
             )
             if result.returncode == 0:
+                self._log("debug", f"Command succeeded: {args[0]}", command=cmd_str)
                 return result.stdout.strip()
+            else:
+                self._log("warning", f"Command failed: {args[0]}",
+                         command=cmd_str, stderr=result.stderr[:200])
             return None
-        except (subprocess.TimeoutExpired, FileNotFoundError, Exception):
+        except subprocess.TimeoutExpired:
+            self._log("error", f"Command timed out after {self.timeout}s", command=cmd_str)
             return None
+        except FileNotFoundError:
+            self._log("error", "npx not found - Claude Flow CLI unavailable", command=cmd_str)
+            return None
+        except Exception as e:
+            self._log("error", f"Command error: {str(e)[:100]}", command=cmd_str)
+            return None
+
+    # =========================================================================
+    # ReasoningBank Health & Initialization
+    # =========================================================================
+
+    def is_reasoningbank_available(self) -> bool:
+        """
+        Check if ReasoningBank is available and initialized.
+
+        Returns:
+            True if ReasoningBank database exists or can be initialized
+        """
+        import os
+        from pathlib import Path
+
+        # Check if database file exists
+        db_paths = [
+            Path('.swarm/memory.db'),
+            Path(os.path.expanduser('~/.swarm/memory.db')),
+            Path(os.path.expanduser('~/.claude/.swarm/memory.db'))
+        ]
+
+        for db_path in db_paths:
+            if db_path.exists():
+                self._log("debug", f"ReasoningBank DB found at {db_path}")
+                return True
+
+        # Try to initialize via stats command (will create DB if needed)
+        result = self._run_command(['memory', 'stats'])
+        if result is not None:
+            self._log("info", "ReasoningBank initialized successfully")
+            return True
+
+        self._log("warning", "ReasoningBank not available")
+        return False
+
+    def initialize_reasoningbank(self) -> bool:
+        """
+        Explicitly initialize ReasoningBank database.
+
+        Returns:
+            True if initialization succeeded
+        """
+        # Use longer timeout for initial setup
+        old_timeout = self.timeout
+        self.timeout = 30.0
+
+        try:
+            # Run memory stats which triggers initialization
+            result = self._run_command(['memory', 'stats'])
+            if result is not None:
+                self._log("info", "ReasoningBank initialized", output=result[:200])
+                return True
+
+            # Fallback: try memory query which also initializes
+            result = self._run_command(['memory', 'query', 'init', '--reasoningbank'])
+            return result is not None
+        finally:
+            self.timeout = old_timeout
+
+    def memory_stats(self) -> Optional[dict]:
+        """
+        Get ReasoningBank statistics.
+
+        Returns:
+            Stats dict with total_memories, namespaces, etc. or None
+        """
+        result = self._run_command(['memory', 'stats', '--json'])
+        if result:
+            try:
+                return json.loads(result)
+            except json.JSONDecodeError:
+                return {'raw': result}
+        return None
 
     # =========================================================================
     # ReasoningBank Memory Operations
@@ -257,6 +378,75 @@ def consolidate_memories() -> bool:
     """
     client = ClaudeFlowClient()
     return client.memory_consolidate()
+
+
+def memory_search(pattern: str, namespace: str = None, limit: int = 5) -> Optional[str]:
+    """
+    Search ReasoningBank for patterns (convenience function).
+
+    Args:
+        pattern: Search pattern (regex supported)
+        namespace: Optional namespace filter
+        limit: Maximum results
+
+    Returns:
+        Search results or None
+    """
+    client = ClaudeFlowClient()
+    args = ["memory", "search", pattern, "--reasoningbank", "--limit", str(limit)]
+    if namespace:
+        args.extend(["--namespace", namespace])
+    return client._run_command(args)
+
+
+def get_tool_patterns(tool_name: str) -> Optional[str]:
+    """
+    Get patterns for a specific tool from ReasoningBank.
+
+    Args:
+        tool_name: Name of tool (e.g., 'Bash', 'Edit', 'Write')
+
+    Returns:
+        Tool-specific patterns or None
+    """
+    client = ClaudeFlowClient()
+    return client.memory_query(
+        f"tool:{tool_name} patterns best practices",
+        namespace="tools",
+        limit=3
+    )
+
+
+def store_tool_pattern(tool_name: str, pattern: dict, confidence: float = 0.6) -> bool:
+    """
+    Store a tool usage pattern to ReasoningBank.
+
+    Args:
+        tool_name: Name of tool
+        pattern: Pattern data (success/failure, context, etc.)
+        confidence: Initial confidence score
+
+    Returns:
+        True on success
+    """
+    from datetime import datetime
+    client = ClaudeFlowClient()
+    key = f"tool_{tool_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    return client.memory_store(key, pattern, namespace="tools", confidence=confidence)
+
+
+def assess_task_complexity(task_description: str) -> Optional[str]:
+    """
+    Assess task complexity for swarm topology selection.
+
+    Returns assessment string or None.
+    """
+    client = ClaudeFlowClient()
+    # Use memory to find similar past tasks
+    similar = client.memory_query(task_description[:100], namespace="tasks", limit=2)
+    if similar:
+        return f"Found similar tasks: {similar[:200]}"
+    return None
 
 
 if __name__ == '__main__':

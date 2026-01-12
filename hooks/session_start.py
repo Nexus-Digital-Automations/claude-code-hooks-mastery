@@ -219,6 +219,140 @@ KEEP WORKING until ALL requested features are complete.
     return "\n".join(context_parts)
 
 
+def assess_task_complexity(prompt: str) -> dict:
+    """
+    Assess task complexity to determine if swarm orchestration is beneficial.
+
+    Analyzes prompt for indicators of multi-agent potential:
+    - Multi-component: frontend, backend, API, database mentions
+    - Large scope: Long prompt with many requirements
+    - Comprehensive: Keywords suggesting full-system work
+    - Parallel: Multiple independent subtasks
+
+    Returns:
+        dict with complexity scores and swarm recommendation
+    """
+    prompt_lower = prompt.lower()
+    indicators = {}
+
+    # Multi-component indicators
+    multi_component_keywords = ['frontend', 'backend', 'api', 'database', 'server',
+                                'client', 'ui', 'service', 'microservice', 'component']
+    indicators['multi_component'] = sum(1 for kw in multi_component_keywords if kw in prompt_lower)
+
+    # Large scope indicators
+    indicators['large_scope'] = len(prompt) > 500 or prompt.count('\n') > 5
+
+    # Comprehensive work indicators
+    comprehensive_keywords = ['comprehensive', 'complete', 'full', 'entire', 'all',
+                             'refactor', 'redesign', 'overhaul', 'migrate', 'upgrade']
+    indicators['comprehensive'] = any(kw in prompt_lower for kw in comprehensive_keywords)
+
+    # Parallel subtask indicators
+    parallel_keywords = ['and also', 'additionally', 'as well as', 'plus', 'along with',
+                        '1.', '2.', '- ', '* ', 'first', 'second', 'then']
+    indicators['parallel_tasks'] = sum(1 for kw in parallel_keywords if kw in prompt)
+
+    # Calculate complexity score
+    complexity_score = (
+        indicators['multi_component'] * 2 +
+        (3 if indicators['large_scope'] else 0) +
+        (4 if indicators['comprehensive'] else 0) +
+        indicators['parallel_tasks']
+    )
+
+    # Recommend swarm if complexity is high enough
+    recommend_swarm = complexity_score >= 5
+
+    # Determine topology based on task type
+    if indicators['multi_component'] >= 3:
+        recommended_topology = "hierarchical"  # Queen coordinates specialists
+    elif indicators['parallel_tasks'] >= 3:
+        recommended_topology = "mesh"  # Peer agents work in parallel
+    else:
+        recommended_topology = "adaptive"  # Dynamic switching
+
+    return {
+        'complexity_score': complexity_score,
+        'recommend_swarm': recommend_swarm,
+        'recommended_topology': recommended_topology,
+        'indicators': indicators
+    }
+
+
+def auto_init_swarm(complexity: dict, session_id: str) -> dict:
+    """
+    Initialize swarm orchestration if complexity assessment recommends it.
+
+    Args:
+        complexity: Result from assess_task_complexity
+        session_id: Session ID for tracking
+
+    Returns:
+        dict with swarm initialization results
+    """
+    if not complexity.get('recommend_swarm', False):
+        return {'initialized': False, 'reason': 'complexity below threshold'}
+
+    results = {
+        'initialized': False,
+        'topology': complexity.get('recommended_topology', 'adaptive'),
+        'swarm_id': None,
+        'agents_spawned': 0
+    }
+
+    try:
+        from utils.claude_flow import ClaudeFlowClient
+        cf = ClaudeFlowClient(timeout=5.0)
+
+        # Initialize swarm with recommended topology
+        swarm_result = cf.swarm_init(topology=results['topology'])
+        if swarm_result:
+            results['initialized'] = True
+            results['swarm_id'] = swarm_result.get('swarm_id', session_id[:12])
+
+            # Store swarm context for session
+            cf.memory_store(
+                f"swarm_{session_id[:8]}",
+                {
+                    "session_id": session_id,
+                    "topology": results['topology'],
+                    "complexity_score": complexity.get('complexity_score', 0),
+                    "initialized_at": datetime.now().isoformat()
+                },
+                namespace="swarm_sessions",
+                confidence=0.7
+            )
+    except Exception:
+        pass  # Graceful degradation - swarm init is optional
+
+    return results
+
+
+def get_initial_prompt(input_data: dict) -> str:
+    """Extract initial prompt from session data if available."""
+    # Check various locations for initial prompt
+    prompt = ""
+
+    # Check conversation history
+    conversation = input_data.get('conversation', [])
+    if conversation:
+        for msg in conversation:
+            if msg.get('role') == 'user':
+                content = msg.get('content', '')
+                if isinstance(content, str):
+                    prompt = content
+                elif isinstance(content, list):
+                    prompt = ' '.join(c.get('text', '') for c in content if isinstance(c, dict))
+                break
+
+    # Check direct prompt field
+    if not prompt:
+        prompt = input_data.get('prompt', '') or input_data.get('initial_prompt', '')
+
+    return prompt
+
+
 def load_reasoning_context() -> str:
     """Load patterns and strategies from Claude-Mem, PatternLearner, and ReasoningBank."""
     context_parts = []
@@ -246,16 +380,29 @@ def load_reasoning_context() -> str:
     except Exception:
         pass  # Graceful degradation
 
-    # Try to load from Claude Flow ReasoningBank
+    # Try to load from Claude Flow ReasoningBank with status reporting
     try:
         from utils.claude_flow import ClaudeFlowClient
-        cf = ClaudeFlowClient()
-        rb_context = cf.memory_query("session patterns", namespace="sessions", limit=3)
-        if rb_context:
-            context_parts.append("--- ReasoningBank Patterns ---")
-            context_parts.append(rb_context[:500])  # Limit output
-    except Exception:
-        pass  # Graceful degradation
+        cf = ClaudeFlowClient(timeout=10.0)
+
+        # Check if ReasoningBank is available
+        if cf.is_reasoningbank_available():
+            rb_context = cf.memory_query("session patterns", namespace="sessions", limit=3)
+            if rb_context:
+                context_parts.append("--- ReasoningBank Patterns ---")
+                context_parts.append(rb_context[:500])
+            else:
+                context_parts.append("✓ ReasoningBank initialized (no patterns yet)")
+
+            # Also try to get stats
+            stats = cf.memory_stats()
+            if stats and isinstance(stats, dict):
+                total = stats.get('total_memories', stats.get('raw', 'unknown'))
+                context_parts.append(f"  Memory entries: {total}")
+        else:
+            context_parts.append("⚠ ReasoningBank not available (run: npx claude-flow@alpha memory stats)")
+    except Exception as e:
+        context_parts.append(f"⚠ ReasoningBank error: {str(e)[:50]}")
 
     return "\n".join(context_parts) if context_parts else ""
 
@@ -274,15 +421,34 @@ def main():
         input_data = json.loads(sys.stdin.read())
         
         # Extract fields
-        _session_id = input_data.get('session_id', 'unknown')  # Reserved for future use
+        session_id = input_data.get('session_id', 'unknown')
         source = input_data.get('source', 'unknown')  # "startup", "resume", or "clear"
 
         # Log the session start event
         log_session_start(input_data)
 
+        # Assess task complexity and auto-init swarm if beneficial
+        initial_prompt = get_initial_prompt(input_data)
+        swarm_context = ""
+        if initial_prompt and len(initial_prompt) > 50:
+            complexity = assess_task_complexity(initial_prompt)
+            if complexity.get('recommend_swarm', False):
+                swarm_result = auto_init_swarm(complexity, session_id)
+                if swarm_result.get('initialized', False):
+                    swarm_context = f"""
+--- Swarm Mode Activated ---
+Topology: {swarm_result.get('topology', 'adaptive')}
+Complexity Score: {complexity.get('complexity_score', 0)}
+Swarm ID: {swarm_result.get('swarm_id', 'N/A')}
+Multi-agent coordination enabled for this session.
+"""
+
         # Load development context if requested
         if args.load_context:
             context = load_development_context(source)
+            # Add swarm context if initialized
+            if swarm_context:
+                context = swarm_context + "\n" + context
             # Add reasoning context (patterns, strategies)
             reasoning_ctx = load_reasoning_context()
             if reasoning_ctx:
