@@ -1,21 +1,6 @@
 # Claude Code Project Assistant
 
----
-
-## 📖 REQUIRED READING: Project-Specific Instructions
-
-**ALWAYS read `CLAUDE_PROJECT.md` at the start of any session working on this project.**
-
-This file contains critical project-specific instructions for:
-- **WRDS MCP usage** — Data retrieval prioritization and tool usage
-- **Python integration** — When to use Python vs WRDS MCP
-- **Output file locations** — All exports/charts MUST go to project folders
-- **ETF PERMNOs** — Common identifiers for major ETFs in CRSP
-- **Investment research workflow** — Screener, analysis, and validation patterns
-
-```
-Location: ./CLAUDE_PROJECT.md
-```
+> **Note:** This is your global CLAUDE.md that applies to all projects. For project-specific instructions, create a `CLAUDE.md` file in the project root directory - it will be automatically loaded alongside this global configuration.
 
 ---
 
@@ -203,7 +188,7 @@ Linting autofix: `npm run lint:fix` (use when possible, never blocks work)
 
 **✅ BELONGS AT ROOT:**
 - Core configuration files (`package.json`, `pyproject.toml`, `Cargo.toml`, etc.)
-- Documentation (`README.md`, `CLAUDE_PROJECT.md`, `CONTRIBUTING.md`)
+- Documentation (`README.md`, `CLAUDE.md`, `CONTRIBUTING.md`)
 - Build/CI/CD specs (`.github/`, `Dockerfile`, `docker-compose.yml`)
 - Essential dotfiles (`.gitignore`, `.editorconfig`, `eslint.config.mjs`)
 - License files (`LICENSE`, `NOTICE`)
@@ -214,7 +199,7 @@ Linting autofix: `npm run lint:fix` (use when possible, never blocks work)
 - Build artifacts (`dist/`, `build/`, `target/`, `*.exe`)
 - Cache files (`__pycache__/`, `node_modules/`, `.cache/`)
 - Generated files (`*.generated.*` unless essential)
-- Output files (charts, exports, reports) → use project-specific folders per CLAUDE_PROJECT.md
+- Output files (charts, exports, reports) → use project-specific folders per project CLAUDE.md
 - Temporary files (`*.tmp`, `*.bak`, `scratch.*`)
 - IDE configs (`.vscode/`, `.idea/`) → gitignore unless team-shared
 
@@ -287,14 +272,14 @@ project-root/
 **Before authorizing stop, verify:**
 - ✅ No temporary files at root (`*.tmp`, `*.log`, `scratch.*`)
 - ✅ No build artifacts at root (`dist/`, `build/`, compiled files)
-- ✅ All outputs in appropriate directories (per CLAUDE_PROJECT.md)
+- ✅ All outputs in appropriate directories (per project CLAUDE.md)
 - ✅ `.gitignore` covers all generated/temporary files
 - ✅ Directory structure follows project conventions
 
 **Integration with existing principles:**
 - Relates to "Security Zero Tolerance" → secrets/credentials properly organized
 - Relates to "Evidence-Based Validation" → outputs in predictable locations
-- Relates to "CLAUDE_PROJECT.md" → project-specific output folders
+- Relates to "Project CLAUDE.md" → project-specific output folders
 
 **Proactive cleanup:**
 - If you generate temporary files during work, remove them before stopping
