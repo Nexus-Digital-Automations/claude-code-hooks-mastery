@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/c4-architecture/commands/c4-architecture.md

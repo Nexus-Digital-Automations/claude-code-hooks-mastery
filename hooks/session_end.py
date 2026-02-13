@@ -36,18 +36,270 @@ EXIT CODES:
 
 import argparse
 import json
-import os
 import sys
-import subprocess
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple, Any
 
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass  # dotenv is optional
+
+# Add hooks directory to path for utils imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+
+# ============================================================================
+# EXTERNAL SERVICE PERSISTENCE
+# ============================================================================
+
+def persist_to_external_services(session_id, analysis, lessons, metrics):
+    """
+    Persist session data to Claude-Mem, ReasoningBank, Neural, Swarm, and Analytics.
+    All operations are non-blocking with graceful fallback.
+
+    Returns dict with persistence results.
+    """
+    results = {
+        "claude_mem": False,
+        "reasoning_bank": False,
+        "pattern_learner": False,
+        "neural_consolidated": False,
+        "swarm_cleanup": False,
+        "analytics_exported": False
+    }
+
+    # 1. Claude-Mem: Generate summary and complete session
+    try:
+        from utils.claude_mem import ClaudeMemClient
+        mem = ClaudeMemClient(timeout=3.0)
+
+        # Generate session summary
+        last_user = analysis.get("last_user_message", "")
+        last_assistant = analysis.get("last_assistant_message", "")
+        if last_user or last_assistant:
+            mem.generate_summary(session_id, last_user[:2000], last_assistant[:2000])
+
+        # Mark session complete
+        mem.complete_session(session_id)
+        results["claude_mem"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    # 2. ReasoningBank: Store lessons with confidence scoring
+    try:
+        from utils.claude_flow import ClaudeFlowClient
+        cf = ClaudeFlowClient(timeout=3.0)
+
+        # Store each lesson
+        for lesson in lessons:
+            cf.memory_store(
+                f"lesson_{lesson.get('category', 'general')}_{session_id[:8]}",
+                lesson,
+                namespace="lessons",
+                confidence=0.6
+            )
+
+        # Store session metrics with higher confidence
+        cf.memory_store(
+            f"metrics_{session_id[:8]}",
+            metrics,
+            namespace="session_metrics",
+            confidence=0.8
+        )
+
+        # Trigger memory consolidation
+        cf.memory_consolidate()
+        results["reasoning_bank"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    # 3. PatternLearner: Learn successful patterns
+    try:
+        from utils.pattern_learner import PatternLearner
+        efficiency = metrics.get("efficiency_score", 0)
+        if efficiency > 50:
+            learner = PatternLearner()
+            learner.learn_pattern({
+                "pattern_key": f"session_{session_id[:8]}",
+                "description": f"Session with {len(analysis.get('tools_used', []))} tools",
+                "tools_used": analysis.get("tools_used", []),
+                "files_modified": len(analysis.get("files_modified", [])),
+                "success": True
+            })
+            results["pattern_learner"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    # 4. NEW: Neural pattern consolidation
+    try:
+        from utils.neural_client import get_neural_client
+        neural = get_neural_client(timeout=5.0)
+
+        # Train pattern from session success
+        efficiency = metrics.get("efficiency_score", 0)
+        if efficiency > 30:  # Only learn from reasonably successful sessions
+            neural.train_pattern(
+                pattern_type='coordination',
+                training_data={
+                    'session_id': session_id,
+                    'tools_used': analysis.get('tools_used', []),
+                    'files_modified': len(analysis.get('files_modified', [])),
+                    'efficiency': efficiency,
+                    'success': efficiency > 50
+                },
+                epochs=10  # Quick consolidation
+            )
+            results["neural_consolidated"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    # 5. NEW: Swarm cleanup
+    try:
+        from utils.swarm_client import get_swarm_client
+        swarm = get_swarm_client(timeout=5.0)
+
+        # Check if swarm is active and clean up
+        status = swarm.swarm_status(verbose=False)
+        if status and status.get('status') == 'active':
+            # Store final swarm metrics before cleanup
+            from utils.mcp_client import get_mcp_client
+            mcp = get_mcp_client(timeout=3.0)
+            mcp.memory_store(
+                key=f'session_final/{session_id[:8]}',
+                value=json.dumps({
+                    'session_id': session_id,
+                    'metrics': metrics,
+                    'swarm_status': status,
+                    'completed_at': datetime.now().isoformat()
+                }),
+                namespace='session_archives',
+                ttl=604800  # 7 day TTL
+            )
+            results["swarm_cleanup"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    # 6. NEW: Analytics export
+    try:
+        from utils.analytics_client import get_analytics_client
+        analytics = get_analytics_client(timeout=5.0)
+
+        # Generate session performance report
+        report = analytics.performance_report(timeframe='24h', format='summary')
+        if report:
+            # Store token usage for this session
+            token_usage = analytics.token_usage(operation='session', timeframe='24h')
+            if token_usage:
+                metrics['token_usage'] = token_usage
+            results["analytics_exported"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    return results
+
+
+# ============================================================================
+# MEMORY CONSOLIDATION
+# ============================================================================
+
+def run_memory_consolidation(session_id: str, metrics: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Run comprehensive memory consolidation across all memory systems.
+
+    Consolidation tasks:
+    1. Claude Flow: Trigger memory_consolidate for ReasoningBank
+    2. PatternLearner: Prune low-confidence patterns
+    3. PatternLearner: Apply time-based decay
+    4. TrajectoryTracker: Finalize session trajectory
+    5. Local cleanup: Rotate old log files
+
+    All operations are non-blocking with graceful fallback.
+    """
+    results = {
+        "reasoning_bank_consolidate": False,
+        "pattern_prune": False,
+        "confidence_decay": False,
+        "trajectory_finalized": False,
+        "logs_rotated": False,
+        "patterns_removed": 0,
+        "high_confidence_count": 0
+    }
+
+    # 1. Claude Flow: Trigger ReasoningBank consolidation
+    try:
+        from utils.claude_flow import ClaudeFlowClient
+        cf = ClaudeFlowClient(timeout=5.0)
+        cf.memory_consolidate()
+        results["reasoning_bank_consolidate"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    # 2. PatternLearner: Prune low-confidence patterns
+    try:
+        from utils.pattern_learner import PatternLearner
+        learner = PatternLearner()
+
+        # Apply time-based decay before pruning
+        learner.decay_confidence(decay_rate=0.95)
+        results["confidence_decay"] = True
+
+        # Prune patterns with confidence < 0.2 and at least 5 samples
+        pruned = learner.prune_low_confidence(threshold=0.2, min_samples=5)
+        results["patterns_removed"] = pruned
+        results["pattern_prune"] = True
+
+        # Get count of high-confidence patterns
+        high_conf = learner.get_high_confidence_patterns(threshold=0.7)
+        results["high_confidence_count"] = len(high_conf)
+    except Exception:
+        pass  # Graceful degradation
+
+    # 3. Finalize trajectory if tracker exists
+    try:
+        from utils.trajectory_tracker import finalize_session_trajectory
+
+        # Determine task success from metrics
+        efficiency = metrics.get("efficiency_score", 0)
+        errors = metrics.get("errors_resolved", 0)
+        tasks = metrics.get("tasks_completed", 0)
+
+        # Consider successful if efficiency > 50% or tasks completed with few errors
+        success = efficiency > 50 or (tasks > 0 and errors <= tasks)
+
+        # Determine task category from session activity
+        if errors > tasks:
+            task_category = "debugging"
+        elif tasks > 0:
+            task_category = "implementation"
+        else:
+            task_category = "exploration"
+
+        trajectory = finalize_session_trajectory(
+            session_id=session_id,
+            success=success,
+            task_category=task_category,
+            summary=f"Session completed with {tasks} tasks, {errors} errors"
+        )
+        results["trajectory_finalized"] = trajectory is not None
+    except Exception:
+        pass  # Graceful degradation
+
+    # 4. Rotate old log files (keep last 100)
+    try:
+        log_dir = Path("logs")
+        if log_dir.exists():
+            log_files = sorted(log_dir.glob("*.json"), key=lambda x: x.stat().st_mtime)
+            if len(log_files) > 100:
+                for old_log in log_files[:-100]:
+                    old_log.unlink()
+                results["logs_rotated"] = True
+    except Exception:
+        pass  # Graceful degradation
+
+    return results
 
 
 # ============================================================================
@@ -429,11 +681,18 @@ def preserve_architectural_decisions(analysis: Dict[str, Any]) -> Tuple[bool, st
                 existing_decisions = []
 
         # Create decision record from session
+        # Convert sets to lists for JSON serialization
+        files_mod = analysis.get('files_modified', [])
+        tools_used = analysis.get('tools_used', [])
+        if isinstance(files_mod, set):
+            files_mod = sorted(list(files_mod))
+        if isinstance(tools_used, set):
+            tools_used = sorted(list(tools_used))
         decision = {
             'timestamp': datetime.now().isoformat(),
-            'files_modified': analysis.get('files_modified', []),
-            'tools_used': analysis.get('tools_used', []),
-            'context': f"Session modified {len(analysis.get('files_modified', []))} files using {len(analysis.get('tools_used', []))} tools"
+            'files_modified': files_mod,
+            'tools_used': tools_used,
+            'context': f"Session modified {len(files_mod)} files using {len(tools_used)} tools"
         }
 
         existing_decisions.append(decision)
@@ -544,15 +803,48 @@ def run_knowledge_preservation() -> Dict[str, Any]:
     if arch_success:
         evidence_count += 1
 
+    # 6. Persist to external services (Claude-Mem, ReasoningBank, PatternLearner, Neural, Swarm, Analytics)
+    external_results = persist_to_external_services(session_id, analysis, lessons, metrics)
+    external_success = any(external_results.values())
+    validation_results['external_persistence'] = {
+        'passed': external_success,
+        'message': f"Claude-Mem: {external_results['claude_mem']}, "
+                   f"ReasoningBank: {external_results['reasoning_bank']}, "
+                   f"PatternLearner: {external_results['pattern_learner']}, "
+                   f"Neural: {external_results['neural_consolidated']}, "
+                   f"Swarm: {external_results['swarm_cleanup']}, "
+                   f"Analytics: {external_results['analytics_exported']}",
+        'evidence': 'external_services' if external_success else None
+    }
+    if external_success:
+        evidence_count += 1
+
+    # 7. Run memory consolidation
+    consolidation_results = run_memory_consolidation(session_id, metrics)
+    consolidation_success = (
+        consolidation_results['reasoning_bank_consolidate'] or
+        consolidation_results['pattern_prune'] or
+        consolidation_results['trajectory_finalized']
+    )
+    validation_results['memory_consolidation'] = {
+        'passed': consolidation_success,
+        'message': f"Consolidated: RB={consolidation_results['reasoning_bank_consolidate']}, "
+                   f"Pruned={consolidation_results['patterns_removed']}, "
+                   f"HighConf={consolidation_results['high_confidence_count']}",
+        'evidence': 'memory_consolidation' if consolidation_success else None
+    }
+    if consolidation_success:
+        evidence_count += 1
+
     # Calculate validation confidence
-    validation_confidence = min((evidence_count * 20), 100)  # 5 methods = 100%
+    validation_confidence = min((evidence_count / 7 * 100), 100)  # 7 methods = 100%
 
     return {
         'validation_results': validation_results,
         'evidence_count': evidence_count,
-        'validation_confidence': validation_confidence,
+        'validation_confidence': round(validation_confidence, 1),
         'session_id': session_id,
-        'total_methods': 5
+        'total_methods': 7
     }
 
 

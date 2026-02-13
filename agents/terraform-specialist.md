@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/cicd-automation/agents/terraform-specialist.md

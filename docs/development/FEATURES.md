@@ -28,3 +28,81 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
 
 ### 2025-11-30 10:56 - Session `87a65b56...`
 - [ ] don't specify the format for the questioning. It will know how to do that. just have it add "[Recommended]" to one of the answers
+
+-----
+### [FEATURE] 2025-12-03 11:32
+**Session:** `6829f2e7...`
+**Request:** please add to the stop hook, though keep it concise, for it to think of every possible way to validate its work and then do it. 3 ways is adequate, though. list out console logs, logs, puppeteer tests...
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-06 21:13
+**Session:** `e25006b3...`
+**Request:** please modify the hook prompts so the agent knows they are to be honest, down to earth, and humble
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-06 21:13
+**Session:** `e25006b3...`
+**Request:** please modify the hook prompts so the agent knows they are to be honest, down to earth, and humble. keep the prompts concise
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-06 21:37
+**Session:** `test123...`
+**Request:** please implement a new feature that does something really complex and interesting
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-22 17:52
+**Session:** `c20fbafe...`
+**Request:** please make sure @"New Tools/" 
+
+are properly incorporated into the @CLAUDE.md and hooks system/prompts.
+
+how can we best incorporate them? can we incorporate all the tools? or would one or two in par...
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-23 01:30
+**Session:** `c20fbafe...`
+**Request:** now what about incorporating @"New Tools/claude-flow-docs/" 
+
+and @"New Tools/claude mem docs/" 
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-23 01:49
+**Session:** `c20fbafe...`
+**Request:** now what about incorporating @"New Tools/claude-flow-docs/" 
+
+and @"New Tools/claude mem docs/" 
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2025-12-23 15:28
+**Session:** `c20fbafe...`
+**Request:** it's fine as is then, just make sure that it works. please go through a test run to make sure all the tools and updates we just did work. have this test run be making comprehensive tests for this code...
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2026-01-01 17:13
+**Session:** `95ac8133...`
+**Request:** please make sure that claude flow in @"New Tools/" is extensively use throughout the claude code agent cycle. also make sure that claude-mem is used. delete the other one, we don't need it
+- [ ] Pending
+-----
+
+-----
+### [FEATURE] 2026-01-01 17:14
+**Session:** `95ac8133...`
+**Request:** please make sure that claude flow in @"New Tools/" is extensively use throughout the claude code agent cycle. also make sure that claude-mem is used. delete the other one, we don't need it
+- [ ] Pending
+-----

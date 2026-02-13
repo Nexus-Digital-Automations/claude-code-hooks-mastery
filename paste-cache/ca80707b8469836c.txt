@@ -1,0 +1,90 @@
+To remove an MCP server from Claude Code, you use the `claude mcp remove` command, but the key is getting the **scope** and server name right. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1l9x13z/how_to_remove_an_mcp_server/)
+
+## 1. Basic remove command
+
+From a terminal:
+
+```bash
+claude mcp list
+```
+
+Find the server *name* in that list (for example, `github`, `figma`, `gemini`). [code.claude](https://code.claude.com/docs/en/mcp)
+
+Then try:
+
+```bash
+claude mcp remove <server-name>
+```
+
+Example:
+
+```bash
+claude mcp remove github
+``` 
+
+This removes a locally scoped server when that’s how it was added. [code.claude](https://code.claude.com/docs/en/mcp)
+
+## 2. When “no local MCP server found” happens
+
+If you see something like:
+
+```bash
+No local MCP server found with name: <name>
+```
+
+it usually means the server is not in the default (local) scope, but in `user` or `global`. [github](https://github.com/anthropics/claude-code/issues/405)
+
+Run:
+
+```bash
+claude mcp get <server-name>
+```
+
+You should see a line like:
+
+```text
+Scope: user
+```
+
+or
+
+```text
+Scope: global
+``` 
+
+
+
+Then remove it with the matching scope, for example:
+
+```bash
+# If Scope: user
+claude mcp remove --scope user <server-name>
+
+# If Scope: global
+claude mcp remove --scope global <server-name>
+``` 
+
+Users in reported issues fixed the “cannot remove” problem exactly this way. [github](https://github.com/anthropics/claude-code/issues/405)
+
+## 3. If it still won’t go away
+
+In stubborn cases, the MCP server entry can live in one of several config files, which you can edit manually and then restart Claude Code. [scottspence](https://scottspence.com/posts/configuring-mcp-tools-in-claude-code)
+
+Look for these files and search for the server name:
+
+- Project-specific: `.claude/settings.local.json` in your project directory. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1l9x13z/how_to_remove_an_mcp_server/)
+- User local: `~/.claude/settings.local.json`. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1l9x13z/how_to_remove_an_mcp_server/)
+- User global: `~/.claude/settings.json`. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1l9x13z/how_to_remove_an_mcp_server/)
+- Main config: `~/.claude.json`. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1l9x13z/how_to_remove_an_mcp_server/)
+- Dedicated MCP config: `~/.claude/mcp_servers.json`. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1l9x13z/how_to_remove_an_mcp_server/)
+
+Remove the corresponding block for that server from the JSON, save, then restart Claude Code so it reloads the updated config. [scottspence](https://scottspence.com/posts/configuring-mcp-tools-in-claude-code)
+
+## 4. Quick checklist
+
+- Confirm the exact server name with `claude mcp list`. [code.claude](https://code.claude.com/docs/en/mcp)
+- Check its scope with `claude mcp get <name>`. [github](https://github.com/anthropics/claude-code/issues/513)
+- Run `claude mcp remove --scope <scope> <name>`. [github](https://github.com/anthropics/claude-code/issues/405)
+- If it persists, remove it from the config JSON files and restart Claude Code. [scottspence](https://scottspence.com/posts/configuring-mcp-tools-in-claude-code)
+
+If you paste the output of `claude mcp list` and `claude mcp get <name>`, I can tell you the exact command you should run next.

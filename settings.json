@@ -1,13 +1,13 @@
 {
   "env": {
-    "BASH_DEFAULT_TIMEOUT_MS": "300000",
-    "BASH_MAX_TIMEOUT_MS": "300000",
-    "CLAUDE_CODE_DISABLE_TELEMETRY": "1",
-    "CLAUDE_CODE_SECURE_MODE": "1",
-    "NODE_OPTIONS": "--max-old-space-size=8192",
-    "HISTFILE": "/dev/null",
-    "HISTSIZE": "0"
+    "CLAUDE_FLOW_AUTO_COMMIT": "false",
+    "CLAUDE_FLOW_AUTO_PUSH": "false",
+    "CLAUDE_FLOW_HOOKS_ENABLED": "true",
+    "CLAUDE_FLOW_TELEMETRY_ENABLED": "true",
+    "CLAUDE_FLOW_REMOTE_EXECUTION": "true",
+    "CLAUDE_FLOW_CHECKPOINTS_ENABLED": "true"
   },
+  "includeCoAuthoredBy": true,
   "permissions": {
     "allow": [
       "Bash",
@@ -30,7 +30,13 @@
       "KillBash",
       "ListMcpResourcesTool",
       "ReadMcpResourceTool",
-      "mcp__*",
+      "mcp__claude-flow_alpha__*",
+      "mcp__ruv-swarm__*",
+      "mcp__flow-nexus__*",
+      "mcp__maverick-mcp___*",
+      "mcp__wrds-mcp__*",
+      "mcp__kroger-mcp__*",
+      "mcp__mcp-python-executor__*",
       "Bash(npm run:*)",
       "Bash(npm install:*)",
       "Bash(npm test:*)",
@@ -294,90 +300,55 @@
       "Bash(cat :*.p12:*::*)"
     ]
   },
+  "model": "sonnet",
+  "enabledMcpjsonServers": [
+    "claude-flow",
+    "ruv-swarm",
+    "flow-nexus",
+    "maverick-mcp",
+    "wrds-mcp",
+    "kroger-mcp",
+    "mcp-python-executor"
+  ],
   "hooks": {
-    "PreToolUse": [
+    "PreToolUse": [],
+    "PostToolUse": [],
+    "PreCompact": [
       {
-        "matcher": "",
+        "matcher": "manual",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/pre_tool_use.py"
+            "command": "/bin/bash -c 'INPUT=$(cat); CUSTOM=$(echo \"$INPUT\" | jq -r \".custom_instructions // \\\"\\\"\"); echo \"🔄 PreCompact Guidance:\"; echo \"📋 IMPORTANT: Review CLAUDE.md in project root for:\"; echo \"   • 54 available agents and concurrent usage patterns\"; echo \"   • Swarm coordination strategies (hierarchical, mesh, adaptive)\"; echo \"   • SPARC methodology workflows with batchtools optimization\"; echo \"   • Critical concurrent execution rules (GOLDEN RULE: 1 MESSAGE = ALL OPERATIONS)\"; if [ -n \"$CUSTOM\" ]; then echo \"🎯 Custom compact instructions: $CUSTOM\"; fi; echo \"✅ Ready for compact operation\"'"
           }
         ]
-      }
-    ],
-    "PostToolUse": [
+      },
       {
-        "matcher": "",
+        "matcher": "auto",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/post_tool_use.py"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/notification.py --notify"
+            "command": "/bin/bash -c 'echo \"🔄 Auto-Compact Guidance (Context Window Full):\"; echo \"📋 CRITICAL: Before compacting, ensure you understand:\"; echo \"   • All 54 agents available in .claude/agents/ directory\"; echo \"   • Concurrent execution patterns from CLAUDE.md\"; echo \"   • Batchtools optimization for 300% performance gains\"; echo \"   • Swarm coordination strategies for complex tasks\"; echo \"⚡ Apply GOLDEN RULE: Always batch operations in single messages\"; echo \"✅ Auto-compact proceeding with full agent context\"'"
           }
         ]
       }
     ],
     "Stop": [
       {
-        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/stop.py"
+            "command": "python3 /Users/jeremyparker/.claude/hooks/stop.py --notify"
           }
         ]
       }
     ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/subagent_stop.py"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
+    "Notification": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/user_prompt_submit.py --log-only --store-last-prompt --name-agent"
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/pre_compact.py"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/hooks/session_start.py --load-context"
+            "command": "python3 /Users/jeremyparker/.claude/hooks/notification.py --notify"
           }
         ]
       }
@@ -385,8 +356,6 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/hooks/run_hook.sh ~/.claude/status_lines/status_line.py",
-    "padding": 0
-  },
-  "alwaysThinkingEnabled": true
+    "command": ".claude/statusline-command.sh"
+  }
 }

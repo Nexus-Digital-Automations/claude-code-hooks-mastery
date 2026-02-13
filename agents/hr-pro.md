@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/hr-legal-compliance/agents/hr-pro.md

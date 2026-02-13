@@ -20,6 +20,130 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
+# Add hooks directory to path for utils imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+
+def track_agent_coordination(session_id, input_data):
+    """
+    Track subagent coordination patterns for multi-agent learning.
+    All operations are non-blocking with graceful fallback.
+    Enhanced with MCP tool integrations for DAA, neural, and swarm coordination.
+    """
+    agent_type = input_data.get("agent_type", "unknown")
+    parent_session = input_data.get("parent_session_id", "")
+    task_summary = input_data.get("task_summary", "")
+
+    # 1. ReasoningBank: Store agent coordination pattern
+    try:
+        from utils.claude_flow import ClaudeFlowClient
+        cf = ClaudeFlowClient(timeout=2.0)
+        cf.memory_store(
+            f"agent_{agent_type}_{session_id[:8]}",
+            {
+                "agent_type": agent_type,
+                "parent_session": parent_session,
+                "task_preview": task_summary[:200] if task_summary else "",
+                "completion_time": datetime.now().isoformat(),
+                "success": True
+            },
+            namespace="agent_coordination",
+            confidence=0.7
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 2. Claude-Mem: Store observation for full-text search
+    try:
+        from utils.claude_mem import ClaudeMemClient
+        mem = ClaudeMemClient(timeout=2.0)
+        mem.store_observation(
+            session_id=parent_session or session_id,
+            tool_name="_subagent_complete",
+            tool_input={"agent_type": agent_type, "session_id": session_id},
+            tool_response=task_summary[:1000] if task_summary else ""
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 3. NEW: DAA Knowledge Sharing - Share learnings with other agents
+    try:
+        from utils.swarm_client import get_swarm_client
+        swarm = get_swarm_client(timeout=5.0)
+
+        # Share knowledge from completed subagent to swarm
+        swarm.daa_knowledge_share(
+            source_agent_id=f"subagent_{session_id[:8]}",
+            target_agent_ids=["swarm_coordinator", "parent_agent"],
+            knowledge_domain=agent_type,
+            knowledge_content={
+                "task_outcome": "success",
+                "task_summary": task_summary[:500] if task_summary else "",
+                "agent_type": agent_type,
+                "completion_time": datetime.now().isoformat()
+            }
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 4. NEW: Neural Pattern Learning - Train from successful subagent completion
+    try:
+        from utils.neural_client import get_neural_client
+        neural = get_neural_client(timeout=3.0)
+
+        # Learn coordination pattern from this agent type
+        neural.analyze_patterns(
+            action='learn',
+            operation=f'subagent:{agent_type}',
+            outcome='success',
+            metadata={
+                'session': session_id[:8],
+                'parent': parent_session[:8] if parent_session else '',
+                'task_length': len(task_summary) if task_summary else 0,
+                'confidence': 0.7
+            }
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 5. NEW: Swarm Coordination Update - Update swarm state
+    try:
+        from utils.swarm_client import get_swarm_client
+        swarm = get_swarm_client(timeout=3.0)
+
+        # Check if swarm is active and update coordination
+        status = swarm.swarm_status(verbose=False)
+        if status and status.get('status') == 'active':
+            # Sync coordination state
+            swarm.coordination_sync()
+
+            # Store subagent completion in memory
+            from utils.mcp_client import get_mcp_client
+            mcp = get_mcp_client(timeout=3.0)
+            mcp.memory_store(
+                key=f'subagent/{session_id[:8]}/complete',
+                value=json.dumps({
+                    'agent_type': agent_type,
+                    'parent_session': parent_session,
+                    'completed_at': datetime.now().isoformat(),
+                    'success': True
+                }),
+                namespace='swarm_coordination',
+                ttl=3600  # 1 hour TTL
+            )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 6. NEW: Analytics Tracking - Record subagent metrics
+    try:
+        from utils.analytics_client import get_analytics_client
+        analytics = get_analytics_client(timeout=3.0)
+
+        # Collect metrics for this subagent completion
+        analytics.metrics_collect(components=['subagent', agent_type])
+    except Exception:
+        pass  # Graceful degradation
+
 
 def get_tts_script_path():
     """
@@ -89,7 +213,11 @@ def main():
 
         # Extract required fields
         session_id = input_data.get("session_id", "")
-        stop_hook_active = input_data.get("stop_hook_active", False)
+        _stop_hook_active = input_data.get("stop_hook_active", False)  # Reserved
+
+        # Track agent coordination to ReasoningBank and Claude-Mem
+        if session_id:
+            track_agent_coordination(session_id, input_data)
 
         # Ensure log directory exists
         log_dir = os.path.join(os.getcwd(), "logs")

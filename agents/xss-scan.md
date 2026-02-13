@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/frontend-mobile-security/commands/xss-scan.md

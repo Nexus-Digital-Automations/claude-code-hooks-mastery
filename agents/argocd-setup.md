@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/kubernetes-operations/skills/gitops-workflow/references/argocd-setup.md

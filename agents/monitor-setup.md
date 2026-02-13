@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/observability-monitoring/commands/monitor-setup.md

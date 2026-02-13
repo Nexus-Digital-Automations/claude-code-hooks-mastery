@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/game-development/agents/minecraft-bukkit-pro.md

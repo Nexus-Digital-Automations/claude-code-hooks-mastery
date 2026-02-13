@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/quantitative-trading/agents/quant-analyst.md

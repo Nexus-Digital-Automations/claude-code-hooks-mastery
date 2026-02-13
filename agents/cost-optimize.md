@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/database-cloud-optimization/commands/cost-optimize.md

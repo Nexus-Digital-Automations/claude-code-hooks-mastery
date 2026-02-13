@@ -161,6 +161,98 @@ def announce_completion():
         pass
 
 
+def check_root_cleanliness():
+    """
+    Check if project root folder is clean (no temporary/generated files).
+    Returns (is_clean: bool, violations: list).
+    """
+    # Allowed files/dirs at root (essential configs and docs only)
+    allowed_patterns = {
+        # Config files
+        'package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml',
+        'pyproject.toml', 'poetry.lock', 'Pipfile', 'Pipfile.lock',
+        'Cargo.toml', 'Cargo.lock', 'go.mod', 'go.sum',
+        'tsconfig.json', 'tsconfig.*.json', 'jsconfig.json',
+        'webpack.config.js', 'vite.config.js', 'rollup.config.js',
+        'jest.config.js', 'vitest.config.js', 'playwright.config.js',
+        '.eslintrc.js', '.eslintrc.json', 'eslint.config.mjs', 'eslint.config.js',
+        '.prettierrc', '.prettierrc.json', '.prettierrc.js',
+        '.editorconfig', '.nvmrc', '.node-version', '.python-version',
+        'babel.config.js', '.babelrc', '.babelrc.json',
+        # Docs
+        'README.md', 'README.txt', 'README.rst', 'CLAUDE.md',
+        'LICENSE', 'LICENSE.md', 'LICENSE.txt', 'NOTICE', 'CONTRIBUTING.md',
+        'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'SECURITY.md',
+        # Build/CI/CD
+        'Dockerfile', 'docker-compose.yml', 'docker-compose.yaml',
+        'Makefile', 'makefile', 'CMakeLists.txt',
+        # Dotfiles/dirs
+        '.gitignore', '.gitattributes', '.dockerignore',
+        '.github', '.gitlab', '.vscode', '.idea',
+        '.git', '.svn', '.hg',
+        # Entry points (for single-file projects)
+        'main.py', 'app.py', 'index.js', 'index.ts', 'main.go', 'main.rs',
+        # Directories
+        'src', 'tests', 'test', 'docs', 'scripts', 'config',
+        'public', 'static', 'assets', 'lib',
+        'node_modules', '__pycache__', '.cache', 'venv', '.venv',
+        # Hidden hook configs
+        '.pre-commit-config.yaml', '.husky',
+        # Claude Code operational directories (from .gitignore)
+        '.claude', 'data', 'plans', 'projects', 'todos', 'statsig',
+        'shell-snapshots', 'session-env', 'file-history', 'paste-cache',
+        'claude-mem', 'cache', 'checkpoints', 'telemetry', 'tasks',
+        'plugins', 'helpers', 'status_lines', 'debug', 'logs',
+        # Claude Code files
+        'history.jsonl', 'stats-cache.json', 'architectural_decisions.json',
+        'lessons.json', 'statusline-command.sh',
+        'package.json', 'package-lock.json', 'settings.local.json',
+        'settings copy.json',
+        # Project-specific directories
+        'python-scripts', 'commands', 'agents', 'skills', 'hooks',
+        '.validation-artifacts', '.swarm', '.claude-flow', '.ruff_cache',
+        'New Tools'
+    }
+
+    # Forbidden patterns (will trigger violations)
+    forbidden_patterns = [
+        '.log', '.tmp', '.bak', '.swp', '.swo',
+        'test-results', 'coverage', '.pytest_cache',
+        'dist', 'build', 'target', '.next', 'out',
+        '.exe', '.o', '.so', '.dylib',
+        'scratch', 'temp', 'debug', 'output.csv', 'output.json',
+        '.generated.', 'chart.', 'report.'
+    ]
+
+    violations = []
+    cwd = Path.cwd()
+
+    try:
+        # List all items in root
+        for item in cwd.iterdir():
+            name = item.name
+
+            # Skip allowed items
+            if name in allowed_patterns:
+                continue
+
+            # Check for forbidden patterns
+            is_violation = False
+            for pattern in forbidden_patterns:
+                if pattern in name.lower():
+                    is_violation = True
+                    break
+
+            if is_violation:
+                item_type = "dir" if item.is_dir() else "file"
+                violations.append(f"  ❌ {name} ({item_type})")
+
+        return (len(violations) == 0, violations)
+    except Exception:
+        # If we can't check, assume clean (fail-safe)
+        return (True, [])
+
+
 def check_stop_authorization():
     """
     Check if stop is authorized via file-based configuration.
@@ -183,6 +275,40 @@ def check_stop_authorization():
 
 def main():
     try:
+        # ROOT CLEANLINESS CHECK - blocks stop if violations found
+        is_clean, violations = check_root_cleanliness()
+        if not is_clean:
+            violation_list = "\n".join(violations)
+            root_blocked_msg = f"""
+======================================================================
+STOP BLOCKED - ROOT FOLDER NOT CLEAN
+======================================================================
+
+🚨 ROOT FOLDER VIOLATIONS DETECTED:
+{violation_list}
+
+ROOT MUST BE CLEAN BEFORE STOPPING:
+✅ Move temp files to appropriate directories
+✅ Move logs to logs/ directory (and gitignore)
+✅ Move outputs to output/ directory (and gitignore)
+✅ Move test results to tests/ or output/ directory
+✅ Delete scratch/debug files OR move to scripts/
+✅ Ensure .gitignore covers all generated files
+
+Run 'ls -la' to verify, then fix violations before proceeding.
+
+ONLY THESE BELONG AT ROOT:
+• Core configs (package.json, pyproject.toml, etc.)
+• Essential docs (README.md, LICENSE, etc.)
+• Build specs (.github/, Dockerfile, etc.)
+• Essential dotfiles (.gitignore, .editorconfig, etc.)
+
+See CLAUDE.md Core Principle #7 for details.
+======================================================================
+"""
+            print(root_blocked_msg, file=sys.stderr)
+            sys.exit(2)  # Exit code 2 blocks stop
+
         # AUTHORIZATION CHECK - blocks stop if not authorized
         if not check_stop_authorization():
             # Get absolute path to authorize-stop.sh script
@@ -193,6 +319,8 @@ def main():
 ======================================================================
 STOP BLOCKED - VALIDATION REQUIRED
 ======================================================================
+
+✅ Root folder is clean!
 
 VALIDATION METHODS (execute 3+):
 □ Unit tests: npm test, pytest, cargo test, go test
@@ -205,11 +333,12 @@ VALIDATION METHODS (execute 3+):
 □ Runtime: start app, confirm no crashes
 
 BEFORE STOPPING:
-1. Complete ALL user requests
-2. Execute 3+ validation methods above
-3. Present validation report with ACTUAL OUTPUT
-4. Commit completed work: git add . && git commit -m "..."
-5. Push to remote: git push
+1. ✅ Root is clean (verified automatically)
+2. Complete ALL user requests
+3. Execute 3+ validation methods above
+4. Present validation report with ACTUAL OUTPUT
+5. Commit completed work: git add . && git commit -m "..."
+6. Push to remote: git push
 
 To authorize stop, run: bash {auth_script}
 ======================================================================
@@ -253,6 +382,62 @@ To authorize stop, run: bash {auth_script}
                 "tool_count": len(input_data.get("tool_calls", [])),
                 "summary": f"Session {session_id[:8]}... completed"
             })
+        except Exception:
+            pass  # Graceful degradation - never block stop
+
+        # NEW: Run quality assessment via Analytics (non-blocking)
+        quality_result = None
+        try:
+            from utils.analytics_client import get_analytics_client
+            analytics = get_analytics_client(timeout=5.0)
+
+            # Run quality assessment on session
+            quality_result = analytics.quality_assess(
+                target='session',
+                criteria=['completion', 'validation', 'testing']
+            )
+
+            # Store quality result if available
+            if quality_result and quality_result.get('score', 0) > 0:
+                from utils.mcp_client import get_mcp_client
+                mcp = get_mcp_client(timeout=3.0)
+                mcp.memory_store(
+                    key=f'quality/{session_id[:8]}',
+                    value=json.dumps(quality_result),
+                    namespace='quality_assessments',
+                    ttl=604800  # 7 day TTL
+                )
+        except Exception:
+            pass  # Graceful degradation - never block stop
+
+        # NEW: Workflow validation check (non-blocking)
+        try:
+            from utils.workflow_client import get_workflow_client
+            workflow = get_workflow_client(timeout=5.0)
+
+            # Check for any active workflows that should complete
+            workflows = workflow.workflow_list(status='active', limit=5)
+            if workflows:
+                # Log active workflows but don't block
+                print(f"Note: {len(workflows)} active workflows detected", file=sys.stderr)
+        except Exception:
+            pass  # Graceful degradation - never block stop
+
+        # NEW: Neural pattern learning from session outcome (non-blocking)
+        try:
+            from utils.neural_client import get_neural_client
+            neural = get_neural_client(timeout=5.0)
+
+            # Learn from completed session
+            neural.analyze_patterns(
+                action='learn',
+                operation='session_complete',
+                outcome='success',
+                metadata={
+                    'session': session_id[:8],
+                    'quality_score': quality_result.get('score', 0) if quality_result else 0
+                }
+            )
         except Exception:
             pass  # Graceful degradation - never block stop
 

@@ -18,6 +18,13 @@ Be helpful, be direct, be real.
 
 ## 🎯 CORE PRINCIPLES
 
+```
+╔════════════════════════════════════════════════════════════════╗
+║  🚨 BEFORE CREATING ANY FILE, ASK: "DOES THIS BELONG AT ROOT?" ║
+║     The answer is almost always NO. See Principle #7 below.   ║
+╚════════════════════════════════════════════════════════════════╝
+```
+
 ### 1. Validation-Required Stop - Prove Before You Stop
 
 **The stop hook blocks stopping until validation is provided.**
@@ -29,6 +36,7 @@ When the stop hook triggers:
 
 **Stop only when:**
 - All work requested by user is complete
+- **Root folder is clean** (no temporary/generated/output files)
 - Tests passing (if tests exist)
 - Build succeeds (if applicable)
 - Validation report presented with proof
@@ -60,12 +68,12 @@ Or use the slash command: `/authorize-stop`
 
 ```
 1. HIGHEST   → Complete user's requested work
-2. HIGH      → Tests pass, app starts, security clean
+2. HIGH      → Root folder clean, tests pass, app starts, security clean
 3. MEDIUM    → Linting/type errors (warnings, inform but don't block)
 4. LOWEST    → Documentation and polish
 ```
 
-**🔴 CRITICAL:** Complete work even with linting/type warnings during development. Quality checks inform but NEVER block progress. However, before authorizing stop, aim for all checks passing.
+**🔴 CRITICAL:** Complete work even with linting/type warnings during development. Quality checks inform but NEVER block progress. However, before authorizing stop, aim for all checks passing **and root folder must be clean**.
 
 ### 4. Autonomous Operation - Never Sit Idle
 
@@ -112,6 +120,40 @@ One form of evidence = NOT ENOUGH. Three+ forms = ACCEPTABLE.
 **Pre-commit hooks MUST exist:** `.pre-commit-config.yaml` OR `.husky/`
 
 *Your hooks enforce this - no secrets will make it to git.*
+
+### 7. Root Folder Cleanliness - MANDATORY
+
+**🚨 CRITICAL: ROOT MUST REMAIN CLEAN AT ALL TIMES**
+
+Before creating ANY file, ask: **Does this belong at root?** The answer is almost always **NO**.
+
+**✅ ONLY ALLOWED AT ROOT:**
+- Core configs: `package.json`, `pyproject.toml`, `Cargo.toml`, `tsconfig.json`
+- Essential docs: `README.md`, `CLAUDE.md`, `LICENSE`
+- Build specs: `.github/`, `Dockerfile`, `docker-compose.yml`
+- Essential dotfiles: `.gitignore`, `.editorconfig`, `eslint.config.mjs`
+- Entry points: `main.py`, `index.ts` (if single-file projects)
+
+**❌ ABSOLUTELY FORBIDDEN AT ROOT:**
+- **ANY test outputs** (`*.log`, `test-results.xml`, `coverage/`)
+- **ANY build artifacts** (`dist/`, `build/`, `target/`, `*.exe`)
+- **ANY generated files** (`*.generated.*`, charts, PDFs, CSVs)
+- **ANY temporary files** (`*.tmp`, `*.bak`, `scratch.*`, `temp.*`)
+- **ANY cache** (`__pycache__/`, `.cache/`, `.pytest_cache/`)
+- **IDE configs** (`.vscode/`, `.idea/`) unless team-shared
+
+**MANDATORY file locations:**
+```
+Source code      → src/
+Tests            → tests/
+Documentation    → docs/
+Scripts          → scripts/
+Generated output → output/ (gitignored)
+Logs             → logs/ (gitignored)
+Cache            → .cache/ (gitignored)
+```
+
+**This is NOT optional. This is NOT a suggestion. Keep root clean.**
 
 ---
 
@@ -184,24 +226,35 @@ Linting autofix: `npm run lint:fix` (use when possible, never blocks work)
 
 ## 📁 CODEBASE ORGANIZATION & ROOT FOLDER CLEANLINESS
 
-### Root Folder Guidelines
+**🚨 READ THIS FIRST BEFORE CREATING ANY FILE:**
 
-**✅ BELONGS AT ROOT:**
+The root folder is sacred. Before creating ANY file, you MUST ask: "Does this belong at root?"
+The answer is almost always NO.
+
+### Root Folder Guidelines - STRICT ENFORCEMENT
+
+**✅ ONLY THESE BELONG AT ROOT:**
 - Core configuration files (`package.json`, `pyproject.toml`, `Cargo.toml`, etc.)
 - Documentation (`README.md`, `CLAUDE.md`, `CONTRIBUTING.md`)
 - Build/CI/CD specs (`.github/`, `Dockerfile`, `docker-compose.yml`)
 - Essential dotfiles (`.gitignore`, `.editorconfig`, `eslint.config.mjs`)
 - License files (`LICENSE`, `NOTICE`)
-- Entry points (`main.py`, `index.ts`, etc.)
+- Entry points (`main.py`, `index.ts`, etc.) - only for single-file projects
 
-**❌ NEVER AT ROOT:**
-- Test outputs or artifacts (`test-results.xml`, `coverage/`, `*.log`)
-- Build artifacts (`dist/`, `build/`, `target/`, `*.exe`)
-- Cache files (`__pycache__/`, `node_modules/`, `.cache/`)
-- Generated files (`*.generated.*` unless essential)
-- Output files (charts, exports, reports) → use project-specific folders per project CLAUDE.md
-- Temporary files (`*.tmp`, `*.bak`, `scratch.*`)
-- IDE configs (`.vscode/`, `.idea/`) → gitignore unless team-shared
+**❌ ABSOLUTELY FORBIDDEN AT ROOT (WILL BLOCK STOP AUTHORIZATION):**
+- **Test outputs or artifacts** (`test-results.xml`, `coverage/`, `*.log`, `*.out`)
+- **Build artifacts** (`dist/`, `build/`, `target/`, `*.exe`, `*.o`, `*.so`)
+- **Cache files** (`__pycache__/`, `node_modules/`, `.cache/`, `.pytest_cache/`)
+- **Generated files** (`*.generated.*`, charts, PDFs, CSVs, Excel files)
+- **Output files** (charts, exports, reports) → MUST use `output/` folder
+- **Temporary files** (`*.tmp`, `*.bak`, `scratch.*`, `temp.*`, `debug.*`)
+- **IDE configs** (`.vscode/`, `.idea/`) → gitignore unless team-shared
+- **Log files** (`*.log`, `error.txt`, `debug.txt`)
+
+**If you create a file at root that doesn't belong there, you MUST:**
+1. Immediately move it to the correct directory
+2. Update any references to the new path
+3. Never authorize stop until root is clean
 
 ### Directory Structure Best Practices
 
@@ -251,40 +304,79 @@ project-root/
 - Tests can depend on everything
 - No circular dependencies
 
-### When Creating New Files
+### When Creating New Files - MANDATORY CHECKLIST
 
-**Before writing a new file, ask:**
-1. Does this belong at root? (Rarely yes - only for essential configs/docs)
-2. Is there an existing directory for this type of file?
-3. Should this be gitignored? (outputs, cache, secrets, build artifacts)
-4. Does this follow the project's naming conventions?
+**🚨 BEFORE WRITING ANY FILE, YOU MUST ASK THESE QUESTIONS:**
 
-**Default locations:**
-- New feature code → `src/features/` or `src/modules/`
-- New utility → `src/utils/` or `src/lib/`
-- New test → `tests/` (mirroring the tested file's path)
-- New script → `scripts/`
-- New doc → `docs/` (or root if essential like README)
-- New config → Root (if essential) or `config/`
+1. **Does this belong at root?**
+   - Answer is **NO** 99% of the time
+   - Only YES for essential configs (`package.json`, `.gitignore`) or docs (`README.md`)
 
-### Enforcement
+2. **Is there an existing directory for this type of file?**
+   - If yes, use that directory
+   - If no, create the appropriate directory first
 
-**Before authorizing stop, verify:**
-- ✅ No temporary files at root (`*.tmp`, `*.log`, `scratch.*`)
-- ✅ No build artifacts at root (`dist/`, `build/`, compiled files)
-- ✅ All outputs in appropriate directories (per project CLAUDE.md)
-- ✅ `.gitignore` covers all generated/temporary files
-- ✅ Directory structure follows project conventions
+3. **Should this be gitignored?**
+   - YES for: outputs, cache, secrets, build artifacts, logs, temp files
+   - Add to `.gitignore` immediately
 
-**Integration with existing principles:**
-- Relates to "Security Zero Tolerance" → secrets/credentials properly organized
-- Relates to "Evidence-Based Validation" → outputs in predictable locations
-- Relates to "Project CLAUDE.md" → project-specific output folders
+4. **Does this follow the project's naming conventions?**
+   - Match the existing pattern (kebab-case, snake_case, etc.)
 
-**Proactive cleanup:**
-- If you generate temporary files during work, remove them before stopping
-- If you create outputs, place them in designated folders
-- If tests create artifacts, ensure they're gitignored
+**MANDATORY file locations (NO EXCEPTIONS):**
+- Source code → `src/` (NEVER at root)
+- Tests → `tests/` (NEVER at root)
+- Scripts → `scripts/` (NEVER at root)
+- Documentation → `docs/` (or root only if README/LICENSE)
+- Generated outputs → `output/` (gitignored, NEVER at root)
+- Logs → `logs/` (gitignored, NEVER at root)
+- Temporary files → `.tmp/` or `temp/` (gitignored, NEVER at root)
+- Config → Root only if essential, otherwise `config/`
+
+**Example violations (DO NOT DO THIS):**
+- ❌ `test-results.xml` at root → ✅ `output/test-results.xml`
+- ❌ `chart.png` at root → ✅ `output/charts/chart.png`
+- ❌ `debug.log` at root → ✅ `logs/debug.log`
+- ❌ `scratch.py` at root → ✅ `scripts/scratch.py` or delete after use
+
+### Enforcement - BLOCKING STOP AUTHORIZATION
+
+**🚨 STOP AUTHORIZATION WILL BE DENIED IF ROOT IS NOT CLEAN**
+
+**Before authorizing stop, you MUST verify and present proof:**
+1. Run `ls -la` at project root
+2. Verify ZERO files at root except allowed essentials
+3. Present the file list in validation report
+4. If ANY violations exist, fix them before proceeding
+
+**Mandatory verification checklist:**
+- ✅ **No temporary files at root** (`*.tmp`, `*.log`, `scratch.*`, `temp.*`, `debug.*`)
+- ✅ **No build artifacts at root** (`dist/`, `build/`, compiled files, `*.exe`, `*.o`)
+- ✅ **No test outputs at root** (`test-results.xml`, `coverage/`, `*.out`)
+- ✅ **No generated files at root** (charts, PDFs, CSVs, Excel files)
+- ✅ **No cache at root** (`__pycache__/`, `.cache/`, `.pytest_cache/`)
+- ✅ **All outputs in `output/` directory** (and gitignored)
+- ✅ **All logs in `logs/` directory** (and gitignored)
+- ✅ **`.gitignore` covers all generated/temporary files**
+- ✅ **Directory structure follows project conventions**
+
+**Integration with Core Principles:**
+- **Principle #1 (Validation-Required Stop)** → Root cleanliness is part of validation
+- **Principle #6 (Security Zero Tolerance)** → Secrets/credentials properly organized
+- **Principle #7 (Root Folder Cleanliness)** → This is the enforcement mechanism
+
+**Proactive cleanup (DO THIS DURING WORK, NOT AT THE END):**
+- As soon as you generate a file, place it in the correct directory
+- Never create files at root "temporarily" - use correct location from the start
+- If tests create artifacts, configure them to output to `output/` or `temp/`
+- Delete truly temporary files (debug, scratch) before stopping
+
+**If you find violations during stop validation:**
+1. Do NOT authorize stop
+2. Move files to correct locations
+3. Update `.gitignore` as needed
+4. Re-run validation
+5. Only then authorize stop
 
 ---
 
@@ -296,6 +388,13 @@ Before authorizing stop, present a validation report:
 
 ```markdown
 ## Validation Report
+
+### Root Folder Status
+**Command:** `ls -la` (at project root)
+**Result:** ✅ CLEAN (no temp/generated/output files at root)
+**Files at root:** [list only essential config/docs]
+
+### Tests
 **Command:** `npm test` (or pytest, cargo test, etc.)
 **Result:** ✅ PASS
 **Output:** [key lines from actual output]
@@ -316,7 +415,7 @@ Or use slash command: `/authorize-stop`
 3. After validation, run `/authorize-stop` → sets `authorized: true`
 4. Stop succeeds, authorization resets to `false` (one-time use)
 
-**Stop only when:** All work done + tests pass + validation proof shown
+**Stop only when:** All work done + **root clean** + tests pass + validation proof shown
 
 ---
 
@@ -324,12 +423,43 @@ Or use slash command: `/authorize-stop`
 
 **❌ NEVER:**
 - Edit `/Users/jeremyparker/.claude/settings.json`
+- **Create files at root** (unless essential config/docs - see Core Principle #7)
+- **Leave temporary/generated files at root** (*.tmp, *.log, test outputs, etc.)
 - Use Playwright (use Puppeteer)
 - Let linting/type errors block work completion
 - Commit secrets or credentials
 - Skip validation before stopping
 - Add unrequested features
 - Authorize stop without presenting validation proof
+- **Authorize stop with unclean root folder**
+
+---
+
+## 🧹 ROOT CLEANLINESS - VISUAL REMINDER
+
+**EVERY time you create a file, see this in your mind:**
+
+```
+❌ DON'T DO THIS:              ✅ DO THIS:
+project-root/                 project-root/
+├── test.log                  ├── src/
+├── output.csv                │   └── app.py
+├── debug.py                  ├── tests/
+├── chart.png                 │   └── test_app.py
+├── scratch.txt               ├── scripts/
+├── package.json              │   └── (utility scripts)
+└── README.md                 ├── output/          (gitignored)
+                              │   ├── charts/
+                              │   │   └── chart.png
+                              │   └── reports/
+                              │       └── output.csv
+                              ├── logs/            (gitignored)
+                              │   └── test.log
+                              ├── package.json
+                              └── README.md
+```
+
+**The right side is MANDATORY. The left side BLOCKS stop authorization.**
 
 ---
 
@@ -341,11 +471,13 @@ Or use slash command: `/authorize-stop`
 - No cutting corners - fix issues before authorizing stop
 - No leaving work half-done - complete everything first
 - No empty claims - present validation reports
+- **No messy root folder - everything in its proper place**
 
 **When you authorize stop, you're declaring:**
 - "This work is complete"
 - "I've run validation and it passed"
 - "The proof is in the validation report"
+- **"The root folder is clean and organized"**
 - "Ready for production"
 
 **Be confident in that declaration.**

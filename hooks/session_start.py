@@ -216,6 +216,16 @@ KEEP WORKING until ALL requested features are complete.
         context_parts.append("\n--- Recent GitHub Issues ---")
         context_parts.append(issues)
 
+    # Detect project type and surface relevant plugins from New Tools
+    try:
+        from utils.plugin_resolver import get_plugins_for_project
+        cwd = os.getcwd()
+        plugin_ctx = get_plugins_for_project(cwd)
+        if plugin_ctx:
+            context_parts.append(f"\n{plugin_ctx}")
+    except Exception:
+        pass  # Graceful degradation
+
     return "\n".join(context_parts)
 
 
@@ -253,12 +263,22 @@ def assess_task_complexity(prompt: str) -> dict:
                         '1.', '2.', '- ', '* ', 'first', 'second', 'then']
     indicators['parallel_tasks'] = sum(1 for kw in parallel_keywords if kw in prompt)
 
+    # Plugin match count enrichment
+    try:
+        from utils.plugin_resolver import get_resolver
+        resolver = get_resolver()
+        plugin_matches = resolver.resolve_by_task(prompt)
+        indicators['plugin_matches'] = len(plugin_matches)
+    except Exception:
+        indicators['plugin_matches'] = 0
+
     # Calculate complexity score
     complexity_score = (
         indicators['multi_component'] * 2 +
         (3 if indicators['large_scope'] else 0) +
         (4 if indicators['comprehensive'] else 0) +
-        indicators['parallel_tasks']
+        indicators['parallel_tasks'] +
+        min(indicators.get('plugin_matches', 0), 3)  # Up to 3 bonus from plugin matches
     )
 
     # Recommend swarm if complexity is high enough
@@ -283,6 +303,7 @@ def assess_task_complexity(prompt: str) -> dict:
 def auto_init_swarm(complexity: dict, session_id: str) -> dict:
     """
     Initialize swarm orchestration if complexity assessment recommends it.
+    Uses MCP-based swarm client for direct tool integration.
 
     Args:
         complexity: Result from assess_task_complexity
@@ -298,35 +319,122 @@ def auto_init_swarm(complexity: dict, session_id: str) -> dict:
         'initialized': False,
         'topology': complexity.get('recommended_topology', 'adaptive'),
         'swarm_id': None,
-        'agents_spawned': 0
+        'agents_spawned': 0,
+        'neural_loaded': False
     }
 
+    # 1. Try MCP-based swarm initialization first (new integration)
     try:
-        from utils.claude_flow import ClaudeFlowClient
-        cf = ClaudeFlowClient(timeout=5.0)
+        from utils.swarm_client import get_swarm_client
+        client = get_swarm_client(timeout=10.0)
 
         # Initialize swarm with recommended topology
-        swarm_result = cf.swarm_init(topology=results['topology'])
+        swarm_result = client.init_swarm(
+            topology=results['topology'],
+            strategy='adaptive',
+            max_agents=8
+        )
+
         if swarm_result:
             results['initialized'] = True
-            results['swarm_id'] = swarm_result.get('swarm_id', session_id[:12])
+            results['swarm_id'] = swarm_result.get('swarmId', session_id[:12])
 
-            # Store swarm context for session
-            cf.memory_store(
-                f"swarm_{session_id[:8]}",
-                {
-                    "session_id": session_id,
-                    "topology": results['topology'],
-                    "complexity_score": complexity.get('complexity_score', 0),
-                    "initialized_at": datetime.now().isoformat()
-                },
-                namespace="swarm_sessions",
-                confidence=0.7
+            # Store session context in swarm memory
+            from utils.mcp_client import get_mcp_client
+            mcp = get_mcp_client(timeout=5.0)
+            mcp.memory_store(
+                key=f'session/{session_id[:8]}',
+                value=json.dumps({
+                    'session_id': session_id,
+                    'topology': results['topology'],
+                    'complexity_score': complexity.get('complexity_score', 0),
+                    'initialized_at': datetime.now().isoformat()
+                }),
+                namespace='swarm_sessions',
+                ttl=86400  # 24 hour TTL
             )
     except Exception:
-        pass  # Graceful degradation - swarm init is optional
+        pass  # Graceful degradation
+
+    # 2. Fallback to legacy claude_flow client if MCP fails
+    if not results['initialized']:
+        try:
+            from utils.claude_flow import ClaudeFlowClient
+            cf = ClaudeFlowClient(timeout=5.0)
+
+            swarm_result = cf.swarm_init(topology=results['topology'])
+            if swarm_result:
+                results['initialized'] = True
+                results['swarm_id'] = swarm_result.get('swarm_id', session_id[:12])
+
+                cf.memory_store(
+                    f"swarm_{session_id[:8]}",
+                    {
+                        "session_id": session_id,
+                        "topology": results['topology'],
+                        "complexity_score": complexity.get('complexity_score', 0),
+                        "initialized_at": datetime.now().isoformat()
+                    },
+                    namespace="swarm_sessions",
+                    confidence=0.7
+                )
+        except Exception:
+            pass  # Graceful degradation
+
+    # 3. NEW: Load neural patterns for session
+    try:
+        from utils.neural_client import get_neural_client
+        neural = get_neural_client(timeout=5.0)
+
+        # Get neural status
+        status = neural.neural_status()
+        if status:
+            results['neural_loaded'] = True
+    except Exception:
+        pass  # Graceful degradation
 
     return results
+
+
+def load_workflow_context(session_id: str) -> str:
+    """
+    Load workflow context from workflow client.
+    Returns context string or empty string.
+    """
+    try:
+        from utils.workflow_client import get_workflow_client
+        client = get_workflow_client(timeout=5.0)
+
+        # Get recent workflows
+        workflows = client.workflow_list(limit=3)
+        if workflows:
+            lines = ["--- Recent Workflows ---"]
+            for w in workflows[:2]:
+                name = w.get('name', 'Unnamed')
+                status = w.get('status', 'unknown')
+                lines.append(f"- {name} ({status})")
+            return "\n".join(lines)
+    except Exception:
+        pass
+    return ""
+
+
+def load_analytics_context() -> str:
+    """
+    Load recent performance metrics from analytics client.
+    Returns context string or empty string.
+    """
+    try:
+        from utils.analytics_client import get_analytics_client
+        client = get_analytics_client(timeout=5.0)
+
+        # Get health check
+        health = client.health_check()
+        if health and health.get('status') == 'healthy':
+            return "✓ Analytics system healthy"
+    except Exception:
+        pass
+    return ""
 
 
 def get_initial_prompt(input_data: dict) -> str:
@@ -453,6 +561,14 @@ Multi-agent coordination enabled for this session.
             reasoning_ctx = load_reasoning_context()
             if reasoning_ctx:
                 context = context + "\n\n" + reasoning_ctx if context else reasoning_ctx
+            # NEW: Add workflow context
+            workflow_ctx = load_workflow_context(session_id)
+            if workflow_ctx:
+                context = context + "\n\n" + workflow_ctx if context else workflow_ctx
+            # NEW: Add analytics context
+            analytics_ctx = load_analytics_context()
+            if analytics_ctx:
+                context = context + "\n\n" + analytics_ctx if context else analytics_ctx
             if context:
                 # Using JSON output to add context
                 output = {

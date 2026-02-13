@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/seo-content-creation/agents/seo-content-writer.md

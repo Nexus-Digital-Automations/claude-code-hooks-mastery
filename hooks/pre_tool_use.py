@@ -75,13 +75,87 @@ def get_current_focus(cwd):
     return None  # All tasks complete or file unreadable
 
 
-def get_context_injection(cwd, tool_name):
+def get_neural_context(tool_name):
     """
-    Build context injection from FEATURES.md and tool-specific files.
+    Query neural patterns for tool-specific insights.
+    Returns context string or empty string.
+    """
+    try:
+        from utils.neural_client import get_neural_client
+        client = get_neural_client(timeout=3.0)
+
+        # Query cognitive patterns for the current tool
+        result = client.analyze_patterns(
+            action='predict',
+            operation=f'tool:{tool_name}',
+            metadata={'context': 'pre_tool'}
+        )
+        if result and result.get('patterns'):
+            patterns = result['patterns']
+            if isinstance(patterns, list) and len(patterns) > 0:
+                return f"--- Neural Patterns for {tool_name} ---\n" + \
+                       "\n".join([f"• {p.get('description', '')[:100]}" for p in patterns[:2]])
+    except Exception:
+        pass
+    return ""
+
+
+def get_swarm_context():
+    """
+    Get current swarm status for coordination awareness.
+    Returns context string or empty string.
+    """
+    try:
+        from utils.swarm_client import get_swarm_client
+        client = get_swarm_client(timeout=3.0)
+
+        status = client.swarm_status(verbose=False)
+        if status and status.get('status') == 'active':
+            topology = status.get('topology', 'unknown')
+            agent_count = status.get('agentCount', 0)
+            if agent_count > 0:
+                return f"--- Active Swarm: {topology} ({agent_count} agents) ---"
+    except Exception:
+        pass
+    return ""
+
+
+def get_github_context(tool_name, tool_input):
+    """
+    Get GitHub context for repository operations.
+    Returns context string or empty string.
+    """
+    # Only add GitHub context for relevant tools
+    if tool_name not in ['Bash', 'Read', 'Write', 'Edit', 'Task']:
+        return ""
+
+    try:
+        from utils.github_client import get_github_client
+        client = get_github_client(timeout=3.0)
+
+        # Check if we're in a git repo
+        repo = client.get_current_repo()
+        if repo:
+            # Get repo metrics if available
+            metrics = client.repo_metrics(repo)
+            if metrics:
+                prs = metrics.get('open_prs', 0)
+                issues = metrics.get('open_issues', 0)
+                if prs > 0 or issues > 0:
+                    return f"--- GitHub: {repo} ({prs} PRs, {issues} issues) ---"
+    except Exception:
+        pass
+    return ""
+
+
+def get_context_injection(cwd, tool_name, tool_input=None):
+    """
+    Build context injection from FEATURES.md, MCP tools, and tool-specific files.
     """
     docs_dir = Path(cwd) / "docs" / "development"
     hooks_dir = docs_dir / "hooks"
     injections = []
+    tool_input = tool_input or {}
 
     # 1. Auto-derive focus from first unfinished task in FEATURES.md
     current_task = get_current_focus(cwd)
@@ -146,6 +220,30 @@ def get_context_injection(cwd, tool_name):
     except Exception:
         pass  # Graceful degradation
 
+    # 7. NEW: Neural pattern query for cognitive insights
+    neural_ctx = get_neural_context(tool_name)
+    if neural_ctx:
+        injections.append(neural_ctx)
+
+    # 8. NEW: Swarm status for coordination awareness
+    swarm_ctx = get_swarm_context()
+    if swarm_ctx:
+        injections.append(swarm_ctx)
+
+    # 9. NEW: GitHub context for repository operations
+    github_ctx = get_github_context(tool_name, tool_input)
+    if github_ctx:
+        injections.append(github_ctx)
+
+    # 10. NEW: Plugin context injection from New Tools marketplace
+    try:
+        from utils.plugin_resolver import get_plugin_context_for_tool
+        plugin_ctx = get_plugin_context_for_tool(tool_name, tool_input)
+        if plugin_ctx:
+            injections.append(plugin_ctx)
+    except Exception:
+        pass  # Graceful degradation
+
     return "\n".join(injections) if injections else None
 
 
@@ -195,9 +293,9 @@ def main():
             print("Reading .env is allowed; use .env.sample for templates", file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
 
-        # Inject context from FEATURES.md (current task reminder)
+        # Inject context from FEATURES.md, MCP tools (neural, swarm, github)
         cwd = input_data.get('cwd', os.getcwd())
-        context = get_context_injection(cwd, tool_name)
+        context = get_context_injection(cwd, tool_name, tool_input)
         if context:
             output = {
                 "hookSpecificOutput": {

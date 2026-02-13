@@ -1,0 +1,291 @@
+     Add Visualization Support to All Statistical Analysis Scripts
+
+     Status: PENDING APPROVAL
+
+     Add chart/visualization capabilities to all 45 statistical analysis scripts where appropriate.
+
+     Scripts to Update: Up to 45
+     Location: python-scripts/general_scripts/statistical-analysis/
+
+     ---
+     Implementation Plan
+
+     Changes to Each Script (where applicable)
+
+     1. Add imports: matplotlib.pyplot (with Agg backend)
+     2. Add argument: --chart_file (optional path to save PNG)
+     3. Add function: generate_visualization(results, chart_file, analysis_type)
+     4. Update output: Include chart_file path in JSON when generated
+
+     Approach
+
+     - Review each script's analysis type
+     - Add appropriate visualizations for that analysis
+     - Skip if visualization doesn't add value (e.g., pure data validation)
+
+     ---
+     Phase 4 Scripts (8 Finance-Focused)
+
+     1. extreme_value.py
+
+     Purpose: Extreme value theory for tail risk analysis
+
+     Visualizations to Add:
+     - Return level plot - Return levels vs return periods with confidence bands
+     - QQ plot - Empirical vs fitted GEV/GPD quantiles
+     - Mean excess plot - Mean excess function for threshold selection
+     - Tail distribution - Empirical tail with fitted distribution overlay
+     - Hill plot - Tail index estimates vs number of order statistics
+
+     ---
+     2. regime_detection.py
+
+     Purpose: Market regime identification and state-switching models
+
+     Visualizations to Add:
+     - Regime time series - Data with colored background by detected regime
+     - Regime probability plot - Smoothed probabilities over time (stacked area)
+     - Transition matrix heatmap - State transition probabilities
+     - Regime statistics comparison - Bar chart of mean/vol by regime
+     - Duration distribution - Histogram of regime durations
+
+     ---
+     3. network_analysis.py
+
+     Purpose: Graph-based analysis for interconnected systems
+
+     Visualizations to Add:
+     - Network graph - Nodes sized by centrality, colored by community
+     - Centrality ranking - Horizontal bar chart of top nodes
+     - Adjacency heatmap - Correlation/connection matrix visualization
+     - Minimum spanning tree - Tree layout with edge weights
+     - Contagion cascade - Multi-panel showing spread over time steps
+
+     ---
+     4. panel_data.py
+
+     Purpose: Longitudinal/cross-sectional time series analysis
+
+     Visualizations to Add:
+     - Coefficient plot - Point estimates with confidence intervals
+     - Fixed effects distribution - Histogram/density of entity effects
+     - Variance decomposition - Pie chart (within/between/residual)
+     - Residual diagnostics - QQ plot and residuals vs fitted
+     - Panel structure - Heatmap showing data availability by entity/time
+
+     ---
+     5. cointegration.py
+
+     Purpose: Long-run equilibrium relationships and pairs trading
+
+     Visualizations to Add:
+     - Price series overlay - Normalized prices of cointegrated pairs
+     - Spread time series - Spread with mean and ±2σ bands
+     - Z-score with signals - Entry/exit signals marked on chart
+     - Rolling hedge ratio - Time-varying beta estimate
+     - Half-life visualization - Mean reversion speed illustration
+
+     ---
+     6. agreement_analysis.py
+
+     Purpose: Inter-rater reliability and consensus measurement
+
+     Visualizations to Add:
+     - Bland-Altman plot - Difference vs mean with limits of agreement
+     - Agreement heatmap - Confusion matrix between raters
+     - Kappa interpretation bar - Kappa value on Landis-Koch scale
+     - ICC forest plot - ICC estimates with CIs across measures
+     - Concordance scatter - Rater 1 vs Rater 2 with identity line
+
+     ---
+     7. sequential_analysis.py
+
+     Purpose: Sequential testing and adaptive designs
+
+     Visualizations to Add:
+     - SPRT boundary plot - Cumulative LR with accept/reject boundaries
+     - Alpha spending curve - Spending function vs information fraction
+     - Group sequential boundaries - Z-statistic boundaries at each look
+     - CUSUM control chart - Cumulative sum with control limits
+     - Conditional power curve - Power vs effect size at interim
+
+     ---
+     8. high_frequency.py
+
+     Purpose: Tick data and intraday analysis
+
+     Visualizations to Add:
+     - Signature plot - RV vs sampling frequency (log-log scale)
+     - Intraday seasonality - U-shaped volatility pattern by time of day
+     - Jump detection - Price series with detected jumps marked
+     - Noise estimation - Autocorrelation of returns at high frequency
+     - RV time series - Daily realized volatility over time
+
+     ---
+     ---
+     Implementation Pattern
+
+     Each script will be updated with:
+
+     # New import
+     import matplotlib
+     matplotlib.use('Agg')  # Non-interactive backend
+     import matplotlib.pyplot as plt
+
+     # New argument in JSON metadata
+     "chart_file": {
+         "type": "string",
+         "description": "Path to save visualization (PNG)",
+         "required": false
+     }
+
+     # New function
+     def generate_visualization(results, chart_file, analysis_type):
+         """Generate and save visualization based on analysis type"""
+         fig, axes = plt.subplots(...)
+         # Plot logic based on analysis_type
+         fig.savefig(chart_file, dpi=150, bbox_inches='tight')
+         plt.close(fig)
+         return chart_file
+
+     # Update main_logic() to call visualization if chart_file provided
+     if chart_file:
+         generate_visualization(results, chart_file, analysis_type)
+         results['chart_file'] = chart_file
+
+     ---
+     Verification Plan
+
+     1. Syntax check: python3 -m py_compile on all 8 scripts
+     2. Import test: Verify matplotlib imports work
+     3. Chart generation: Test each script produces valid PNG
+     4. JSON output: Confirm chart_file path appears in output
+
+     ---
+     Files to Modify
+     ┌────────────────────────┬──────────────┬────────────────┐
+     │         Script         │ Lines (est.) │ Visualizations │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ extreme_value.py       │ +80-100      │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ cointegration.py       │ +70-90       │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ regime_detection.py    │ +80-100      │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ panel_data.py          │ +70-90       │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ network_analysis.py    │ +90-110      │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ high_frequency.py      │ +80-100      │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ agreement_analysis.py  │ +70-90       │ 5 chart types  │
+     ├────────────────────────┼──────────────┼────────────────┤
+     │ sequential_analysis.py │ +80-100      │ 5 chart types  │
+     └────────────────────────┴──────────────┴────────────────┘
+     Total estimated additions: ~600-800 lines across 8 files
+
+     ---
+     Previous Implementation Order (COMPLETED)
+
+     1. extreme_value.py - GEV, POT, tail indices ✅
+     2. cointegration.py - Engle-Granger, Johansen, ECM ✅
+     3. regime_detection.py - HMM, Markov switching ✅
+     4. panel_data.py - Fixed/random effects, Hausman ✅
+     5. network_analysis.py - Centrality, community detection ✅
+     6. high_frequency.py - Realized volatility, microstructure ✅
+     7. agreement_analysis.py - Kappa, ICC, Bland-Altman ✅
+     8. sequential_analysis.py - SPRT, group sequential ✅
+
+     ---
+     Dependencies
+
+     Required (already available):
+     - matplotlib (for visualizations)
+     - numpy, scipy, pandas
+
+     ---
+     Previous Work Reference (COMPLETED)
+
+     Phase 3 - General Statistics (10 scripts) ✅
+
+     1. causal_inference.py ✅ - DiD, propensity matching, IV
+     2. outlier_detection.py ✅ - Z-score, IQR, IF, LOF
+     3. missing_data.py ✅ - MICE, EM, pattern analysis
+     4. effect_size.py ✅ - Cohen's d, OR, RR, NNT
+     5. model_selection.py ✅ - AIC/BIC, CV, stepwise
+     6. robust_statistics.py ✅ - M-estimators, robust regression
+     7. change_point.py ✅ - CUSUM, PELT, BOCPD
+     8. mixed_effects.py ✅ - LME, ICC, variance components
+     9. meta_analysis.py ✅ - Forest plots, heterogeneity
+     10. experimental_design.py ✅ - Factorial, RSM, optimal
+
+     Phase 2 - Investment-Focused (10 scripts) ✅
+
+     1. portfolio_optimization.py ✅
+     2. factor_models.py ✅
+     3. performance_attribution.py ✅
+     4. risk_decomposition.py ✅
+     5. monte_carlo_finance.py ✅
+     6. stress_testing.py ✅
+     7. copula_analysis.py ✅
+     8. fixed_income.py ✅
+     9. options_analytics.py ✅
+     10. yield_curve_modeling.py ✅
+
+     ---
+     All 45 Scripts - Add Visualizations
+
+     Original Scripts (17)
+
+     1. bayesian_analysis.py - Posterior distributions, trace plots
+     2. correlation_analysis.py - Correlation heatmap, scatter matrix
+     3. data_cleaner.py - Skip (utility)
+     4. data_standardizer.py - Skip (utility)
+     5. data_transformer.py - Skip (utility)
+     6. data_validator.py - Skip (utility)
+     7. descriptive_stats.py - Histograms, box plots
+     8. distribution_analysis.py - PDF/CDF plots, QQ plots
+     9. hypothesis_testing.py - P-value visualization, effect plots
+     10. multivariate_analysis.py - PCA scree plot, biplot
+     11. nonparametric_stats.py - Rank plots, bootstrap distributions
+     12. power_analysis.py - Power curves
+     13. regression_analysis.py - Residual plots, coefficient plots
+     14. sampling_methods.py - Sample distribution visualization
+     15. statistical_visualization.py - Already has visualizations
+     16. survival_analysis.py - Kaplan-Meier curves, hazard plots
+     17. time_series_analysis.py - ACF/PACF, decomposition plots
+
+     Phase 2 - Investment (10)
+
+     1. portfolio_optimization.py - Efficient frontier
+     2. factor_models.py - Factor loadings bar chart
+     3. performance_attribution.py - Attribution waterfall
+     4. risk_decomposition.py - Risk contribution pie chart
+     5. monte_carlo_finance.py - Simulation fan chart
+     6. stress_testing.py - Scenario impact bars
+     7. copula_analysis.py - Copula contour plots
+     8. fixed_income.py - Yield curve plot
+     9. options_analytics.py - Payoff diagrams, Greeks surface
+     10. yield_curve_modeling.py - Yield curve with models
+
+     Phase 3 - General Statistics (10)
+
+     1. causal_inference.py - Treatment effect plots
+     2. outlier_detection.py - Outlier scatter with markers
+     3. missing_data.py - Missing pattern heatmap
+     4. effect_size.py - Effect size forest plot
+     5. model_selection.py - AIC/BIC comparison bars
+     6. robust_statistics.py - Robust vs OLS comparison
+     7. change_point.py - Time series with change points
+     8. mixed_effects.py - Random effects caterpillar plot
+     9. meta_analysis.py - Forest plot
+     10. experimental_design.py - Response surface, interaction plots
+
+     Phase 4 - Finance (8) - Already detailed above
+
+     ---
+     Verification
+
+     1. Syntax check all modified scripts
+     2. Test chart generation with sample data
+     3. Verify PNG output is valid

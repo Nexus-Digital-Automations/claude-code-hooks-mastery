@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/seo-technical-optimization/agents/seo-meta-optimizer.md

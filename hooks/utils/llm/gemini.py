@@ -238,7 +238,7 @@ def main():
             if message:
                 print(message)
             else:
-                print("Error generating completion message")
+                sys.exit(1)  # Exit with error code, don't print error message
         elif sys.argv[1] == "--agent-name":
             # Generate agent name (no input needed)
             name = generate_agent_name()

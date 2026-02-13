@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/backend-development/skills/api-design-principles/assets/api-design-checklist.md

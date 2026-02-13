@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/api-scaffolding/agents/fastapi-pro.md

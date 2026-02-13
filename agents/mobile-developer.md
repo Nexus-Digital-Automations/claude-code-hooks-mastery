@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/frontend-mobile-development/agents/mobile-developer.md

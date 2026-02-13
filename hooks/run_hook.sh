@@ -5,16 +5,20 @@
 # Unset conda/python environment variables that cause warnings
 unset PYTHONHOME PYTHONPATH CONDA_PREFIX CONDA_PYTHON_EXE CONDA_DEFAULT_ENV CONDA_EXE CONDA_SHLVL _CE_CONDA CONDA_PROMPT_MODIFIER
 
-# Create temp file for stderr
+# Create temp files for stdout and stderr
+STDOUT_TMP=$(mktemp)
 STDERR_TMP=$(mktemp)
 
-# Run uv and capture stderr
-uv run "$@" 2>"$STDERR_TMP"
+# Run uv and capture both stdout and stderr
+uv run "$@" >"$STDOUT_TMP" 2>"$STDERR_TMP"
 EXIT_CODE=$?
 
-# Filter and output stderr (remove the platform warning)
-grep -v "Could not find platform independent libraries" "$STDERR_TMP" >&2
+# Output stdout (this is the JSON that Claude Code expects)
+cat "$STDOUT_TMP"
+
+# Filter and output stderr (remove the platform warning and zsh eval errors)
+grep -v -E "(Could not find platform independent libraries|^\(eval\):)" "$STDERR_TMP" >&2
 
 # Cleanup and exit with original code
-rm -f "$STDERR_TMP"
+rm -f "$STDOUT_TMP" "$STDERR_TMP"
 exit $EXIT_CODE

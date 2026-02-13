@@ -120,9 +120,8 @@ def main():
         with open(log_file, 'w') as f:
             json.dump(log_data, f, indent=2)
         
-        # Announce notification via TTS only if --notify flag is set
-        # Skip TTS for the generic "Claude is waiting for your input" message
-        if args.notify and input_data.get('message') != 'Claude is waiting for your input':
+        # Announce notification via TTS if --notify flag is set
+        if args.notify:
             announce_notification()
         
         sys.exit(0)

@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/frontend-mobile-security/agents/mobile-security-coder.md

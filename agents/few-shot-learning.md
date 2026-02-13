@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/llm-application-dev/skills/prompt-engineering-patterns/references/few-shot-learning.md

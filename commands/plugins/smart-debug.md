@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/debugging-toolkit/commands/smart-debug.md

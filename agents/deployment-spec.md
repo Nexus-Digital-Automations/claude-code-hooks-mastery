@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/kubernetes-operations/skills/k8s-manifest-generator/references/deployment-spec.md

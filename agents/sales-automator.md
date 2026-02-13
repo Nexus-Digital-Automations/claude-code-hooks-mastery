@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/customer-sales-automation/agents/sales-automator.md

@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/seo-analysis-monitoring/agents/seo-authority-builder.md

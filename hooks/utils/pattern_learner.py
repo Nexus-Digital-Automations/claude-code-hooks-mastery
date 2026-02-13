@@ -450,6 +450,169 @@ class PatternLearner:
             'by_tool': by_tool
         }
 
+    # =========================================================================
+    # Confidence Scoring System - EMA-based Pattern Confidence
+    # =========================================================================
+
+    def update_confidence(self, pattern_key: str, outcome: bool, weight: float = 1.0):
+        """
+        Update confidence score for a pattern using exponential moving average.
+
+        Args:
+            pattern_key: Unique identifier for the pattern
+            outcome: True for success, False for failure
+            weight: Weight for this update (default 1.0)
+        """
+        # Initialize confidence scores storage if not exists
+        if '_confidence_scores' not in self.patterns:
+            self.patterns['_confidence_scores'] = {}
+
+        scores = self.patterns['_confidence_scores']
+
+        # Initialize pattern if not exists
+        if pattern_key not in scores:
+            scores[pattern_key] = {
+                'score': 0.5,  # Start neutral
+                'samples': 0,
+                'last_updated': None
+            }
+
+        # EMA update with learning rate alpha
+        alpha = 0.3 * weight  # Learning rate, weighted
+        current = scores[pattern_key]['score']
+        new_value = 1.0 if outcome else 0.0
+
+        # EMA formula: new_score = alpha * new_value + (1 - alpha) * current
+        scores[pattern_key]['score'] = alpha * new_value + (1 - alpha) * current
+        scores[pattern_key]['samples'] += 1
+        scores[pattern_key]['last_updated'] = datetime.now().isoformat()
+
+        # Sync to ReasoningBank if available
+        self._sync_confidence_to_reasoning_bank(pattern_key, scores[pattern_key])
+
+        self._save_patterns()
+
+    def get_confidence(self, pattern_key: str) -> float:
+        """
+        Get current confidence score for a pattern.
+
+        Args:
+            pattern_key: Unique identifier for the pattern
+
+        Returns:
+            Confidence score between 0.0 and 1.0 (default 0.5)
+        """
+        scores = self.patterns.get('_confidence_scores', {})
+        pattern_data = scores.get(pattern_key, {})
+        return pattern_data.get('score', 0.5)
+
+    def get_confidence_stats(self, pattern_key: str) -> Dict[str, Any]:
+        """
+        Get full confidence statistics for a pattern.
+
+        Args:
+            pattern_key: Unique identifier for the pattern
+
+        Returns:
+            Dict with score, samples, last_updated
+        """
+        scores = self.patterns.get('_confidence_scores', {})
+        return scores.get(pattern_key, {
+            'score': 0.5,
+            'samples': 0,
+            'last_updated': None
+        })
+
+    def get_high_confidence_patterns(self, threshold: float = 0.7) -> list:
+        """
+        Get patterns with confidence above threshold.
+
+        Args:
+            threshold: Minimum confidence score (default 0.7)
+
+        Returns:
+            List of (pattern_key, score) tuples
+        """
+        scores = self.patterns.get('_confidence_scores', {})
+        high_conf = []
+
+        for key, data in scores.items():
+            score = data.get('score', 0.5)
+            if score >= threshold:
+                high_conf.append((key, score))
+
+        return sorted(high_conf, key=lambda x: x[1], reverse=True)
+
+    def decay_confidence(self, decay_rate: float = 0.95):
+        """
+        Apply time-based decay to all confidence scores.
+        Call periodically to reduce confidence of stale patterns.
+
+        Args:
+            decay_rate: Multiplier for decay (default 0.95 = 5% decay)
+        """
+        scores = self.patterns.get('_confidence_scores', {})
+
+        for key in scores:
+            # Decay towards neutral (0.5)
+            current = scores[key].get('score', 0.5)
+            # Move score towards 0.5 by decay_rate
+            scores[key]['score'] = 0.5 + (current - 0.5) * decay_rate
+
+        self._save_patterns()
+
+    def _sync_confidence_to_reasoning_bank(self, pattern_key: str, data: Dict[str, Any]):
+        """
+        Sync confidence score to ReasoningBank via Claude Flow.
+
+        Args:
+            pattern_key: Pattern identifier
+            data: Confidence data to sync
+        """
+        try:
+            from claude_flow import ClaudeFlowClient
+            cf = ClaudeFlowClient(timeout=2.0)
+            cf.memory_store(
+                f"confidence_{pattern_key}",
+                {
+                    "pattern_key": pattern_key,
+                    "confidence": data.get('score', 0.5),
+                    "samples": data.get('samples', 0)
+                },
+                namespace="confidence_scores",
+                confidence=data.get('score', 0.5)
+            )
+        except Exception:
+            pass  # Graceful degradation
+
+    def prune_low_confidence(self, threshold: float = 0.2, min_samples: int = 5):
+        """
+        Remove patterns with consistently low confidence.
+
+        Args:
+            threshold: Maximum score to prune (default 0.2)
+            min_samples: Minimum samples before pruning (default 5)
+
+        Returns:
+            Number of patterns pruned
+        """
+        scores = self.patterns.get('_confidence_scores', {})
+        to_remove = []
+
+        for key, data in scores.items():
+            score = data.get('score', 0.5)
+            samples = data.get('samples', 0)
+            if score < threshold and samples >= min_samples:
+                to_remove.append(key)
+
+        for key in to_remove:
+            del scores[key]
+
+        if to_remove:
+            self._save_patterns()
+
+        return len(to_remove)
+
 
 if __name__ == '__main__':
     # Simple test

@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/security-scanning/agents/threat-modeling-expert.md

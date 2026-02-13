@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/cloud-infrastructure/agents/hybrid-cloud-architect.md

@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/cloud-infrastructure/skills/terraform-module-library/references/aws-modules.md

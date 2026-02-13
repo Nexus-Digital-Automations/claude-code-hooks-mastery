@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/kubernetes-operations/skills/k8s-security-policies/references/rbac-patterns.md

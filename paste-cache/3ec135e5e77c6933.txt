@@ -1,0 +1,38 @@
+You can add MCP servers to Claude Code non-interactively from your terminal by using the `claude mcp add … -- <command> <args…>` pattern (good for `npx`-hosted servers), or by writing a `.mcp.json` file in a project to declare one or more MCP servers that Claude Code will load. [reddit](https://www.reddit.com/r/ClaudeAI/comments/1jf4hnt/setting_up_mcp_servers_in_claude_code_a_tech/)
+
+## Add an MCP server (CLI)
+These examples install MCP servers that run via `npx` and register them with Claude Code:
+
+```bash
+# Add a server (example: sequential-thinking) to your user scope
+claude mcp add sequential-thinking -s user -- npx -y @modelcontextprotocol/server-sequential-thinking
+``` 
+
+
+You can repeat the same pattern for other servers:
+
+```bash
+claude mcp add toolkit/)
+
+Example (Docker MCP Gateway):
+
+```json
+{
+  "mcpServers": {
+    "MCP_DOCKER": {
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+
+After adding/changing `.mcp.json`, restart Claude Code so it reloads the config. [docker](https://www.docker.com/blog/add-mcp-servers-to-claude-code-with-mcp-toolkit/)
+
+## Verify in Claude Code
+Inside Claude Code, use the `/mcp` slash command to list configured/available MCP servers and confirm your new server appears. [docker](https://www.docker.com/blog/add-mcp-servers-to-claude-code-with-mcp-toolkit/)
+
+## If you want, share your setup
+Which environment are you on (macOS/Linux/Windows), and are your MCP servers `npx`-based, Python/`uv`-based, or Docker-based?

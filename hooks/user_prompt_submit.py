@@ -18,6 +18,217 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
+# Add hooks directory to path for utils imports
+sys.path.insert(0, str(Path(__file__).parent))
+
+
+def store_request_pattern(session_id, prompt, category, cwd):
+    """
+    Store request pattern to ReasoningBank and Claude-Mem.
+    All operations are non-blocking with graceful fallback.
+    Enhanced with MCP tool integrations for workflow and neural patterns.
+    """
+    # 1. ReasoningBank: Store pattern via Claude Flow (increased timeout)
+    try:
+        from utils.claude_flow import ClaudeFlowClient
+        cf = ClaudeFlowClient(timeout=5.0)
+        cf.memory_store(
+            f"request_{category}_{session_id[:8]}",
+            {
+                "category": category,
+                "prompt_preview": prompt[:200],
+                "project": Path(cwd).name if cwd else "unknown",
+                "timestamp": datetime.now().isoformat()
+            },
+            namespace="user_requests",
+            confidence=0.5
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 2. Claude-Mem: Store for full-text search (increased timeout)
+    try:
+        from utils.claude_mem import ClaudeMemClient
+        mem_client = ClaudeMemClient(timeout=5.0)
+        mem_client.store_observation(
+            session_id=session_id,
+            tool_name="_user_request",
+            tool_input={"category": category, "prompt": prompt[:500]},
+            tool_response=""
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+    # 3. NEW: Neural Pattern Analysis - Learn from user request patterns
+    try:
+        from utils.neural_client import get_neural_client
+        neural = get_neural_client(timeout=3.0)
+
+        # Analyze cognitive patterns from this request type
+        neural.analyze_patterns(
+            action='learn',
+            operation=f'user_request:{category}',
+            outcome='received',
+            metadata={
+                'session': session_id[:8],
+                'category': category,
+                'prompt_length': len(prompt),
+                'project': Path(cwd).name if cwd else 'unknown'
+            }
+        )
+    except Exception:
+        pass  # Graceful degradation
+
+
+def get_workflow_recommendation(prompt, category):
+    """
+    Get workflow recommendation based on prompt complexity and category.
+    Returns workflow config or None if not applicable.
+    """
+    # Only recommend workflows for substantial feature/bug requests
+    if category not in ['feature', 'bug'] or len(prompt) < 50:
+        return None
+
+    # Determine complexity based on keywords
+    complex_keywords = [
+        'implement', 'build', 'create', 'refactor', 'migrate',
+        'integrate', 'redesign', 'optimize', 'comprehensive', 'full'
+    ]
+    prompt_lower = prompt.lower()
+
+    is_complex = any(kw in prompt_lower for kw in complex_keywords)
+    if not is_complex:
+        return None
+
+    # Build workflow configuration
+    if category == 'feature':
+        return {
+            'name': f'feature_{datetime.now().strftime("%Y%m%d_%H%M")}',
+            'steps': [
+                {'name': 'analyze', 'description': 'Analyze requirements'},
+                {'name': 'design', 'description': 'Design architecture'},
+                {'name': 'implement', 'description': 'Implement feature'},
+                {'name': 'test', 'description': 'Test implementation'},
+                {'name': 'review', 'description': 'Code review'}
+            ],
+            'triggers': ['on_start'],
+            'priority': 'high' if 'urgent' in prompt_lower else 'medium'
+        }
+    elif category == 'bug':
+        return {
+            'name': f'bugfix_{datetime.now().strftime("%Y%m%d_%H%M")}',
+            'steps': [
+                {'name': 'reproduce', 'description': 'Reproduce the bug'},
+                {'name': 'diagnose', 'description': 'Diagnose root cause'},
+                {'name': 'fix', 'description': 'Implement fix'},
+                {'name': 'verify', 'description': 'Verify fix works'},
+                {'name': 'test', 'description': 'Run regression tests'}
+            ],
+            'triggers': ['on_start'],
+            'priority': 'critical' if 'critical' in prompt_lower else 'high'
+        }
+
+    return None
+
+
+def create_workflow_for_request(session_id, prompt, category):
+    """
+    Create an automated workflow for complex requests.
+    Non-blocking with graceful fallback.
+    """
+    workflow_config = get_workflow_recommendation(prompt, category)
+    if not workflow_config:
+        return None
+
+    try:
+        from utils.workflow_client import get_workflow_client
+        workflow = get_workflow_client(timeout=5.0)
+
+        # Create the workflow
+        result = workflow.create_workflow(
+            name=workflow_config['name'],
+            steps=workflow_config['steps'],
+            triggers=workflow_config.get('triggers', [])
+        )
+
+        if result and result.get('workflowId'):
+            return result['workflowId']
+    except Exception:
+        pass  # Graceful degradation
+
+    return None
+
+
+def get_agent_recommendation(category, prompt):
+    """
+    Get recommended agent type based on request category and content.
+    Returns agent type string or None.
+    """
+    prompt_lower = prompt.lower()
+
+    # Security-related keywords
+    if any(kw in prompt_lower for kw in ['security', 'vulnerability', 'owasp', 'authentication', 'authorization']):
+        return 'owasp-guardian-sonnet'
+
+    # Testing keywords
+    if any(kw in prompt_lower for kw in ['test', 'coverage', 'tdd', 'unit test', 'integration test']):
+        return 'test-engineer-sonnet'
+
+    # Performance keywords
+    if any(kw in prompt_lower for kw in ['performance', 'optimize', 'slow', 'benchmark', 'profil']):
+        return 'perf-analyzer'
+
+    # API/design keywords
+    if any(kw in prompt_lower for kw in ['api', 'endpoint', 'rest', 'graphql', 'schema']):
+        return 'api-designer-sonnet'
+
+    # Architecture keywords
+    if any(kw in prompt_lower for kw in ['architect', 'design', 'structure', 'pattern', 'refactor']):
+        return 'system-architect-sonnet'
+
+    # Documentation keywords
+    if any(kw in prompt_lower for kw in ['document', 'readme', 'docs', 'comment', 'jsdoc']):
+        return 'documentation-writer-sonnet'
+
+    # Default by category
+    category_map = {
+        'bug': 'debug-detective-sonnet',
+        'feature': 'coder',
+        'question': 'researcher'
+    }
+
+    return category_map.get(category)
+
+
+def get_sparc_mode_recommendation(prompt, category):
+    """
+    Recommend SPARC mode based on request type.
+    Returns mode string or None.
+    """
+    prompt_lower = prompt.lower()
+
+    # TDD keywords
+    if any(kw in prompt_lower for kw in ['tdd', 'test-driven', 'test first', 'red green']):
+        return 'test'
+
+    # API keywords
+    if any(kw in prompt_lower for kw in ['api', 'endpoint', 'rest', 'graphql']):
+        return 'api'
+
+    # UI keywords
+    if any(kw in prompt_lower for kw in ['ui', 'frontend', 'component', 'react', 'vue']):
+        return 'ui'
+
+    # Refactor keywords
+    if any(kw in prompt_lower for kw in ['refactor', 'clean', 'improve', 'optimize code']):
+        return 'refactor'
+
+    # Default to dev mode for features
+    if category == 'feature':
+        return 'dev'
+
+    return None
+
 
 def log_user_prompt(session_id, input_data):
     """Log user prompt to logs directory."""
@@ -230,7 +441,18 @@ def inject_ambiguity_prompt(prompt):
     if prompt_lower in skip_patterns or len(prompt_lower) < 20:
         return None
 
-    return """🔍 BEFORE STARTING: If this request has any ambiguity or multiple valid approaches, ask clarifying questions first. Mark your recommended answer with [Recommended]."""
+    return """UPFRONT: Clarify ambiguity NOW. Mark recommended with [Recommended].
+
+PLAN VALIDATION (3+ methods before stopping):
+• Tests: npm test, pytest, cargo test
+• Build: npm run build, tsc --noEmit
+• Lint: eslint, flake8, mypy
+• Logs: console.log, app logs
+• Runtime: start app, verify
+• Browser: Puppeteer screenshots
+• API: curl endpoints
+
+Execute autonomously—no mid-task questions."""
 
 
 def validate_prompt(prompt):
@@ -283,6 +505,10 @@ def main():
 
         # Track requests in docs/development/ if cwd is available
         cwd = input_data.get('cwd', '')
+        workflow_id = None
+        recommended_agent = None
+        sparc_mode = None
+
         if cwd and args.store_last_prompt:
             try:
                 category, is_trackable = categorize_prompt(prompt)
@@ -293,6 +519,18 @@ def main():
                     # Also track in FEATURES.md if it's a feature request
                     if category == 'feature':
                         update_features(cwd, prompt, session_id)
+
+                    # Store to ReasoningBank and Claude-Mem
+                    store_request_pattern(session_id, prompt, category, cwd)
+
+                    # NEW: Create workflow for complex requests
+                    workflow_id = create_workflow_for_request(session_id, prompt, category)
+
+                    # NEW: Get agent recommendation
+                    recommended_agent = get_agent_recommendation(category, prompt)
+
+                    # NEW: Get SPARC mode recommendation
+                    sparc_mode = get_sparc_mode_recommendation(prompt, category)
             except Exception:
                 # Don't block on tracking errors
                 pass
@@ -307,10 +545,38 @@ def main():
 
         # Inject ambiguity detection context for substantial requests
         ambiguity_context = inject_ambiguity_prompt(prompt)
+
+        # Build additional context with recommendations
+        context_parts = []
         if ambiguity_context:
+            context_parts.append(ambiguity_context)
+
+        # Add workflow context if created
+        if workflow_id:
+            context_parts.append(f"\n📋 WORKFLOW: Auto-created workflow '{workflow_id}' for this request.")
+
+        # Add agent recommendation
+        if recommended_agent:
+            context_parts.append(f"\n🤖 RECOMMENDED AGENT: Consider using '{recommended_agent}' for this task.")
+
+        # Add SPARC mode recommendation
+        if sparc_mode:
+            context_parts.append(f"\n⚡ SPARC MODE: '{sparc_mode}' mode recommended for this type of work.")
+
+        # Add plugin suggestions from New Tools marketplace
+        try:
+            from utils.plugin_resolver import get_plugin_suggestions_for_prompt
+            plugin_suggestions = get_plugin_suggestions_for_prompt(prompt)
+            if plugin_suggestions:
+                context_parts.append(f"\n{plugin_suggestions}")
+        except Exception:
+            pass  # Graceful degradation
+
+        # Output combined context
+        if context_parts:
             output = {
                 "hookSpecificOutput": {
-                    "additionalContext": ambiguity_context
+                    "additionalContext": "\n".join(context_parts)
                 }
             }
             print(json.dumps(output))

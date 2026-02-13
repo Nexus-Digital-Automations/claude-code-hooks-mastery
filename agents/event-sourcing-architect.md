@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/backend-development/agents/event-sourcing-architect.md

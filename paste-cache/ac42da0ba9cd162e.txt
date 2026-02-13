@@ -1,0 +1,30 @@
+`claude-flow@v3alpha` is failing **before it even runs**—`npx` can’t complete the package install step because npm is throwing `cb.apply is not a function`. This is a known `npx`/npm failure mode (often cache/toolchain corruption or a mismatched `npx` install), and it’s not specific to Claude Flow. [github](https://github.com/npm/npx/issues/67)
+
+## What your versions suggest
+You’re on Node v22.21.1 with npm 10.9.4, but `npx -v` reports 10.2.2, which strongly hints you may have a **separately-installed/older npx** on PATH (historically a common cause of this exact error). [github](https://github.com/npm/npx/issues/67)
+
+## Fix (most likely)
+Run these in order:
+
+1) Verify where `npx` is coming from:
+- `which -a npx`
+- `ls -l $(which npx)`
+
+2) Remove standalone `npx` if present and use the one bundled with npm (the `npx` repo issue notes this “standalone npx” situation can trigger `cb.apply` errors). [github](https://github.com/npm/npx/issues/67)
+- `npm uninstall -g npx`  (only if you previously installed it globally)
+
+3) Clear npx/npm caches and retry:
+- `npm cache clean --force` [github](https://github.com/nodejs/help/issues/2874)
+- `rm -rf ~/.npm/_npx`
+- `npx -v` (should now match npm more closely)
+- `npx claude-flow@alpha doctor` (or `@v3alpha` after it’s working)
+
+## If it still fails
+The next highest-probability fix is reinstalling Node/npm cleanly (many reports resolve `cb.apply` only after removing corrupted npm folders/caches and reinstalling). [github](https://github.com/nodejs/help/issues/2874)
+
+Paste the output of:
+- `which -a npx`
+- `npm prefix -g`
+- `npm root -g`
+
+That will usually make it obvious whether an old `npx` binary is shadowing the bundled one.

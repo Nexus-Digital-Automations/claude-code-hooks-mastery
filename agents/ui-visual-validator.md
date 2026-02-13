@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/accessibility-compliance/agents/ui-visual-validator.md
