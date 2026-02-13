@@ -343,13 +343,19 @@ project-root/
 
 **🚨 STOP AUTHORIZATION WILL BE DENIED IF ROOT IS NOT CLEAN**
 
+**The stop hook automatically checks TWO things:**
+1. **Root folder cleanliness** (BLOCKING) - blocks stop if violations found
+2. **Codebase organization** (INFORMATIONAL) - provides suggestions/warnings
+
 **Before authorizing stop, you MUST verify and present proof:**
 1. Run `ls -la` at project root
 2. Verify ZERO files at root except allowed essentials
 3. Present the file list in validation report
 4. If ANY violations exist, fix them before proceeding
 
-**Mandatory verification checklist:**
+**Mandatory verification checklist (automatically checked by stop hook):**
+
+**Root Cleanliness (BLOCKING):**
 - ✅ **No temporary files at root** (`*.tmp`, `*.log`, `scratch.*`, `temp.*`, `debug.*`)
 - ✅ **No build artifacts at root** (`dist/`, `build/`, compiled files, `*.exe`, `*.o`)
 - ✅ **No test outputs at root** (`test-results.xml`, `coverage/`, `*.out`)
@@ -358,7 +364,13 @@ project-root/
 - ✅ **All outputs in `output/` directory** (and gitignored)
 - ✅ **All logs in `logs/` directory** (and gitignored)
 - ✅ **`.gitignore` covers all generated/temporary files**
-- ✅ **Directory structure follows project conventions**
+
+**Codebase Organization (INFORMATIONAL):**
+- ⚠️  **No source code at root** (*.py, *.js, *.ts files → should be in src/)
+- 💡 **Consistent test directory** (use tests/ not mix of test/, spec/, __tests__/)
+- 💡 **Documentation organized** (many .md files → consider docs/)
+- 💡 **Scripts organized** (many .sh files → consider scripts/)
+- 💡 **Proper project structure** (src/, tests/, docs/, scripts/ when applicable)
 
 **Integration with Core Principles:**
 - **Principle #1 (Validation-Required Stop)** → Root cleanliness is part of validation

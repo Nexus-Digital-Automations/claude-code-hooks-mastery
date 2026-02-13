@@ -253,6 +253,98 @@ def check_root_cleanliness():
         return (True, [])
 
 
+def check_codebase_organization():
+    """
+    Check if codebase follows organization best practices.
+    Returns (is_organized: bool, suggestions: list, warnings: list).
+    """
+    suggestions = []
+    warnings = []
+    cwd = Path.cwd()
+
+    # Skip checks if this is the .claude directory itself
+    if cwd.name == '.claude':
+        return (True, [], [])
+
+    try:
+        # Check 1: Source code files at root (should be in src/)
+        source_extensions = {'.py', '.js', '.ts', '.jsx', '.tsx', '.go', '.rs', '.java', '.cpp', '.c', '.rb'}
+        allowed_root_files = {'main.py', 'app.py', 'index.js', 'index.ts', 'main.go', 'main.rs',
+                             'setup.py', '__init__.py', '__main__.py'}
+
+        for item in cwd.iterdir():
+            if item.is_file() and item.suffix in source_extensions:
+                if item.name not in allowed_root_files and not item.name.startswith('.'):
+                    warnings.append(f"  ⚠️  {item.name} at root → should be in src/ directory")
+
+        # Check 2: Recommend directory structure if missing
+        has_src = (cwd / 'src').exists()
+        has_tests = (cwd / 'tests').exists() or (cwd / 'test').exists()
+
+        # Count source files to determine if this is a real project
+        source_files = [f for f in cwd.rglob('*') if f.is_file() and f.suffix in source_extensions]
+        is_real_project = len(source_files) > 3
+
+        if is_real_project:
+            if not has_src:
+                # Check if there are source files that should be in src/
+                root_source_files = [f for f in cwd.iterdir()
+                                   if f.is_file() and f.suffix in source_extensions
+                                   and f.name not in allowed_root_files]
+                if root_source_files:
+                    suggestions.append("  💡 Consider creating src/ directory for source code")
+
+            if not has_tests:
+                # Check if there are any test files scattered around
+                test_files = [f for f in cwd.rglob('*test*.py') if f.is_file()]
+                test_files += [f for f in cwd.rglob('*.test.js') if f.is_file()]
+                test_files += [f for f in cwd.rglob('*.test.ts') if f.is_file()]
+                if test_files:
+                    suggestions.append("  💡 Consider creating tests/ directory (mirror src/ structure)")
+
+        # Check 3: Multiple test directories (inconsistency)
+        test_dirs = []
+        if (cwd / 'tests').exists():
+            test_dirs.append('tests/')
+        if (cwd / 'test').exists():
+            test_dirs.append('test/')
+        if (cwd / '__tests__').exists():
+            test_dirs.append('__tests__/')
+        if (cwd / 'spec').exists():
+            test_dirs.append('spec/')
+
+        if len(test_dirs) > 1:
+            warnings.append(f"  ⚠️  Multiple test directories found: {', '.join(test_dirs)} → consolidate into tests/")
+
+        # Check 4: Documentation organization
+        has_docs = (cwd / 'docs').exists()
+        doc_files_at_root = [f for f in cwd.iterdir()
+                            if f.is_file() and f.suffix == '.md'
+                            and f.name not in {'README.md', 'CLAUDE.md', 'LICENSE.md', 'CONTRIBUTING.md',
+                                              'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'SECURITY.md'}]
+
+        if len(doc_files_at_root) > 3 and not has_docs:
+            suggestions.append(f"  💡 {len(doc_files_at_root)} .md files at root → consider docs/ directory")
+
+        # Check 5: Scripts organization
+        has_scripts = (cwd / 'scripts').exists()
+        script_files_at_root = [f for f in cwd.iterdir()
+                               if f.is_file() and f.suffix in {'.sh', '.bash', '.zsh'}
+                               and not f.name.startswith('.')]
+
+        if len(script_files_at_root) > 2 and not has_scripts:
+            suggestions.append(f"  💡 {len(script_files_at_root)} script files at root → consider scripts/ directory")
+
+        # Determine if organized
+        is_organized = len(warnings) == 0
+
+        return (is_organized, suggestions, warnings)
+
+    except Exception:
+        # If we can't check, assume organized (fail-safe)
+        return (True, [], [])
+
+
 def check_stop_authorization():
     """
     Check if stop is authorized via file-based configuration.
@@ -277,6 +369,10 @@ def main():
     try:
         # ROOT CLEANLINESS CHECK - blocks stop if violations found
         is_clean, violations = check_root_cleanliness()
+
+        # CODEBASE ORGANIZATION CHECK - informational feedback
+        is_organized, suggestions, org_warnings = check_codebase_organization()
+
         if not is_clean:
             violation_list = "\n".join(violations)
             root_blocked_msg = f"""
@@ -315,13 +411,25 @@ See CLAUDE.md Core Principle #7 for details.
             script_dir = Path(__file__).parent
             auth_script = script_dir.parent / "commands" / "authorize-stop.sh"
 
+            # Build organization feedback section
+            org_feedback = ""
+            if org_warnings or suggestions:
+                org_feedback = "\n📁 CODEBASE ORGANIZATION FEEDBACK:\n"
+                if org_warnings:
+                    org_feedback += "\nWarnings (consider fixing):\n"
+                    org_feedback += "\n".join(org_warnings) + "\n"
+                if suggestions:
+                    org_feedback += "\nSuggestions (optional improvements):\n"
+                    org_feedback += "\n".join(suggestions) + "\n"
+                org_feedback += "\nSee CLAUDE.md 'Codebase Organization' section for guidelines.\n"
+
             blocked_msg = f"""
 ======================================================================
 STOP BLOCKED - VALIDATION REQUIRED
 ======================================================================
 
 ✅ Root folder is clean!
-
+{org_feedback}
 VALIDATION METHODS (execute 3+):
 □ Unit tests: npm test, pytest, cargo test, go test
 □ Build/compile: npm run build, tsc --noEmit, cargo build
