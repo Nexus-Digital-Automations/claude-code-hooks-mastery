@@ -1,5 +1,24 @@
 # Claude Code Project Assistant
 
+---
+
+## 📖 REQUIRED READING: Project-Specific Instructions
+
+**ALWAYS read `CLAUDE_PROJECT.md` at the start of any session working on this project.**
+
+This file contains critical project-specific instructions for:
+- **WRDS MCP usage** — Data retrieval prioritization and tool usage
+- **Python integration** — When to use Python vs WRDS MCP
+- **Output file locations** — All exports/charts MUST go to project folders
+- **ETF PERMNOs** — Common identifiers for major ETFs in CRSP
+- **Investment research workflow** — Screener, analysis, and validation patterns
+
+```
+Location: ./CLAUDE_PROJECT.md
+```
+
+---
+
 ## CORE IDENTITY
 
 You are a **capable engineer** who values:
@@ -178,6 +197,112 @@ Linting autofix: `npm run lint:fix` (use when possible, never blocks work)
 
 ---
 
+## 📁 CODEBASE ORGANIZATION & ROOT FOLDER CLEANLINESS
+
+### Root Folder Guidelines
+
+**✅ BELONGS AT ROOT:**
+- Core configuration files (`package.json`, `pyproject.toml`, `Cargo.toml`, etc.)
+- Documentation (`README.md`, `CLAUDE_PROJECT.md`, `CONTRIBUTING.md`)
+- Build/CI/CD specs (`.github/`, `Dockerfile`, `docker-compose.yml`)
+- Essential dotfiles (`.gitignore`, `.editorconfig`, `eslint.config.mjs`)
+- License files (`LICENSE`, `NOTICE`)
+- Entry points (`main.py`, `index.ts`, etc.)
+
+**❌ NEVER AT ROOT:**
+- Test outputs or artifacts (`test-results.xml`, `coverage/`, `*.log`)
+- Build artifacts (`dist/`, `build/`, `target/`, `*.exe`)
+- Cache files (`__pycache__/`, `node_modules/`, `.cache/`)
+- Generated files (`*.generated.*` unless essential)
+- Output files (charts, exports, reports) → use project-specific folders per CLAUDE_PROJECT.md
+- Temporary files (`*.tmp`, `*.bak`, `scratch.*`)
+- IDE configs (`.vscode/`, `.idea/`) → gitignore unless team-shared
+
+### Directory Structure Best Practices
+
+**Standard organization pattern:**
+```
+project-root/
+├── src/                  # Source code
+│   ├── core/            # Core business logic
+│   ├── utils/           # Shared utilities
+│   └── services/        # External integrations
+├── tests/               # Test files (mirror src/ structure)
+├── docs/                # Documentation
+├── config/              # Configuration files
+├── scripts/             # Utility scripts
+├── assets/              # Static assets (images, fonts, etc.)
+├── output/              # Generated outputs (gitignored)
+│   ├── charts/
+│   ├── exports/
+│   └── reports/
+└── [config files]       # Root-level configs only
+```
+
+**Naming conventions:**
+- Directories: `kebab-case/` (or `snake_case/` for Python projects)
+- Group by feature OR layer (be consistent within project)
+- Use `src/` (not `lib/`, `app/`, or mixed)
+- Use `tests/` (not `test/`, `spec/`, or mixed)
+
+### File Organization Rules
+
+**1. Separation of Concerns**
+- Source code → `src/`
+- Tests → `tests/` (mirroring `src/` structure)
+- Documentation → `docs/` or root-level `.md` files
+- Configuration → Root or `config/` (not scattered)
+- Generated/temporary files → Dedicated folders with `.gitignore`
+
+**2. Artifact Management**
+- Build artifacts → `.gitignore` and dedicated folder (`dist/`, `build/`, `target/`)
+- Output files (charts, CSVs, PDFs) → `output/` or project-specific folder
+- Cache → `.cache/`, `__pycache__/`, `node_modules/` (all gitignored)
+- Logs → `logs/` (gitignored except `.gitkeep`)
+
+**3. Dependency Direction (Clean Architecture)**
+- Core business logic depends on NOTHING
+- Services/adapters depend on core (not vice versa)
+- Tests can depend on everything
+- No circular dependencies
+
+### When Creating New Files
+
+**Before writing a new file, ask:**
+1. Does this belong at root? (Rarely yes - only for essential configs/docs)
+2. Is there an existing directory for this type of file?
+3. Should this be gitignored? (outputs, cache, secrets, build artifacts)
+4. Does this follow the project's naming conventions?
+
+**Default locations:**
+- New feature code → `src/features/` or `src/modules/`
+- New utility → `src/utils/` or `src/lib/`
+- New test → `tests/` (mirroring the tested file's path)
+- New script → `scripts/`
+- New doc → `docs/` (or root if essential like README)
+- New config → Root (if essential) or `config/`
+
+### Enforcement
+
+**Before authorizing stop, verify:**
+- ✅ No temporary files at root (`*.tmp`, `*.log`, `scratch.*`)
+- ✅ No build artifacts at root (`dist/`, `build/`, compiled files)
+- ✅ All outputs in appropriate directories (per CLAUDE_PROJECT.md)
+- ✅ `.gitignore` covers all generated/temporary files
+- ✅ Directory structure follows project conventions
+
+**Integration with existing principles:**
+- Relates to "Security Zero Tolerance" → secrets/credentials properly organized
+- Relates to "Evidence-Based Validation" → outputs in predictable locations
+- Relates to "CLAUDE_PROJECT.md" → project-specific output folders
+
+**Proactive cleanup:**
+- If you generate temporary files during work, remove them before stopping
+- If you create outputs, place them in designated folders
+- If tests create artifacts, ensure they're gitignored
+
+---
+
 ## 📋 STOP AUTHORIZATION QUICK REFERENCE
 
 ### Validation Report Format
@@ -303,7 +428,7 @@ npx claude-flow@alpha memory consolidate            # Prune low-confidence
 - **Adaptive**: Dynamic topology switching based on task
 - **Collective**: Consensus-based group intelligence
 
-### Agent Types (54+ available)
+### Agent Types (150+ available, including 99 from Plugin Ecosystem)
 ```
 coder       → Implementation specialist
 reviewer    → Code review and QA
@@ -311,6 +436,37 @@ tester      → Comprehensive testing
 researcher  → Deep research and analysis
 architect   → System design
 debugger    → Error analysis and fixes
+```
+
+---
+
+## MCP Tools Quick Reference
+
+Three MCP servers via `mcp__<server>__<tool>`:
+
+| Server | Prefix | Key Tools |
+|--------|--------|-----------|
+| **Claude-Flow** | `mcp__claude-flow_alpha__` | `swarm_init`, `task_orchestrate`, `memory_usage`, `neural_train` |
+| **Ruv-Swarm** | `mcp__ruv-swarm__` | `swarm_init`, `agent_spawn`, `benchmark_run`, `neural_patterns` |
+| **Flow-Nexus** | `mcp__flow-nexus__` | `sandbox_create`, `neural_cluster_init`, `workflow_create` |
+
+### Common Operations
+```javascript
+// Swarm
+mcp__ruv-swarm__swarm_init { topology: "mesh", maxAgents: 5 }
+mcp__ruv-swarm__agent_spawn { type: "analyst", name: "test" }
+mcp__ruv-swarm__task_orchestrate { task: "desc", strategy: "adaptive" }
+
+// Neural
+mcp__ruv-swarm__neural_patterns { pattern: "all" }
+mcp__ruv-swarm__benchmark_run { type: "swarm", iterations: 3 }
+```
+
+### Permission Setup (`settings.json`)
+```json
+"mcp__claude-flow_alpha__*",
+"mcp__ruv-swarm__*",
+"mcp__flow-nexus__*"
 ```
 
 ---
@@ -350,6 +506,52 @@ curl "http://localhost:37777/api/search?query=bugfix&type=feature"
 
 ---
 
+## Plugin Ecosystem (67 Plugins, 99 Agents, 107 Skills)
+
+Production-ready workflow plugins from `~/.claude/New Tools/agents/plugins/`.
+Automatically resolved and injected by hooks based on file type, tool context, and task keywords.
+
+### Categories
+
+| Category | Plugins | Focus |
+|----------|---------|-------|
+| Development | backend-development, frontend-mobile, full-stack, multi-platform, developer-essentials | App development across stacks |
+| Languages | python, javascript-typescript, systems-programming, jvm, web-scripting, functional, julia, shell, arm-cortex | Language-specific best practices |
+| Testing | unit-testing, tdd-workflows | Test automation and TDD methodology |
+| Security | security-scanning, security-compliance, backend-api-security, frontend-mobile-security | SAST, OWASP, compliance |
+| Infrastructure | cloud-infrastructure, kubernetes-operations, cicd-automation, deployment-strategies | Cloud, K8s, CI/CD, IaC |
+| Operations | incident-response, error-diagnostics, distributed-debugging, observability-monitoring | Production operations |
+| Data | data-engineering, data-validation-suite, database-design, database-migrations | ETL, schema, migrations |
+| AI/ML | llm-application-dev, agent-orchestration, context-management, machine-learning-ops | LLM apps, MLOps, agents |
+| Quality | code-review-ai, comprehensive-review, performance-testing-review | Code quality and review |
+| Documentation | code-documentation, documentation-generation, c4-architecture | Docs, diagrams, ADRs |
+| Business | business-analytics, hr-legal-compliance, customer-sales-automation | Business operations |
+| Marketing | seo-content-creation, seo-technical-optimization, seo-analysis-monitoring, content-marketing | SEO, content strategy |
+| Finance | quantitative-trading, payment-processing | Trading, payments |
+| Blockchain | blockchain-web3 | Smart contracts, DeFi |
+| Gaming | game-development | Unity, Minecraft |
+| Accessibility | accessibility-compliance | WCAG, a11y |
+| Modernization | framework-migration, codebase-cleanup | Legacy modernization |
+
+### How Plugin Resolution Works
+
+Hooks automatically resolve relevant plugins:
+
+1. **PreToolUse** (step 10): Matches by file extension and tool context
+2. **SessionStart**: Detects project type (`pyproject.toml` -> python plugins, etc.)
+3. **PostToolUse**: Records which plugins were relevant to successful operations
+4. **UserPromptSubmit**: Analyzes prompt keywords against plugin catalog
+
+### Reference Paths
+
+- **Marketplace catalog:** `~/.claude/New Tools/agents/.claude-plugin/marketplace.json`
+- **Plugin resolver:** `~/.claude/hooks/utils/plugin_resolver.py`
+- **Agent index:** `~/.claude/agents/PLUGINS_INDEX.md`
+- **Skills index:** `~/.claude/skills/PLUGINS_INDEX.md`
+- **Installer:** `~/.claude/scripts/install-new-tools.sh`
+
+---
+
 ## Integrated Memory Architecture
 
 ```
@@ -365,7 +567,8 @@ curl "http://localhost:37777/api/search?query=bugfix&type=feature"
 │  PreToolUse (every operation)                            │
 │     ├─→ FEATURES.md: current task injection             │
 │     ├─→ PatternLearner: recent patterns                 │
-│     └─→ ReasoningBank: tool-specific patterns           │
+│     ├─→ ReasoningBank: tool-specific patterns           │
+│     └─→ PluginResolver: file/tool context matching      │
 │                                                          │
 │  Stop                                                    │
 │     ├─→ Claude-Mem: persist_session_learnings()         │
@@ -388,4 +591,4 @@ You provide:
 
 **Do good work. Be honest about tradeoffs. Keep learning.**
 
-**Version:** 5.4 (Humble Engineer + Claude Flow + Claude-Mem)
+**Version:** 5.6 (Humble Engineer + Claude Flow + Claude-Mem + MCP Tools + Plugin Ecosystem)
