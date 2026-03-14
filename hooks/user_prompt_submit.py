@@ -8,9 +8,15 @@
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from datetime import datetime
+
+# Clear potentially contaminated Python environment variables (same as stop.py)
+for _var in ['PYTHONHOME', 'PYTHONPATH']:
+    if _var in os.environ:
+        del os.environ[_var]
 
 try:
     from dotenv import load_dotenv
@@ -23,236 +29,53 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 
 def store_request_pattern(session_id, prompt, category, cwd):
-    """
-    Store request pattern to ReasoningBank and Claude-Mem.
-    All operations are non-blocking with graceful fallback.
-    Enhanced with MCP tool integrations for workflow and neural patterns.
-    """
-    # 1. ReasoningBank: Store pattern via Claude Flow (increased timeout)
-    try:
-        from utils.claude_flow import ClaudeFlowClient
-        cf = ClaudeFlowClient(timeout=5.0)
-        cf.memory_store(
-            f"request_{category}_{session_id[:8]}",
-            {
-                "category": category,
-                "prompt_preview": prompt[:200],
-                "project": Path(cwd).name if cwd else "unknown",
-                "timestamp": datetime.now().isoformat()
-            },
-            namespace="user_requests",
-            confidence=0.5
-        )
-    except Exception:
-        pass  # Graceful degradation
-
-    # 2. Claude-Mem: Store for full-text search (increased timeout)
+    """Store request pattern to Claude-Mem for full-text search across sessions."""
     try:
         from utils.claude_mem import ClaudeMemClient
-        mem_client = ClaudeMemClient(timeout=5.0)
+        project = Path(cwd).name if cwd else "unknown"
+        mem_client = ClaudeMemClient(timeout=0.5)
+        mem_client.init_session(
+            session_id=session_id,
+            project=project,
+            prompt=prompt
+        )
         mem_client.store_observation(
             session_id=session_id,
             tool_name="_user_request",
-            tool_input={"category": category, "prompt": prompt[:500]},
+            tool_input={"category": category, "prompt": prompt[:500],
+                        "project": project},
             tool_response=""
         )
     except Exception:
-        pass  # Graceful degradation
-
-    # 3. NEW: Neural Pattern Analysis - Learn from user request patterns
-    try:
-        from utils.neural_client import get_neural_client
-        neural = get_neural_client(timeout=3.0)
-
-        # Analyze cognitive patterns from this request type
-        neural.analyze_patterns(
-            action='learn',
-            operation=f'user_request:{category}',
-            outcome='received',
-            metadata={
-                'session': session_id[:8],
-                'category': category,
-                'prompt_length': len(prompt),
-                'project': Path(cwd).name if cwd else 'unknown'
-            }
-        )
-    except Exception:
-        pass  # Graceful degradation
-
-
-def get_workflow_recommendation(prompt, category):
-    """
-    Get workflow recommendation based on prompt complexity and category.
-    Returns workflow config or None if not applicable.
-    """
-    # Only recommend workflows for substantial feature/bug requests
-    if category not in ['feature', 'bug'] or len(prompt) < 50:
-        return None
-
-    # Determine complexity based on keywords
-    complex_keywords = [
-        'implement', 'build', 'create', 'refactor', 'migrate',
-        'integrate', 'redesign', 'optimize', 'comprehensive', 'full'
-    ]
-    prompt_lower = prompt.lower()
-
-    is_complex = any(kw in prompt_lower for kw in complex_keywords)
-    if not is_complex:
-        return None
-
-    # Build workflow configuration
-    if category == 'feature':
-        return {
-            'name': f'feature_{datetime.now().strftime("%Y%m%d_%H%M")}',
-            'steps': [
-                {'name': 'analyze', 'description': 'Analyze requirements'},
-                {'name': 'design', 'description': 'Design architecture'},
-                {'name': 'implement', 'description': 'Implement feature'},
-                {'name': 'test', 'description': 'Test implementation'},
-                {'name': 'review', 'description': 'Code review'}
-            ],
-            'triggers': ['on_start'],
-            'priority': 'high' if 'urgent' in prompt_lower else 'medium'
-        }
-    elif category == 'bug':
-        return {
-            'name': f'bugfix_{datetime.now().strftime("%Y%m%d_%H%M")}',
-            'steps': [
-                {'name': 'reproduce', 'description': 'Reproduce the bug'},
-                {'name': 'diagnose', 'description': 'Diagnose root cause'},
-                {'name': 'fix', 'description': 'Implement fix'},
-                {'name': 'verify', 'description': 'Verify fix works'},
-                {'name': 'test', 'description': 'Run regression tests'}
-            ],
-            'triggers': ['on_start'],
-            'priority': 'critical' if 'critical' in prompt_lower else 'high'
-        }
-
-    return None
-
-
-def create_workflow_for_request(session_id, prompt, category):
-    """
-    Create an automated workflow for complex requests.
-    Non-blocking with graceful fallback.
-    """
-    workflow_config = get_workflow_recommendation(prompt, category)
-    if not workflow_config:
-        return None
-
-    try:
-        from utils.workflow_client import get_workflow_client
-        workflow = get_workflow_client(timeout=5.0)
-
-        # Create the workflow
-        result = workflow.create_workflow(
-            name=workflow_config['name'],
-            steps=workflow_config['steps'],
-            triggers=workflow_config.get('triggers', [])
-        )
-
-        if result and result.get('workflowId'):
-            return result['workflowId']
-    except Exception:
-        pass  # Graceful degradation
-
-    return None
-
-
-def get_agent_recommendation(category, prompt):
-    """
-    Get recommended agent type based on request category and content.
-    Returns agent type string or None.
-    """
-    prompt_lower = prompt.lower()
-
-    # Security-related keywords
-    if any(kw in prompt_lower for kw in ['security', 'vulnerability', 'owasp', 'authentication', 'authorization']):
-        return 'owasp-guardian-sonnet'
-
-    # Testing keywords
-    if any(kw in prompt_lower for kw in ['test', 'coverage', 'tdd', 'unit test', 'integration test']):
-        return 'test-engineer-sonnet'
-
-    # Performance keywords
-    if any(kw in prompt_lower for kw in ['performance', 'optimize', 'slow', 'benchmark', 'profil']):
-        return 'perf-analyzer'
-
-    # API/design keywords
-    if any(kw in prompt_lower for kw in ['api', 'endpoint', 'rest', 'graphql', 'schema']):
-        return 'api-designer-sonnet'
-
-    # Architecture keywords
-    if any(kw in prompt_lower for kw in ['architect', 'design', 'structure', 'pattern', 'refactor']):
-        return 'system-architect-sonnet'
-
-    # Documentation keywords
-    if any(kw in prompt_lower for kw in ['document', 'readme', 'docs', 'comment', 'jsdoc']):
-        return 'documentation-writer-sonnet'
-
-    # Default by category
-    category_map = {
-        'bug': 'debug-detective-sonnet',
-        'feature': 'coder',
-        'question': 'researcher'
-    }
-
-    return category_map.get(category)
-
-
-def get_sparc_mode_recommendation(prompt, category):
-    """
-    Recommend SPARC mode based on request type.
-    Returns mode string or None.
-    """
-    prompt_lower = prompt.lower()
-
-    # TDD keywords
-    if any(kw in prompt_lower for kw in ['tdd', 'test-driven', 'test first', 'red green']):
-        return 'test'
-
-    # API keywords
-    if any(kw in prompt_lower for kw in ['api', 'endpoint', 'rest', 'graphql']):
-        return 'api'
-
-    # UI keywords
-    if any(kw in prompt_lower for kw in ['ui', 'frontend', 'component', 'react', 'vue']):
-        return 'ui'
-
-    # Refactor keywords
-    if any(kw in prompt_lower for kw in ['refactor', 'clean', 'improve', 'optimize code']):
-        return 'refactor'
-
-    # Default to dev mode for features
-    if category == 'feature':
-        return 'dev'
-
-    return None
+        pass  # Service may not be running; fail silently
 
 
 def log_user_prompt(session_id, input_data):
     """Log user prompt to logs directory."""
-    # Ensure logs directory exists
-    log_dir = Path("logs")
-    log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / 'user_prompt_submit.json'
-    
-    # Read existing log data or initialize empty list
-    if log_file.exists():
-        with open(log_file, 'r') as f:
-            try:
-                log_data = json.load(f)
-            except (json.JSONDecodeError, ValueError):
-                log_data = []
-    else:
-        log_data = []
-    
-    # Append the entire input data
-    log_data.append(input_data)
-    
-    # Write back to file with formatting
-    with open(log_file, 'w') as f:
-        json.dump(log_data, f, indent=2)
+    try:
+        # Ensure logs directory exists (absolute path relative to this file)
+        log_dir = Path(__file__).parent.parent / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file = log_dir / 'user_prompt_submit.json'
+
+        # Read existing log data or initialize empty list
+        if log_file.exists():
+            with open(log_file, 'r') as f:
+                try:
+                    log_data = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    log_data = []
+        else:
+            log_data = []
+
+        # Append the entire input data
+        log_data.append(input_data)
+
+        # Write back to file with formatting
+        with open(log_file, 'w') as f:
+            json.dump(log_data, f, indent=2)
+    except Exception:
+        pass  # Logging must never block the hook
 
 
 # Legacy function removed - now handled by manage_session_data
@@ -262,8 +85,8 @@ def manage_session_data(session_id, prompt, name_agent=False):
     """Manage session data in the new JSON structure."""
     import subprocess
     
-    # Ensure sessions directory exists
-    sessions_dir = Path(".claude/data/sessions")
+    # Ensure sessions directory exists (absolute path relative to this file)
+    sessions_dir = Path(__file__).parent.parent / "data" / "sessions"
     sessions_dir.mkdir(parents=True, exist_ok=True)
     
     # Load or create session file
@@ -280,13 +103,25 @@ def manage_session_data(session_id, prompt, name_agent=False):
     
     # Add the new prompt
     session_data["prompts"].append(prompt)
-    
+
+    # Classify and persist task type (additive — short/stop prompts return "other" and don't downgrade)
+    try:
+        new_type = classify_task_type(prompt)
+        existing = session_data.get("task_type", "other")
+        if existing == "other" or existing == new_type:
+            session_data["task_type"] = new_type
+        elif new_type != "other" and existing != new_type:
+            session_data["task_type"] = "mixed"
+        # else: keep existing (short/stop prompts return "other", don't downgrade)
+    except Exception:
+        pass
+
     # Generate agent name if requested and not already present
     if name_agent and "agent_name" not in session_data:
         # Try Ollama first (preferred)
         try:
             result = subprocess.run(
-                ["uv", "run", ".claude/hooks/utils/llm/ollama.py", "--agent-name"],
+                ["uv", "run", str(Path(__file__).parent / "utils" / "llm" / "ollama.py"), "--agent-name"],
                 capture_output=True,
                 text=True,
                 timeout=5  # Shorter timeout for local Ollama
@@ -303,7 +138,7 @@ def manage_session_data(session_id, prompt, name_agent=False):
             # Fall back to Anthropic if Ollama fails
             try:
                 result = subprocess.run(
-                    ["uv", "run", ".claude/hooks/utils/llm/anth.py", "--agent-name"],
+                    ["uv", "run", str(Path(__file__).parent / "utils" / "llm" / "anth.py"), "--agent-name"],
                     capture_output=True,
                     text=True,
                     timeout=10
@@ -325,6 +160,50 @@ def manage_session_data(session_id, prompt, name_agent=False):
     except Exception:
         # Silently fail if we can't write the file
         pass
+
+
+def classify_task_type(prompt: str) -> str:
+    """Returns: "research", "docs", "code", "config", "mixed", or "other". Never raises."""
+    try:
+        if not prompt or not isinstance(prompt, str):
+            return "other"
+    except Exception:
+        return "other"
+
+    def _has_ext(text: str, ext: str) -> bool:
+        """True if ext appears as a full extension (not a prefix of a longer extension)."""
+        idx = text.find(ext)
+        while idx != -1:
+            end = idx + len(ext)
+            if end >= len(text) or not text[end].isalpha():
+                return True
+            idx = text.find(ext, idx + 1)
+        return False
+
+    p = prompt.lower()
+    is_research = (p.endswith("?") or any(p.startswith(w) for w in
+        ["what", "how", "why", "explain", "describe", "tell me", "can you"])
+        or any(kw in p for kw in ["what is", "how does", "show me how"]))
+    is_docs = any(kw in p for kw in [".md", "readme", "changelog", "docstring",
+        "documentation", "comment", "jsdoc", "docs", "document"])
+    is_code = (any(kw in p for kw in ["fix", "implement", "refactor", "add feature",
+        "build", "create"])
+        or any(_has_ext(p, ext) for ext in [".py", ".js", ".ts", ".go", ".rs", ".rb",
+            ".java", ".cpp", ".c", ".sh"]))
+    is_config = (any(kw in p for kw in ["hook", "settings", "config", "workflow"])
+        or any(_has_ext(p, ext) for ext in [".json", ".yaml", ".toml", ".sh", ".env"]))
+    matches = sum([is_research, is_docs, is_code, is_config])
+    if matches >= 2:
+        return "mixed"
+    if is_research:
+        return "research"
+    if is_docs:
+        return "docs"
+    if is_code:
+        return "code"
+    if is_config:
+        return "config"
+    return "other"
 
 
 def categorize_prompt(prompt):
@@ -428,6 +307,47 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
         f.write(entry)
 
 
+def build_agent_routing_directive(prompt):
+    """Returns agent routing directive string, or None for trivial prompts."""
+    prompt_stripped = prompt.strip()
+    # Skip very short prompts, slash commands, simple acks
+    if len(prompt_stripped) < 15 or prompt_stripped.startswith('/'):
+        return None
+    trivial = {
+        'ok', 'yes', 'no', 'sure', 'thanks', 'done', 'good', 'fine',
+        'great', 'perfect', 'got it', 'sounds good', 'continue', 'proceed'
+    }
+    if prompt_stripped.lower() in trivial:
+        return None
+
+    return """BEFORE ANSWERING: Check if this task falls into a specialist domain:
+• Implementing features in a specific language or framework (Rust, Go, Python, FastAPI, React, etc.)
+• Security analysis, audit, or hardening
+• ML/AI model training, evaluation, or deployment
+• Infrastructure, cloud, or DevOps setup
+• Database design, migration, or optimization
+• Code review, test suite creation, or performance profiling
+
+If YES → dispatch: Task(subagent_type="<agent>", prompt="<full task>")
+          then announce: "Routing to <agent> for <reason>."
+If NO  → answer directly (questions, explanations, quick edits, clarifications).
+
+AVAILABLE AGENTS (subagent_type: <name> in Task tool):
+[CODE]     python-pro, typescript-pro, javascript-pro, rust-pro, golang-pro, java-pro, scala-pro, csharp-pro, ruby-pro, elixir-pro, bash-pro, cpp-pro, c-pro
+[BACKEND]  backend-architect, fastapi-pro, django-pro, graphql-architect, api-designer-sonnet
+[FRONTEND] frontend-developer, ui-ux-designer, mobile-developer, flutter-expert, ios-developer
+[SECURITY] security-auditor, threat-modeling-expert, backend-security-coder, frontend-security-coder, owasp-guardian-sonnet
+[ML/DATA]  data-scientist, ml-engineer, mlops-engineer, data-engineer, ai-engineer, prompt-engineer
+[DATABASE] database-architect, database-optimizer, sql-pro, database-admin
+[INFRA]    kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer, cicd-engineer-sonnet
+[TESTING]  test-automator, tdd-orchestrator, architect-review, code-reviewer, performance-engineer
+[OPS]      incident-responder, devops-troubleshooter, observability-engineer, error-detective, debugger
+[DOCS]     docs-architect, tutorial-engineer, mermaid-expert, c4-code, c4-component, c4-container, c4-context
+[OTHER]    legacy-modernizer, dx-optimizer, quant-analyst, payment-integration, blockchain-developer
+
+Full catalog: ~/.claude/agents/AGENT_INDEX.md"""
+
+
 def inject_ambiguity_prompt(prompt):
     """
     Inject context telling agent to resolve ambiguities.
@@ -441,18 +361,15 @@ def inject_ambiguity_prompt(prompt):
     if prompt_lower in skip_patterns or len(prompt_lower) < 20:
         return None
 
-    return """UPFRONT: Clarify ambiguity NOW. Mark recommended with [Recommended].
+    return """STEP 1 — UPFRONT CLARITY: If this task has ≥2 valid interpretations that would lead to
+different implementations, ask ALL clarifying questions in one batch NOW. For each option,
+mark your preferred choice [Recommended]. Then wait for a response before proceeding.
+If the task is clear, skip to Step 2 immediately.
 
-PLAN VALIDATION (3+ methods before stopping):
-• Tests: npm test, pytest, cargo test
-• Build: npm run build, tsc --noEmit
-• Lint: eslint, flake8, mypy
-• Logs: console.log, app logs
-• Runtime: start app, verify
-• Browser: Puppeteer screenshots
-• API: curl endpoints
-
-Execute autonomously—no mid-task questions."""
+STEP 2 — AUTONOMOUS EXECUTION: Once task is clear, proceed fully autonomously.
+Never ask "should I proceed?", "do you want me to X?", or "want me to continue?".
+Errors = fix immediately. Mid-task ambiguity = resolve with best judgment, don't ask.
+Actions you can execute = EXECUTE THEM. Never write "I recommend X" or "You should run Y" — those are tasks, not suggestions. If risky/destructive, confirm once then execute."""
 
 
 def validate_prompt(prompt):
@@ -505,9 +422,6 @@ def main():
 
         # Track requests in docs/development/ if cwd is available
         cwd = input_data.get('cwd', '')
-        workflow_id = None
-        recommended_agent = None
-        sparc_mode = None
 
         if cwd and args.store_last_prompt:
             try:
@@ -516,23 +430,11 @@ def main():
                 if is_trackable:
                     update_user_requests(cwd, prompt, category, session_id)
 
-                    # Also track in FEATURES.md if it's a feature request
                     if category == 'feature':
                         update_features(cwd, prompt, session_id)
 
-                    # Store to ReasoningBank and Claude-Mem
                     store_request_pattern(session_id, prompt, category, cwd)
-
-                    # NEW: Create workflow for complex requests
-                    workflow_id = create_workflow_for_request(session_id, prompt, category)
-
-                    # NEW: Get agent recommendation
-                    recommended_agent = get_agent_recommendation(category, prompt)
-
-                    # NEW: Get SPARC mode recommendation
-                    sparc_mode = get_sparc_mode_recommendation(prompt, category)
             except Exception:
-                # Don't block on tracking errors
                 pass
         
         # Validate prompt if requested and not in log-only mode
@@ -548,20 +450,14 @@ def main():
 
         # Build additional context with recommendations
         context_parts = []
+
+        # Prepend routing directive so Claude sees it first
+        agent_directive = build_agent_routing_directive(prompt)
+        if agent_directive:
+            context_parts.insert(0, agent_directive)
+
         if ambiguity_context:
             context_parts.append(ambiguity_context)
-
-        # Add workflow context if created
-        if workflow_id:
-            context_parts.append(f"\n📋 WORKFLOW: Auto-created workflow '{workflow_id}' for this request.")
-
-        # Add agent recommendation
-        if recommended_agent:
-            context_parts.append(f"\n🤖 RECOMMENDED AGENT: Consider using '{recommended_agent}' for this task.")
-
-        # Add SPARC mode recommendation
-        if sparc_mode:
-            context_parts.append(f"\n⚡ SPARC MODE: '{sparc_mode}' mode recommended for this type of work.")
 
         # Add plugin suggestions from New Tools marketplace
         try:
