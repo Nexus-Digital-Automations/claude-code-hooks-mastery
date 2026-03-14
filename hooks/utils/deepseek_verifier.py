@@ -66,9 +66,10 @@ Cross-reference agent claims against these facts. Contradictions = suspicious.
 "Ran pytest" but no pytest appears in bash history → ask or reject.
 "No frontend files" but .tsx/.jsx appear in files_modified → suspicious.
 
-If files_modified and bash_commands are both empty: either no tools were used (chat
-session) or tracking failed. Fall back to skip reasons and evidence text, but apply
-extra skepticism since no ground truth exists.
+If files_modified and bash_commands are marked "transcript tracking unavailable":
+this means the session transcript could not be parsed, NOT that nothing was done.
+Fall back entirely to the evidence text and skip reasons in the verification record.
+Apply normal (not extra) skepticism — treat them like a session where tracking wasn't set up.
 
 ═══ CONVERSATION PROTOCOL ═══
 You have up to 3 clarification rounds. Respond in ONE of two ways:
@@ -266,9 +267,13 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
             lines.append("Files actually modified this session (from Edit/Write tool calls):")
             for f in files_modified[:30]:
                 lines.append(f"  {f}")
+            lines.append("")
         else:
-            lines.append("Files actually modified: (none recorded)")
-        lines.append("")
+            # Empty list means transcript tracking unavailable for this session,
+            # NOT that no files were modified. Do not include as negative signal.
+            lines.append("Files actually modified: (transcript tracking unavailable — "
+                         "do NOT interpret as 'no files edited')")
+            lines.append("")
 
         # Bash commands run this session (ground truth from transcript)
         bash_cmds = context.get("bash_commands") or []
@@ -276,9 +281,11 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
             lines.append("Bash commands actually run this session (last 15):")
             for cmd in bash_cmds:
                 lines.append(f"  $ {cmd}")
+            lines.append("")
         else:
-            lines.append("Bash commands run: (none recorded)")
-        lines.append("")
+            lines.append("Bash commands run: (transcript tracking unavailable — "
+                         "do NOT interpret as 'no commands run')")
+            lines.append("")
 
         # Legacy extension-count summary (if available)
         if tool_summary:
