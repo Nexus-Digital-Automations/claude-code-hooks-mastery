@@ -1121,18 +1121,8 @@ Verify it, then stop.
             print(hedging_msg, file=sys.stderr)
             sys.exit(2)
 
-        # VERIFICATION CHECKLIST CHECK — blocks stop if any of 8 items are pending
-        _vr = read_verification_record()
-        _vr_complete, _vr_done, _vr_pending = check_verification_complete(_vr)
-        if not _vr_complete:
-            print(build_checklist_message(_vr_done, _vr_pending), file=sys.stderr)
-            sys.exit(2)
-
-        # EVIDENCE DISPLAY — show full command output for all completed steps
-        _evidence_display = format_evidence_display(_vr_done, _vr.get("checks", {}))
-        print(_evidence_display, file=sys.stderr)
-
-        # Write DeepSeek review context so authorize-stop.sh can pass it to the verifier
+        # Write DeepSeek review context early (before any blocking checks) so
+        # authorize-stop.sh always has fresh context even if agent runs it directly.
         try:
             _files_mod, _bash_cmds, _last_prompt = _extract_transcript_context(input_data)
             _ds_ctx = {
@@ -1148,6 +1138,17 @@ Verify it, then stop.
             )
         except Exception:
             pass
+
+        # VERIFICATION CHECKLIST CHECK — blocks stop if any of 8 items are pending
+        _vr = read_verification_record()
+        _vr_complete, _vr_done, _vr_pending = check_verification_complete(_vr)
+        if not _vr_complete:
+            print(build_checklist_message(_vr_done, _vr_pending), file=sys.stderr)
+            sys.exit(2)
+
+        # EVIDENCE DISPLAY — show full command output for all completed steps
+        _evidence_display = format_evidence_display(_vr_done, _vr.get("checks", {}))
+        print(_evidence_display, file=sys.stderr)
 
         # AUTHORIZATION CHECK - blocks stop if not authorized
         if not check_stop_authorization():
