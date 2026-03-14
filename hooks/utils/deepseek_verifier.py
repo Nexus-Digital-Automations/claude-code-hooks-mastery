@@ -1,11 +1,16 @@
 """Independent AI verification of stop-hook evidence quality via DeepSeek Chat.
 
 Public interface:
-    verify_with_deepseek(checks: dict) -> dict
+    verify_with_deepseek(checks, context=None, state_file=None) -> dict
         Returns approval decision. Never raises.
 
 Requires: DEEPSEEK_API_KEY environment variable (or .env file).
-Uses only stdlib (urllib.request, json, os) — no pip dependencies.
+Uses only stdlib (urllib.request, json, os, pathlib) — no pip dependencies.
+
+Multi-turn conversation mode:
+    DeepSeek can ask up to 3 clarifying questions before issuing a verdict.
+    State persists in state_file between authorize-stop.sh invocations.
+    Claude answers via `answer-deepseek.sh`; re-running authorize-stop continues.
 """
 
 from __future__ import annotations
@@ -14,6 +19,7 @@ import json
 import os
 import urllib.request
 import urllib.error
+from pathlib import Path
 
 # Checks in canonical order (mirrors stop.py _VR_CHECKS_ORDER — not imported to avoid circular)
 _VR_CHECKS_ORDER = [
@@ -29,14 +35,61 @@ _VR_CHECKS_ORDER = [
     ("upstream_sync", "UPSTREAM SYNC"),
 ]
 
+_MAX_TURNS = 5         # max conversation turns before forcing verdict
+_PER_TURN_TIMEOUT = 25 # seconds per API call (slightly longer than single-shot)
+
 _SYSTEM_PROMPT = """\
-You are a strict independent audit AI for a code quality enforcement system.
+You are an independent evidence auditor for a code quality enforcement system.
 An AI coding agent claims to have completed 10 verification checks before stopping.
-Your job: determine whether each check has GENUINE evidence of actual execution,
+Your role: determine whether each check has GENUINE evidence of actual execution,
 or was FABRICATED / MINIMAL / EXCUSED without real work.
 
-YOUR DEFAULT IS SKEPTICISM. Approve only when evidence clearly proves the check ran.
-When in doubt, reject.
+═══ YOUR APPROACH — FIRM BUT FAIR ═══
+FIRM: Require real execution evidence. Source reading ≠ runtime validation.
+      "The code looks correct" or "logic is sound" is not evidence.
+FAIR: Engage with the agent's actual context. When evidence is ambiguous,
+      ask ONE clarifying question instead of reflexively rejecting.
+
+Your default is skepticism — approve only when evidence is clear.
+When genuinely unsure (not clearly fabricated, not clearly genuine), ask.
+When clearly fabricated or clearly insufficient — reject immediately.
+
+═══ GROUND TRUTH — USE THIS FIRST ═══
+The WORK CONTEXT section at the top contains:
+  • Last task: what the user asked the agent to do
+  • Last assistant message: what Claude CLAIMED to have done (unverified)
+  • Files actually modified: paths from Edit/Write tool calls (CANNOT be faked)
+  • Bash commands actually run: commands from Bash tool calls (CANNOT be faked)
+  • File type summary: extension counts (secondary signal)
+
+Cross-reference agent claims against these facts. Contradictions = suspicious.
+"Ran pytest" but no pytest appears in bash history → ask or reject.
+"No frontend files" but .tsx/.jsx appear in files_modified → suspicious.
+
+If files_modified and bash_commands are both empty: either no tools were used (chat
+session) or tracking failed. Fall back to skip reasons and evidence text, but apply
+extra skepticism since no ground truth exists.
+
+═══ CONVERSATION PROTOCOL ═══
+You have up to 3 clarification rounds. Respond in ONE of two ways:
+
+1. QUESTION MODE (evidence genuinely ambiguous — not clearly fake, not clearly real):
+   Start your response with exactly: QUESTION: <your question>
+   Ask about ONE specific ambiguity. Be direct and specific.
+   Example: "QUESTION: You claimed tests passed but no pytest command appears in
+   the bash history. Did you run tests in a separate terminal not tracked here?"
+
+2. VERDICT MODE (enough information to decide):
+   Respond ONLY with valid JSON (no other text):
+   {"approved": true|false, "verdict": "one sentence",
+    "suspicious_steps": ["key1"], "instructions": "..."}
+
+Rules:
+- Clearly genuine evidence → verdict immediately (don't ask unnecessary questions)
+- Clearly fabricated → verdict immediately with specific correction instructions
+- Ambiguous → ONE question per turn, ONE topic per question
+- After all conversation turns → give your best verdict regardless
+- NEVER respond with both a question and JSON
 
 ═══ STEP 1: READ THE WORK CONTEXT — THIS IS GROUND TRUTH ═══
 The user message begins with a WORK CONTEXT section containing:
@@ -52,13 +105,6 @@ from the raw session transcript. The agent CANNOT fake these. Use them to:
   • Detect lies: "ran pytest" but no pytest command appears in bash history → suspicious
   • Detect source-reading disguised as validation: grep/cat/read commands ≠ running tests
   • Identify project type from actual file paths (e.g., hooks/stop.py → Python hook project)
-
-Cross-reference the agent's CLAIMS (in evidence and skip reasons) against the FACTS
-(files modified, bash commands). Contradictions must be flagged.
-
-If files_modified and bash_commands are both empty: either no tools were used (chat
-session) or tracking failed. Fall back to skip reasons and evidence text, but apply
-extra skepticism since no ground truth exists.
 
 ═══ STEP 2: EVALUATE SKIPPED CHECKS ═══
 A skip is valid ONLY when the check genuinely does not apply to this project.
@@ -186,20 +232,12 @@ These agent patterns are attempts to avoid real verification. Reject them:
 
 ═══ STEP 5: DISPLAY ARTIFACTS — DO NOT PENALIZE ═══
   • "[N more chars truncated]" — evidence cut for display; more real content exists.
-  • "printf '{...}'" — formatting shorthand; if output follows, command ran.
-
-Respond ONLY with valid JSON:
-{
-  "approved": true|false,
-  "verdict": "one sentence summary",
-  "suspicious_steps": ["step_key_names"],
-  "instructions": "If rejected: specific corrective steps per suspicious item. If approved: empty string."
-}"""
+  • "printf '{...}'" — formatting shorthand; if output follows, command ran."""
 
 _EVIDENCE_TRUNCATE = 800
 _API_URL = "https://api.deepseek.com/chat/completions"
 _MODEL = "deepseek-chat"
-_TIMEOUT = 20
+_TIMEOUT = 20  # legacy single-shot timeout (kept for compatibility)
 
 
 def _build_user_message(checks: dict, context: dict | None = None) -> str:
@@ -258,7 +296,7 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
         lines += ["====================", ""]
 
     lines += [
-        "Please review the following 8 verification steps and determine if the evidence is genuine.",
+        "Please review the following 10 verification steps and determine if the evidence is genuine.",
         "",
     ]
     for i, (key, label) in enumerate(_VR_CHECKS_ORDER, 1):
@@ -290,24 +328,105 @@ def _skipped(reason: str) -> dict:
         "instructions": "",
         "skipped": True,
         "skip_reason": reason,
+        "pending": False,
+        "questions": "",
     }
 
 
-def verify_with_deepseek(checks: dict, context: dict | None = None) -> dict:
-    """Review verification evidence with DeepSeek Chat.
+def _load_state(state_file: Path) -> list:
+    """Load conversation history from state file. Returns [] if not found."""
+    try:
+        data = json.loads(state_file.read_text())
+        return data.get("messages", [])
+    except Exception:
+        return []
+
+
+def _save_state(state_file: Path, messages: list) -> None:
+    """Save conversation history to state file."""
+    try:
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(json.dumps({"messages": messages}, indent=2))
+    except Exception:
+        pass
+
+
+def _api_call(api_key: str, messages: list, json_mode: bool = False,
+              timeout: int = _PER_TURN_TIMEOUT) -> tuple[bool, str]:
+    """Make one API call. Returns (ok, content_or_error)."""
+    payload = {
+        "model": _MODEL,
+        "messages": messages,
+        "max_tokens": 600,
+        "temperature": 0.1,
+    }
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
+
+    body = json.dumps(payload).encode("utf-8")
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+    try:
+        req = urllib.request.Request(_API_URL, data=body, headers=headers, method="POST")
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            raw = resp.read().decode("utf-8")
+        response_data = json.loads(raw)
+        content = response_data["choices"][0]["message"]["content"]
+        return (True, content)
+    except urllib.error.HTTPError as exc:
+        return (False, f"http_error:{exc.code}")
+    except urllib.error.URLError as exc:
+        reason = str(exc.reason)
+        if "timed out" in reason.lower() or "timeout" in reason.lower():
+            return (False, "timeout")
+        return (False, f"url_error:{reason}")
+    except TimeoutError:
+        return (False, "timeout")
+    except Exception as exc:
+        return (False, f"verifier_error:{type(exc).__name__}")
+
+
+def _parse_verdict(content: str) -> dict | None:
+    """Try to parse content as a verdict JSON. Returns None if it's a QUESTION or invalid JSON."""
+    stripped = content.strip()
+    if stripped.startswith("QUESTION:"):
+        return None  # It's a question, not a verdict
+    try:
+        result = json.loads(stripped)
+        if isinstance(result, dict) and "approved" in result:
+            return result
+        return None
+    except json.JSONDecodeError:
+        return None
+
+
+def verify_with_deepseek(
+    checks: dict,
+    context: dict | None = None,
+    state_file: str | Path | None = None,
+) -> dict:
+    """Review verification evidence with DeepSeek Chat (multi-turn conversational mode).
 
     Args:
-        checks  - Verification check data from the stop hook
-        context - Optional dict with 'last_user_prompt' and 'last_assistant_message'
-                  so DeepSeek can calibrate expectations to the actual work done.
+        checks      - Verification check data from the stop hook
+        context     - Optional dict with 'last_user_prompt', 'last_assistant_message',
+                      'files_modified', 'bash_commands' so DeepSeek can calibrate
+                      expectations to the actual work done.
+        state_file  - Optional path to persist conversation state between invocations.
+                      When provided and a QUESTION was asked, state is saved and
+                      'pending=True' is returned so authorize-stop.sh can prompt the agent.
 
-    Returns:
-        approved      - True if evidence looks genuine (or verifier was skipped)
-        verdict       - One-sentence summary from DeepSeek
-        suspicious_steps - Keys of suspicious checks
-        instructions  - What the agent must do (empty string if approved)
-        skipped       - True when verifier did not run (key missing, timeout, error)
-        skip_reason   - Why it was skipped (empty string when ran successfully)
+    Returns dict with keys:
+        approved          - True if evidence looks genuine (or verifier was skipped)
+        verdict           - One-sentence summary from DeepSeek
+        suspicious_steps  - Keys of suspicious checks
+        instructions      - What the agent must do (empty string if approved)
+        skipped           - True when verifier did not run
+        skip_reason       - Why it was skipped (empty when ran successfully)
+        pending           - True when DeepSeek has asked a question (awaiting answer)
+        questions         - The question text when pending=True
 
     Never raises.
     """
@@ -315,35 +434,88 @@ def verify_with_deepseek(checks: dict, context: dict | None = None) -> dict:
     if not api_key:
         return _skipped("DEEPSEEK_API_KEY not set")
 
+    state_path = Path(state_file) if state_file else None
+
     try:
-        user_message = _build_user_message(checks, context)
-        payload = {
-            "model": _MODEL,
-            "messages": [
+        # Load existing conversation history (empty list if first turn)
+        history = _load_state(state_path) if state_path else []
+
+        # Build initial user message only if no conversation has started yet
+        if not history:
+            initial_message = _build_user_message(checks, context)
+            history = [{"role": "user", "content": initial_message}]
+
+        # Conversation loop: up to _MAX_TURNS turns
+        question_count = sum(
+            1 for m in history
+            if m["role"] == "assistant" and m["content"].strip().startswith("QUESTION:")
+        )
+
+        for turn in range(_MAX_TURNS):
+            # On the final turn, force JSON mode to get a verdict
+            is_final_turn = (turn == _MAX_TURNS - 1) or (question_count >= 3)
+
+            # Assemble messages: system + conversation history
+            messages = [
                 {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": user_message},
-            ],
-            "max_tokens": 500,
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"},
-        }
-        body = json.dumps(payload).encode("utf-8")
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        }
+            ] + history
 
-        req = urllib.request.Request(_API_URL, data=body, headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=_TIMEOUT) as resp:
-            raw = resp.read().decode("utf-8")
+            ok, content = _api_call(api_key, messages,
+                                    json_mode=is_final_turn,
+                                    timeout=_PER_TURN_TIMEOUT)
 
-        response_data = json.loads(raw)
-        content = response_data["choices"][0]["message"]["content"]
+            if not ok:
+                # Map error codes back to _skipped reasons
+                if content == "timeout":
+                    return _skipped("API timeout")
+                elif content.startswith("http_error:"):
+                    return _skipped(f"API error: {content.split(':',1)[1]}")
+                elif content.startswith("verifier_error:"):
+                    return _skipped(f"verifier error: {content.split(':',1)[1]}")
+                else:
+                    return _skipped(f"API error: {content}")
 
-        try:
-            result = json.loads(content)
-        except json.JSONDecodeError:
-            # Keyword fallback: if response text signals rejection, treat as rejected
+            # Try to parse as verdict first
+            verdict_result = _parse_verdict(content)
+            if verdict_result is not None:
+                # Got a verdict — clear state file if it exists
+                if state_path and state_path.exists():
+                    try:
+                        state_path.unlink()
+                    except Exception:
+                        pass
+                approved = bool(verdict_result.get("approved", True))
+                return {
+                    "approved": approved,
+                    "verdict": str(verdict_result.get("verdict", "")),
+                    "suspicious_steps": list(verdict_result.get("suspicious_steps", [])),
+                    "instructions": str(verdict_result.get("instructions", "")),
+                    "skipped": False,
+                    "skip_reason": "",
+                    "pending": False,
+                    "questions": "",
+                }
+
+            # Check if it's a QUESTION
+            stripped = content.strip()
+            if stripped.startswith("QUESTION:"):
+                question_text = stripped[len("QUESTION:"):].strip()
+                # Save state: append assistant's question to history
+                history.append({"role": "assistant", "content": stripped})
+                if state_path:
+                    _save_state(state_path, history)
+                return {
+                    "approved": False,
+                    "verdict": "",
+                    "suspicious_steps": [],
+                    "instructions": "",
+                    "skipped": False,
+                    "skip_reason": "",
+                    "pending": True,
+                    "questions": question_text,
+                }
+
+            # Non-JSON, non-QUESTION response — try keyword fallback
             lower = content.lower()
             if any(kw in lower for kw in ("suspicious", "false", "rejected", "fabricated")):
                 return {
@@ -353,27 +525,82 @@ def verify_with_deepseek(checks: dict, context: dict | None = None) -> dict:
                     "instructions": content[:1000],
                     "skipped": False,
                     "skip_reason": "",
+                    "pending": False,
+                    "questions": "",
                 }
             return _skipped("JSON parse failure on API response")
 
-        approved = bool(result.get("approved", True))
-        return {
-            "approved": approved,
-            "verdict": str(result.get("verdict", "")),
-            "suspicious_steps": list(result.get("suspicious_steps", [])),
-            "instructions": str(result.get("instructions", "")),
-            "skipped": False,
-            "skip_reason": "",
-        }
+        # Exhausted all turns without a verdict (shouldn't happen with json_mode on last turn)
+        return _skipped("conversation exhausted without verdict")
 
-    except urllib.error.HTTPError as exc:
-        return _skipped(f"API error: {exc.code}")
-    except urllib.error.URLError as exc:
-        reason = str(exc.reason)
-        if "timed out" in reason.lower() or "timeout" in reason.lower():
-            return _skipped("API timeout")
-        return _skipped(f"API error: {reason}")
-    except TimeoutError:
-        return _skipped("API timeout")
     except Exception as exc:
         return _skipped(f"verifier error: {type(exc).__name__}")
+
+
+# ─── CLI interface ────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="DeepSeek evidence reviewer — multi-turn conversational mode"
+    )
+    parser.add_argument("--vr-file", required=True,
+                        help="Path to verification_record.json")
+    parser.add_argument("--context-file",
+                        help="Path to deepseek_context.json (optional)")
+    parser.add_argument("--state-file",
+                        default=".claude/data/deepseek_review_state.json",
+                        help="Path to persist conversation state")
+    args = parser.parse_args()
+
+    # Load verification record
+    vr_file = Path(args.vr_file)
+    try:
+        checks = json.loads(vr_file.read_text()).get("checks", {})
+    except Exception:
+        checks = {}
+
+    # Load context
+    context = None
+    if args.context_file:
+        try:
+            context = json.loads(Path(args.context_file).read_text())
+        except Exception:
+            pass
+
+    state_path = Path(args.state_file)
+
+    result = verify_with_deepseek(checks, context, state_file=state_path)
+
+    if result.get("skipped"):
+        print(f"⏭  DeepSeek review skipped: {result['skip_reason']}")
+        sys.exit(0)
+
+    if result.get("pending"):
+        print("\n" + "=" * 70)
+        print("DEEPSEEK REVIEWER HAS A QUESTION")
+        print("=" * 70)
+        print(f"\n{result['questions']}")
+        print("\nAnswer with:")
+        print('  bash ~/.claude/commands/answer-deepseek.sh "your answer"')
+        print("Then re-run authorize-stop.")
+        print("=" * 70 + "\n")
+        sys.exit(1)
+
+    if not result["approved"]:
+        print("\n" + "=" * 70)
+        print("DEEPSEEK REVIEWER REJECTED — EVIDENCE INSUFFICIENT")
+        print("=" * 70)
+        print(f"\nVerdict: {result['verdict']}")
+        if result.get("suspicious_steps"):
+            print(f"Suspicious: {', '.join(result['suspicious_steps'])}")
+        if result.get("instructions"):
+            print(f"\nRequired actions:\n{result['instructions']}")
+        print("=" * 70 + "\n")
+        sys.exit(1)
+
+    # Approved
+    print(f"\n✅ DeepSeek review passed: {result['verdict']}\n")
+    sys.exit(0)
