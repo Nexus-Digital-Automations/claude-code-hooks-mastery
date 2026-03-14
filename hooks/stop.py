@@ -12,6 +12,7 @@ import os
 import sys
 import random
 import subprocess
+import time
 from pathlib import Path
 
 # Add hooks directory to path for imports
@@ -161,6 +162,56 @@ def announce_completion():
         pass
 
 
+def get_stop_attempts_path():
+    """Return path to stop attempts tracking file."""
+    return Path(__file__).parent.parent / "data" / "stop_attempts.json"
+
+
+def record_stop_attempt():
+    """Record a stop attempt timestamp. Keeps last 10 attempts."""
+    attempts_file = get_stop_attempts_path()
+    attempts_file.parent.mkdir(parents=True, exist_ok=True)
+
+    attempts = []
+    if attempts_file.exists():
+        try:
+            with open(attempts_file, 'r') as f:
+                data = json.load(f)
+                attempts = data.get("attempts", [])
+        except (json.JSONDecodeError, IOError):
+            attempts = []
+
+    attempts.append({"ts": time.time()})
+    # Keep only last 10
+    attempts = attempts[-10:]
+
+    try:
+        with open(attempts_file, 'w') as f:
+            json.dump({"attempts": attempts}, f)
+    except IOError:
+        pass
+
+    return attempts
+
+
+def detect_emergency_mode(attempts):
+    """
+    Detect if the agent is in a rapid-fire stop loop.
+    Returns (is_emergency, count_in_window, window_seconds) if 3+ attempts in 30s.
+    """
+    now = time.time()
+    window = 30.0
+    recent = [a for a in attempts if now - a.get("ts", 0) <= window]
+    count = len(recent)
+
+    if count >= 3:
+        earliest = min(a["ts"] for a in recent)
+        span = round(now - earliest, 1)
+        return (True, count, span)
+
+    return (False, count, 0)
+
+
 def check_root_cleanliness():
     """
     Check if project root folder is clean (no temporary/generated files).
@@ -182,7 +233,7 @@ def check_root_cleanliness():
         # Docs
         'README.md', 'README.txt', 'README.rst', 'CLAUDE.md',
         'LICENSE', 'LICENSE.md', 'LICENSE.txt', 'NOTICE', 'CONTRIBUTING.md',
-        'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'SECURITY.md',
+        'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'SECURITY.md', 'RELEASE_PROCESS.md',
         # Build/CI/CD
         'Dockerfile', 'docker-compose.yml', 'docker-compose.yaml',
         'Makefile', 'makefile', 'CMakeLists.txt',
@@ -196,6 +247,8 @@ def check_root_cleanliness():
         'src', 'tests', 'test', 'docs', 'scripts', 'config',
         'public', 'static', 'assets', 'lib',
         'node_modules', '__pycache__', '.cache', 'venv', '.venv',
+        # Project-specific data/output directories (often gitignored)
+        'output', 'reports', 'mcp_server',
         # Hidden hook configs
         '.pre-commit-config.yaml', '.husky',
         # Claude Code operational directories (from .gitignore)
@@ -211,18 +264,33 @@ def check_root_cleanliness():
         # Project-specific directories
         'python-scripts', 'commands', 'agents', 'skills', 'hooks',
         '.validation-artifacts', '.swarm', '.claude-flow', '.ruff_cache',
-        'New Tools'
+        'New Tools',
+        # Rust/Cargo build output (always gitignored, required at root by Cargo)
+        'target',
+        # Next.js build output (always gitignored, required at root by Next.js)
+        '.next',
     }
 
-    # Forbidden patterns (will trigger violations)
-    forbidden_patterns = [
+    # Forbidden extensions (files only — directories are never flagged)
+    forbidden_extensions = {
+        # Logs and temp files
         '.log', '.tmp', '.bak', '.swp', '.swo',
-        'test-results', 'coverage', '.pytest_cache',
-        'dist', 'build', 'target', '.next', 'out',
-        '.exe', '.o', '.so', '.dylib',
-        'scratch', 'temp', 'debug', 'output.csv', 'output.json',
-        '.generated.', 'chart.', 'report.'
-    ]
+        # Data/output files
+        '.csv', '.xlsx', '.xls', '.tsv',
+        '.pdf', '.docx', '.doc',
+        # Images/media
+        '.png', '.jpg', '.jpeg', '.gif', '.webp', '.mp4', '.mp3',
+        # Archives
+        '.zip', '.tar', '.gz', '.tgz', '.rar',
+        # Compiled/binary
+        '.exe', '.o', '.so', '.dylib', '.dll',
+        # Text docs (standard ones like README.txt already in allowed_patterns)
+        '.txt',
+        # Markdown (standard ones like README.md, CLAUDE.md already in allowed_patterns)
+        '.md',
+        # Compiled output and test output
+        '.out', '.xml',
+    }
 
     violations = []
     cwd = Path.cwd()
@@ -232,20 +300,15 @@ def check_root_cleanliness():
         for item in cwd.iterdir():
             name = item.name
 
-            # Skip allowed items
+            # Skip allowed items (fast path)
             if name in allowed_patterns:
                 continue
 
-            # Check for forbidden patterns
-            is_violation = False
-            for pattern in forbidden_patterns:
-                if pattern in name.lower():
-                    is_violation = True
-                    break
-
-            if is_violation:
-                item_type = "dir" if item.is_dir() else "file"
-                violations.append(f"  ❌ {name} ({item_type})")
+            # Only flag files, not directories
+            if item.is_file():
+                ext = item.suffix.lower()
+                if ext in forbidden_extensions:
+                    violations.append(f"  ❌ {name} (file)")
 
         return (len(violations) == 0, violations)
     except Exception:
@@ -345,6 +408,239 @@ def check_codebase_organization():
         return (True, [], [])
 
 
+def check_upstream_sync(cwd=None):
+    """Check if repo is a fork (has 'upstream' remote) and if it's synced.
+
+    Returns:
+        None  — not a fork, or git not available
+        dict  — {'behind': int, 'branch': str, 'fetch_ok': bool}
+    """
+    try:
+        import subprocess
+        kw = dict(capture_output=True, text=True, cwd=cwd)
+
+        # Check for upstream remote
+        r = subprocess.run(['git', 'remote'], **kw)
+        if r.returncode != 0 or 'upstream' not in r.stdout.split():
+            return None  # Not a fork
+
+        # Get current branch
+        branch_r = subprocess.run(['git', 'branch', '--show-current'], **kw)
+        branch = branch_r.stdout.strip() or 'main'
+
+        # Fetch upstream (quiet, with timeout — non-fatal if it fails)
+        fetch_r = subprocess.run(
+            ['git', 'fetch', 'upstream', '--quiet'],
+            capture_output=True, cwd=cwd, timeout=15
+        )
+        fetch_ok = fetch_r.returncode == 0
+
+        if not fetch_ok:
+            return {'behind': None, 'branch': branch, 'fetch_ok': False}
+
+        # Count commits behind upstream/<branch>
+        behind_r = subprocess.run(
+            ['git', 'rev-list', '--count', f'HEAD..upstream/{branch}'],
+            **kw
+        )
+        if behind_r.returncode != 0:
+            return {'behind': None, 'branch': branch, 'fetch_ok': True}
+
+        behind = int(behind_r.stdout.strip() or '0')
+        return {'behind': behind, 'branch': branch, 'fetch_ok': True}
+
+    except Exception:
+        return None
+
+
+def detect_rate_limit(input_data):
+    """
+    Detect if the session is stopping due to a rate limit or API overload error.
+    Checks last_assistant_message and the tail of the transcript file.
+    Returns (is_rate_limited: bool, detail: str).
+    """
+    # Patterns checked against the last_assistant_message (human-readable text).
+    # Must be distinctive enough to avoid false positives in normal responses.
+    last_msg_patterns = [
+        'rate limit', 'rate_limit', 'ratelimit',
+        'too many requests', 'too_many_requests',
+        'RateLimitError', 'OverloadedError',
+        'resource_exhausted',
+        'server is overloaded',
+        'rate limit exceeded',
+        'api rate limit',
+        'quota exceeded',
+        'anthropic.rate_limit',
+    ]
+
+    # Broader patterns for raw transcript/error entries where 429 status codes appear literally.
+    rate_limit_patterns = last_msg_patterns + [
+        'http 429', 'status: 429', '" 429"', "'429'",
+        'overloaded', 'overload',
+        'throttl',
+        'retry after', 'retry_after',
+        'request limit',
+    ]
+
+    def check_text(text):
+        """Check if text contains any rate limit pattern."""
+        if not text:
+            return None
+        text_lower = text.lower()
+        for pattern in rate_limit_patterns:
+            if pattern.lower() in text_lower:
+                return pattern
+        return None
+
+    # Check 1: last_assistant_message — use stricter pattern set only
+    def check_text_strict(text):
+        if not text:
+            return None
+        text_lower = text.lower()
+        for pattern in last_msg_patterns:
+            if pattern.lower() in text_lower:
+                return pattern
+        return None
+
+    last_msg = input_data.get('last_assistant_message', '')
+    match = check_text_strict(last_msg)
+    if match:
+        return (True, f"Rate limit detected in last message (matched: '{match}')")
+
+    # Check 2: Tail of transcript file for error entries
+    transcript_path = input_data.get('transcript_path', '')
+    if transcript_path and Path(transcript_path).exists():
+        try:
+            # Read last 10 lines of transcript
+            with open(transcript_path, 'r') as f:
+                lines = f.readlines()
+            tail_lines = lines[-10:] if len(lines) >= 10 else lines
+
+            for line in tail_lines:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    # Check message content for rate limit errors
+                    msg = entry.get('message', {})
+                    content = msg.get('content', '')
+
+                    # Handle string content
+                    if isinstance(content, str):
+                        match = check_text(content)
+                        if match:
+                            return (True, f"Rate limit detected in transcript (matched: '{match}')")
+
+                    # Handle list content (content blocks)
+                    elif isinstance(content, list):
+                        for block in content:
+                            if isinstance(block, dict):
+                                block_text = block.get('text', '') or block.get('content', '') or ''
+                                match = check_text(block_text)
+                                if match:
+                                    return (True, f"Rate limit detected in transcript (matched: '{match}')")
+
+                    # Check for error type entries
+                    entry_type = entry.get('type', '')
+                    if entry_type == 'error':
+                        error_text = json.dumps(entry)
+                        match = check_text(error_text)
+                        if match:
+                            return (True, f"Rate limit error entry in transcript (matched: '{match}')")
+
+                except (json.JSONDecodeError, TypeError, AttributeError):
+                    # Check raw line as fallback
+                    match = check_text(line)
+                    if match:
+                        return (True, f"Rate limit detected in raw transcript (matched: '{match}')")
+
+        except (IOError, OSError):
+            pass  # Can't read transcript, skip this check
+
+    return (False, '')
+
+
+def detect_hedging_language(input_data):
+    """
+    Detect speculative/hedging language OR user-delegation phrases in the last assistant message.
+    Agents must verify things themselves — never speculate and never offload verification to the user.
+    Returns (has_hedging: bool, matched_phrase: str, snippet: str, category: str).
+    category is 'hedging' or 'delegation'.
+    """
+    HEDGING_PHRASES = [
+        'should be working',
+        'should be fixed',
+        'should work now',
+        'should now work',
+        'should be live',
+        'should be running',
+        'should be up',
+        'should be functional',
+        'should be operational',
+        'should be accessible',
+        'should be able to',
+        'this should fix',
+        'this should work',
+        'this should resolve',
+        'that should fix',
+        'that should work',
+        'that should resolve',
+        'ought to work',
+        'ought to fix',
+        'hopefully',
+        'probably works',
+        'likely works',
+        'might work now',
+        'should be working now',
+        'should be',
+    ]
+
+    # Phrases that offload verification responsibility to the user.
+    # The ONLY allowed form is "to repeat the verification I did yourself" — which
+    # presupposes the agent already verified and merely offers the user a way to reproduce it.
+    # Note: "to verify" does NOT substring-match "verification" (chars diverge at index 5).
+    DELEGATION_PHRASES = [
+        'to verify',
+        'to check for yourself',
+        'to see for yourself',
+        'check for yourself',
+        'see for yourself',
+    ]
+
+    last_msg = input_data.get('last_assistant_message', '')
+    if not last_msg:
+        return (False, '', '', '')
+
+    # Strip code blocks, inline code, and double-quoted strings — quoted/example phrases are not claims
+    import re
+    scannable = re.sub(r'```.*?```', '', last_msg, flags=re.DOTALL)
+    scannable = re.sub(r'`[^`]*`', '', scannable)
+    scannable = re.sub(r'"[^"\n]{3,100}"', '', scannable)
+
+    msg_lower = scannable.lower()
+
+    # Check hedging phrases first (more specific before catch-all 'should be')
+    for phrase in HEDGING_PHRASES:
+        if phrase in msg_lower:
+            idx = msg_lower.find(phrase)
+            start = max(0, idx - 40)
+            end = min(len(scannable), idx + len(phrase) + 60)
+            snippet = scannable[start:end].replace('\n', ' ').strip()
+            return (True, phrase, snippet, 'hedging')
+
+    # Check delegation phrases
+    for phrase in DELEGATION_PHRASES:
+        if phrase in msg_lower:
+            idx = msg_lower.find(phrase)
+            start = max(0, idx - 40)
+            end = min(len(scannable), idx + len(phrase) + 60)
+            snippet = scannable[start:end].replace('\n', ' ').strip()
+            return (True, phrase, snippet, 'delegation')
+
+    return (False, '', '', '')
+
+
 def check_stop_authorization():
     """
     Check if stop is authorized via file-based configuration.
@@ -365,8 +661,294 @@ def check_stop_authorization():
         return False
 
 
+# ── Verification record helpers ────────────────────────────────────────────
+
+_VR_CHECKS_ORDER = [
+    ("tests",         "TESTS              "),
+    ("build",         "BUILD              "),
+    ("lint",          "LINT               "),
+    ("app_starts",    "APP STARTS         "),
+    ("api",           "API/CODE INVOCATION"),
+    ("frontend",      "FRONTEND VALIDATION"),
+    ("happy_path",    "HAPPY PATH         "),
+    ("error_cases",   "ERROR CASES        "),
+    ("commit_push",   "COMMIT & PUSH      "),
+]
+
+_VR_RUN_CMDS = {
+    "tests":
+        "pytest 2>&1 | bash ~/.claude/commands/check-tests.sh\n"
+        "  npm test 2>&1 | bash ~/.claude/commands/check-tests.sh",
+    "build":
+        "npm run build 2>&1 | bash ~/.claude/commands/check-build.sh\n"
+        "  tsc --noEmit 2>&1 | bash ~/.claude/commands/check-build.sh\n"
+        "  cargo build 2>&1 | bash ~/.claude/commands/check-build.sh",
+    "lint":
+        "npm run lint 2>&1 | bash ~/.claude/commands/check-lint.sh\n"
+        "  ruff check . 2>&1 | bash ~/.claude/commands/check-lint.sh\n"
+        "  cargo clippy 2>&1 | bash ~/.claude/commands/check-lint.sh",
+    "app_starts":
+        "# Check if already running first:\n"
+        "  PORT=3000  # or 8000, 8080 — use the project's actual port\n"
+        "  # If running: kill it, restart, and record:\n"
+        "  (lsof -ti:$PORT | xargs kill -9 2>/dev/null; sleep 1; npm start 2>&1 | head -30) | bash ~/.claude/commands/check-app-starts.sh\n"
+        "  # If not running: start normally:\n"
+        "  npm start 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh\n"
+        "  python main.py 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh",
+    "api":
+        "curl http://localhost:PORT/api/ENDPOINT 2>&1 | bash ~/.claude/commands/check-api.sh\n"
+        '  python -c "from app import fn; print(fn(args))" 2>&1 | bash ~/.claude/commands/check-api.sh\n'
+        '  bash ~/.claude/commands/check-api.sh "called POST /api/X with Y, got response Z (min 50 chars)"',
+    "frontend":
+        "npx playwright test 2>&1 | bash ~/.claude/commands/check-frontend.sh\n"
+        "  npm run test:e2e 2>&1 | bash ~/.claude/commands/check-frontend.sh\n"
+        '  bash ~/.claude/commands/check-frontend.sh "opened http://..., verified X, clicked Y, saw Z, console: zero errors (min 50 chars)"',
+    "happy_path":
+        'bash ~/.claude/commands/check-happy-path.sh "I did X with input Y and saw result Z"',
+    "error_cases":
+        'bash ~/.claude/commands/check-error-cases.sh "I tested X error by doing Y and saw Z"',
+    "commit_push":
+        'git add -p && git commit -m "msg" && git push\n'
+        '  bash ~/.claude/commands/check-commit-push.sh "committed N files on branch X, pushed to origin"',
+}
+
+_VR_SKIP_CMDS = {
+    "tests":        'bash ~/.claude/commands/check-tests.sh --skip "reason (min 10 chars)"',
+    "build":        'bash ~/.claude/commands/check-build.sh --skip "reason (min 10 chars)"',
+    "lint":         'bash ~/.claude/commands/check-lint.sh --skip "reason (min 10 chars)"',
+    "app_starts":   'bash ~/.claude/commands/check-app-starts.sh --skip "reason (min 10 chars)"',
+    "api":          'bash ~/.claude/commands/check-api.sh --skip "reason (min 10 chars)"',
+    "frontend":     'bash ~/.claude/commands/check-frontend.sh --skip "reason (min 10 chars)"',
+    "happy_path":   'bash ~/.claude/commands/check-happy-path.sh --skip "reason (min 10 chars)"',
+    "error_cases":  'bash ~/.claude/commands/check-error-cases.sh --skip "reason (min 10 chars)"',
+    "commit_push":  'bash ~/.claude/commands/check-commit-push.sh --skip "reason (min 10 chars)"',
+}
+
+
+def read_verification_record() -> dict:
+    """Read .claude/data/verification_record.json.
+    Returns all-pending default if missing or unreadable."""
+    vr_file = Path(".claude/data/verification_record.json")
+    all_pending = {
+        k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
+        for k, _ in _VR_CHECKS_ORDER
+    }
+    default = {"reset_at": None, "checks": all_pending}
+    try:
+        with open(vr_file, 'r') as f:
+            data = json.load(f)
+        # Ensure all keys are present
+        checks = data.get("checks", {})
+        for k, _ in _VR_CHECKS_ORDER:
+            if k not in checks:
+                checks[k] = all_pending[k]
+        data["checks"] = checks
+        return data
+    except Exception:
+        return default
+
+
+def check_verification_complete(record: dict):
+    """Returns (is_complete, done_items, pending_items).
+    done_items and pending_items are lists of (key, label, status, ts_short, ev_short).
+    """
+    checks = record.get("checks", {})
+    done_items = []
+    pending_items = []
+    for key, label in _VR_CHECKS_ORDER:
+        item = checks.get(key, {})
+        status = item.get("status", "pending")
+        if status == "pending":
+            pending_items.append((key, label, "pending", None, None))
+        else:
+            ts = item.get("timestamp") or ""
+            ts_short = ts[11:16] if len(ts) >= 16 else (ts or "?")
+            ev = item.get("evidence") or item.get("skip_reason") or ""
+            ev_short = ev[:70].replace("\n", " ") if ev else ""
+            done_items.append((key, label, status, ts_short, ev_short))
+    is_complete = len(pending_items) == 0
+    return (is_complete, done_items, pending_items)
+
+
+def build_checklist_message(done_items: list, pending_items: list) -> str:
+    """Build the STOP BLOCKED — VERIFICATION REQUIRED message."""
+    SEP = "━" * 68
+    lines = [
+        "",
+        "=" * 70,
+        "STOP BLOCKED — VERIFICATION REQUIRED",
+        "=" * 70,
+        "",
+        "YOU MUST RUN EACH COMMAND BELOW AND RECORD EVIDENCE.",
+        "Reading code is not verification. Running commands is.",
+        "Every item below requires a SPECIFIC action. No shortcuts.",
+    ]
+
+    step = 0
+    for key, label, status, ts_short, ev_short in done_items:
+        step += 1
+        mark = "✅" if status == "done" else "⏭ "
+        ev_display = f' — "{ev_short}"' if ev_short else ""
+        lines += [
+            "",
+            SEP,
+            f"{mark} STEP {step}: {label.strip()}  (done @ {ts_short}{ev_display})",
+            SEP,
+        ]
+
+    for key, label, status, ts_short, ev_short in pending_items:
+        step += 1
+        lines += [
+            "",
+            SEP,
+            f"❌ STEP {step}: {label.strip()}  (not done)",
+            SEP,
+        ]
+        # Per-check instructions
+        if key in ("happy_path", "error_cases"):
+            lines.append(f"Describe exactly what you tested (min 30 chars). Be specific:")
+            lines.append(f"  {_VR_RUN_CMDS[key]}")
+            lines.append(f"No applicable scenario? Skip with a reason (min 10 chars):")
+            lines.append(f"  {_VR_SKIP_CMDS[key]}")
+        else:
+            lines.append(f"Run the command and pipe the output:")
+            for cmd_line in _VR_RUN_CMDS[key].split("\n"):
+                lines.append(f"  {cmd_line}")
+            lines.append(f"Not applicable? Skip with a reason (min 10 chars):")
+            lines.append(f"  {_VR_SKIP_CMDS[key]}")
+
+    lines += [
+        "",
+        "Complete ALL pending items, then run:",
+        "  bash ~/.claude/commands/authorize-stop.sh",
+        "=" * 70,
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def format_evidence_display(done_items: list, checks: dict) -> str:
+    """Show full evidence for all completed verification checks."""
+    EVIDENCE_TRUNCATE = 500
+    SEP = "─" * 68
+    lines = [
+        "",
+        "=" * 70,
+        "VERIFICATION EVIDENCE SUMMARY",
+        "=" * 70,
+        "",
+    ]
+    for i, (key, label, status, ts_short, _ev_short) in enumerate(done_items, 1):
+        check_data = checks.get(key, {})
+        if status == "skipped":
+            full_ev = check_data.get("skip_reason") or ""
+            ev_label = "Skip reason"
+        else:
+            full_ev = check_data.get("evidence") or ""
+            ev_label = "Command output"
+        mark = "✅" if status == "done" else "⏭ "
+        lines.append(f"{mark} Step {i}: {label.strip()}  [{status} @ {ts_short}]")
+        lines.append(SEP)
+        if full_ev:
+            display_ev = full_ev[:EVIDENCE_TRUNCATE]
+            truncated = len(full_ev) > EVIDENCE_TRUNCATE
+            lines.append(f"{ev_label}:")
+            for ev_line in display_ev.split("\n"):
+                lines.append(f"  {ev_line}")
+            if truncated:
+                lines.append(f"  ... [{len(full_ev) - EVIDENCE_TRUNCATE} more chars truncated]")
+        else:
+            lines.append(f"{ev_label}: (none recorded)")
+        lines.append("")
+    lines.append("=" * 70)
+    return "\n".join(lines)
+
+
 def main():
     try:
+        # Read JSON input from stdin EARLY so we can use it for rate limit detection
+        # Store in a variable for later use (stdin can only be read once)
+        try:
+            raw_stdin = sys.stdin.read()
+            input_data = json.loads(raw_stdin) if raw_stdin.strip() else {}
+        except (json.JSONDecodeError, ValueError):
+            input_data = {}
+
+        # RATE LIMIT DETECTION - auto-allow stop if rate limited
+        is_rate_limited, rate_limit_detail = detect_rate_limit(input_data)
+        if is_rate_limited:
+            rate_limit_msg = f"""
+======================================================================
+STOP ALLOWED - RATE LIMIT DETECTED
+======================================================================
+
+{rate_limit_detail}
+
+Bypassing validation requirements — rate limit errors are not
+something the agent can fix. Session will stop gracefully.
+======================================================================
+"""
+            print(rate_limit_msg, file=sys.stderr)
+            # Still log the stop event
+            try:
+                log_dir = os.path.join(os.getcwd(), "logs")
+                os.makedirs(log_dir, exist_ok=True)
+                log_path = os.path.join(log_dir, "stop.json")
+                if os.path.exists(log_path):
+                    with open(log_path, 'r') as f:
+                        try:
+                            log_data = json.load(f)
+                        except (json.JSONDecodeError, ValueError):
+                            log_data = []
+                else:
+                    log_data = []
+                input_data['_rate_limited'] = True
+                input_data['_rate_limit_detail'] = rate_limit_detail
+                log_data.append(input_data)
+                with open(log_path, 'w') as f:
+                    json.dump(log_data, f, indent=2)
+            except Exception:
+                pass
+            sys.exit(0)  # Allow stop immediately
+
+        # EMERGENCY MODE DETECTION - detect rapid-fire stop loops
+        # (only matters if not already authorized)
+        attempts = record_stop_attempt()
+        is_emergency, attempt_count, span = detect_emergency_mode(attempts)
+
+        if is_emergency and not check_stop_authorization():
+            auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
+            emergency_msg = f"""
+╔══════════════════════════════════════════════════════════════╗
+║  🚨 EMERGENCY: YOU ARE STUCK IN A STOP LOOP 🚨              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  You have attempted to stop {attempt_count} times in {span}s.{' ' * max(0, 17 - len(str(attempt_count)) - len(str(span)))}║
+║  Responding with "." or short text will NOT let you stop.    ║
+║                                                              ║
+║  THE USER REQUIRES THOROUGH VALIDATION BEFORE STOPPING.      ║
+║                                                              ║
+║  TO ACTUALLY STOP, YOU MUST:                                 ║
+║                                                              ║
+║  1. STOP trying to stop. Do the work first.                  ║
+║  2. Complete all requested tasks                             ║
+║  3. Run validation (tests, build, lint — 3+ methods)         ║
+║  4. Present a validation report with ACTUAL OUTPUT            ║
+║  5. Run this exact command:                                  ║
+║     bash {auth_script}  ║
+║  6. THEN you may stop (the hook will allow it)               ║
+║                                                              ║
+║  The authorize-stop command sets a one-time flag that        ║
+║  lets the stop hook pass. Without it, stopping is blocked.   ║
+║                                                              ║
+║  DO NOT respond with "." or minimal text.                    ║
+║  DO NOT try to stop again without completing steps above.    ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+"""
+            print(emergency_msg, file=sys.stderr)
+            sys.exit(2)
+
         # ROOT CLEANLINESS CHECK - blocks stop if violations found
         is_clean, violations = check_root_cleanliness()
 
@@ -405,11 +987,89 @@ See CLAUDE.md Core Principle #7 for details.
             print(root_blocked_msg, file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks stop
 
+        # HEDGING LANGUAGE CHECK — blocks stop if last message contains speculative or delegation phrases
+        _has_hedging, _hedging_phrase, _hedging_snippet, _hedging_category = detect_hedging_language(input_data)
+        if _has_hedging:
+            if _hedging_category == 'delegation':
+                hedging_msg = f"""
+======================================================================
+STOP BLOCKED — DELEGATION PHRASE DETECTED
+======================================================================
+
+🚫 Your last message contains "{_hedging_phrase}" — offloading verification to the user.
+
+  Context: "...{_hedging_snippet}..."
+
+Agents must verify things themselves. Never tell the user to "run X to verify" —
+that means YOU haven't verified it yet.
+
+REQUIRED — actually verify it yourself:
+  • Run the code / start the service / hit the endpoint
+  • Observe the actual output / response / behavior
+  • Record evidence with definitive language: "Verification: exit 0, 9/9 passed"
+  • You MAY say "to repeat the verification I did yourself, run..." (agent already verified)
+
+Verify it yourself, then stop.
+======================================================================
+"""
+            else:
+                hedging_msg = f"""
+======================================================================
+STOP BLOCKED — SPECULATIVE LANGUAGE DETECTED
+======================================================================
+
+🚫 Your last message contains "{_hedging_phrase}" — a speculative phrase.
+
+  Context: "...{_hedging_snippet}..."
+
+"Should be" is not verification. Speculation is not proof.
+You must PROVE the thing works before stopping.
+
+REQUIRED — actually verify it:
+  • Run the code / start the service / hit the endpoint
+  • Observe the actual output / response / behavior
+  • Record evidence with the check commands
+  • Use definitive language: "it works" not "should be working"
+
+Verify it, then stop.
+======================================================================
+"""
+            print(hedging_msg, file=sys.stderr)
+            sys.exit(2)
+
+        # VERIFICATION CHECKLIST CHECK — blocks stop if any of 8 items are pending
+        _vr = read_verification_record()
+        _vr_complete, _vr_done, _vr_pending = check_verification_complete(_vr)
+        if not _vr_complete:
+            print(build_checklist_message(_vr_done, _vr_pending), file=sys.stderr)
+            sys.exit(2)
+
+        # EVIDENCE DISPLAY — show full command output for all completed steps
+        _evidence_display = format_evidence_display(_vr_done, _vr.get("checks", {}))
+        print(_evidence_display, file=sys.stderr)
+
         # AUTHORIZATION CHECK - blocks stop if not authorized
         if not check_stop_authorization():
             # Get absolute path to authorize-stop.sh script
             script_dir = Path(__file__).parent
             auth_script = script_dir.parent / "commands" / "authorize-stop.sh"
+
+            # Check upstream sync for forks
+            upstream_sync = check_upstream_sync()
+            upstream_line = ""
+            if upstream_sync is not None:
+                if not upstream_sync['fetch_ok']:
+                    upstream_line = "⚠️  Fork upstream fetch failed — verify sync manually\n"
+                elif upstream_sync['behind'] and upstream_sync['behind'] > 0:
+                    n = upstream_sync['behind']
+                    b = upstream_sync['branch']
+                    upstream_line = (
+                        f"⚠️  FORK OUT OF SYNC — {n} commit(s) behind upstream/{b}\n"
+                        f"   Sync before stopping: git fetch upstream && "
+                        f"git merge upstream/{b} && git push\n"
+                    )
+                else:
+                    upstream_line = f"✅ Fork is in sync with upstream/{upstream_sync['branch']}\n"
 
             # Build organization feedback section
             org_feedback = ""
@@ -423,53 +1083,150 @@ See CLAUDE.md Core Principle #7 for details.
                     org_feedback += "\n".join(suggestions) + "\n"
                 org_feedback += "\nSee CLAUDE.md 'Codebase Organization' section for guidelines.\n"
 
-            blocked_msg = f"""
-======================================================================
-STOP BLOCKED - VALIDATION REQUIRED
-======================================================================
-
-✅ Root folder is clean!
-{org_feedback}
-VALIDATION METHODS (execute 3+):
-□ Unit tests: npm test, pytest, cargo test, go test
-□ Build/compile: npm run build, tsc --noEmit, cargo build
-□ Lint check: eslint, flake8, mypy, clippy
-□ Console.log: add logs, run app, verify output
-□ App logs: review logs/ for errors/warnings
-□ Puppeteer: screenshot UI, test interactions
-□ API tests: curl endpoints, verify responses
-□ Runtime: start app, confirm no crashes
-
-BEFORE STOPPING:
-1. ✅ Root is clean (verified automatically)
-2. Complete ALL user requests
-3. Execute 3+ validation methods above
-4. Present validation report with ACTUAL OUTPUT
-5. Commit completed work: git add . && git commit -m "..."
-6. Push to remote: git push
-
-To authorize stop, run: bash {auth_script}
-======================================================================
-"""
+            # Build dynamic auth-required message showing all 6 verified items
+            _blocked_lines = [
+                "",
+                "=" * 70,
+                "STOP BLOCKED - AUTHORIZATION REQUIRED",
+                "=" * 70,
+                "",
+                "✅ Root folder is clean.",
+                "✅ All 8 verification checks completed.",
+                "",
+            ]
+            if upstream_line:
+                _blocked_lines.append(upstream_line.rstrip())
+                _blocked_lines.append("")
+            if org_feedback:
+                _blocked_lines.append(org_feedback.strip())
+                _blocked_lines.append("")
+            # Show each verified item with evidence
+            for _vr_key, _vr_label, _vr_status, _vr_ts, _vr_ev in _vr_done:
+                _mark = "✅" if _vr_status == "done" else "⏭ "
+                _ev_display = f' — "{_vr_ev}"' if _vr_ev else ""
+                _blocked_lines.append(
+                    f"  {_mark} {_vr_label}  [{_vr_status} @ {_vr_ts}]{_ev_display}"
+                )
+            _blocked_lines += [
+                "",
+                "Now authorize the stop:",
+                f"  bash {auth_script}",
+                "=" * 70,
+                "",
+            ]
+            blocked_msg = "\n".join(_blocked_lines)
             print(blocked_msg, file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks stop
 
-        # Stop is authorized - reset authorization for next time (one-time use)
+        # ── Two-phase security scan gate ──────────────────────────────────────
+        _auth_file = Path(".claude/data/stop_authorization.json")
+        _scan_complete = False
+        _prior_report = None
         try:
-            auth_file = Path(".claude/data/stop_authorization.json")
-            with open(auth_file, 'w') as f:
-                json.dump({"authorized": False}, f)
+            with open(_auth_file, 'r') as _f:
+                _auth_state = json.load(_f)
+            _scan_complete = _auth_state.get("security_scan_complete", False)
+            _prior_report = _auth_state.get("security_report_path")
         except Exception:
-            pass  # Fail silently if can't reset
+            pass  # Treat as scan not yet run
+
+        if not _scan_complete:
+            # Phase 1: run the security scan
+            print("\n🔐 Running security scan...", file=sys.stderr, flush=True)
+            _critical_count = 0
+            _warning_count = 0
+            _report_path = ""
+            try:
+                from utils.security_scanner import run_security_scan
+                _critical_count, _warning_count, _report_path = run_security_scan(
+                    Path.cwd(), timeout_per_tool=8, global_timeout=45
+                )
+            except Exception:
+                pass  # Graceful degradation — scanner errors never block stop
+
+            # Save scan state, clear authorization
+            try:
+                with open(_auth_file, 'w') as _f:
+                    json.dump({
+                        "authorized": False,
+                        "security_scan_complete": True,
+                        "security_report_path": _report_path,
+                    }, _f)
+            except Exception:
+                pass
+
+            if _critical_count > 0:
+                _sec_blocked = (
+                    "\n======================================================================"
+                    "\nSTOP BLOCKED — SECURITY SCAN FOUND CRITICAL ISSUES"
+                    "\n======================================================================"
+                    f"\n\n🔴 Critical findings: {_critical_count}"
+                    f"\n⚠️  Warnings:          {_warning_count}"
+                    f"\n📄 Full report:       {_report_path}"
+                    "\n\nFix the critical issues, then run /authorize-stop to re-scan."
+                    "\n======================================================================\n"
+                )
+                print(_sec_blocked, file=sys.stderr)
+                sys.exit(2)  # Block stop
+            else:
+                # Scan passed — show summary and require one more authorization
+                # (so the user actually sees the result; silent allows are invisible)
+                _sec_ok_msg = (
+                    "\n======================================================================"
+                    "\nSECURITY SCAN PASSED ✅"
+                    "\n======================================================================"
+                    f"\n\n🔴 Critical findings: 0"
+                    f"\n⚠️  Warnings:          {_warning_count}"
+                    f"\n📄 Report:            {_report_path}"
+                    "\n\nRun /authorize-stop once more to complete the stop."
+                    "\n======================================================================\n"
+                )
+                print(_sec_ok_msg, file=sys.stderr)
+                sys.exit(2)  # Show the summary; next authorize skips re-scan
+        else:
+            # Phase 2: scan already ran and passed; user re-authorized — allow stop
+            _prior = f" Report: {_prior_report}" if _prior_report else ""
+            _phase2_msg = (
+                "\n======================================================================"
+                "\nSECURITY SCAN PREVIOUSLY PASSED ✅ — Proceeding with stop"
+                "\n======================================================================"
+                f"\n{_prior}"
+                "\n======================================================================\n"
+            )
+            print(_phase2_msg, file=sys.stderr)
+            # Fall through — allow stop
+
+        # Final reset — always one-time use; clears both auth and scan state
+        try:
+            with open(_auth_file, 'w') as _f:
+                json.dump({
+                    "authorized": False,
+                    "security_scan_complete": False,
+                    "security_report_path": None,
+                }, _f)
+        except Exception:
+            pass
+
+        # Reset verification record for next task — all items back to pending
+        try:
+            from datetime import datetime as _dt
+            _vr_file = Path(".claude/data/verification_record.json")
+            _all_pending = {
+                k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
+                for k in ["tests", "build", "lint", "app_starts", "api", "frontend", "happy_path", "error_cases"]
+            }
+            with open(_vr_file, 'w') as _f:
+                json.dump({"reset_at": _dt.now().isoformat(), "checks": _all_pending}, _f)
+        except Exception:
+            pass
 
         # Parse command line arguments
         parser = argparse.ArgumentParser()
         parser.add_argument('--chat', action='store_true', help='Copy transcript to chat.json')
         parser.add_argument('--notify', action='store_true', help='Enable TTS completion announcement')
         args = parser.parse_args()
-        
-        # Read JSON input from stdin
-        input_data = json.load(sys.stdin)
+
+        # input_data was already read from stdin at the top of main()
 
         # Extract required fields
         session_id = input_data.get("session_id", "")
