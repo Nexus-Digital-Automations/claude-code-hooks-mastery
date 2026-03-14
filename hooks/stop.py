@@ -295,6 +295,11 @@ def check_root_cleanliness():
     violations = []
     cwd = Path.cwd()
 
+    # Skip cleanliness check when CWD is ~/.claude or any subdirectory
+    # (e.g. if session cd'd into agents/, hooks/, etc.)
+    if cwd.name == '.claude' or any(p.name == '.claude' for p in cwd.parents):
+        return (True, [])
+
     try:
         # List all items in root
         for item in cwd.iterdir():
@@ -673,6 +678,7 @@ _VR_CHECKS_ORDER = [
     ("happy_path",    "HAPPY PATH         "),
     ("error_cases",   "ERROR CASES        "),
     ("commit_push",   "COMMIT & PUSH      "),
+    ("upstream_sync", "UPSTREAM SYNC      "),
 ]
 
 _VR_RUN_CMDS = {
@@ -710,6 +716,10 @@ _VR_RUN_CMDS = {
     "commit_push":
         'git add -p && git commit -m "msg" && git push\n'
         '  bash ~/.claude/commands/check-commit-push.sh "committed N files on branch X, pushed to origin"',
+    "upstream_sync":
+        "# Auto-runs via static_checker.py on authorize-stop.\n"
+        "# To skip manually:\n"
+        'bash ~/.claude/commands/check-upstream-sync.sh --skip "not a fork — no upstream remote"',
 }
 
 _VR_SKIP_CMDS = {
@@ -722,6 +732,7 @@ _VR_SKIP_CMDS = {
     "happy_path":   'bash ~/.claude/commands/check-happy-path.sh --skip "reason (min 10 chars)"',
     "error_cases":  'bash ~/.claude/commands/check-error-cases.sh --skip "reason (min 10 chars)"',
     "commit_push":  'bash ~/.claude/commands/check-commit-push.sh --skip "reason (min 10 chars)"',
+    "upstream_sync": 'bash ~/.claude/commands/check-upstream-sync.sh --skip "not a fork — no upstream remote"',
 }
 
 
@@ -1213,10 +1224,22 @@ Verify it, then stop.
             _vr_file = Path(".claude/data/verification_record.json")
             _all_pending = {
                 k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
-                for k in ["tests", "build", "lint", "app_starts", "api", "frontend", "happy_path", "error_cases"]
+                for k, _ in _VR_CHECKS_ORDER
             }
             with open(_vr_file, 'w') as _f:
                 json.dump({"reset_at": _dt.now().isoformat(), "checks": _all_pending}, _f)
+        except Exception:
+            pass
+
+        # Reset dynamic checks alongside verification record
+        try:
+            _dc_file = Path(".claude/data/dynamic_checks.json")
+            if _dc_file.exists():
+                _dc_file.write_text(json.dumps({
+                    "project_root": str(Path.cwd()),
+                    "registered_at": None,
+                    "checks": {},
+                }, indent=2))
         except Exception:
             pass
 
