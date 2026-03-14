@@ -1,6 +1,7 @@
 #!/bin/bash
 # Authorize a one-time stop.
-# Checks all 10 verification items first — refuses if any are still pending.
+# Gate 1: 10-check verification gate — refuses if any items are still pending.
+# Gate 2: DeepSeek conversational evidence review (if API key is set).
 # Preserves security_scan_complete=true if the scan already passed this cycle.
 AUTH_FILE=".claude/data/stop_authorization.json"
 VR_FILE=".claude/data/verification_record.json"
@@ -23,6 +24,7 @@ if [ -f "$DYNAMIC_VALIDATOR" ] && [ -f "$DC_FILE_PATH" ]; then
         --only-pending 2>/dev/null || true
 fi
 
+# ── Gate 1: 10-check verification ──────────────────────────────────────────
 python3 - "$AUTH_FILE" "$VR_FILE" << 'PYEOF'
 import json, sys
 from datetime import datetime
@@ -153,9 +155,8 @@ if pending:
     print("\n".join(lines))
     sys.exit(1)
 
-# ── All checks verified — proceed to authorize ──────────────────────────────
+# ── All 10 checks verified — print summary (auth write happens after DeepSeek gate) ──
 
-# Read current auth state
 try:
     with open(auth_file) as f:
         state = json.load(f)
@@ -163,18 +164,9 @@ except Exception:
     state = {}
 
 scan_done = state.get("security_scan_complete", False)
-report_path = state.get("security_report_path")
-
-new_state = {
-    "authorized": True,
-    "security_scan_complete": scan_done,
-    "security_report_path": report_path,
-}
-with open(auth_file, "w") as f:
-    json.dump(new_state, f)
 
 # Print verified summary
-lines = ["", "✅ All 10 checks verified — stop authorized"]
+lines = ["", "✅ All 10 checks verified"]
 for key, label, status, ts_short, ev_short in done:
     mark = "✅" if status == "done" else "⏭ "
     ev_display = f' — "{ev_short}"' if ev_short else ""
@@ -189,3 +181,37 @@ else:
 lines.append("")
 print("\n".join(lines))
 PYEOF
+
+# Exit if Gate 1 failed (PYEOF exited with non-zero)
+[ $? -ne 0 ] && exit 1
+
+# ── Gate 2: DeepSeek conversational evidence review ──────────────────────────
+DEEPSEEK_VERIFIER="$HOME/.claude/hooks/utils/deepseek_verifier.py"
+CONTEXT_FILE=".claude/data/deepseek_context.json"
+DEEPSEEK_STATE=".claude/data/deepseek_review_state.json"
+
+if [ -f "$DEEPSEEK_VERIFIER" ]; then
+    python3 "$DEEPSEEK_VERIFIER" \
+        --vr-file "$VR_FILE" \
+        --context-file "$CONTEXT_FILE" \
+        --state-file "$DEEPSEEK_STATE" || exit 1
+fi
+
+# ── All gates passed — write authorized: true ────────────────────────────────
+python3 - "$AUTH_FILE" << 'AUTHEOF'
+import json, sys
+auth_file = sys.argv[1]
+try:
+    with open(auth_file) as f:
+        state = json.load(f)
+except Exception:
+    state = {}
+state["authorized"] = True
+with open(auth_file, "w") as f:
+    json.dump(state, f)
+print("\n✅ Stop authorized.\n")
+AUTHEOF
+
+# Clear DeepSeek state so next task starts fresh
+rm -f ".claude/data/deepseek_review_state.json" \
+       ".claude/data/deepseek_context.json"
