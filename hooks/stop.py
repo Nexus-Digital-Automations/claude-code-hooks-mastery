@@ -458,6 +458,79 @@ def check_upstream_sync(cwd=None):
         return None
 
 
+def _extract_transcript_context(input_data):
+    """Extract files_modified, bash_commands, and last_user_prompt from transcript JSONL.
+
+    Returns (files_modified: list[str], bash_commands: list[str], last_user_prompt: str).
+    All fields are always returned; empty when transcript is unavailable.
+    """
+    transcript_path = input_data.get('transcript_path', '')
+    files_modified = []
+    bash_commands = []
+    last_user_prompt = ""
+
+    if not transcript_path or not Path(transcript_path).exists():
+        return files_modified, bash_commands, last_user_prompt
+
+    try:
+        with open(transcript_path, 'r') as _tf:
+            for _line in _tf:
+                _line = _line.strip()
+                if not _line:
+                    continue
+                try:
+                    _entry = json.loads(_line)
+                except json.JSONDecodeError:
+                    continue
+
+                _msg = _entry.get("message", {})
+                _content = _msg.get("content", [])
+                _role = _msg.get("role", "")
+
+                if _role == "assistant" and isinstance(_content, list):
+                    for _block in _content:
+                        if not isinstance(_block, dict):
+                            continue
+                        if _block.get("type") == "tool_use":
+                            _name = _block.get("name", "")
+                            _inp = _block.get("input", {}) or {}
+                            if _name in ("Edit", "Write", "MultiEdit"):
+                                _fp = _inp.get("file_path", "")
+                                if _fp and _fp not in files_modified:
+                                    files_modified.append(_fp)
+                            elif _name == "Bash":
+                                _cmd = (_inp.get("command") or "").strip()
+                                if _cmd:
+                                    bash_commands.append(_cmd[:200])
+                elif _role == "user":
+                    if isinstance(_content, list):
+                        # Real user messages have type="text" blocks (not tool_result)
+                        for _block in _content:
+                            if isinstance(_block, dict) and _block.get("type") == "text":
+                                _text = (_block.get("text") or "").strip()
+                                if _text:
+                                    last_user_prompt = _text
+                    elif isinstance(_content, str) and _content.strip():
+                        last_user_prompt = _content.strip()
+    except Exception:
+        pass
+
+    # Keep only last 15 bash commands to stay within context budget
+    bash_commands = bash_commands[-15:]
+    return files_modified, bash_commands, last_user_prompt
+
+
+def _get_session_task_type(session_id: str) -> str:
+    """Get task_type from session data file. Returns 'unknown' on any error."""
+    try:
+        _sf = Path(f".claude/data/sessions/{session_id}.json")
+        if _sf.exists():
+            return json.loads(_sf.read_text()).get("task_type", "unknown")
+    except Exception:
+        pass
+    return "unknown"
+
+
 def detect_rate_limit(input_data):
     """
     Detect if the session is stopping due to a rate limit or API overload error.
@@ -1059,6 +1132,23 @@ Verify it, then stop.
         _evidence_display = format_evidence_display(_vr_done, _vr.get("checks", {}))
         print(_evidence_display, file=sys.stderr)
 
+        # Write DeepSeek review context so authorize-stop.sh can pass it to the verifier
+        try:
+            _files_mod, _bash_cmds, _last_prompt = _extract_transcript_context(input_data)
+            _ds_ctx = {
+                "last_user_prompt": _last_prompt or input_data.get("last_user_prompt", ""),
+                "last_assistant_message": input_data.get("last_assistant_message", ""),
+                "task_type": _get_session_task_type(input_data.get("session_id", "")),
+                "files_modified": _files_mod,
+                "bash_commands": _bash_cmds,
+            }
+            Path(".claude/data").mkdir(parents=True, exist_ok=True)
+            Path(".claude/data/deepseek_context.json").write_text(
+                json.dumps(_ds_ctx, indent=2)
+            )
+        except Exception:
+            pass
+
         # AUTHORIZATION CHECK - blocks stop if not authorized
         if not check_stop_authorization():
             # Get absolute path to authorize-stop.sh script
@@ -1240,6 +1330,17 @@ Verify it, then stop.
                     "registered_at": None,
                     "checks": {},
                 }, indent=2))
+        except Exception:
+            pass
+
+        # Reset DeepSeek review state for next task
+        try:
+            for _ds_file in [
+                Path(".claude/data/deepseek_review_state.json"),
+                Path(".claude/data/deepseek_context.json"),
+            ]:
+                if _ds_file.exists():
+                    _ds_file.unlink()
         except Exception:
             pass
 
