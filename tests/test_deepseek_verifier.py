@@ -716,3 +716,54 @@ class TestRejectionContinuation:
             (m["content"] for m in reversed(updated_msgs) if m["role"] == "user"), ""
         )
         assert "9 passed" in last_user
+
+
+# ─── System prompt quality smoke tests ───────────────────────────────────────
+
+class TestSystemPromptQuality:
+    """Smoke tests ensuring _SYSTEM_PROMPT and _api_call stay aligned with the plan."""
+
+    def test_max_tokens_is_900(self, monkeypatch):
+        """_api_call payload must use max_tokens=900."""
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-key")
+        captured = []
+
+        import json as _json
+
+        def capture_urlopen(req, timeout):
+            body = _json.loads(req.data.decode())
+            captured.append(body)
+            raise urllib.error.URLError("test abort")
+
+        with patch("urllib.request.urlopen", side_effect=capture_urlopen):
+            from utils import deepseek_verifier
+            import importlib
+            importlib.reload(deepseek_verifier)
+            deepseek_verifier.verify_with_deepseek({})
+
+        assert captured, "No API call was made"
+        assert captured[0]["max_tokens"] == 900, (
+            f"Expected max_tokens=900, got {captured[0].get('max_tokens')}"
+        )
+
+    def test_system_prompt_contains_pytest_happy_path_guidance(self):
+        """_SYSTEM_PROMPT must tell DeepSeek to accept clear pytest test names as happy_path."""
+        from utils import deepseek_verifier
+        import importlib
+        importlib.reload(deepseek_verifier)
+        prompt = deepseek_verifier._SYSTEM_PROMPT
+        assert "test name makes scenario unambiguous" in prompt or \
+               "test name" in prompt and "unambiguous" in prompt, (
+            "Prompt should instruct DeepSeek to accept pytest output when test name "
+            "makes the scenario unambiguous"
+        )
+
+    def test_system_prompt_contains_per_step_instructions_format(self):
+        """_SYSTEM_PROMPT must show the 'STEP <NAME>:' instructions format."""
+        from utils import deepseek_verifier
+        import importlib
+        importlib.reload(deepseek_verifier)
+        prompt = deepseek_verifier._SYSTEM_PROMPT
+        assert "STEP " in prompt and "To fix:" in prompt, (
+            "Prompt should contain per-step instructions format with 'STEP <NAME>: ... To fix:'"
+        )

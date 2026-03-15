@@ -27,7 +27,7 @@ _VR_CHECKS_ORDER = [
     ("build",       "BUILD"),
     ("lint",        "LINT"),
     ("app_starts",  "APP STARTS"),
-    ("api",         "API/CODE INVOCATION"),
+    ("api",         "CODE/SCRIPT/API EXECUTION"),
     ("frontend",    "FRONTEND VALIDATION"),
     ("happy_path",  "HAPPY PATH"),
     ("error_cases", "ERROR CASES"),
@@ -48,11 +48,26 @@ or was FABRICATED / MINIMAL / EXCUSED without real work.
 FIRM: Require real execution evidence. Source reading ≠ runtime validation.
       "The code looks correct" or "logic is sound" is not evidence.
 FAIR: Engage with the agent's actual context. When evidence is ambiguous,
-      ask ONE clarifying question instead of reflexively rejecting.
+      ask ONE targeted question that explains the gap AND what to provide to fill it.
+
+Prefer QUESTION over rejection when:
+  • Evidence is present but in an unexpected format (e.g., test suite output for happy_path)
+  • Skip reason is plausible but you can't verify without one more data point
+  • This is turn 0 and the agent hasn't had a chance to clarify
+Prefer REJECTION when:
+  • Evidence is clearly fabricated or source-reading dressed up as execution
+  • The agent repeated the same excuse after a direct question
 
 Your default is skepticism — approve only when evidence is clear.
 When genuinely unsure (not clearly fabricated, not clearly genuine), ask.
 When clearly fabricated or clearly insufficient — reject immediately.
+
+═══ STEP 0: ACKNOWLEDGE BEFORE CRITIQUING ═══
+Before noting problems, state what checks passed and why. This helps the agent
+understand what the bar is and what already meets it. Example:
+"TESTS, BUILD, LINT, and all skips look credible. The issue is with HAPPY PATH and
+ERROR CASES specifically: [explain gap]. To resolve: [exact ask]."
+Put this acknowledgment in the `verdict` field when rejected, or in the QUESTION text.
 
 ═══ GROUND TRUTH — USE THIS FIRST ═══
 The WORK CONTEXT section at the top contains:
@@ -74,16 +89,37 @@ Apply normal (not extra) skepticism — treat them like a session where tracking
 ═══ CONVERSATION PROTOCOL ═══
 You have up to 3 clarification rounds. Respond in ONE of two ways:
 
-1. QUESTION MODE (evidence genuinely ambiguous — not clearly fake, not clearly real):
+1. QUESTION MODE — use when evidence is present but ambiguous:
    Start your response with exactly: QUESTION: <your question>
-   Ask about ONE specific ambiguity. Be direct and specific.
-   Example: "QUESTION: You claimed tests passed but no pytest command appears in
-   the bash history. Did you run tests in a separate terminal not tracked here?"
+   Your question MUST include:
+     (a) What specific gap you found ("Your happy_path shows test names but...")
+     (b) What you need to resolve it ("...I need the actual call + return value, or
+         pytest -v output where the test name makes the tested scenario unambiguous")
+     (c) A yes/no hook ("Did you run [specific thing]? If yes, paste the output.")
+   Ask about ONE step. Do not combine multiple steps into one question.
+   Example: "QUESTION: Your happy_path evidence shows pytest test names but no
+   assertion outputs. Did you run the test suite (not just read the file)? If yes,
+   paste the pytest -v output lines showing test names and PASSED/FAILED status."
 
-2. VERDICT MODE (enough information to decide):
+2. VERDICT MODE — use when you have enough information:
    Respond ONLY with valid JSON (no other text):
-   {"approved": true|false, "verdict": "one sentence",
-    "suspicious_steps": ["key1"], "instructions": "..."}
+   {"approved": true|false, "verdict": "one sentence summary",
+    "suspicious_steps": ["key1", "key2"],
+    "instructions": "structured per-step guidance (see format below)"}
+
+   When approved=false, instructions MUST follow this format:
+   "STEP <NAME>: <what exactly failed the standard>. To fix: <exact command or action> + <what output to paste>.\nSTEP <NAME>: ..."
+
+   Examples of GOOD instructions (specific, actionable):
+   "STEP HAPPY PATH: Test names appear but no assertion outputs visible. To fix: run
+   `pytest tests/test_X.py -v -s` and paste lines showing test names + PASSED/FAILED,
+   OR describe: called fn(input), got output Y.\nSTEP ERROR CASES: Same issue — paste
+   test output showing an error was triggered and the error response observed."
+
+   Examples of BAD instructions (vague, do NOT use):
+   "Provide actual execution evidence."
+   "Re-run verification with genuine output."
+   "Show real test results."
 
 Rules:
 - Clearly genuine evidence → verdict immediately (don't ask unnecessary questions)
@@ -146,8 +182,10 @@ GENUINE: Compiler/bundler output with error counts.
 NOT GENUINE: "build works" with no command or output; no build command in bash history
 
 ── LINT ──────────────────────────────────────────────────────────────────────────
-GENUINE: Linter output with specific issue counts.
-  "ruff check .: 2 warnings, 0 errors"  |  "eslint: 0 problems"
+GENUINE: Linter output confirming checks ran.
+  ruff: "All checks passed!" or "N error(s), M warning(s)"
+  eslint: "0 problems (0 errors, 0 warnings)"
+  Cross-check: lint command must appear in bash_commands (ruff / eslint / flake8 / etc.)
 NOT GENUINE: "lint passes" with no output; no lint command in bash history
 
 ── APP STARTS ────────────────────────────────────────────────────────────────────
@@ -155,10 +193,19 @@ GENUINE: Server startup logs from an actual process.
   "Server listening on port 3000"  |  "uvicorn running on http://0.0.0.0:8000"
 NOT GENUINE: "app starts" with no logs; syntax check output; no start command in bash
 
-── API / CODE INVOCATION ─────────────────────────────────────────────────────────
-GENUINE: Actual HTTP response or function return value with status code and body.
-  curl with HTTP status + body  |  Python call with specific return value
-NOT GENUINE: "API works"; "endpoint exists in source"; source code reading
+── CODE / SCRIPT / API EXECUTION ────────────────────────────────────────────────
+RUN IT IF YOU CAN. Any modified code, script, or function should be executed.
+Use REAL-WORLD inputs — replicate how the code is actually used in practice, not trivial/dummy calls.
+GENUINE — any actual execution with observable output:
+  • Script: bash/sh run with realistic args, exit code shown, output captured
+    "bash sandbox-run.sh --check tests --cmd 'pytest': exit 0, ✅ Tests recorded"
+  • HTTP: curl with realistic payload, status code + response body shown
+  • Function: Python/JS/etc call with real-world-representative input, specific return value printed
+  • CLI tool: any command that exercises the changed code with real output
+SKIP ONLY IF: no interpreter available, no valid test input exists, pure docs/config change.
+NOT GENUINE: "works fine"; "script runs"; source code reading; grep/cat to confirm content;
+  trivial/dummy inputs that don't exercise the real code path;
+  skipping when bash history shows the code was available and could have been run
 
 ── FRONTEND VALIDATION ───────────────────────────────────────────────────────────
 STRICT. This check verifies the UI works in a browser. Reading source is NOT validation.
@@ -190,31 +237,45 @@ files and no frontend extensions, the frontend skip is valid — even if .html/.
 files exist in other directories of the repository.
 
 ── HAPPY PATH ────────────────────────────────────────────────────────────────────
-Requires the agent to have EXECUTED something and observed the result.
-Check bash commands: was the code actually run? Or only read/grepped?
+Requires EXECUTED code with observable outcome. Check bash commands: was code run?
 
-GENUINE: Execution with observable outcome.
-  "ran python3 -c '...', got expected output X"
-  "ran pytest tests/test_x.py, 3 assertions passed — output: [...]"
-  "called fn(args), returned expected_result"
+GENUINE — any of these:
+  • Direct execution: "ran python3 -c 'from app import fn; print(fn(args))', got X"
+  • pytest output where test name makes scenario unambiguous AND shows pass/fail:
+    "test_conversation_continues_after_rejection PASSED" + test invoked real code
+    (accept this if the test name describes the happy path clearly)
+  • Manual walkthrough: specific URL + actions taken + what was observed
+  • "called fn(input_args), returned expected_value"
+
 NOT GENUINE:
-  • "source code confirms the feature works" — inspection, not execution
-  • "code review of X.py shows the logic is correct" — inspection
-  • "verified implementation in source files" — inspection
-  • Claims about what code SHOULD do, not what it DID when run
+  • "source code confirms the feature works" — reading, not execution
+  • "code review of X.py shows the logic is correct" — reading, not execution
+  • "verified implementation in source files" — reading, not execution
+  • Claims about what code SHOULD do (not what it DID when run)
+  • Test names with no context about what was asserted
+
+WHEN AMBIGUOUS (test output present but scenario unclear): Ask whether the tests
+invoked the real code path vs mocks, and what the assertions were.
+Do NOT reject immediately — ask one targeted question first.
 
 ── ERROR CASES ───────────────────────────────────────────────────────────────────
-Requires the agent to have TRIGGERED an error and OBSERVED the response.
-Check bash commands: did the agent run something to provoke an error?
+Requires TRIGGERED an error condition and OBSERVED the error response.
 
-GENUINE: Error triggered + error response observed.
-  "passed invalid input, got ValueError: expected X got Y"
-  "curl /api/bad-endpoint → HTTP 404 + JSON error body"
+GENUINE — any of these:
+  • Direct error trigger: "passed invalid input, got ValueError: expected X got Y"
+  • pytest output where test name makes error scenario clear:
+    "test_http_error_returns_skipped PASSED", "test_rejected_preserves_state PASSED"
+    (accept when test name clearly names an error/rejection/failure scenario)
+  • curl returning error HTTP status + body
+
 NOT GENUINE:
   • "error handling code is present in source"
-  • "try/except block exists in the file"
+  • "try/except block exists in file"
   • "reviewed error handling logic"
   • No bash commands that could produce errors
+
+WHEN AMBIGUOUS: Ask for one specific error scenario by name and what response was observed.
+Do NOT reject immediately — ask one targeted question first.
 
 ═══ STEP 4: EXCUSE DETECTION ═══
 These agent patterns are attempts to avoid real verification. Reject them:
@@ -305,6 +366,43 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
                          f"Read count: {tool_summary.get('read_count', 0)}")
             lines.append("")
 
+        # Sandbox execution log (tamper-evident: command + exit code + output)
+        sandbox_log = Path(".claude/data/sandbox_executions.json")
+        if sandbox_log.exists():
+            try:
+                from datetime import datetime, timezone, timedelta
+                data = json.loads(sandbox_log.read_text())
+                executions = data.get("executions", [])
+                cutoff = datetime.now(timezone.utc) - timedelta(minutes=90)
+                recent = []
+                for ex in executions:
+                    try:
+                        ts_str = ex.get("timestamp", "")
+                        ts = datetime.fromisoformat(ts_str).replace(tzinfo=timezone.utc)
+                        if ts >= cutoff:
+                            recent.append(ex)
+                    except Exception:
+                        recent.append(ex)  # include if timestamp unparseable
+                if recent:
+                    lines.append(
+                        "Sandbox execution log (tamper-evident — command actually ran, "
+                        "output captured at execution time):"
+                    )
+                    for ex in recent:
+                        lines.append(
+                            f"  [{ex.get('timestamp', '?')}] "
+                            f"check={ex.get('check', '?')}  "
+                            f"exit={ex.get('exit_code', '?')}"
+                        )
+                        cmd = (ex.get("command") or "")[:120]
+                        lines.append(f"  $ {cmd}")
+                        excerpt = (ex.get("stdout") or "")[:400].replace("\n", "\n    ")
+                        if excerpt:
+                            lines.append(f"    {excerpt}")
+                        lines.append("")
+            except Exception:
+                pass
+
         lines += ["====================", ""]
 
     lines += [
@@ -369,7 +467,7 @@ def _api_call(api_key: str, messages: list, json_mode: bool = False,
     payload = {
         "model": _MODEL,
         "messages": messages,
-        "max_tokens": 600,
+        "max_tokens": 900,
         "temperature": 0.1,
     }
     if json_mode:
@@ -452,10 +550,14 @@ def verify_with_deepseek(
         # Load existing conversation history (empty list if first turn)
         history = _load_state(state_path) if state_path else []
 
-        # Build initial user message only if no conversation has started yet
+        # Always build fresh initial message from current evidence.
+        # On re-runs history[0] is refreshed so DeepSeek sees updated records,
+        # but Q&A turns (positions 1+) are preserved from the state file.
+        initial_message = _build_user_message(checks, context)
         if not history:
-            initial_message = _build_user_message(checks, context)
             history = [{"role": "user", "content": initial_message}]
+        else:
+            history[0] = {"role": "user", "content": initial_message}
 
         # Conversation loop: up to _MAX_TURNS turns
         question_count = sum(

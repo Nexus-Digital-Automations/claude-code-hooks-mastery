@@ -39,7 +39,7 @@ CHECKS_ORDER = [
     ("build",        "BUILD              "),
     ("lint",         "LINT               "),
     ("app_starts",   "APP STARTS         "),
-    ("api",          "API/CODE INVOCATION"),
+    ("api",          "CODE/SCRIPT/API EXECUTION"),
     ("frontend",     "FRONTEND VALIDATION"),
     ("happy_path",   "HAPPY PATH         "),
     ("error_cases",  "ERROR CASES        "),
@@ -52,7 +52,9 @@ RUN_CMDS = {
     "build":       "npm run build 2>&1 | bash ~/.claude/commands/check-build.sh\n     tsc --noEmit 2>&1 | bash ~/.claude/commands/check-build.sh",
     "lint":        "npm run lint 2>&1 | bash ~/.claude/commands/check-lint.sh\n     ruff check . 2>&1 | bash ~/.claude/commands/check-lint.sh",
     "app_starts":  "npm start 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh\n     python main.py 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh",
-    "api":         'curl http://localhost:PORT/api/ENDPOINT 2>&1 | bash ~/.claude/commands/check-api.sh\n     bash ~/.claude/commands/check-api.sh "called POST /api/X with Y, got response Z (min 50 chars)"',
+    "api":         "bash SCRIPT.sh --args 2>&1 | bash ~/.claude/commands/check-api.sh\n"
+                   "     curl http://localhost:PORT/api/ENDPOINT 2>&1 | bash ~/.claude/commands/check-api.sh\n"
+                   '     bash ~/.claude/commands/check-api.sh "ran X with args Y, got output Z (min 50 chars)"',
     "frontend":    'npx playwright test 2>&1 | bash ~/.claude/commands/check-frontend.sh\n     bash ~/.claude/commands/check-frontend.sh "opened http://..., verified X, clicked Y, saw Z, console: zero errors (min 50 chars)"',
     "happy_path":  'bash ~/.claude/commands/check-happy-path.sh "describe what you tested..."',
     "error_cases": 'bash ~/.claude/commands/check-error-cases.sh "describe error cases you tested..."',
@@ -189,6 +191,95 @@ PYEOF
 DEEPSEEK_VERIFIER="$HOME/.claude/hooks/utils/deepseek_verifier.py"
 CONTEXT_FILE=".claude/data/deepseek_context.json"
 DEEPSEEK_STATE=".claude/data/deepseek_review_state.json"
+
+# Refresh deepseek_context.json from the current transcript before calling the
+# verifier. The stop hook writes it once (and it goes stale); authorize-stop
+# may be called many times after the agent runs more commands, so we need
+# up-to-date bash_commands / files_modified for DeepSeek ground truth.
+python3 - "$CONTEXT_FILE" "$VR_FILE" << 'REFRESH_EOF'
+import json, sys
+from pathlib import Path
+
+context_file = Path(sys.argv[1])
+vr_file = Path(sys.argv[2])
+
+# Load existing context (created by stop hook) for non-bash fields
+try:
+    existing = json.loads(context_file.read_text())
+except Exception:
+    existing = {}
+
+# Find transcript path from existing context (stop hook put it there) OR by
+# scanning the most-recently-modified session JSONL in known locations.
+transcript_path = existing.get("transcript_path", "")
+if not transcript_path or not Path(transcript_path).exists():
+    # Fallback: find most recent JSONL in project sessions directory
+    candidates = sorted(
+        Path.home().glob(".claude/projects/**/*.jsonl"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True
+    )
+    transcript_path = str(candidates[0]) if candidates else ""
+
+# Determine task start time from verification record
+task_start_ts = ""
+try:
+    task_start_ts = json.loads(vr_file.read_text()).get("reset_at", "")
+except Exception:
+    pass
+
+files_modified, bash_commands = [], []
+if transcript_path and Path(transcript_path).exists():
+    try:
+        with open(transcript_path) as tf:
+            for line in tf:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except Exception:
+                    continue
+                if task_start_ts:
+                    entry_ts = entry.get("timestamp", "")
+                    if entry_ts and entry_ts < task_start_ts:
+                        continue
+                msg = entry.get("message", {})
+                role = msg.get("role", "")
+                content = msg.get("content", [])
+                if role == "assistant" and isinstance(content, list):
+                    for block in content:
+                        if not isinstance(block, dict):
+                            continue
+                        if block.get("type") == "tool_use":
+                            name = block.get("name", "")
+                            inp = block.get("input", {}) or {}
+                            if name in ("Edit", "Write", "MultiEdit"):
+                                fp = inp.get("file_path", "")
+                                if fp and fp not in files_modified:
+                                    files_modified.append(fp)
+                            elif name == "Bash":
+                                cmd = (inp.get("command") or "").strip()
+                                if cmd:
+                                    bash_commands.append(cmd[:200])
+        bash_commands = bash_commands[-15:]
+    except Exception:
+        pass
+
+# Merge: keep existing fields, overwrite bash_commands + files_modified
+existing["bash_commands"] = bash_commands
+existing["files_modified"] = files_modified
+context_file.write_text(json.dumps(existing, indent=2))
+REFRESH_EOF
+
+# Clear stale DeepSeek state if evidence was re-recorded since last review.
+# When VR file is newer than state file, Claude updated evidence after a
+# rejection — restart the conversation so DeepSeek reviews fresh.
+if [ -f "$DEEPSEEK_STATE" ] && [ -f "$VR_FILE" ]; then
+    if [ "$VR_FILE" -nt "$DEEPSEEK_STATE" ]; then
+        rm -f "$DEEPSEEK_STATE"
+    fi
+fi
 
 if [ -f "$DEEPSEEK_VERIFIER" ]; then
     python3 "$DEEPSEEK_VERIFIER" \

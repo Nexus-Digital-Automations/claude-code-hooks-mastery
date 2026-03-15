@@ -461,6 +461,10 @@ def check_upstream_sync(cwd=None):
 def _extract_transcript_context(input_data):
     """Extract files_modified, bash_commands, and last_user_prompt from transcript JSONL.
 
+    Only processes entries written AFTER the current task's verification reset_at
+    timestamp. This prevents tool calls from previous tasks in the same session
+    from contaminating the DeepSeek reviewer's ground truth context.
+
     Returns (files_modified: list[str], bash_commands: list[str], last_user_prompt: str).
     All fields are always returned; empty when transcript is unavailable.
     """
@@ -472,6 +476,15 @@ def _extract_transcript_context(input_data):
     if not transcript_path or not Path(transcript_path).exists():
         return files_modified, bash_commands, last_user_prompt
 
+    # Determine task start time from verification record (reset_at field).
+    # Entries before this time belong to previous tasks — skip them.
+    task_start_ts = ""
+    try:
+        vr_data = json.loads(Path(".claude/data/verification_record.json").read_text())
+        task_start_ts = vr_data.get("reset_at", "")
+    except Exception:
+        pass  # If VR unreadable, fall back to reading full transcript (old behavior)
+
     try:
         with open(transcript_path, 'r') as _tf:
             for _line in _tf:
@@ -482,6 +495,12 @@ def _extract_transcript_context(input_data):
                     _entry = json.loads(_line)
                 except json.JSONDecodeError:
                     continue
+
+                # Skip entries from before the current task started
+                if task_start_ts:
+                    entry_ts = _entry.get("timestamp", "")
+                    if entry_ts and entry_ts < task_start_ts:
+                        continue
 
                 _msg = _entry.get("message", {})
                 _content = _msg.get("content", [])
@@ -746,7 +765,7 @@ _VR_CHECKS_ORDER = [
     ("build",         "BUILD              "),
     ("lint",          "LINT               "),
     ("app_starts",    "APP STARTS         "),
-    ("api",           "API/CODE INVOCATION"),
+    ("api",           "CODE/SCRIPT/API EXECUTION"),
     ("frontend",      "FRONTEND VALIDATION"),
     ("happy_path",    "HAPPY PATH         "),
     ("error_cases",   "ERROR CASES        "),
@@ -775,9 +794,13 @@ _VR_RUN_CMDS = {
         "  npm start 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh\n"
         "  python main.py 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh",
     "api":
-        "curl http://localhost:PORT/api/ENDPOINT 2>&1 | bash ~/.claude/commands/check-api.sh\n"
-        '  python -c "from app import fn; print(fn(args))" 2>&1 | bash ~/.claude/commands/check-api.sh\n'
-        '  bash ~/.claude/commands/check-api.sh "called POST /api/X with Y, got response Z (min 50 chars)"',
+        "# Run WHATEVER CODE WAS CHANGED — scripts, functions, CLI tools, APIs.\n"
+        "# Use REAL-WORLD inputs that replicate how the code is actually used.\n"
+        "# If you can execute it, you must. Only skip if execution is impossible.\n"
+        "  bash SCRIPT.sh --args 2>&1 | bash ~/.claude/commands/check-api.sh\n"
+        "  curl http://localhost:PORT/api/ENDPOINT 2>&1 | bash ~/.claude/commands/check-api.sh\n"
+        '  python -c "from app import fn; print(fn(real_args))" 2>&1 | bash ~/.claude/commands/check-api.sh\n'
+        '  bash ~/.claude/commands/check-api.sh "ran X with real input Y, got output Z, exit N (min 50 chars)"',
     "frontend":
         "npx playwright test 2>&1 | bash ~/.claude/commands/check-frontend.sh\n"
         "  npm run test:e2e 2>&1 | bash ~/.claude/commands/check-frontend.sh\n"
@@ -890,15 +913,15 @@ def build_checklist_message(done_items: list, pending_items: list) -> str:
         ]
         # Per-check instructions
         if key in ("happy_path", "error_cases"):
-            lines.append(f"Describe exactly what you tested (min 30 chars). Be specific:")
+            lines.append("Describe exactly what you tested (min 30 chars). Be specific:")
             lines.append(f"  {_VR_RUN_CMDS[key]}")
-            lines.append(f"No applicable scenario? Skip with a reason (min 10 chars):")
+            lines.append("No applicable scenario? Skip with a reason (min 10 chars):")
             lines.append(f"  {_VR_SKIP_CMDS[key]}")
         else:
-            lines.append(f"Run the command and pipe the output:")
+            lines.append("Run the command and pipe the output:")
             for cmd_line in _VR_RUN_CMDS[key].split("\n"):
                 lines.append(f"  {cmd_line}")
-            lines.append(f"Not applicable? Skip with a reason (min 10 chars):")
+            lines.append("Not applicable? Skip with a reason (min 10 chars):")
             lines.append(f"  {_VR_SKIP_CMDS[key]}")
 
     lines += [
