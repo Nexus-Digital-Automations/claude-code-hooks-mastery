@@ -27,13 +27,19 @@ try:
     last_asst = next(
         (m["content"] for m in reversed(msgs) if m["role"] == "assistant"), ""
     )
-    if not last_asst.strip().startswith("QUESTION:"):
-        print("❌ No pending question found in conversation state.", file=sys.stderr)
+    # Allow responding after both questions AND rejection verdicts
+    if not last_asst:
+        print("❌ No conversation state found. Run authorize-stop first.", file=sys.stderr)
         sys.exit(1)
+    # Detect what the last message was for better output messaging
+    is_question = last_asst.strip().startswith("QUESTION:")
     msgs.append({"role": "user", "content": answer})
     data["messages"] = msgs
     open(state_file, "w").write(json.dumps(data, indent=2))
-    print(f"✅ Answer recorded. Re-run authorize-stop to continue the review.")
+    if is_question:
+        print("✅ Answer recorded. Re-run authorize-stop to continue the review.")
+    else:
+        print("✅ Additional context recorded. Re-run authorize-stop to continue the conversation.")
 except Exception as e:
     print(f"❌ Failed to record answer: {e}", file=sys.stderr)
     sys.exit(1)

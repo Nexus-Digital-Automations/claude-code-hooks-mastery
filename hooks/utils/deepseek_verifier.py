@@ -184,6 +184,11 @@ DOES COUNT:
 SKIP VALID ONLY IF: no .tsx/.jsx/.html/.vue/.svelte in files_modified AND skip reason
 names the project type ("Python hook script", "CLI tool", "backend API only").
 
+Do NOT flag a frontend skip based on what other directories EXIST in the repo.
+Only the files in files_modified matter. If files_modified shows only .py/.sh/.json
+files and no frontend extensions, the frontend skip is valid — even if .html/.js/.css
+files exist in other directories of the repository.
+
 ── HAPPY PATH ────────────────────────────────────────────────────────────────────
 Requires the agent to have EXECUTED something and observed the result.
 Check bash commands: was the code actually run? Or only read/grepped?
@@ -485,13 +490,19 @@ def verify_with_deepseek(
             # Try to parse as verdict first
             verdict_result = _parse_verdict(content)
             if verdict_result is not None:
-                # Got a verdict — clear state file if it exists
-                if state_path and state_path.exists():
-                    try:
-                        state_path.unlink()
-                    except Exception:
-                        pass
                 approved = bool(verdict_result.get("approved", True))
+                if approved:
+                    # Approved: clear state so next task starts fresh
+                    if state_path and state_path.exists():
+                        try:
+                            state_path.unlink()
+                        except Exception:
+                            pass
+                else:
+                    # Rejected: save verdict to history so agent can respond and continue
+                    history.append({"role": "assistant", "content": content})
+                    if state_path:
+                        _save_state(state_path, history)
                 return {
                     "approved": approved,
                     "verdict": str(verdict_result.get("verdict", "")),
@@ -605,6 +616,9 @@ if __name__ == "__main__":
             print(f"Suspicious: {', '.join(result['suspicious_steps'])}")
         if result.get("instructions"):
             print(f"\nRequired actions:\n{result['instructions']}")
+        print("\nTo provide additional context and continue the conversation:")
+        print('  bash ~/.claude/commands/answer-deepseek.sh "your response"')
+        print("Then re-run authorize-stop.")
         print("=" * 70 + "\n")
         sys.exit(1)
 

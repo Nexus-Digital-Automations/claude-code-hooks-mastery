@@ -533,3 +533,187 @@ class TestMultiTurnConversation:
         assert "questions" in result
         assert result["pending"] is False
         assert result["questions"] == ""
+
+
+# ─── Rejection continuation tests ────────────────────────────────────────────
+
+class TestRejectionContinuation:
+    """Tests for rejection-preservation behavior (negotiable-rejections plan)."""
+
+    def _make_api_response(self, content: str) -> MagicMock:
+        """Build a mock urllib response returning raw text content."""
+        raw = json.dumps({
+            "choices": [{"message": {"content": content}}]
+        }).encode("utf-8")
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = raw
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        return mock_resp
+
+    def test_rejection_preserves_state_file(self, monkeypatch, tmp_path):
+        """On rejection, state file is NOT deleted — conversation can continue."""
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-key")
+        state_file = tmp_path / "state.json"
+        verdict = json.dumps({
+            "approved": False,
+            "verdict": "Evidence is insufficient.",
+            "suspicious_steps": ["tests"],
+            "instructions": "Run pytest and paste actual output.",
+        })
+        mock_resp = self._make_api_response(verdict)
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            from utils import deepseek_verifier
+            import importlib
+            importlib.reload(deepseek_verifier)
+            result = deepseek_verifier.verify_with_deepseek(
+                {"tests": {"status": "done", "evidence": "ok"}},
+                state_file=state_file,
+            )
+        assert result["approved"] is False
+        assert result["pending"] is False
+        assert state_file.exists(), "State file should survive rejection for conversation continuation"
+
+    def test_rejection_state_has_verdict_in_history(self, monkeypatch, tmp_path):
+        """After rejection, state file history contains the verdict as an assistant message."""
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-key")
+        state_file = tmp_path / "state.json"
+        rejection_json = json.dumps({
+            "approved": False,
+            "verdict": "No real test execution found.",
+            "suspicious_steps": ["tests"],
+            "instructions": "Run pytest and paste actual output.",
+        })
+        mock_resp = self._make_api_response(rejection_json)
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            from utils import deepseek_verifier
+            import importlib
+            importlib.reload(deepseek_verifier)
+            deepseek_verifier.verify_with_deepseek(
+                {"tests": {"status": "done", "evidence": "ok"}},
+                state_file=state_file,
+            )
+
+        assert state_file.exists()
+        data = json.loads(state_file.read_text())
+        msgs = data.get("messages", [])
+        asst_msgs = [m["content"] for m in msgs if m["role"] == "assistant"]
+        assert any("approved" in m for m in asst_msgs), (
+            "Rejection verdict JSON should appear in history as an assistant message"
+        )
+
+    def test_approved_deletes_state_file(self, monkeypatch, tmp_path):
+        """Approval still deletes state file (existing behavior preserved)."""
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-key")
+        state_file = tmp_path / "state.json"
+        state_file.write_text(json.dumps({
+            "messages": [{"role": "user", "content": "evidence"}]
+        }))
+
+        verdict = json.dumps({
+            "approved": True,
+            "verdict": "Evidence is genuine.",
+            "suspicious_steps": [],
+            "instructions": "",
+        })
+        mock_resp = self._make_api_response(verdict)
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            from utils import deepseek_verifier
+            import importlib
+            importlib.reload(deepseek_verifier)
+            result = deepseek_verifier.verify_with_deepseek(
+                {"tests": {"status": "done", "evidence": "47 passed"}},
+                state_file=state_file,
+            )
+
+        assert result["approved"] is True
+        assert not state_file.exists(), "State file should be cleared on approval"
+
+    def test_conversation_continues_after_rejection(self, monkeypatch, tmp_path):
+        """Pre-load state with rejection + user response, second call returns approval."""
+        monkeypatch.setenv("DEEPSEEK_API_KEY", "fake-key")
+        state_file = tmp_path / "state.json"
+
+        # Simulate state after a rejection — verdict saved as assistant message,
+        # user provided additional context via answer-deepseek.sh
+        rejection_json = json.dumps({
+            "approved": False,
+            "verdict": "No test runner visible in bash history.",
+            "suspicious_steps": ["tests"],
+            "instructions": "Run pytest and paste actual output.",
+        })
+        pre_state = {
+            "messages": [
+                {"role": "user", "content": "...initial evidence..."},
+                {"role": "assistant", "content": rejection_json},
+                {"role": "user", "content": "I ran pytest in a separate terminal. Output: 9 passed in 1.2s."},
+            ]
+        }
+        state_file.write_text(json.dumps(pre_state))
+
+        # Second call: DeepSeek approves after seeing the additional context
+        approval = json.dumps({
+            "approved": True,
+            "verdict": "Tests confirmed genuine after additional context.",
+            "suspicious_steps": [],
+            "instructions": "",
+        })
+        messages_sent = []
+
+        def capture_urlopen(req, timeout):
+            import json as _json
+            body = _json.loads(req.data.decode())
+            messages_sent.extend(body["messages"])
+            return self._make_api_response(approval)
+
+        with patch("urllib.request.urlopen", side_effect=capture_urlopen):
+            from utils import deepseek_verifier
+            import importlib
+            importlib.reload(deepseek_verifier)
+            result = deepseek_verifier.verify_with_deepseek({}, state_file=state_file)
+
+        assert result["approved"] is True
+        # Verify rejection + user response were included in the follow-up API call
+        user_contents = [m["content"] for m in messages_sent if m["role"] == "user"]
+        assert any("9 passed" in c for c in user_contents)
+
+    def test_answer_deepseek_allows_after_rejection(self, tmp_path):
+        """answer-deepseek.sh logic: when last message is a rejection JSON, appending still works."""
+        state_file = tmp_path / "state.json"
+        rejection_json = json.dumps({
+            "approved": False,
+            "verdict": "No test runner found.",
+            "suspicious_steps": ["tests"],
+            "instructions": "Run pytest.",
+        })
+        state = {
+            "messages": [
+                {"role": "user", "content": "...evidence..."},
+                {"role": "assistant", "content": rejection_json},
+            ]
+        }
+        state_file.write_text(json.dumps(state))
+
+        # Simulate the logic from answer-deepseek.sh
+        data = json.loads(state_file.read_text())
+        msgs = data.get("messages", [])
+        last_asst = next(
+            (m["content"] for m in reversed(msgs) if m["role"] == "assistant"), ""
+        )
+        # New logic: allow responding if last_asst is non-empty (not just QUESTION:)
+        assert last_asst, "Should find last assistant message"
+        is_question = last_asst.strip().startswith("QUESTION:")
+        assert not is_question, "Rejection verdict is not a question"
+
+        # Append user response (simulating what answer-deepseek.sh does)
+        msgs.append({"role": "user", "content": "I ran pytest separately. 9 passed."})
+        data["messages"] = msgs
+        state_file.write_text(json.dumps(data, indent=2))
+
+        # Verify the state was updated correctly
+        updated = json.loads(state_file.read_text())
+        updated_msgs = updated.get("messages", [])
+        last_user = next(
+            (m["content"] for m in reversed(updated_msgs) if m["role"] == "user"), ""
+        )
+        assert "9 passed" in last_user
