@@ -8,7 +8,6 @@ Run with: python -m pytest tests/test_deepseek_verifier.py -v
 
 import json
 import sys
-import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 import urllib.error
@@ -200,7 +199,7 @@ class TestBuildUserMessage:
         assert "never completed" in msg
 
     def test_evidence_truncated_to_800_chars(self):
-        from utils.deepseek_verifier import _build_user_message, _EVIDENCE_TRUNCATE
+        from utils.deepseek_verifier import _build_user_message
         long_evidence = "x" * 2000
         checks = {"tests": {"status": "done", "evidence": long_evidence}}
         msg = _build_user_message(checks)
