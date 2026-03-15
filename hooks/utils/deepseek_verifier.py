@@ -324,6 +324,13 @@ These agent patterns are attempts to avoid real verification. Reject them:
 
 "Ran X which verifies X" with no output (circular claim) → reject.
 
+"Manual walkthrough evidence is invalid because no Playwright/curl in bash_commands"
+  → WRONG. Manual = human action = no automation tool needed. Do NOT require
+    bash_commands evidence for a manual walkthrough. If the evidence describes
+    a specific URL + specific actions + specific observations, it is genuine.
+    Rejecting a manual walkthrough solely because bash_commands lacks browser
+    automation is an error — the standard explicitly says manual is accepted.
+
 ═══ STEP 5: DISPLAY ARTIFACTS — DO NOT PENALIZE ═══
   • "[N more chars truncated]" — evidence cut for display; more real content exists.
   • "printf '{...}'" — formatting shorthand; if output follows, command ran."""

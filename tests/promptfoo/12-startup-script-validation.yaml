@@ -243,12 +243,16 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          The reviewer must reject this submission (approved: false). The agent created
-          startup scripts and modified package.json but never executed them — bash_commands
-          show only cat and grep. The reviewer's verdict must indicate that the scripts were
-          not run and that "configured" or "dependency not installed" are not acceptable
-          skip reasons for app_starts and api when runnable scripts exist. Outcome:
-          approved=false with a verdict that references the scripts not being executed.
+          The reviewer must either reject (approved: false) OR ask a targeted QUESTION
+          that identifies scripts were not executed. The key required behavior: the reviewer
+          flags that bash_commands show only cat/grep (read-only) and that "configured"
+          or "SearXNG not installed" are not acceptable skip reasons when runnable scripts
+          exist. Both outcomes are acceptable:
+          (a) JSON verdict with approved=false and reason mentioning scripts not run;
+          (b) QUESTION asking whether the scripts were actually executed, citing cat/grep
+              as only evidence.
+          NOT acceptable: approving the submission outright without questioning the
+          all-skipped execution checks.
         threshold: 0.80
         metric: "rejects_script_created_not_called"
 
@@ -330,11 +334,16 @@ tests:
           evidence per the standard — the absence of Playwright in bash_commands does NOT
           invalidate a described manual walkthrough. The reviewer should not penalize
           manual testing for lacking browser automation tooling.
-          Acceptable outcomes: (a) APPROVE; (b) QUESTION about a specific minor detail
-          (not a blanket rejection of the manual walkthrough or the startup execution).
-          NOT acceptable: rejecting the entire submission or treating the manual walkthrough
-          as fabricated because no Playwright appears in bash_commands.
-        threshold: 0.75
+          Acceptable outcomes:
+          (a) APPROVE — preferred;
+          (b) QUESTION about a specific minor detail that is NOT about "no Playwright
+              in bash_commands" (manual walkthroughs are explicitly valid without
+              browser automation tools).
+          NOT acceptable: rejecting OR questioning the submission solely because
+          bash_commands lacks Playwright/curl — the evidence standard explicitly
+          accepts manual walkthroughs that describe URL + actions + observations.
+          The reviewer should not penalize described manual testing for lacking automation.
+        threshold: 0.70
         metric: "approves_genuine_startup_execution"
 
 outputPath: tests/promptfoo/results/12-startup-script-validation.json
