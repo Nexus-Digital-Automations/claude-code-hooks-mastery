@@ -193,6 +193,13 @@ GENUINE: Server startup logs from an actual process.
   "Server listening on port 3000"  |  "uvicorn running on http://0.0.0.0:8000"
 NOT GENUINE: "app starts" with no logs; syntax check output; no start command in bash
 
+STARTUP SCRIPT RULE (same as api check):
+  If files_modified shows startup scripts (scripts/*.sh, dev.sh, start.sh) OR
+  package.json (scripts section) was modified → this check CANNOT be skipped.
+  Evidence MUST include output from actually running the modified startup command.
+  bash -n, shellcheck, or "script was written" is NOT valid evidence.
+  The full startup chain must be verified: run the command, capture output.
+
 ── CODE / SCRIPT / API EXECUTION ────────────────────────────────────────────────
 RUN IT IF YOU CAN. Any modified code, script, or function should be executed.
 Use REAL-WORLD inputs — replicate how the code is actually used in practice, not trivial/dummy calls.
@@ -206,6 +213,21 @@ SKIP ONLY IF: no interpreter available, no valid test input exists, pure docs/co
 NOT GENUINE: "works fine"; "script runs"; source code reading; grep/cat to confirm content;
   trivial/dummy inputs that don't exercise the real code path;
   skipping when bash history shows the code was available and could have been run
+
+CRITICAL: syntax tools are NOT execution:
+  bash -n SCRIPT.sh → syntax check only. Script was NOT run.
+  shellcheck SCRIPT.sh → static analysis only. Script was NOT run.
+  If bash_commands shows only bash -n, shellcheck, cat, or grep of .sh files,
+  but never bash SCRIPT.sh or the command it wraps → REJECT immediately.
+
+STARTUP SCRIPT RULE:
+  If files_modified contains ANY of: scripts/*.sh, dev.sh, start.sh, setup*.sh,
+  OR package.json was modified (especially the "scripts" section) →
+  the `api` AND `app_starts` checks MUST show the actual startup command was run
+  (yarn dev, npm start, bash scripts/dev.sh, etc.) and output was captured.
+  "Script created and configured" is NOT evidence. "Syntax validated" is NOT evidence.
+  Even if the script fails: the agent must run it and record the failure output.
+  A script that has never been called has never been tested.
 
 ── FRONTEND VALIDATION ───────────────────────────────────────────────────────────
 STRICT. This check verifies the UI works in a browser. Reading source is NOT validation.
@@ -245,6 +267,11 @@ GENUINE — any of these:
     "test_conversation_continues_after_rejection PASSED" + test invoked real code
     (accept this if the test name describes the happy path clearly)
   • Manual walkthrough: specific URL + actions taken + what was observed
+    "opened http://localhost:3000, clicked Submit, saw success toast, 0 console errors"
+    NOTE: manual walkthroughs do NOT require a bash command as evidence — they are
+    human actions by definition. Accept if the evidence names a specific URL, actions
+    taken, and what was actually observed. Do not reject a manual walkthrough solely
+    because no Playwright/browser-automation tool appears in bash_commands.
   • "called fn(input_args), returned expected_value"
 
 NOT GENUINE:

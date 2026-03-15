@@ -786,6 +786,8 @@ _VR_RUN_CMDS = {
         "  ruff check . 2>&1 | bash ~/.claude/commands/check-lint.sh\n"
         "  cargo clippy 2>&1 | bash ~/.claude/commands/check-lint.sh",
     "app_starts":
+        "# ⚠️  If you created/modified startup scripts or package.json scripts:\n"
+        "#     bash -n script.sh or shellcheck = syntax check ONLY. Must run the full command.\n"
         "# Check if already running first:\n"
         "  PORT=3000  # or 8000, 8080 — use the project's actual port\n"
         "  # If running: kill it, restart, and record:\n"
@@ -794,6 +796,11 @@ _VR_RUN_CMDS = {
         "  npm start 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh\n"
         "  python main.py 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh",
     "api":
+        "# ⚠️  bash -n SCRIPT.sh = syntax check ONLY — the script was NOT run.\n"
+        "# ⚠️  shellcheck = static analysis — the script was NOT run.\n"
+        "# If you created/modified startup scripts or package.json, run the actual command:\n"
+        "  bash scripts/dev.sh 2>&1 | head -20 | bash ~/.claude/commands/check-api.sh\n"
+        "  yarn dev 2>&1 | head -20 | bash ~/.claude/commands/check-api.sh\n"
         "# Run WHATEVER CODE WAS CHANGED — scripts, functions, CLI tools, APIs.\n"
         "# Use REAL-WORLD inputs that replicate how the code is actually used.\n"
         "# If you can execute it, you must. Only skip if execution is impossible.\n"
