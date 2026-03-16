@@ -47,6 +47,19 @@ if [ "$1" = "--skip" ]; then
         echo "   Example: bash ~/.claude/commands/check-commit-push.sh --skip \"no changes to commit — read-only task\"" >&2
         exit 1
     fi
+    # Reject "pre-existing" and similar cop-out skip reasons
+    _REASON_LOWER=$(echo "$REASON" | tr '[:upper:]' '[:lower:]')
+    if echo "$_REASON_LOWER" | grep -qE 'pre.?exist|already.fail|was.fail|before.my.change|before.this.change|not.caused.by|unrelated.to.my'; then
+        echo "❌ Skip reason rejected: 'pre-existing failures' is not a valid reason." >&2
+        echo "   Fix the failures, or use a specific reason with documented user approval." >&2
+        exit 1
+    fi
+    # Reject "user didn't ask" excuses — commits are automatic, not user-triggered
+    if echo "$_REASON_LOWER" | grep -qE 'user.did.not|user.didn.t|not.request|not.asked|didn.t.ask|did.not.ask|no.request|wasn.t.asked|was.not.asked'; then
+        echo "❌ Skip reason rejected: commits and pushes are automatic — 'user did not request' is not a valid reason." >&2
+        echo "   Commit the changes. Only valid skips: no files modified, read-only task, etc." >&2
+        exit 1
+    fi
     python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "skipped" "" "$REASON"
     if [ $? -ne 0 ]; then
         echo "❌ Failed to write verification record" >&2

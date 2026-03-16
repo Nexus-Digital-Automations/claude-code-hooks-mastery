@@ -1,13 +1,12 @@
 """
-Unified MCP client for Claude-Flow, Ruv-Swarm, and Flow-Nexus tools.
+Unified MCP client for Claude-Flow and Flow-Nexus tools.
 Provides a consistent interface with graceful degradation and timeout handling.
 """
 
 import json
 import subprocess
-import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 import time
 
@@ -19,7 +18,7 @@ except ImportError:
 
 class MCPClient:
     """
-    Unified MCP client supporting Claude-Flow, Ruv-Swarm, and Flow-Nexus.
+    Unified MCP client supporting Claude-Flow and Flow-Nexus.
 
     All operations are non-blocking with configurable timeouts and graceful fallbacks.
     """
@@ -30,7 +29,7 @@ class MCPClient:
 
         Args:
             timeout: Default timeout in seconds (uses config if not specified)
-            server: Default server to use (claude-flow, ruv-swarm, flow-nexus)
+            server: Default server to use (claude-flow, flow-nexus)
         """
         self.config = get_config()
         self.server = server
@@ -71,8 +70,6 @@ class MCPClient:
         if not self.config.is_server_enabled(self.server):
             return None
 
-        prefix = self.config.get_server_prefix(self.server)
-        full_tool = f"{prefix}{tool_name}"
         use_timeout = timeout or self.timeout
 
         start_time = time.time()
@@ -80,8 +77,6 @@ class MCPClient:
             # Build npx command for MCP tool invocation
             if self.server == 'claude-flow':
                 cmd = ['npx', 'claude-flow@alpha', 'mcp', 'call', tool_name, json.dumps(params)]
-            elif self.server == 'ruv-swarm':
-                cmd = ['npx', 'ruv-swarm', 'mcp', 'call', tool_name, json.dumps(params)]
             else:
                 # For flow-nexus, use direct CLI
                 cmd = ['npx', 'flow-nexus@latest', 'mcp', 'call', tool_name, json.dumps(params)]
@@ -390,11 +385,6 @@ def get_mcp_client(server: str = 'claude-flow', timeout: Optional[float] = None)
 def get_claude_flow_client(timeout: Optional[float] = None) -> MCPClient:
     """Get a Claude Flow MCP client."""
     return MCPClient(timeout=timeout, server='claude-flow')
-
-
-def get_ruv_swarm_client(timeout: Optional[float] = None) -> MCPClient:
-    """Get a Ruv-Swarm MCP client."""
-    return MCPClient(timeout=timeout, server='ruv-swarm')
 
 
 def get_flow_nexus_client(timeout: Optional[float] = None) -> MCPClient:

@@ -64,7 +64,6 @@ class NeuralClient:
 
         use_timeout = timeout or self.timeout
         server = 'flow-nexus' if self.use_flow_nexus else 'claude-flow'
-        prefix = self.config.get_server_prefix(server)
 
         start_time = time.time()
         try:

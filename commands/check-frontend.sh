@@ -1,26 +1,19 @@
 #!/bin/bash
-# Record code/script/API execution evidence in verification_record.json.
-# USE THIS WHENEVER CODE CAN BE RUN. If you modified a script, run it.
-# If you modified a function, call it. If you built a tool, invoke it.
-# Use REAL-WORLD inputs — replicate how the code is actually used in practice,
-# not trivial/dummy calls. Only skip if execution is genuinely impossible
-# (no interpreter, no valid test input available).
+# Record frontend validation in verification_record.json.
+# Requires actually running browser tests or opening the UI and verifying it works.
 #
-# Usage (pipe mode — preferred, works for any executable):
-#   bash myscript.sh --arg value 2>&1 | bash ~/.claude/commands/check-api.sh
-#   curl http://localhost:3000/api/health 2>&1 | bash ~/.claude/commands/check-api.sh
-#   python -c "from mymodule import process; print(process({'x': 1}))" 2>&1 | bash ~/.claude/commands/check-api.sh
-#   node -e "const fn = require('./fn'); console.log(fn(42))" 2>&1 | bash ~/.claude/commands/check-api.sh
+# Usage (pipe mode — preferred):
+#   npx playwright test 2>&1 | bash ~/.claude/commands/check-frontend.sh
+#   npm run test:e2e 2>&1 | bash ~/.claude/commands/check-frontend.sh
 #
-# Usage (description mode — when execution output isn't capturable):
-#   bash ~/.claude/commands/check-api.sh "ran sandbox-run.sh --check tests --cmd 'pytest', exit 0, ✅ Tests recorded"
-#   bash ~/.claude/commands/check-api.sh "called POST /api/users with {email:...}, got 201 {id: 42}"
+# Usage (description mode — when using MCP browser tools or Puppeteer manually):
+#   bash ~/.claude/commands/check-frontend.sh "opened http://localhost:3000/dashboard, verified new Export button visible and clickable, clicked it, saw download dialog appear, checked browser console: zero errors"
 #
-# Usage (skip — only when execution is genuinely impossible):
-#   bash ~/.claude/commands/check-api.sh --skip "pure config/docs change, no executable code modified"
+# Usage (skip with reason):
+#   bash ~/.claude/commands/check-frontend.sh --skip "no frontend, this is a backend-only service"
 
 VR_FILE=".claude/data/verification_record.json"
-CHECK_KEY="api"
+CHECK_KEY="frontend"
 mkdir -p ".claude/data"
 
 UPDATE_PY='
@@ -56,7 +49,7 @@ if [ "$1" = "--skip" ]; then
     REASON="${2:-}"
     if [ -z "$REASON" ] || [ "${#REASON}" -lt 10 ]; then
         echo "❌ Skip reason required (min 10 chars)." >&2
-        echo "   Example: bash ~/.claude/commands/check-api.sh --skip \"no API endpoints, pure CLI tool\"" >&2
+        echo "   Example: bash ~/.claude/commands/check-frontend.sh --skip \"no frontend, backend-only service\"" >&2
         exit 1
     fi
     # Reject "pre-existing" and similar cop-out skip reasons
@@ -71,13 +64,13 @@ if [ "$1" = "--skip" ]; then
         echo "❌ Failed to write verification record" >&2
         exit 1
     fi
-    echo "✅ API/code invocation skipped: $REASON"
+    echo "✅ Frontend validation skipped: $REASON"
 elif [ ! -t 0 ]; then
     # Pipe mode: stdin is not a terminal
     OUTPUT=$(cat)
     if [ -z "$OUTPUT" ]; then
         echo "❌ No output received. Did you pipe your command?" >&2
-        echo "   Example: curl http://localhost:3000/api/health 2>&1 | bash ~/.claude/commands/check-api.sh" >&2
+        echo "   Example: npx playwright test 2>&1 | bash ~/.claude/commands/check-frontend.sh" >&2
         exit 1
     fi
     TMPFILE=$(mktemp)
@@ -88,13 +81,13 @@ elif [ ! -t 0 ]; then
         rm -f "$TMPFILE"
         exit 1
     fi
-    echo "✅ API/code invocation recorded"
+    echo "✅ Frontend validation recorded"
 else
     # Description mode
     DESCRIPTION="${1:-}"
     if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 50 ]; then
-        echo "❌ Description too short (min 50 chars). Include: what was run/called, what real-world input/args were used, what output was seen." >&2
-        echo "   Example: bash ~/.claude/commands/check-api.sh \"ran check-api.sh with --skip flag, got ✅ message, exit 0\"" >&2
+        echo "❌ Description too short (min 50 chars). Include: URL visited, interactions performed, and whether console was clean." >&2
+        echo "   Example: bash ~/.claude/commands/check-frontend.sh \"opened http://localhost:3000/dashboard, verified new Export button visible and clickable, saw download dialog, console: zero errors\"" >&2
         exit 1
     fi
     TMPFILE=$(mktemp)
@@ -105,5 +98,5 @@ else
         rm -f "$TMPFILE"
         exit 1
     fi
-    echo "✅ API/code invocation recorded"
+    echo "✅ Frontend validation recorded"
 fi

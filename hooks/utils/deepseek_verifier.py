@@ -176,10 +176,23 @@ GENUINE: Test runner output with pass/fail counts.
 NOT GENUINE: "tests pass" with no output; py_compile (syntax check ≠ test runner);
   reading test files; no test runner visible in bash commands but claims "tests pass"
 
+MUST PASS — FAILURES IN OUTPUT = REJECTION:
+  Test output showing failures ("N failed", "FAILED", "errors: N") is NOT
+  acceptable evidence, even if the evidence is genuine execution.
+  A test run that fails is a failing TESTS check — period.
+  Fix the failures and show a clean passing run, OR skip with a specific reason
+  naming the exact test(s) and documented user approval.
+  "Pre-existing failures" is NOT a valid reason (see STEP 4 above).
+
 ── BUILD ─────────────────────────────────────────────────────────────────────────
 GENUINE: Compiler/bundler output with error counts.
   "tsc --noEmit: exit 0"  |  "cargo build: Finished in 4.5s"
 NOT GENUINE: "build works" with no command or output; no build command in bash history
+
+MUST SUCCEED — ERRORS IN OUTPUT = REJECTION:
+  Build output showing compilation errors is NOT acceptable evidence.
+  Fix errors and show a clean build, OR skip with documented reason.
+  "Pre-existing build errors" is NOT valid (see STEP 4 above).
 
 ── LINT ──────────────────────────────────────────────────────────────────────────
 GENUINE: Linter output confirming checks ran.
@@ -187,6 +200,12 @@ GENUINE: Linter output confirming checks ran.
   eslint: "0 problems (0 errors, 0 warnings)"
   Cross-check: lint command must appear in bash_commands (ruff / eslint / flake8 / etc.)
 NOT GENUINE: "lint passes" with no output; no lint command in bash history
+
+MUST BE CLEAN — ERRORS IN OUTPUT = REJECTION:
+  Lint output showing errors (not warnings) is NOT acceptable evidence.
+  Warnings are acceptable; errors are not.
+  Fix errors and show clean output, OR skip with documented reason.
+  "Pre-existing lint errors" is NOT valid (see STEP 4 above).
 
 ── APP STARTS ────────────────────────────────────────────────────────────────────
 GENUINE: Server startup logs from an actual process.
@@ -307,6 +326,17 @@ Do NOT reject immediately — ask one targeted question first.
 ═══ STEP 4: EXCUSE DETECTION ═══
 These agent patterns are attempts to avoid real verification. Reject them:
 
+LAZY COMMAND DELEGATION — "Execute, Don't Recommend" violation:
+  If last_assistant_message contains ANY of:
+    "Try the command", "Try running", "You should run",
+    "you'll need to run", "you'll want to run", "you need to run"
+  → The agent told the user to run a command instead of running it themselves.
+  → REJECT immediately. This is a hard rule from CLAUDE.md.
+  Exception: agent may ask user to run a genuinely risky/destructive command
+    (e.g., "rm -rf /production-data") after the agent has already done safe prep —
+    but even then the agent should explain WHY it cannot run it (not just delegate lazily).
+  If in doubt: reject and require the agent to show the command's output.
+
 "Source verification confirms…" / "verified in source files" for frontend/happy/errors
   → Reject. Reading source ≠ runtime validation. Flag and require actual execution.
 
@@ -330,6 +360,28 @@ These agent patterns are attempts to avoid real verification. Reject them:
     a specific URL + specific actions + specific observations, it is genuine.
     Rejecting a manual walkthrough solely because bash_commands lacks browser
     automation is an error — the standard explicitly says manual is accepted.
+
+"USER DID NOT REQUEST A COMMIT" — REJECT IMMEDIATELY FOR COMMIT & PUSH:
+  Commits and pushes are AUTOMATIC after any coding task — the agent does not need
+  explicit user permission. If commit_push is skipped with any of:
+    "user did not request", "user didn't ask", "not requested", "not asked to commit",
+    "no request to commit", "wasn't asked", "user hasn't asked"
+  → REJECT immediately. The only valid skip reasons for commit_push are:
+    "no files modified", "read-only task", "no changes staged", or similar
+    genuine absence of work to commit. "User didn't ask" is never valid.
+
+"PRE-EXISTING FAILURE" EXCUSES — REJECT IMMEDIATELY:
+  If skip_reason, evidence text, OR last_assistant_message contains any of:
+    "pre-existing", "preexisting", "pre existing",
+    "was already failing", "already failing", "was failing before",
+    "before my change", "before this change", "not caused by my change",
+    "unrelated to my change", "existed before", "were failing before"
+    (when used to justify leaving failures/errors in place)
+  → REJECT the affected check immediately. No questions needed.
+  The agent must EITHER fix the failures OR provide a skip with explicit
+  user-documented approval (not just a claim — "user approved skipping
+  test_X because [specific tracked reason]"). Simply asserting that something
+  was already broken is NOT an acceptable excuse.
 
 ═══ STEP 5: DISPLAY ARTIFACTS — DO NOT PENALIZE ═══
   • "[N more chars truncated]" — evidence cut for display; more real content exists.

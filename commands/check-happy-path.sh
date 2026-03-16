@@ -1,10 +1,14 @@
 #!/bin/bash
-# Record upstream sync status in verification_record.json.
-# Normally auto-run by static_checker.py via authorize-stop.sh.
-# Manual skip: bash ~/.claude/commands/check-upstream-sync.sh --skip "not a fork"
+# Record happy path test description in verification_record.json.
+# Description must be specific: what input, what action, what result you observed.
+#
+# Usage:
+#   bash ~/.claude/commands/check-happy-path.sh "navigated to /login, entered test@example.com / password123, clicked submit, redirected to /dashboard, saw welcome message"
+# Usage (skip with reason):
+#   bash ~/.claude/commands/check-happy-path.sh --skip "config-only change, no user-facing happy path"
 
 VR_FILE=".claude/data/verification_record.json"
-CHECK_KEY="upstream_sync"
+CHECK_KEY="happy_path"
 mkdir -p ".claude/data"
 
 UPDATE_PY='
@@ -40,7 +44,7 @@ if [ "$1" = "--skip" ]; then
     REASON="${2:-}"
     if [ -z "$REASON" ] || [ "${#REASON}" -lt 10 ]; then
         echo "❌ Skip reason required (min 10 chars)." >&2
-        echo "   Example: bash ~/.claude/commands/check-upstream-sync.sh --skip \"not a fork, no upstream remote\"" >&2
+        echo "   Example: bash ~/.claude/commands/check-happy-path.sh --skip \"config-only change, no user-facing happy path\"" >&2
         exit 1
     fi
     # Reject "pre-existing" and similar cop-out skip reasons
@@ -51,20 +55,29 @@ if [ "$1" = "--skip" ]; then
         exit 1
     fi
     python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "skipped" "" "$REASON"
-    echo "✅ Upstream sync skipped: $REASON"
-elif [ "$1" = "--result" ]; then
-    # Called by static_checker.py with pre-computed result string
-    RESULT="${2:-}"
-    if [ -z "$RESULT" ]; then
-        echo "❌ --result requires a description" >&2
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to write verification record" >&2
+        exit 1
+    fi
+    echo "✅ Happy path skipped: $REASON"
+else
+    if [ -n "$1" ]; then
+        DESCRIPTION="$1"
+    else
+        DESCRIPTION=$(cat)
+    fi
+    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 30 ]; then
+        echo "❌ Description too short (min 30 chars). Be specific: what input, what action, what result." >&2
+        echo "   Example: bash ~/.claude/commands/check-happy-path.sh \"navigated to /login, entered valid credentials, clicked submit, saw /dashboard with welcome message\"" >&2
         exit 1
     fi
     TMPFILE=$(mktemp)
-    printf '%s' "$RESULT" > "$TMPFILE"
+    printf '%s' "$DESCRIPTION" > "$TMPFILE"
     python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "done" "$TMPFILE" ""
-    echo "✅ Upstream sync recorded"
-else
-    echo "ℹ️  upstream_sync is a static check — it auto-runs when you run authorize-stop.sh." >&2
-    echo "   To skip: bash ~/.claude/commands/check-upstream-sync.sh --skip \"not a fork\"" >&2
-    exit 1
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to write verification record" >&2
+        rm -f "$TMPFILE"
+        exit 1
+    fi
+    echo "✅ Happy path recorded"
 fi

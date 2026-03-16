@@ -1,10 +1,13 @@
 #!/bin/bash
-# Record upstream sync status in verification_record.json.
-# Normally auto-run by static_checker.py via authorize-stop.sh.
-# Manual skip: bash ~/.claude/commands/check-upstream-sync.sh --skip "not a fork"
+# Record app startup results in verification_record.json.
+# Usage (start app and pipe output):
+#   npm start 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh
+#   python main.py 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh
+# Usage (skip with reason):
+#   bash ~/.claude/commands/check-app-starts.sh --skip "library module, no runnable app entry point"
 
 VR_FILE=".claude/data/verification_record.json"
-CHECK_KEY="upstream_sync"
+CHECK_KEY="app_starts"
 mkdir -p ".claude/data"
 
 UPDATE_PY='
@@ -40,7 +43,7 @@ if [ "$1" = "--skip" ]; then
     REASON="${2:-}"
     if [ -z "$REASON" ] || [ "${#REASON}" -lt 10 ]; then
         echo "❌ Skip reason required (min 10 chars)." >&2
-        echo "   Example: bash ~/.claude/commands/check-upstream-sync.sh --skip \"not a fork, no upstream remote\"" >&2
+        echo "   Example: bash ~/.claude/commands/check-app-starts.sh --skip \"library module, no runnable app entry point\"" >&2
         exit 1
     fi
     # Reject "pre-existing" and similar cop-out skip reasons
@@ -51,20 +54,25 @@ if [ "$1" = "--skip" ]; then
         exit 1
     fi
     python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "skipped" "" "$REASON"
-    echo "✅ Upstream sync skipped: $REASON"
-elif [ "$1" = "--result" ]; then
-    # Called by static_checker.py with pre-computed result string
-    RESULT="${2:-}"
-    if [ -z "$RESULT" ]; then
-        echo "❌ --result requires a description" >&2
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to write verification record" >&2
+        exit 1
+    fi
+    echo "✅ App startup skipped: $REASON"
+else
+    OUTPUT=$(cat)
+    if [ -z "$OUTPUT" ]; then
+        echo "❌ No output received. Did you pipe your command?" >&2
+        echo "   Example: npm start 2>&1 | head -30 | bash ~/.claude/commands/check-app-starts.sh" >&2
         exit 1
     fi
     TMPFILE=$(mktemp)
-    printf '%s' "$RESULT" > "$TMPFILE"
+    printf '%s' "$OUTPUT" > "$TMPFILE"
     python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "done" "$TMPFILE" ""
-    echo "✅ Upstream sync recorded"
-else
-    echo "ℹ️  upstream_sync is a static check — it auto-runs when you run authorize-stop.sh." >&2
-    echo "   To skip: bash ~/.claude/commands/check-upstream-sync.sh --skip \"not a fork\"" >&2
-    exit 1
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to write verification record" >&2
+        rm -f "$TMPFILE"
+        exit 1
+    fi
+    echo "✅ App startup recorded"
 fi

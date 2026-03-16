@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 from datetime import datetime
@@ -93,7 +92,7 @@ def check_upstream_sync(cwd: Path) -> tuple[str, str]:
     rc2, behind_out, _ = _run(
         f"git log HEAD..{remote}/{branch} --oneline 2>/dev/null", cwd, 10
     )
-    behind_commits = [l for l in behind_out.strip().splitlines() if l.strip()]
+    behind_commits = [line for line in behind_out.strip().splitlines() if line.strip()]
     behind_count = len(behind_commits)
 
     if behind_count > 0:
