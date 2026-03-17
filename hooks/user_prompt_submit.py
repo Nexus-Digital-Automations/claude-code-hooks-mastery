@@ -28,6 +28,44 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).parent))
 
 
+def _reset_verification_for_new_task(session_id: str) -> None:
+    """Reset verification state at start of each new user prompt.
+
+    Prevents stale evidence from a previous task in the same session
+    from being used as proof for the current task's work.
+    Mirrors session_start.py:reset_verification_record() but runs per-prompt.
+    """
+    vr_file = Path(".claude/data/verification_record.json")
+    try:
+        vr_file.parent.mkdir(parents=True, exist_ok=True)
+        all_pending = {
+            k: {"status": "pending", "evidence": None, "timestamp": None,
+                "skip_reason": None}
+            for k in ["tests", "build", "lint", "app_starts", "api",
+                      "frontend", "happy_path", "error_cases"]
+        }
+        with open(vr_file, "w") as f:
+            json.dump({
+                "reset_at": datetime.now().isoformat(),
+                "session_id": session_id,
+                "checks": all_pending,
+            }, f, indent=2)
+    except Exception:
+        pass  # Never block prompt submission
+
+    # Also clear the DeepSeek multi-turn conversation state so the reviewer
+    # starts fresh for this task (context is rebuilt at stop time from transcript).
+    for ds_file in [
+        Path(".claude/data/deepseek_review_state.json"),
+        Path(".claude/data/deepseek_context.json"),
+    ]:
+        try:
+            if ds_file.exists():
+                ds_file.unlink()
+        except Exception:
+            pass
+
+
 def store_request_pattern(session_id, prompt, category, cwd):
     """Store request pattern to Claude-Mem for full-text search across sessions."""
     try:
@@ -307,6 +345,66 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
         f.write(entry)
 
 
+def build_deepseek_delegation_directive(prompt, mode_config):
+    """Returns a DeepSeek delegation directive string, or None for non-delegatable prompts."""
+    prompt_stripped = prompt.strip()
+    # Skip very short prompts, slash commands, simple acks
+    if len(prompt_stripped) < 15 or prompt_stripped.startswith('/'):
+        return None
+    trivial = {
+        'ok', 'yes', 'no', 'sure', 'thanks', 'done', 'good', 'fine',
+        'great', 'perfect', 'got it', 'sounds good', 'continue', 'proceed'
+    }
+    if prompt_stripped.lower() in trivial:
+        return None
+
+    # Check delegation policy against task type
+    policy = mode_config.get('delegation_policy', {})
+    task_type = classify_task_type(prompt)
+
+    # Map task types to policy keys
+    type_to_policy = {
+        'code': 'code_tasks',
+        'research': 'research_tasks',
+        'config': 'config_tasks',
+        'docs': 'docs_tasks',
+    }
+    policy_key = type_to_policy.get(task_type)
+    if not policy_key or not policy.get(policy_key, False):
+        return None  # Not a delegatable task type per policy
+
+    profile = mode_config.get('deepseek_profile', 'standard')
+    plan_mode = mode_config.get('deepseek_plan_mode', True)
+
+    return f"""DEEPSEEK DELEGATION MODE — You are the SUPERVISOR.
+
+FOR THIS CODE TASK: Delegate implementation to DeepSeek via MCP tools.
+
+DELEGATION STEPS:
+1. Formulate a PRECISE task description (include file paths, expected behavior, constraints)
+2. Call: mcp__deepseek-agent__run with profile="{profile}", plan_mode={str(plan_mode).lower()}
+   - Include the full working directory context
+   - Specify exact files to create/modify
+3. Monitor: mcp__deepseek-agent__get_state to check progress
+4. Retrieve: mcp__deepseek-agent__get_output when complete
+
+SKEPTICAL REVIEW PROTOCOL (MANDATORY after DeepSeek completes):
+1. Read EVERY file DeepSeek modified — use the Read tool, line by line
+2. Look for bugs with a magnifying glass:
+   - Off-by-one errors, wrong variable names, hardcoded values
+   - Missing error handling, broken imports, security vulnerabilities
+   - Logic that doesn't match the original spec
+3. Run tests independently — do NOT trust DeepSeek's claims
+4. Run linter independently
+5. Rate confidence: "high" / "needs-fixes" / "redo"
+   - "high": No issues found after thorough review (cite evidence)
+   - "needs-fixes": Issues found — fix them yourself or send specific follow-up
+   - "redo": Fundamentally wrong — send new task with clearer spec
+
+DO NOT DELEGATE: questions, explanations, git ops, reviews, validation, security checks.
+If DeepSeek is unavailable, implement directly yourself."""
+
+
 def build_agent_routing_directive(prompt):
     """Returns agent routing directive string, or None for trivial prompts."""
     prompt_stripped = prompt.strip()
@@ -412,7 +510,10 @@ def main():
         # Extract session_id and prompt
         session_id = input_data.get('session_id', 'unknown')
         prompt = input_data.get('prompt', '')
-        
+
+        # Reset verification state for new task (per-prompt isolation)
+        _reset_verification_for_new_task(session_id)
+
         # Log the user prompt
         log_user_prompt(session_id, input_data)
 
@@ -451,10 +552,22 @@ def main():
         # Build additional context with recommendations
         context_parts = []
 
-        # Prepend routing directive so Claude sees it first
-        agent_directive = build_agent_routing_directive(prompt)
-        if agent_directive:
-            context_parts.insert(0, agent_directive)
+        # Prepend routing directive — deepseek delegation or normal agent routing
+        try:
+            from utils.config_loader import get_config
+            mode_config = get_config().get_agent_mode()
+            if mode_config.get("mode") == "deepseek":
+                directive = build_deepseek_delegation_directive(prompt, mode_config)
+                if directive:
+                    context_parts.insert(0, directive)
+            else:
+                agent_directive = build_agent_routing_directive(prompt)
+                if agent_directive:
+                    context_parts.insert(0, agent_directive)
+        except Exception:
+            agent_directive = build_agent_routing_directive(prompt)
+            if agent_directive:
+                context_parts.insert(0, agent_directive)
 
         if ambiguity_context:
             context_parts.append(ambiguity_context)

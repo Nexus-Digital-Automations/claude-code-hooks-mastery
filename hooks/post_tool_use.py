@@ -7,6 +7,7 @@ import json
 import subprocess
 import sys
 import os
+from datetime import datetime
 from pathlib import Path
 
 # Add hooks directory to path for utils imports
@@ -186,6 +187,69 @@ def store_tool_observation(session_id, tool_name, tool_input, tool_result):
         pass  # Graceful degradation
 
 
+def update_tool_tracking(session_id: str, tool_name: str, tool_input: dict) -> None:
+    """Atomic read-modify-write to ~/.claude/data/sessions/{session_id}_tools.json. Never raises."""
+    try:
+        tools_file = Path.home() / ".claude" / "data" / "sessions" / f"{session_id}_tools.json"
+        data = {}
+        if tools_file.exists():
+            try: data = json.loads(tools_file.read_text())
+            except Exception: data = {}
+        if not data:
+            data = {"session_id": session_id, "edit_extensions": {},
+                    "write_extensions": {}, "bash_count": 0, "read_count": 0}
+
+        if tool_name in ("Edit", "MultiEdit"):
+            ext = Path(tool_input.get("file_path", "")).suffix.lower() or ".unknown"
+            data["edit_extensions"][ext] = data["edit_extensions"].get(ext, 0) + 1
+        elif tool_name == "Write":
+            ext = Path(tool_input.get("file_path", "")).suffix.lower() or ".unknown"
+            data["write_extensions"][ext] = data["write_extensions"].get(ext, 0) + 1
+        elif tool_name == "Bash":
+            data["bash_count"] = data.get("bash_count", 0) + 1
+        elif tool_name == "Read":
+            data["read_count"] = data.get("read_count", 0) + 1
+        else:
+            return  # Nothing to track
+
+        data["last_updated"] = datetime.now().isoformat()
+        tools_file.parent.mkdir(parents=True, exist_ok=True)
+        tools_file.write_text(json.dumps(data, indent=2))
+    except Exception:
+        pass
+
+
+def _track_deepseek_result(session_id, tool_name, tool_input, tool_result):
+    """Log DeepSeek MCP tool calls to a ring buffer (last 50 entries)."""
+    ds_log = Path.home() / ".claude" / "data" / "deepseek_delegations.json"
+    ds_log.parent.mkdir(parents=True, exist_ok=True)
+
+    entries = []
+    if ds_log.exists():
+        try:
+            entries = json.loads(ds_log.read_text())
+        except Exception:
+            entries = []
+
+    # Extract action from tool name (e.g. mcp__deepseek-agent__run → run)
+    action = tool_name.rsplit("__", 1)[-1] if "__" in tool_name else tool_name
+
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "session_id": session_id[:8],
+        "action": action,
+        "task_snippet": str(tool_input.get("task", tool_input.get("prompt", "")))[:200],
+        "agent_id": tool_input.get("agent_id", ""),
+        "state": str(tool_result)[:200] if tool_result else "",
+    }
+    entries.append(entry)
+
+    # Keep last 50 entries
+    entries = entries[-50:]
+
+    ds_log.write_text(json.dumps(entries, indent=2))
+
+
 def lint_file(file_path):
     """
     Run appropriate linter on file based on extension.
@@ -245,6 +309,17 @@ def main():
         # Store observation to Claude-Mem, ReasoningBank, and PatternLearner
         if session_id:
             store_tool_observation(session_id, tool_name, tool_input, tool_result)
+
+        # Track tool usage for DeepSeek context enrichment
+        if session_id and tool_name in ("Write", "Edit", "MultiEdit", "Bash", "Read"):
+            update_tool_tracking(session_id, tool_name, tool_input)
+
+        # Track DeepSeek MCP delegations
+        if tool_name.startswith('mcp__deepseek-agent__'):
+            try:
+                _track_deepseek_result(session_id, tool_name, tool_input, tool_result)
+            except Exception:
+                pass
 
         # Log to JSONL file (append-only, safe for concurrent access)
         log_dir = Path.home() / '.claude' / 'logs'

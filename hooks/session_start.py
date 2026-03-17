@@ -106,6 +106,31 @@ def get_recent_issues():
     return None
 
 
+def reset_verification_record(session_id: str = "unknown") -> None:
+    """Reset verification_record.json at session start.
+
+    Prevents stale evidence from a previous session being used as proof
+    for the current session's work. Called unconditionally on every session
+    start (startup, resume, clear).
+    """
+    vr_file = Path(".claude/data/verification_record.json")
+    try:
+        vr_file.parent.mkdir(parents=True, exist_ok=True)
+        all_pending = {
+            k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
+            for k in ["tests", "build", "lint", "app_starts", "api", "frontend",
+                      "happy_path", "error_cases"]
+        }
+        with open(vr_file, "w") as f:
+            json.dump({
+                "reset_at": datetime.now().isoformat(),
+                "session_id": session_id,
+                "checks": all_pending,
+            }, f, indent=2)
+    except Exception:
+        pass  # Graceful degradation — never block session start
+
+
 def load_development_context(source):
     """Load relevant development context based on session source."""
     context_parts = []
@@ -114,76 +139,63 @@ def load_development_context(source):
     context_parts.append(f"Session started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     context_parts.append(f"Session source: {source}")
 
-    # Add validation requirements
-    validation_instructions = """
---- MANDATORY VALIDATION PROTOCOL ---
-BEFORE completing ANY task, you MUST validate your work using one or more of these methods:
-
-TESTING METHODS:
-- Unit tests: `npm test`, `pytest`, `cargo test`, `go test`, `jest`, `mocha`
-- Integration tests: Run API tests, database tests
-- E2E tests: Puppeteer, Playwright, Cypress, Selenium
-- Type checking: `tsc --noEmit`, `mypy`, `pyright`
-
-BUILD VERIFICATION:
-- Compile/build: `npm run build`, `tsc`, `cargo build`, `go build`
-- Lint check: `eslint`, `flake8`, `pylint`, `clippy`
-- No errors in build output
-
-RUNTIME VERIFICATION:
-- Add console.log/print statements to verify code paths execute
-- Run the application and check it starts without errors
-- Make API calls and verify responses
-- Check browser console for errors
-
-LOG ANALYSIS:
-- Review application logs for errors/warnings
-- Check server logs after making requests
-- Analyze test output for failures
-- Review build output for warnings
-
-VISUAL VERIFICATION:
-- Take screenshots of UI changes (if applicable)
-- Use Puppeteer/Playwright to capture page state
-- Verify visual elements render correctly
-
-PROOF OF FUNCTIONALITY:
-- Show command output proving tests pass
-- Display log entries proving code executed
-- Capture API responses showing correct behavior
-- Screenshot showing expected UI state
-
-VALIDATION REPORT REQUIRED:
-Before stopping, you MUST present a report like this:
-
-## Validation Report
-**Command:** `[what you ran]`
-**Result:** ✅ PASS or ❌ FAIL
-**Output:** [actual output snippet]
-
-Show proof. The user is a critical thinker - not empty claims.
-
-YOU ARE NOT ALLOWED TO STOP until you have:
-1. Executed at least one validation method
-2. Confirmed the validation passed
-3. Fixed any failures found
-4. Presented a validation report with proof
-
-This is not optional - it is a requirement. Run the validation commands yourself.
+    # Add session rules (autonomous + validation, concise)
+    session_rules = """
+--- SESSION RULES ---
+1. AUTONOMOUS: Never ask permission mid-task. Decide and proceed. Fix errors immediately.
+2. VALIDATE: Before declaring any task complete, run actual commands and show output.
+   Minimum: tests + build. No claims without evidence.
+   Format: Command: <x> | Result: ✅/❌ | Output: <actual snippet>
+3. ROOT CLEAN: Never create files at project root except essential configs.
+4. STOP: Use /authorize-stop after presenting validation proof.
+5. EXECUTE DON'T RECOMMEND: If you can do it, do it. Never say "I recommend X" or "You should Y" for actions within your capability. Ask for user approval only for risky, destructive, or irreversible actions — then execute immediately upon approval.
 """
-    context_parts.append(validation_instructions)
+    context_parts.append(session_rules)
 
-    # Add autonomous execution guidance
-    autonomous_execution = """
---- AUTONOMOUS EXECUTION ---
-DO NOT ASK: "Should I fix this?" / "Should I continue?" / "Want me to proceed?"
-Just fix it. Just continue. Just proceed.
-Errors = fix immediately and continue.
-Ambiguity = resolve UPFRONT ONLY, not mid-task.
-KEEP WORKING until ALL requested features are complete.
+    # Inject DeepSeek supervisor context if in deepseek mode
+    try:
+        from utils.config_loader import get_config
+        if get_config().is_deepseek_mode():
+            session_rules_ds = """
+--- DEEPSEEK SUPERVISOR MODE ---
+You are in SUPERVISOR mode. You do NOT write implementation code directly.
+
+DELEGATION PROTOCOL:
+- Delegate code implementation tasks to DeepSeek via mcp__deepseek-agent__run
+- Use mcp__deepseek-agent__spawn to create a DeepSeek agent first if needed
+- Use mcp__deepseek-agent__get_output to retrieve completed work
+- Use mcp__deepseek-agent__get_state to check progress
+
+CRITICAL REVIEWER MINDSET:
+DeepSeek is a cheaper, less capable model. It WILL make mistakes. Treat its
+output like a junior developer's PR — assume bugs, logic errors, security
+holes, and style violations until you prove otherwise.
+
+DETECTIVE PROTOCOL (after every DeepSeek task):
+1. Read EVERY file DeepSeek modified — line by line, not skimming
+2. Check for: off-by-one errors, missing error handling, wrong variable names,
+   hardcoded values, broken imports, security vulnerabilities, logic that
+   doesn't match the spec
+3. Run tests yourself — don't trust DeepSeek's claim that "tests pass"
+4. Run the linter yourself
+5. If you find ANY issue: fix it yourself OR send DeepSeek a specific follow-up
+   task describing exactly what's wrong
+6. Never say "DeepSeek's output looks good" without citing specific evidence
+
+TASKS YOU KEEP (do NOT delegate):
+- Questions, explanations, read-only reviews
+- Git operations, validation, security audits
+- Architectural decisions, code review
+- Stop authorization and verification
+
+FALLBACK: If DeepSeek is unavailable, implement directly yourself.
+
+You are the quality gate. DeepSeek is the labor. Never rubber-stamp.
 """
-    context_parts.append(autonomous_execution)
-    
+            context_parts.append(session_rules_ds)
+    except Exception:
+        pass  # Graceful degradation
+
     # Add git information
     branch, changes = get_git_status()
     if branch:
@@ -531,6 +543,9 @@ def main():
         # Extract fields
         session_id = input_data.get('session_id', 'unknown')
         source = input_data.get('source', 'unknown')  # "startup", "resume", or "clear"
+
+        # Reset verification record — prevent stale cross-session evidence
+        reset_verification_record(session_id)
 
         # Log the session start event
         log_session_start(input_data)

@@ -5,8 +5,7 @@ Provides unified access to feature toggles, server configs, and timeouts.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
-import os
+from typing import Dict, Optional
 
 
 class ConfigLoader:
@@ -15,6 +14,7 @@ class ConfigLoader:
     _instance = None
     _features_cache: Optional[Dict] = None
     _servers_cache: Optional[Dict] = None
+    _mode_cache: Optional[Dict] = None
 
     def __new__(cls):
         """Singleton pattern for configuration."""
@@ -211,6 +211,42 @@ class ConfigLoader:
         features = self.get_features()
         log_dir = features.get('logging', {}).get('log_dir', '.claude/logs')
         return Path.home() / log_dir
+
+    def _default_mode(self) -> Dict:
+        """Return default agent mode configuration."""
+        return {
+            "mode": "claude",
+            "last_switched": None,
+            "deepseek_profile": "standard",
+            "deepseek_plan_mode": True,
+            "delegation_policy": {
+                "code_tasks": True,
+                "research_tasks": False,
+                "config_tasks": False,
+                "docs_tasks": False,
+            },
+        }
+
+    def get_agent_mode(self, force_reload: bool = False) -> Dict:
+        """Load agent mode configuration with caching."""
+        if ConfigLoader._mode_cache and not force_reload:
+            return ConfigLoader._mode_cache
+
+        mode_file = Path.home() / '.claude' / 'data' / 'agent_mode.json'
+        try:
+            if mode_file.exists():
+                with open(mode_file, 'r') as f:
+                    ConfigLoader._mode_cache = json.load(f)
+            else:
+                ConfigLoader._mode_cache = self._default_mode()
+        except Exception:
+            ConfigLoader._mode_cache = self._default_mode()
+
+        return ConfigLoader._mode_cache
+
+    def is_deepseek_mode(self) -> bool:
+        """Check if the current agent mode is deepseek."""
+        return self.get_agent_mode().get("mode") == "deepseek"
 
 
 # Convenience function for quick access

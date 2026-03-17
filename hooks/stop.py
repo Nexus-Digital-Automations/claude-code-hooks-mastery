@@ -663,7 +663,7 @@ def detect_hedging_language(input_data):
     Detect speculative/hedging language OR user-delegation phrases in the last assistant message.
     Agents must verify things themselves — never speculate and never offload verification to the user.
     Returns (has_hedging: bool, matched_phrase: str, snippet: str, category: str).
-    category is 'hedging' or 'delegation'.
+    category is 'hedging', 'delegation', or 'lazy_execution'.
     """
     HEDGING_PHRASES = [
         'should be working',
@@ -734,6 +734,26 @@ def detect_hedging_language(input_data):
             end = min(len(scannable), idx + len(phrase) + 60)
             snippet = scannable[start:end].replace('\n', ' ').strip()
             return (True, phrase, snippet, 'delegation')
+
+    # Patterns where agent instructs user to run a command the agent should run itself.
+    # "Execute, Don't Recommend" (CLAUDE.md Principle #4).
+    LAZY_EXECUTION_PHRASES = [
+        'try the command',
+        'try running',
+        'you should run',
+        "you'll need to run",
+        "you'll want to run",
+        'you need to run',
+        'you can run',
+    ]
+
+    for phrase in LAZY_EXECUTION_PHRASES:
+        if phrase in msg_lower:
+            idx = msg_lower.find(phrase)
+            start = max(0, idx - 40)
+            end = min(len(scannable), idx + len(phrase) + 80)
+            snippet = scannable[start:end].replace('\n', ' ').strip()
+            return (True, phrase, snippet, 'lazy_execution')
 
     return (False, '', '', '')
 
@@ -1126,6 +1146,29 @@ REQUIRED — actually verify it yourself:
 Verify it yourself, then stop.
 ======================================================================
 """
+            elif _hedging_category == 'lazy_execution':
+                hedging_msg = f"""
+======================================================================
+STOP BLOCKED — EXECUTE, DON'T RECOMMEND VIOLATION
+======================================================================
+
+🚫 Your last message contains "{_hedging_phrase}" — you told the user to run a command
+   instead of running it yourself.
+
+  Context: "...{_hedging_snippet}..."
+
+CLAUDE.md Principle #4: "NEVER say 'You should run Y' for actions the agent can execute."
+The agent must run commands itself, not delegate to the user.
+
+REQUIRED:
+  • Run the command yourself right now
+  • Capture the output / error
+  • Report the result definitively ("Ran X — output: ...")
+  • If the command is risky/destructive, confirm with user FIRST, then run it
+
+Run it, then stop.
+======================================================================
+"""
             else:
                 hedging_msg = f"""
 ======================================================================
@@ -1161,6 +1204,8 @@ Verify it, then stop.
                 "task_type": _get_session_task_type(input_data.get("session_id", "")),
                 "files_modified": _files_mod,
                 "bash_commands": _bash_cmds,
+                "transcript_path": input_data.get("transcript_path", ""),
+                "session_id": input_data.get("session_id", ""),
             }
             Path(".claude/data").mkdir(parents=True, exist_ok=True)
             Path(".claude/data/deepseek_context.json").write_text(
@@ -1372,6 +1417,21 @@ Verify it, then stop.
             ]:
                 if _ds_file.exists():
                     _ds_file.unlink()
+        except Exception:
+            pass
+
+        # Informational DeepSeek delegation summary (non-blocking)
+        try:
+            from utils.config_loader import get_config
+            if get_config().is_deepseek_mode():
+                _ds_log = Path.home() / ".claude" / "data" / "deepseek_delegations.json"
+                if _ds_log.exists():
+                    _ds_entries = json.loads(_ds_log.read_text())
+                    # Filter to current session (match on first 8 chars)
+                    _sid_prefix = input_data.get("session_id", "")[:8]
+                    _session_ds = [d for d in _ds_entries if d.get("session_id") == _sid_prefix]
+                    if _session_ds:
+                        print(f"\xf0\x9f\x93\x8b DeepSeek delegations in this session: {len(_session_ds)}", file=sys.stderr)
         except Exception:
             pass
 
