@@ -175,12 +175,23 @@ def run_static_checks(
         results["upstream_sync"] = status
         print(f"[static] upstream_sync: {status}", file=sys.stderr)
 
-    # lint
+    # lint — guard: never overwrite manually-recorded clean lint evidence
     if not only_pending or _is_pending(vr_file, "lint"):
-        status, evidence = check_lint(cwd)
-        _write_vr(vr_file, "lint", status, evidence)
-        results["lint"] = status
-        print(f"[static] lint: {status}", file=sys.stderr)
+        # Double-check status at write time to prevent overwriting "done" evidence
+        # (covers any race where _is_pending was checked before manual recording)
+        try:
+            _lr = json.loads(vr_file.read_text())
+            _lint_already_done = _lr.get("checks", {}).get("lint", {}).get("status") == "done"
+        except Exception:
+            _lint_already_done = False
+        if _lint_already_done:
+            results["lint"] = "done"
+            print("[static] lint: already done — skipping auto-lint", file=sys.stderr)
+        else:
+            status, evidence = check_lint(cwd)
+            _write_vr(vr_file, "lint", status, evidence)
+            results["lint"] = status
+            print(f"[static] lint: {status}", file=sys.stderr)
 
     return results
 

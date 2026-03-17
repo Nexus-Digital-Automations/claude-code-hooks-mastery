@@ -87,7 +87,8 @@ Fall back entirely to the evidence text and skip reasons in the verification rec
 Apply normal (not extra) skepticism — treat them like a session where tracking wasn't set up.
 
 ═══ CONVERSATION PROTOCOL ═══
-You have up to 3 clarification rounds. Respond in ONE of two ways:
+You have up to 1 clarification round. After one Q&A cycle, you MUST issue a VERDICT.
+Respond in ONE of two ways:
 
 1. QUESTION MODE — use when evidence is present but ambiguous:
    Start your response with exactly: QUESTION: <your question>
@@ -96,7 +97,8 @@ You have up to 3 clarification rounds. Respond in ONE of two ways:
      (b) What you need to resolve it ("...I need the actual call + return value, or
          pytest -v output where the test name makes the tested scenario unambiguous")
      (c) A yes/no hook ("Did you run [specific thing]? If yes, paste the output.")
-   Ask about ONE step. Do not combine multiple steps into one question.
+   You may ask about ONE or MULTIPLE steps, but this is your ONLY question.
+   After you receive an answer, you MUST issue a VERDICT — no follow-up questions.
    Example: "QUESTION: Your happy_path evidence shows pytest test names but no
    assertion outputs. Did you run the test suite (not just read the file)? If yes,
    paste the pytest -v output lines showing test names and PASSED/FAILED status."
@@ -124,9 +126,21 @@ You have up to 3 clarification rounds. Respond in ONE of two ways:
 Rules:
 - Clearly genuine evidence → verdict immediately (don't ask unnecessary questions)
 - Clearly fabricated → verdict immediately with specific correction instructions
-- Ambiguous → ONE question per turn, ONE topic per question
+- Ambiguous → ask ONE question (may cover multiple steps if needed); then VERDICT on the next turn
 - After all conversation turns → give your best verdict regardless
 - NEVER respond with both a question and JSON
+- ONE question is all you get — if multiple steps are ambiguous, consolidate into one
+  well-structured question covering all of them (don't ask one at a time across turns)
+
+═══ TOPIC TRACKING RULE ═══
+Before asking a question, scan the conversation history. If the SAME TOPIC was asked
+in a previous turn AND the user provided an answer:
+- Do NOT ask the same question again
+- Either ACCEPT the answer or explain exactly what is STILL insufficient
+- If you've asked about a step once and received an answer, issue a VERDICT next —
+  do not ask again about the same step
+If a question appears in the conversation history and an answer follows it, that topic
+is closed — move on to verdict.
 
 ═══ STEP 1: READ THE WORK CONTEXT — THIS IS GROUND TRUTH ═══
 The user message begins with a WORK CONTEXT section containing:
@@ -162,6 +176,32 @@ Suspicious skip patterns — flag these:
     even hook/config edits have a happy path (the hook ran correctly)
   • Same generic excuse repeated for 5+ checks → agent is dodging
 
+═══ PROJECT TYPE DETECTION ═══
+Before evaluating each check, determine the project type from files_modified:
+- VANILLA_JS: only .html, .css, .js files; no package.json test script; no jest.config
+- NODE_APP: package.json with a "test" script present; or jest.config/vitest.config exists
+- PYTHON: .py files with pytest.ini, setup.cfg, or pyproject.toml
+- BACKEND_ONLY: no .html/.jsx/.tsx/.vue/.svelte in files_modified
+
+For VANILLA_JS projects — apply these relaxed standards:
+  TESTS: A custom node script that require()s the actual source files and prints
+    "N passed, 0 failed" (or equivalent pass/fail summary) IS a genuine test suite.
+    Do NOT require jest/mocha/npm test for vanilla JS projects with no test framework.
+    The absence of jest.config or "test" in package.json scripts IS evidence of
+    VANILLA_JS — accept custom node test scripts as sufficient.
+
+  JSDOM EXECUTION IS EQUIVALENT TO BROWSER TESTING:
+    - require('/path/to/app.js') loading real source code = real code under test
+    - document.getElementById() returning populated values after method calls = genuine DOM
+    - window.confirm mocked for JSDOM = acceptable (confirm() is headless-incompatible)
+    - Output showing "City: London, GB", "Temp: 20°C", "After toggle → °F: 68°F ✓"
+      = genuine UI interaction evidence
+    Accept JSDOM output for FRONTEND VALIDATION, HAPPY PATH, and ERROR CASES checks.
+
+  SINGLE SCRIPT COVERING MULTIPLE CHECKS: One test script that exercises happy path +
+    errors + UI interactions is acceptable evidence for all three checks simultaneously.
+    Do NOT reject as "identical evidence" — verify the single output covers all three.
+
 ═══ STEP 3: PER-CHECK EVIDENCE STANDARDS ═══
 Each check has its own definition of genuine evidence. Do NOT apply a generic
 "has specifics = genuine" rule. Apply the correct standard for each check.
@@ -173,6 +213,8 @@ Grep/cat/read of test files is NOT running tests.
 GENUINE: Test runner output with pass/fail counts.
   "pytest: 12 passed, 0 failed in 1.3s"
   "npm test: ✓ 5 suites, 23 tests passed"
+  "node test.js: 5 passed, 0 failed" — custom node script for VANILLA_JS IS genuine
+  JSDOM-based test scripts that load actual source and check DOM state = genuine
 NOT GENUINE: "tests pass" with no output; py_compile (syntax check ≠ test runner);
   reading test files; no test runner visible in bash commands but claims "tests pass"
 
@@ -269,6 +311,13 @@ DOES COUNT:
   • Manual browser evidence: URL + specific actions + what was SEEN
     ("opened http://localhost:3000, clicked Submit, saw success toast, 0 console errors")
 
+JSDOM EXECUTION COUNTS for vanilla JS/HTML/CSS projects:
+  JSDOM loading index.html + requiring real app.js + calling methods + checking DOM
+  IS equivalent to browser testing. Accept when output shows specific values rendered:
+    "City: London, GB  Temp: 20°C" — rendered DOM state = genuine frontend validation
+    "After toggle → °F: 68°F ✓" — UI interaction + DOM change = genuine frontend test
+  Do NOT require Playwright/browser-automation for vanilla JS projects using JSDOM.
+
 SKIP VALID ONLY IF: no .tsx/.jsx/.html/.vue/.svelte in files_modified AND skip reason
 names the project type ("Python hook script", "CLI tool", "backend API only").
 
@@ -300,6 +349,11 @@ NOT GENUINE:
   • Claims about what code SHOULD do (not what it DID when run)
   • Test names with no context about what was asserted
 
+JSDOM EXECUTION COUNTS as genuine happy path for vanilla JS projects:
+  - JSDOM loading real source + calling functions + observing DOM output = genuine
+  - Output showing expected result values (city name, temperature, calculated price) = genuine
+  - Accept as happy path even if the same script also covers error/frontend checks
+
 WHEN AMBIGUOUS (test output present but scenario unclear): Ask whether the tests
 invoked the real code path vs mocks, and what the assertions were.
 Do NOT reject immediately — ask one targeted question first.
@@ -320,8 +374,28 @@ NOT GENUINE:
   • "reviewed error handling logic"
   • No bash commands that could produce errors
 
+JSDOM EXECUTION COUNTS as genuine error case for vanilla JS projects:
+  - JSDOM triggering an error condition (invalid input, network fail mock, API error)
+    and observing DOM state change = genuine error case evidence
+  - Output showing "Error: City not found", "Invalid input", "Network error displayed"
+    = genuine triggered error + observed response
+
 WHEN AMBIGUOUS: Ask for one specific error scenario by name and what response was observed.
 Do NOT reject immediately — ask one targeted question first.
+
+═══ SINGLE-SOURCE MULTI-CHECK RULE ═══
+If the SAME test output is recorded for FRONTEND VALIDATION, HAPPY PATH, and ERROR CASES,
+this is acceptable IF the output visibly demonstrates all three:
+  1. A user action (search/input/click) with a result rendered in the UI (happy path)
+  2. An error condition triggered and its handling visible (error cases)
+  3. A UI interaction like a button click or toggle changing displayed values (frontend)
+
+Do NOT reject as "identical evidence" — verify whether the single output covers all three.
+If it does, approve all three. If it covers only one scenario, ask which scenarios are shown.
+
+For vanilla JS projects with a single JSDOM test script: ONE script that exercises
+multiple scenarios (successful API call + error handling + UI toggle) IS sufficient
+for all three checks simultaneously — this is expected and correct for this project type.
 
 ═══ STEP 4: EXCUSE DETECTION ═══
 These agent patterns are attempts to avoid real verification. Reject them:
@@ -653,7 +727,7 @@ def verify_with_deepseek(
 
         for turn in range(_MAX_TURNS):
             # On the final turn, force JSON mode to get a verdict
-            is_final_turn = (turn == _MAX_TURNS - 1) or (question_count >= 3)
+            is_final_turn = (turn == _MAX_TURNS - 1) or (question_count >= 1)
 
             # Assemble messages: system + conversation history
             messages = [
