@@ -535,7 +535,7 @@ def _extract_transcript_context(input_data):
         pass
 
     # Keep only last 15 bash commands to stay within context budget
-    bash_commands = bash_commands[-15:]
+    bash_commands = bash_commands[-30:]
     return files_modified, bash_commands, last_user_prompt
 
 

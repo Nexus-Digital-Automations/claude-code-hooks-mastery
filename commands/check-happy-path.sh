@@ -66,9 +66,9 @@ else
     else
         DESCRIPTION=$(cat)
     fi
-    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 30 ]; then
-        echo "❌ Description too short (min 30 chars). Be specific: what input, what action, what result." >&2
-        echo "   Example: bash ~/.claude/commands/check-happy-path.sh \"navigated to /login, entered valid credentials, clicked submit, saw /dashboard with welcome message\"" >&2
+    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 150 ]; then
+        echo "❌ Description too short (min 150 chars). Must demonstrate EACH requested feature." >&2
+        echo "   Example: 'created deck, added 2 cards via modal, ran quiz (Q: What is 7×8? → A: 56, Got It), deleted card (count updated 2→1), edited card question (saved + visible), Due Today mode showed 1 due card'" >&2
         exit 1
     fi
     TMPFILE=$(mktemp)

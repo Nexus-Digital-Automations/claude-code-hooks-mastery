@@ -66,9 +66,9 @@ else
     else
         DESCRIPTION=$(cat)
     fi
-    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 30 ]; then
-        echo "❌ Description too short (min 30 chars). Be specific: what bad input, what error was expected, what happened." >&2
-        echo "   Example: bash ~/.claude/commands/check-error-cases.sh \"submitted form with wrong password, got 401 error shown; tried empty field, got validation msg; console zero errors\"" >&2
+    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 100 ]; then
+        echo "❌ Description too short (min 100 chars). Cover error states for multiple features." >&2
+        echo "   Example: 'empty deck name blocked (toast shown), delete card confirmed cancel (no deletion), quiz null session gracefully handled (no crash), invalid JSON import rejected with error message'" >&2
         exit 1
     fi
     TMPFILE=$(mktemp)

@@ -69,6 +69,33 @@ understand what the bar is and what already meets it. Example:
 ERROR CASES specifically: [explain gap]. To resolve: [exact ask]."
 Put this acknowledgment in the `verdict` field when rejected, or in the QUESTION text.
 
+═══ STEP 0.5: FEATURE COMPLETENESS CHECK — DO THIS BEFORE EVALUATING INDIVIDUAL CHECKS ═══
+For any task described as "build X", "create X", "implement X", or containing a feature list:
+
+1. EXTRACT the complete feature list from "Last task" in WORK CONTEXT.
+   Feature signals: buttons, CRUD ops (add/edit/delete), modals, modes, filters, confirmations,
+   summary screens, settings panels, import/export, timers, counters.
+
+2. For EACH extracted feature, check evidence and files_modified for proof of implementation.
+   Signs of MISSING implementation:
+   - Feature listed in task but no DOM element, handler, or function exists for it
+   - alert()/confirm() substituted where a proper modal was explicitly requested
+   - Empty event handler or TODO comment where logic should be
+   - Button exists in HTML but click handler does nothing or calls a stub
+
+3. If ANY requested feature has NO implementation evidence → REJECT IMMEDIATELY.
+   Do not wait for individual check evaluation. Issue verdict with approved=false.
+   Include in `verdict`: "Task requested [N] features. Unimplemented: [list each by name].
+   To fix: implement each missing feature fully. Then re-record HAPPY PATH demonstrating
+   each one: 'clicked Delete button, item removed from list'; 'filled edit modal, saved,
+   UI updated'; etc."
+
+4. The HAPPY PATH and FRONTEND tests MUST exercise every requested feature.
+   If happy_path evidence only covers 2 of 6 features: reject with missing 4 listed.
+   "Card flipped" is not coverage for "deck deletion". "Quiz started" is not coverage for
+   "quiz summary modal". Every feature needs its own test observation.
+═══════════════════════════════════════════════════════════════════════════════════════════
+
 ═══ GROUND TRUTH — USE THIS FIRST ═══
 The WORK CONTEXT section at the top contains:
   • Last task: what the user asked the agent to do
@@ -183,24 +210,26 @@ Before evaluating each check, determine the project type from files_modified:
 - PYTHON: .py files with pytest.ini, setup.cfg, or pyproject.toml
 - BACKEND_ONLY: no .html/.jsx/.tsx/.vue/.svelte in files_modified
 
-For VANILLA_JS projects — apply these relaxed standards:
-  TESTS: A custom node script that require()s the actual source files and prints
-    "N passed, 0 failed" (or equivalent pass/fail summary) IS a genuine test suite.
-    Do NOT require jest/mocha/npm test for vanilla JS projects with no test framework.
-    The absence of jest.config or "test" in package.json scripts IS evidence of
-    VANILLA_JS — accept custom node test scripts as sufficient.
+For VANILLA_JS projects — apply STRICTER standards, not relaxed:
+  Single-file HTML apps have MORE surface area to test wrong, not less.
 
-  JSDOM EXECUTION IS EQUIVALENT TO BROWSER TESTING:
-    - require('/path/to/app.js') loading real source code = real code under test
-    - document.getElementById() returning populated values after method calls = genuine DOM
-    - window.confirm mocked for JSDOM = acceptable (confirm() is headless-incompatible)
-    - Output showing "City: London, GB", "Temp: 20°C", "After toggle → °F: 68°F ✓"
-      = genuine UI interaction evidence
-    Accept JSDOM output for FRONTEND VALIDATION, HAPPY PATH, and ERROR CASES checks.
+  TESTS: A custom node script that loads the actual source and tests actual functions
+    with pass/fail output IS genuine. But it must cover ALL requested features.
+    A script testing 2 of 6 features means 4 features are UNVERIFIED.
+
+  JSDOM / PLAYWRIGHT EXECUTION:
+    - Playwright or JSDOM output counts as browser testing, BUT only for features it exercises
+    - Output showing card flip and deck selection does NOT cover deck deletion or edit modal
+    - For each feature in the task: there must be a specific action+result in the test output
+    - "3 tests passed" without naming which features = ambiguous = ask
 
   SINGLE SCRIPT COVERING MULTIPLE CHECKS: One test script that exercises happy path +
-    errors + UI interactions is acceptable evidence for all three checks simultaneously.
-    Do NOT reject as "identical evidence" — verify the single output covers all three.
+    errors + UI interactions is acceptable for all three checks ONLY IF the output
+    explicitly demonstrates every requested feature. Not just a subset.
+    Missing features = those checks are not covered. Reject and list what's missing.
+
+  alert()/confirm() in place of a requested modal = incomplete implementation.
+    Reject and require proper modal implementation.
 
 ═══ STEP 3: PER-CHECK EVIDENCE STANDARDS ═══
 Each check has its own definition of genuine evidence. Do NOT apply a generic
@@ -472,8 +501,8 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
     lines = []
 
     if context:
-        last_prompt  = (context.get("last_user_prompt") or "unknown")[:400]
-        last_msg     = (context.get("last_assistant_message") or "")[:1000]
+        last_prompt  = (context.get("last_user_prompt") or "unknown")[:2000]
+        last_msg     = (context.get("last_assistant_message") or "")[:2000]
         task_type    = (context.get("task_type") or "unknown")
         tool_summary = context.get("tool_summary") or {}
 
@@ -504,7 +533,7 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
         # Bash commands run this session (ground truth from transcript)
         bash_cmds = context.get("bash_commands") or []
         if bash_cmds:
-            lines.append("Bash commands actually run this session (last 15):")
+            lines.append("Bash commands actually run this session (last 30):")
             for cmd in bash_cmds:
                 lines.append(f"  $ {cmd}")
             lines.append("")
@@ -627,7 +656,7 @@ def _api_call(api_key: str, messages: list, json_mode: bool = False,
     payload = {
         "model": _MODEL,
         "messages": messages,
-        "max_tokens": 900,
+        "max_tokens": 2000,
         "temperature": 0.1,
     }
     if json_mode:

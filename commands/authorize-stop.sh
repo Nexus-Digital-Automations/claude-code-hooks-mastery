@@ -213,13 +213,18 @@ except Exception:
 # scanning the most-recently-modified session JSONL in known locations.
 transcript_path = existing.get("transcript_path", "")
 if not transcript_path or not Path(transcript_path).exists():
-    # Fallback: find most recent JSONL in project sessions directory
+    # Fallback: find most recent JSONL, filtered by session_id when available
+    session_id = existing.get("session_id", "")
     candidates = sorted(
         Path.home().glob(".claude/projects/**/*.jsonl"),
         key=lambda p: p.stat().st_mtime,
         reverse=True
     )
-    transcript_path = str(candidates[0]) if candidates else ""
+    if session_id:
+        matched = [p for p in candidates if session_id in p.name]
+        transcript_path = str(matched[0]) if matched else ""
+    else:
+        transcript_path = str(candidates[0]) if candidates else ""
 
 # Determine task start time from verification record
 task_start_ts = ""
@@ -262,7 +267,7 @@ if transcript_path and Path(transcript_path).exists():
                                 cmd = (inp.get("command") or "").strip()
                                 if cmd:
                                     bash_commands.append(cmd[:200])
-        bash_commands = bash_commands[-15:]
+        bash_commands = bash_commands[-30:]
     except Exception:
         pass
 

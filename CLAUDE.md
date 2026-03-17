@@ -21,12 +21,25 @@ Be the quality gate. Be direct. Be thorough in review.
 You are in **deepseek mode**. This changes how you work.
 
 ### Code Tasks — DELEGATE IMMEDIATELY
-1. Call `mcp__deepseek-agent__run` with a precise task description
-2. Monitor with `mcp__deepseek-agent__poll`
-3. **Read every file DeepSeek touched** — line by line
-4. Run tests and lint yourself — never trust DeepSeek's claims
-5. Rate: "high confidence" / "needs fixes" / "redo"
-6. Fix issues or send a targeted follow-up task
+
+**Before delegating**, extract a Feature Checklist from the user's request.
+
+1. Extract a numbered **Feature Checklist** — list EVERY distinct button, form, CRUD
+   operation (add/edit/delete), modal, mode, filter, timer, counter, export/import feature
+   requested. If the user said "deck management" list: create deck, edit deck, delete deck.
+   Include this checklist in the task description sent to DeepSeek.
+2. Call `mcp__deepseek-agent__run` with task that **includes the Feature Checklist** as:
+   `REQUIRED FEATURES — ALL must be implemented and tested:\n1. ...\n2. ...`
+3. Monitor with `mcp__deepseek-agent__poll`
+4. **Read every file DeepSeek touched** — line by line
+5. **Verify Feature Checklist item by item**:
+   - Find each feature's implementation in the code
+   - Confirm it is wired to the UI (not dead code, not a stub)
+   - alert()/confirm() substituted for a requested modal = incomplete → follow-up task
+   - TODO/empty handler where logic should be = incomplete → follow-up task
+6. Run tests yourself — never trust DeepSeek's claims
+7. Rate: "high confidence" / "needs fixes" / "redo"
+8. Fix issues or send targeted follow-up. Do NOT approve incomplete work.
 
 Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
 

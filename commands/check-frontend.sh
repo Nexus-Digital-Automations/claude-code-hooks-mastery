@@ -85,9 +85,9 @@ elif [ ! -t 0 ]; then
 else
     # Description mode
     DESCRIPTION="${1:-}"
-    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 50 ]; then
-        echo "❌ Description too short (min 50 chars). Include: URL visited, interactions performed, and whether console was clean." >&2
-        echo "   Example: bash ~/.claude/commands/check-frontend.sh \"opened http://localhost:3000/dashboard, verified new Export button visible and clickable, saw download dialog, console: zero errors\"" >&2
+    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 200 ]; then
+        echo "❌ Description too short (min 200 chars). Must demonstrate EACH requested feature." >&2
+        echo "   Include: URL, every button/form tested, results for create/edit/delete/modal/filter, console errors." >&2
         exit 1
     fi
     TMPFILE=$(mktemp)
