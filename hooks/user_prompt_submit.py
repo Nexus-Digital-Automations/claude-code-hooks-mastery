@@ -224,10 +224,15 @@ def classify_task_type(prompt: str) -> str:
         or any(kw in p for kw in ["what is", "how does", "show me how"]))
     is_docs = any(kw in p for kw in [".md", "readme", "changelog", "docstring",
         "documentation", "comment", "jsdoc", "docs", "document"])
-    is_code = (any(kw in p for kw in ["fix", "implement", "refactor", "add feature",
-        "build", "create"])
+    is_code = (any(kw in p for kw in [
+        "fix", "implement", "refactor", "add feature", "build", "create",
+        "write", "make", "develop", "generate", "set up", "add",
+        "app", "dashboard", "website", "webpage", "component", "function",
+        "script", "program", "api", "class", "module", "feature", "page",
+        "service", "test", "migrate", "deploy", "integrate",
+    ])
         or any(_has_ext(p, ext) for ext in [".py", ".js", ".ts", ".go", ".rs", ".rb",
-            ".java", ".cpp", ".c", ".sh"]))
+            ".java", ".cpp", ".c", ".sh", ".html", ".css", ".sql"]))
     is_config = (any(kw in p for kw in ["hook", "settings", "config", "workflow"])
         or any(_has_ext(p, ext) for ext in [".json", ".yaml", ".toml", ".sh", ".env"]))
     matches = sum([is_research, is_docs, is_code, is_config])
@@ -373,20 +378,31 @@ def build_deepseek_delegation_directive(prompt, mode_config):
     if not policy_key or not policy.get(policy_key, False):
         return None  # Not a delegatable task type per policy
 
-    profile = mode_config.get('deepseek_profile', 'standard')
+    profile = "confined"  # Always use confined profile — scopes DeepSeek to Claude Coding Projects
     plan_mode = mode_config.get('deepseek_plan_mode', True)
 
-    return f"""DEEPSEEK DELEGATION MODE — You are the SUPERVISOR.
+    return f"""⚠️ THIS DIRECTIVE OVERRIDES CLAUDE.md'S AUTONOMOUS-OPERATION RULE ⚠️
+DEEPSEEK DELEGATION MODE — You are the SUPERVISOR.
 
 FOR THIS CODE TASK: Delegate implementation to DeepSeek via MCP tools.
 
+WORKSPACE CONSTRAINT (MANDATORY):
+• DeepSeek MUST operate inside a subdirectory of:
+    /Users/jeremyparker/Desktop/Claude Coding Projects
+• You MUST pass working_dir="<full path to the specific project>" in every run() call.
+• The base path itself (/Users/jeremyparker/Desktop/Claude Coding Projects) is NOT valid.
+• If no project subdirectory has been identified yet, ask the user before delegating.
+
 DELEGATION STEPS:
-1. Formulate a PRECISE task description (include file paths, expected behavior, constraints)
-2. Call: mcp__deepseek-agent__run with profile="{profile}", plan_mode={str(plan_mode).lower()}
-   - Include the full working directory context
+1. Identify the project directory (must be a subpath of the workspace above).
+2. Formulate a PRECISE task description (include file paths, expected behavior, constraints)
+3. Call: mcp__deepseek-agent__run with
+     profile="{profile}",
+     plan_mode={str(plan_mode).lower()},
+     working_dir="<absolute path to project subdirectory>"
    - Specify exact files to create/modify
-3. Monitor: mcp__deepseek-agent__get_state to check progress
-4. Retrieve: mcp__deepseek-agent__get_output when complete
+4. Monitor: mcp__deepseek-agent__get_state to check progress
+5. Retrieve: mcp__deepseek-agent__get_output when complete
 
 SKEPTICAL REVIEW PROTOCOL (MANDATORY after DeepSeek completes):
 1. Read EVERY file DeepSeek modified — use the Read tool, line by line

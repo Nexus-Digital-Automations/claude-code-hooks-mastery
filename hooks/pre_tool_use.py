@@ -247,6 +247,42 @@ def get_context_injection(cwd, tool_name, tool_input=None):
     return "\n".join(injections) if injections else None
 
 
+DEEPSEEK_BASE_PATH = "/Users/jeremyparker/Desktop/Claude Coding Projects"
+
+
+def check_deepseek_working_dir(tool_name, tool_input):
+    """
+    Block mcp__deepseek-agent__run calls that lack a working_dir or point
+    outside BASE_PATH.  The base path itself is not valid — only subpaths.
+
+    Returns (blocked: bool, reason: str | None).
+    """
+    if tool_name != "mcp__deepseek-agent__run":
+        return False, None
+
+    working_dir = tool_input.get("working_dir", "").strip()
+    if not working_dir:
+        return True, (
+            "BLOCKED: mcp__deepseek-agent__run requires a working_dir.\n"
+            f"working_dir must be a subdirectory of: {DEEPSEEK_BASE_PATH}\n"
+            "Example: working_dir=\"/Users/jeremyparker/Desktop/Claude Coding Projects/my-project\""
+        )
+
+    # Normalise to an absolute, resolved path string for comparison
+    resolved = str(Path(working_dir).resolve())
+    base = str(Path(DEEPSEEK_BASE_PATH).resolve())
+
+    # Must be strictly *inside* base (not equal to base itself)
+    if resolved == base or not resolved.startswith(base + "/"):
+        return True, (
+            f"BLOCKED: working_dir '{working_dir}' is outside the allowed workspace.\n"
+            f"Allowed: subdirectories of {DEEPSEEK_BASE_PATH}\n"
+            "The base path itself is not a valid working directory — specify a named subproject."
+        )
+
+    return False, None
+
+
 def is_env_file_write(tool_name, tool_input):
     """
     Check if any tool is trying to WRITE/EDIT .env files containing sensitive data.
@@ -292,6 +328,12 @@ def main():
             print("BLOCKED: Writing/editing .env files is prohibited", file=sys.stderr)
             print("Reading .env is allowed; use .env.sample for templates", file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
+
+        # Enforce DeepSeek working_dir confinement
+        ds_blocked, ds_reason = check_deepseek_working_dir(tool_name, tool_input)
+        if ds_blocked:
+            print(ds_reason, file=sys.stderr)
+            sys.exit(2)
 
         # Inject context from FEATURES.md, MCP tools (neural, swarm, github)
         cwd = input_data.get('cwd', os.getcwd())
