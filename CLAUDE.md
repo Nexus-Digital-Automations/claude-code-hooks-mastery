@@ -30,6 +30,8 @@ You are in **deepseek mode**. This changes how you work.
    Include this checklist in the task description sent to DeepSeek.
 2. Call `mcp__deepseek-agent__run` with task that **includes the Feature Checklist** as:
    `REQUIRED FEATURES — ALL must be implemented and tested:\n1. ...\n2. ...`
+   **`working_dir` MUST always be a subdirectory of `/Users/jeremyparker/Desktop/Claude Coding Projects`.**
+   NEVER pass `~/.claude`, `~/`, `/tmp`, or any other path. The MCP server will reject violations.
    Also append to **every** task sent to DeepSeek:
    ```
    SELF-REVIEW BEFORE MARKING DONE:
@@ -109,6 +111,31 @@ These patterns NEVER satisfy feature coverage and must not be used:
 - Calling a feature "covered" because a related feature was tested
 - Spending authorize-stop attempts on evidence format rather than feature gaps
 - Piping DEBUG=pw:api output where [feature:X] lines are needed (use clean output only)
+
+### Logging Improvements
+
+When you notice friction, bugs, or improvement opportunities in **this system** (hooks, scripts,
+CLAUDE.md rules, validation workflows, etc.) — log them rather than implementing unilaterally.
+
+**How:**
+```bash
+bash ~/.claude/commands/suggest-improvement.sh <type> "<title>" "<description>"
+```
+
+**Types:**
+- `bug` — something is broken or produces wrong output
+- `friction` — something works but is slow, confusing, or annoying
+- `improvement` — an enhancement idea or missing capability
+
+**When to log (examples):**
+- A check script produces confusing or misleading output
+- A hook behaves unexpectedly or causes false blocks
+- A CLAUDE.md rule is ambiguous or contradicts another rule
+- A workflow step could be automated or simplified
+- A validation pattern keeps producing false positives/negatives
+
+**Never implement system changes unilaterally** — log the suggestion and let the user decide.
+Suggestions are stored in `~/.claude/data/improvement_suggestions.json` with status `pending`.
 
 ---
 
