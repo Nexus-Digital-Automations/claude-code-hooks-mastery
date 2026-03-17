@@ -3,6 +3,23 @@ name: Pair Programming
 description: AI-assisted pair programming with multiple modes (driver/navigator/switch), real-time verification, quality monitoring, and comprehensive testing. Supports TDD, debugging, refactoring, and learning sessions. Features automatic role switching, continuous code review, security scanning, and performance optimization with truth-score verification.
 ---
 
+---
+## ⚠️ Deepseek Mode — Check Before Proceeding
+
+Read `~/.claude/data/agent_mode.json`.
+
+**If `mode == "deepseek"`:**
+This skill writes or modifies code/files. Code work MUST be delegated in deepseek mode.
+- Do NOT execute this skill's implementation steps directly
+- Call `mcp__deepseek-agent__run` with a precise task description (include file paths, constraints, acceptance criteria)
+- After DeepSeek completes: read every changed file yourself and validate
+- You are supervisor; DeepSeek is the worker
+
+**If `mode == "claude"`:** Proceed normally with this skill.
+
+---
+
+
 # Pair Programming
 
 Collaborative AI pair programming with intelligent role management, real-time quality monitoring, and comprehensive development workflows.

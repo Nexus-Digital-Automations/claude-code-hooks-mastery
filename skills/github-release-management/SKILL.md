@@ -21,6 +21,23 @@ related_skills:
   - multi-repo-coordination
 ---
 
+---
+## ⚠️ Deepseek Mode — Check Before Proceeding
+
+Read `~/.claude/data/agent_mode.json`.
+
+**If `mode == "deepseek"`:**
+This skill writes or modifies code/files. Code work MUST be delegated in deepseek mode.
+- Do NOT execute this skill's implementation steps directly
+- Call `mcp__deepseek-agent__run` with a precise task description (include file paths, constraints, acceptance criteria)
+- After DeepSeek completes: read every changed file yourself and validate
+- You are supervisor; DeepSeek is the worker
+
+**If `mode == "claude"`:** Proceed normally with this skill.
+
+---
+
+
 # GitHub Release Management Skill
 
 Intelligent release automation and orchestration using AI swarms for comprehensive software releases - from changelog generation to multi-platform deployment with rollback capabilities.

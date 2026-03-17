@@ -1,0 +1,159 @@
+description: "DeepSeek mode delegation — skills must not block immediate code delegation"
+
+# Tests that when mode == "deepseek", the agent delegates code tasks to DeepSeek
+# immediately rather than running skill ceremonies (brainstorming, writing-plans, etc.).
+#
+# Also tests that non-code tasks stay local regardless of mode, and that claude mode
+# behaves normally without delegation.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+
+# Use DeepSeek as grading model for llm-rubric assertions
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+
+prompts:
+  - label: "deepseek-mode-delegation-prompt"
+    raw: |
+      You are Claude Code. Your active mode has already been determined.
+
+      ════════════════════════════════════════
+      ACTIVE MODE: {{mode}}
+      ════════════════════════════════════════
+      Do NOT read ~/.claude/data/agent_mode.json — the mode above is already resolved.
+
+      ## Rules for mode == "deepseek"
+      (Only applies when ACTIVE MODE above is "deepseek")
+
+      - Code tasks MUST be delegated immediately: call mcp__deepseek-agent__run first
+      - Do NOT run brainstorming, writing-plans, or any skill ceremony before delegating
+      - Do NOT let a skill's HARD-GATE block delegation
+      - Non-code tasks (questions, explanations, git ops, reviews, docs) you handle directly
+
+      Code task triggers → delegate immediately, skip all skills:
+      "Build X", "Create X", "Make X", "Implement X", "Write a [app/service/script/component]",
+      "Fix X", "Refactor X", "Add feature X"
+
+      ## Rules for mode == "claude"
+      (Only applies when ACTIVE MODE above is "claude")
+
+      - Normal operation: implement directly, do NOT call mcp__deepseek-agent__run
+      - Skills apply normally (brainstorming, TDD, etc.)
+      - Do NOT delegate to DeepSeek under any circumstances
+
+      ════════════════════════════════════════
+      REMINDER: Your mode is {{mode}}. Follow only the rules for that mode.
+      ════════════════════════════════════════
+
+      User request: {{user_task}}
+
+      Respond as required by your active mode. State the mode you are operating in at the start of your response.
+
+tests:
+  - description: "deepseek mode + 'Create a Weather Dashboard web app' → must delegate via mcp__deepseek-agent__run"
+    vars:
+      mode: "deepseek"
+      user_task: "Create a Weather Dashboard web app"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response explicitly mentions calling mcp__deepseek-agent__run (or
+          describes delegating the task to DeepSeek) as the FIRST action. The response must
+          NOT describe running a brainstorming ceremony, a 12-step design process, asking
+          clarifying questions as part of a gate, or writing a design doc before delegation.
+          Describing what will be included in the task description passed to DeepSeek is fine.
+          Fail if: the response launches into a brainstorming process, describes phases of
+          design before coding, or says it will ask clarifying questions before starting —
+          these indicate the skill ceremony was not short-circuited. Also fail if the response
+          writes code directly without mentioning DeepSeek delegation.
+        threshold: 0.75
+        metric: "deepseek_delegates_weather_app"
+
+  - description: "deepseek mode + 'Build a FastAPI CRUD API with auth' → must delegate, not write code directly"
+    vars:
+      mode: "deepseek"
+      user_task: "Build a FastAPI CRUD API with auth"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response calls mcp__deepseek-agent__run (or clearly describes
+          delegating to DeepSeek) without first writing any FastAPI code, route definitions,
+          Pydantic models, or auth implementation directly. The task description passed to
+          DeepSeek may mention FastAPI, auth, CRUD — that is expected and good. The key
+          requirement is that NO code is written directly in the response, and delegation
+          happens first.
+          Fail if: the response writes FastAPI routes, auth middleware, or any implementation
+          code directly. Also fail if the response runs brainstorming or writing-plans skill
+          ceremonies before delegating — deepseek mode means delegate immediately.
+        threshold: 0.75
+        metric: "deepseek_delegates_fastapi_api"
+
+  - description: "deepseek mode + conceptual question → must answer directly, no delegation"
+    vars:
+      mode: "deepseek"
+      user_task: "What is async/await in Python and when should I use it?"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response directly answers the conceptual question about async/await
+          in Python without delegating to DeepSeek. Non-code questions are kept locally
+          regardless of mode. A good answer explains what async/await is, the event loop,
+          coroutines, and when to use it (I/O-bound tasks, not CPU-bound). The response
+          should NOT call mcp__deepseek-agent__run for this non-code question.
+          Fail if: the response delegates to DeepSeek or calls mcp__deepseek-agent__run
+          for this explanation-only question. Delegation for questions/explanations violates
+          the "non-code tasks you keep" rule even in deepseek mode.
+        threshold: 0.75
+        metric: "deepseek_answers_question_directly"
+
+  - description: "claude mode + 'Create a Weather Dashboard web app' → must NOT delegate to DeepSeek"
+    vars:
+      mode: "claude"
+      user_task: "Create a Weather Dashboard web app"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response does NOT call mcp__deepseek-agent__run and does NOT delegate
+          to DeepSeek. In claude mode, the agent implements directly. The response should
+          either: (a) start implementing the app, (b) run a brainstorming skill to design
+          it first, or (c) ask clarifying questions — all of these are correct claude-mode
+          behavior. The key requirement is no DeepSeek delegation.
+          Fail if: the response calls mcp__deepseek-agent__run or describes delegating to
+          DeepSeek — this is claude mode, delegation to DeepSeek is wrong here.
+        threshold: 0.75
+        metric: "claude_mode_no_deepseek_delegation"
+
+  - description: "deepseek mode + brainstorming skill triggered for 'build X' → must short-circuit to DeepSeek"
+    vars:
+      mode: "deepseek"
+      user_task: >
+        I want to build a real-time chat application. Please use the brainstorming skill
+        to explore the design and requirements before we start.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response acknowledges deepseek mode and delegates to DeepSeek
+          (calls or describes mcp__deepseek-agent__run) rather than running the full
+          brainstorming ceremony. The response may briefly note the user asked for
+          brainstorming but explain that deepseek mode requires immediate delegation
+          for code tasks. Stating the mode at the start and then delegating is correct.
+          Also acceptable: a very brief mode confirmation followed by calling DeepSeek.
+          Fail ONLY if: the response actually runs the multi-step brainstorming process —
+          asking a series of clarifying questions as a HARD-GATE before any action,
+          presenting multiple design options and requiring user approval before proceeding,
+          or saying "I'll use the brainstorming skill now" and executing the full 12-step
+          ceremony without ever mentioning delegation. A response that says "in deepseek
+          mode I skip ceremonies and delegate" then calls DeepSeek is a clear pass.
+        threshold: 0.65
+        metric: "deepseek_short_circuits_brainstorming_for_build"
+
+outputPath: tests/promptfoo/results/14-deepseek-mode-delegation.json

@@ -32,6 +32,21 @@ related_skills:
 estimated_time: 30-45 minutes
 ---
 
+---
+## ⚠️ Deepseek Mode — Awareness Note
+
+Read `~/.claude/data/agent_mode.json`.
+
+**If `mode == "deepseek"`:**
+This skill handles non-code work (analysis / coordination / git ops / docs / validation) — safe to run directly.
+However: if this skill leads to a code implementation step (writing/modifying files), that step
+MUST use `mcp__deepseek-agent__run` rather than direct code writing. You supervise; DeepSeek executes.
+
+**If `mode == "claude"`:** No change — proceed normally with this skill.
+
+---
+
+
 # GitHub Project Management
 
 ## Overview

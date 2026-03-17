@@ -7,6 +7,21 @@ tags: [swarm, distributed, parallel, research, testing, development, coordinatio
 author: Claude Flow Team
 ---
 
+---
+## ⚠️ Deepseek Mode — Awareness Note
+
+Read `~/.claude/data/agent_mode.json`.
+
+**If `mode == "deepseek"`:**
+This skill handles non-code work (analysis / coordination / git ops / docs / validation) — safe to run directly.
+However: if this skill leads to a code implementation step (writing/modifying files), that step
+MUST use `mcp__deepseek-agent__run` rather than direct code writing. You supervise; DeepSeek executes.
+
+**If `mode == "claude"`:** No change — proceed normally with this skill.
+
+---
+
+
 # Advanced Swarm Orchestration
 
 Master advanced swarm patterns for distributed research, development, and testing workflows. This skill covers comprehensive orchestration strategies using both MCP tools and CLI commands.

@@ -7,6 +7,21 @@ tags: [performance, bottleneck, optimization, profiling, metrics, analysis]
 author: Claude Flow Team
 ---
 
+---
+## ⚠️ Deepseek Mode — Awareness Note
+
+Read `~/.claude/data/agent_mode.json`.
+
+**If `mode == "deepseek"`:**
+This skill handles non-code work (analysis / coordination / git ops / docs / validation) — safe to run directly.
+However: if this skill leads to a code implementation step (writing/modifying files), that step
+MUST use `mcp__deepseek-agent__run` rather than direct code writing. You supervise; DeepSeek executes.
+
+**If `mode == "claude"`:** No change — proceed normally with this skill.
+
+---
+
+
 # Performance Analysis Skill
 
 Comprehensive performance analysis suite for identifying bottlenecks, profiling swarm operations, generating detailed reports, and providing actionable optimization recommendations.

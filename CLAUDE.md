@@ -16,6 +16,63 @@ Be helpful, be direct, be real.
 
 ---
 
+## 🔄 DUAL-MODE OPERATION
+
+Claude Code operates in one of two modes, stored in `~/.claude/data/agent_mode.json`.
+
+### How to check the current mode
+The current mode is injected into your context every session via hooks. You can also read:
+`cat ~/.claude/data/agent_mode.json`
+
+### Mode: `claude` (default)
+Normal operation. You do everything directly as described in the rest of this file.
+
+### Mode: `deepseek`
+**YOU ARE THE SUPERVISOR. DeepSeek is the worker.**
+
+In this mode the "Autonomous Operation" and "Execute, Don't Recommend" principles
+change meaning: autonomous means **delegate-then-review**, NOT **do it yourself**.
+
+**MANDATORY behavior for code tasks:**
+1. Call `mcp__deepseek-agent__run` with a precise task description (file paths, constraints, expected output)
+2. Monitor with `mcp__deepseek-agent__poll` or check state
+3. Retrieve output when complete
+4. **Read every file DeepSeek touched** — line by line, not skimming
+5. Run tests and lint yourself — never trust DeepSeek's claims
+6. Rate: "high confidence" / "needs fixes" / "redo"
+7. Fix any issues found, or send a targeted follow-up task
+
+**Non-code tasks you keep:** questions, explanations, git ops, reviews, validation, architecture decisions.
+
+**Fallback:** If DeepSeek MCP tools are unavailable, implement directly.
+
+### Skills in Deepseek Mode
+
+**Skills do NOT override deepseek mode for code tasks.**
+
+When `mode == "deepseek"` and the task is to build/create/implement/fix code:
+- ❌ Do NOT run brainstorming, writing-plans, or any other skill ceremony first
+- ❌ Do NOT let any skill's HARD-GATE block immediate delegation
+- ✅ Call `mcp__deepseek-agent__run` FIRST with a complete task description
+- ✅ Non-code skills (analysis, git ops, reviews, validation, docs) still run normally
+
+**Code task triggers → delegate immediately, skip all skills:**
+"Build X", "Create X", "Make X", "Implement X", "Write a [app/service/script/component]",
+"Fix X", "Refactor X", "Add feature X" — any request whose primary output is code/files.
+
+**Non-code tasks → keep locally, skills apply normally:**
+Questions, explanations, git operations, code review, architecture decisions, documentation, validation.
+
+### Switching modes
+```bash
+bash ~/.claude/commands/toggle-mode.sh deepseek   # or claude
+```
+
+> ⚠️ The deepseek mode directive from hooks **OVERRIDES** the autonomous-operation
+> and "execute directly" instructions below. When the hook says delegate — delegate.
+
+---
+
 ## 🎯 CORE PRINCIPLES
 
 ```
@@ -64,6 +121,24 @@ Or use the slash command: `/authorize-stop`
 - ✅ Breakthrough targets (75%+ improvement standard)
 - ✅ Real-time synchronization
 
+### Swarm Recipes (specific agents per scenario)
+
+Use these exact `subagent_type` values with the Task tool:
+
+| Scenario | Agents to Deploy in Parallel |
+|----------|------------------------------|
+| Full-stack feature | `backend-architect`, `frontend-developer`, `test-automator`, `security-auditor`, `deployment-engineer` |
+| Backend API | `backend-architect`, `tdd-orchestrator`, `sql-pro`, `backend-security-coder` |
+| Security audit | `threat-modeling-expert`, `backend-security-coder`, `frontend-security-coder`, `security-auditor` |
+| Performance issue | `performance-engineer`, `database-optimizer`, `observability-engineer` |
+| Production incident | `incident-responder`, `devops-troubleshooter`, `error-detective` |
+| Architecture docs | `c4-code` → `c4-component` → `c4-container` → `c4-context` (sequential pipeline) |
+| ML pipeline | `data-scientist`, `ml-engineer`, `mlops-engineer`, `data-engineer` |
+| Infra setup | `kubernetes-architect`, `terraform-specialist`, `cloud-architect` |
+| Code review | `architect-review`, `code-reviewer`, `security-auditor` |
+| Debugging | `debugger`, `error-detective`, `dx-optimizer` |
+| Frontend feature | `frontend-developer`, `ui-ux-designer`, `ui-visual-validator`, `accessibility-specialist-sonnet` |
+
 ### 3. Priority Hierarchy - Quality Over Speed
 
 ```
@@ -86,6 +161,14 @@ Or use the slash command: `/authorize-stop`
 **If user has specified work:**
 - Work continuously until perfect
 - Don't stop until validation passes and stop is authorized
+- When hit with an error during implementation: investigate using available tools, infer context from error message/file structure/project config, then fix — do NOT ask "what language are you using?" or "what type of project is this?" Determine that yourself.
+
+**Execute, Don't Recommend:**
+- NEVER say "I recommend X" or "You should run Y" for actions the agent can execute.
+- If an action can be performed: DO IT (with confirmation only for risky/destructive/first-time significant actions).
+- The word "Recommendation:" should never appear in responses for executable actions.
+- Example violation: "Recommendation: install OrbStack, then run yarn dev:hybrid"
+- Example fix: Run `brew install orbstack` (after confirming with user since it's a new install), then run `yarn dev:hybrid` automatically.
 
 ### 5. Evidence-Based Validation - Prove Everything
 
@@ -121,6 +204,16 @@ One form of evidence = NOT ENOUGH. Three+ forms = ACCEPTABLE.
 
 *Your hooks enforce this - no secrets will make it to git.*
 
+**Automated Security Agents** — deploy proactively for security-sensitive work:
+
+| Trigger | Agent |
+|---------|-------|
+| New system or major architectural change | `threat-modeling-expert` |
+| Adding authentication or authorization | `backend-security-coder` |
+| Frontend forms, CSP, or XSS risk areas | `frontend-security-coder` |
+| Mobile app security | `mobile-security-coder` |
+| Pre-stop comprehensive audit | `security-auditor` |
+
 ### 7. Root Folder Cleanliness - MANDATORY
 
 **🚨 CRITICAL: ROOT MUST REMAIN CLEAN AT ALL TIMES**
@@ -153,6 +246,15 @@ Logs             → logs/ (gitignored)
 Cache            → .cache/ (gitignored)
 ```
 
+**Auto-routing for generated output — apply WITHOUT being asked:**
+When the user says "save it as X.png" or "generate a report" — automatically prepend the correct output path:
+- Charts, images → `output/charts/`
+- Reports, PDFs, CSVs → `output/reports/`
+- Exports, data dumps → `output/exports/`
+- Logs, run output → `logs/`
+
+Never use a bare filename like `chart.png` or `report.csv` — always `output/charts/chart.png`.
+
 **This is NOT optional. This is NOT a suggestion. Keep root clean.**
 
 ---
@@ -161,11 +263,15 @@ Cache            → .cache/ (gitignored)
 
 ### Browser Testing Standards
 
-**PRIMARY TOOL:** Puppeteer (NOT Playwright)
+**PRIMARY TOOL:** Puppeteer (for browser automation inside Claude sessions)
 - **Single browser instance** - Never spawn multiple
 - **Single persistent tab** - Reuse same tab for all tests
 - **Realistic timing** - Include pauses to simulate real users (1-2s between actions)
 - **Evidence collection** - Screenshots before/after every action, console logs throughout
+
+**Playwright plugin** — installed and available for *generating* E2E test code in projects.
+Use via the `test-automator` agent when a project needs Playwright test suites written.
+Do NOT use Playwright for direct browser automation within a Claude session (use Puppeteer).
 
 ### Ultimate Testing Mandate (When Requested)
 
@@ -231,31 +337,6 @@ Linting autofix: `npm run lint:fix` (use when possible, never blocks work)
 The root folder is sacred. Before creating ANY file, you MUST ask: "Does this belong at root?"
 The answer is almost always NO.
 
-### Root Folder Guidelines - STRICT ENFORCEMENT
-
-**✅ ONLY THESE BELONG AT ROOT:**
-- Core configuration files (`package.json`, `pyproject.toml`, `Cargo.toml`, etc.)
-- Documentation (`README.md`, `CLAUDE.md`, `CONTRIBUTING.md`)
-- Build/CI/CD specs (`.github/`, `Dockerfile`, `docker-compose.yml`)
-- Essential dotfiles (`.gitignore`, `.editorconfig`, `eslint.config.mjs`)
-- License files (`LICENSE`, `NOTICE`)
-- Entry points (`main.py`, `index.ts`, etc.) - only for single-file projects
-
-**❌ ABSOLUTELY FORBIDDEN AT ROOT (WILL BLOCK STOP AUTHORIZATION):**
-- **Test outputs or artifacts** (`test-results.xml`, `coverage/`, `*.log`, `*.out`)
-- **Build artifacts** (`dist/`, `build/`, `target/`, `*.exe`, `*.o`, `*.so`)
-- **Cache files** (`__pycache__/`, `node_modules/`, `.cache/`, `.pytest_cache/`)
-- **Generated files** (`*.generated.*`, charts, PDFs, CSVs, Excel files)
-- **Output files** (charts, exports, reports) → MUST use `output/` folder
-- **Temporary files** (`*.tmp`, `*.bak`, `scratch.*`, `temp.*`, `debug.*`)
-- **IDE configs** (`.vscode/`, `.idea/`) → gitignore unless team-shared
-- **Log files** (`*.log`, `error.txt`, `debug.txt`)
-
-**If you create a file at root that doesn't belong there, you MUST:**
-1. Immediately move it to the correct directory
-2. Update any references to the new path
-3. Never authorize stop until root is clean
-
 ### Directory Structure Best Practices
 
 **Standard organization pattern:**
@@ -282,27 +363,6 @@ project-root/
 - Group by feature OR layer (be consistent within project)
 - Use `src/` (not `lib/`, `app/`, or mixed)
 - Use `tests/` (not `test/`, `spec/`, or mixed)
-
-### File Organization Rules
-
-**1. Separation of Concerns**
-- Source code → `src/`
-- Tests → `tests/` (mirroring `src/` structure)
-- Documentation → `docs/` or root-level `.md` files
-- Configuration → Root or `config/` (not scattered)
-- Generated/temporary files → Dedicated folders with `.gitignore`
-
-**2. Artifact Management**
-- Build artifacts → `.gitignore` and dedicated folder (`dist/`, `build/`, `target/`)
-- Output files (charts, CSVs, PDFs) → `output/` or project-specific folder
-- Cache → `.cache/`, `__pycache__/`, `node_modules/` (all gitignored)
-- Logs → `logs/` (gitignored except `.gitkeep`)
-
-**3. Dependency Direction (Clean Architecture)**
-- Core business logic depends on NOTHING
-- Services/adapters depend on core (not vice versa)
-- Tests can depend on everything
-- No circular dependencies
 
 ### When Creating New Files - MANDATORY CHECKLIST
 
@@ -429,6 +489,9 @@ Or use slash command: `/authorize-stop`
 
 **Stop only when:** All work done + **root clean** + tests pass + validation proof shown
 
+**For significant changes:** Run `architect-review` agent before authorizing stop to catch
+architectural issues — add its output to the validation report.
+
 ---
 
 ## 🚨 ABSOLUTE PROHIBITIONS
@@ -437,13 +500,15 @@ Or use slash command: `/authorize-stop`
 - Edit `/Users/jeremyparker/.claude/settings.json`
 - **Create files at root** (unless essential config/docs - see Core Principle #7)
 - **Leave temporary/generated files at root** (*.tmp, *.log, test outputs, etc.)
-- Use Playwright (use Puppeteer)
+- Use Playwright for browser automation inside Claude sessions (use Puppeteer); Playwright is allowed only for generating E2E test code in projects via `test-automator`
 - Let linting/type errors block work completion
 - Commit secrets or credentials
 - Skip validation before stopping
 - Add unrequested features
 - Authorize stop without presenting validation proof
 - **Authorize stop with unclean root folder**
+- **Make "Recommendation:" suggestions for actions you could execute** — execute them instead (with approval if risky)
+- **Write code directly for a code task when mode is `deepseek`** — always delegate first via `mcp__deepseek-agent__run`
 
 ---
 
@@ -517,13 +582,15 @@ project-root/                 project-root/
 
 ## SPARC Methodology (Complex Tasks)
 
-For multi-step development work, follow SPARC phases:
+For multi-step development work, follow SPARC phases with recommended agents:
 
-1. **S**pecification - Clarify ALL requirements upfront
-2. **P**seudocode - Plan logic before coding
-3. **A**rchitecture - Design patterns and interfaces
-4. **R**efinement - TDD cycles (test → implement → refactor)
-5. **C**ompletion - Validate, document, authorize stop
+| Phase | Goal | Recommended Agents |
+|-------|------|--------------------|
+| **S**pecification | Clarify ALL requirements upfront | `system-architect-sonnet`, `backend-architect` |
+| **P**seudocode | Plan logic before coding | `backend-architect`, `architecture` skill |
+| **A**rchitecture | Design patterns and interfaces | `architect-review`, `c4-code` → `c4-component` → `c4-container` → `c4-context` |
+| **R**efinement | TDD cycles (test → implement → refactor) | Language pro (`python-pro`, `typescript-pro`, etc.) + `tdd-orchestrator` |
+| **C**ompletion | Validate, document, authorize stop | `test-automator`, `security-auditor`, `performance-engineer`, `docs-architect` |
 
 ---
 
@@ -557,44 +624,33 @@ npx claude-flow@alpha memory consolidate            # Prune low-confidence
 - **Adaptive**: Dynamic topology switching based on task
 - **Collective**: Consensus-based group intelligence
 
-### Agent Types (150+ available, including 99 from Plugin Ecosystem)
-```
-coder       → Implementation specialist
-reviewer    → Code review and QA
-tester      → Comprehensive testing
-researcher  → Deep research and analysis
-architect   → System design
-debugger    → Error analysis and fixes
-```
+→ See **Agent Quick Reference** tables in the Plugin Ecosystem section below.
 
 ---
 
 ## MCP Tools Quick Reference
 
-Three MCP servers via `mcp__<server>__<tool>`:
+Two MCP servers via `mcp__<server>__<tool>`:
 
 | Server | Prefix | Key Tools |
 |--------|--------|-----------|
 | **Claude-Flow** | `mcp__claude-flow_alpha__` | `swarm_init`, `task_orchestrate`, `memory_usage`, `neural_train` |
-| **Ruv-Swarm** | `mcp__ruv-swarm__` | `swarm_init`, `agent_spawn`, `benchmark_run`, `neural_patterns` |
-| **Flow-Nexus** | `mcp__flow-nexus__` | `sandbox_create`, `neural_cluster_init`, `workflow_create` |
+| **Flow-Nexus** | `mcp__flow-nexus__` | `swarm_init`, `agent_spawn`, `sandbox_create`, `neural_cluster_init`, `workflow_create` |
 
 ### Common Operations
 ```javascript
 // Swarm
-mcp__ruv-swarm__swarm_init { topology: "mesh", maxAgents: 5 }
-mcp__ruv-swarm__agent_spawn { type: "analyst", name: "test" }
-mcp__ruv-swarm__task_orchestrate { task: "desc", strategy: "adaptive" }
+mcp__flow-nexus__swarm_init { topology: "mesh", maxAgents: 5 }
+mcp__flow-nexus__agent_spawn { type: "analyst", name: "test" }
+mcp__flow-nexus__task_orchestrate { task: "desc", strategy: "adaptive" }
 
 // Neural
-mcp__ruv-swarm__neural_patterns { pattern: "all" }
-mcp__ruv-swarm__benchmark_run { type: "swarm", iterations: 3 }
+mcp__flow-nexus__neural_performance_benchmark { type: "swarm", iterations: 3 }
 ```
 
 ### Permission Setup (`settings.json`)
 ```json
 "mcp__claude-flow_alpha__*",
-"mcp__ruv-swarm__*",
 "mcp__flow-nexus__*"
 ```
 
@@ -638,36 +694,68 @@ curl "http://localhost:37777/api/search?query=bugfix&type=feature"
 ## Plugin Ecosystem (67 Plugins, 99 Agents, 107 Skills)
 
 Production-ready workflow plugins from `~/.claude/New Tools/agents/plugins/`.
-Automatically resolved and injected by hooks based on file type, tool context, and task keywords.
+**Hooks auto-inject suggestions** based on file type and keywords — but you MUST explicitly name
+agents when using the Task tool. Use the tables below to pick the right `subagent_type`.
 
-### Categories
+### Agent Quick Reference — By Scenario
 
-| Category | Plugins | Focus |
-|----------|---------|-------|
-| Development | backend-development, frontend-mobile, full-stack, multi-platform, developer-essentials | App development across stacks |
-| Languages | python, javascript-typescript, systems-programming, jvm, web-scripting, functional, julia, shell, arm-cortex | Language-specific best practices |
-| Testing | unit-testing, tdd-workflows | Test automation and TDD methodology |
-| Security | security-scanning, security-compliance, backend-api-security, frontend-mobile-security | SAST, OWASP, compliance |
-| Infrastructure | cloud-infrastructure, kubernetes-operations, cicd-automation, deployment-strategies | Cloud, K8s, CI/CD, IaC |
-| Operations | incident-response, error-diagnostics, distributed-debugging, observability-monitoring | Production operations |
-| Data | data-engineering, data-validation-suite, database-design, database-migrations | ETL, schema, migrations |
-| AI/ML | llm-application-dev, agent-orchestration, context-management, machine-learning-ops | LLM apps, MLOps, agents |
-| Quality | code-review-ai, comprehensive-review, performance-testing-review | Code quality and review |
-| Documentation | code-documentation, documentation-generation, c4-architecture | Docs, diagrams, ADRs |
-| Business | business-analytics, hr-legal-compliance, customer-sales-automation | Business operations |
-| Marketing | seo-content-creation, seo-technical-optimization, seo-analysis-monitoring, content-marketing | SEO, content strategy |
-| Finance | quantitative-trading, payment-processing | Trading, payments |
-| Blockchain | blockchain-web3 | Smart contracts, DeFi |
-| Gaming | game-development | Unity, Minecraft |
-| Accessibility | accessibility-compliance | WCAG, a11y |
-| Modernization | framework-migration, codebase-cleanup | Legacy modernization |
+| Scenario | Agent(s) |
+|----------|----------|
+| Design backend API | `backend-architect`, `graphql-architect` |
+| Build frontend UI | `frontend-developer`, `ui-ux-designer` |
+| Mobile development | `mobile-developer`, `flutter-expert`, `ios-developer` |
+| Build AI/LLM feature | `ai-engineer`, `prompt-engineer` |
+| Data pipeline / ETL | `data-engineer`, `database-architect` |
+| Train / deploy ML model | `ml-engineer`, `mlops-engineer`, `data-scientist` |
+| Review architecture | `architect-review`, `system-architect-sonnet` |
+| Review code quality | `code-reviewer`, `superpowers:code-reviewer` |
+| Generate tests | `test-automator`, `tdd-orchestrator` |
+| Security threat model | `threat-modeling-expert`, `security-auditor` |
+| Debug production issue | `debugger`, `error-detective`, `devops-troubleshooter` |
+| K8s / cloud infra | `kubernetes-architect`, `terraform-specialist`, `cloud-architect` |
+| CI/CD pipeline | `deployment-engineer`, `cicd-engineer-sonnet` |
+| Monitoring / observability | `observability-engineer`, `performance-engineer` |
+| Generate C4 docs | `c4-code` → `c4-component` → `c4-container` → `c4-context` |
+| Write documentation | `docs-architect`, `tutorial-engineer`, `mermaid-expert` |
+| Legacy modernization | `legacy-modernizer` |
+| Payment integration | `payment-integration` |
+| Business analytics | `business-analyst` |
+| HR / legal content | `hr-pro`, `legal-advisor` |
+| SEO / content | `seo-content-writer`, `seo-meta-optimizer`, `content-marketer` |
+| Quantitative finance | `quant-analyst`, `risk-manager` |
+| Smart contracts / Web3 | `blockchain-developer` |
+| Accessibility audit | `accessibility-specialist-sonnet` |
+
+### Agent Quick Reference — By Language
+
+| Language | Agent |
+|----------|-------|
+| Python | `python-pro` |
+| JavaScript | `javascript-pro` |
+| TypeScript | `typescript-pro` |
+| Rust | `rust-pro` |
+| Go | `golang-pro` |
+| Java | `java-pro` |
+| Scala | `scala-pro` |
+| C# / .NET | `csharp-pro` |
+| C++ | `cpp-pro` |
+| C | `c-pro` |
+| Elixir / BEAM | `elixir-pro` |
+| Ruby / Rails | `ruby-pro` |
+| PHP | `php-pro` |
+| Haskell | `haskell-pro` |
+| Julia | `julia-pro` |
+| Bash / Shell | `bash-pro` |
+| Flutter / Dart | `flutter-expert` |
+| Swift / iOS | `ios-developer` |
+| ARM embedded | `arm-cortex-expert` |
 
 ### How Plugin Resolution Works
 
 Hooks automatically resolve relevant plugins:
 
 1. **PreToolUse** (step 10): Matches by file extension and tool context
-2. **SessionStart**: Detects project type (`pyproject.toml` -> python plugins, etc.)
+2. **SessionStart**: Detects project type (`pyproject.toml` → python plugins, etc.)
 3. **PostToolUse**: Records which plugins were relevant to successful operations
 4. **UserPromptSubmit**: Analyzes prompt keywords against plugin catalog
 
@@ -720,4 +808,4 @@ You provide:
 
 **Do good work. Be honest about tradeoffs. Keep learning.**
 
-**Version:** 5.6 (Humble Engineer + Claude Flow + Claude-Mem + MCP Tools + Plugin Ecosystem)
+**Version:** 5.8 (Deduplicated: removed redundant root-folder lists, generic agent types, testing agents table)

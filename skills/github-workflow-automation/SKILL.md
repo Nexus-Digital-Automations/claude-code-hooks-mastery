@@ -22,6 +22,23 @@ priority: high
 progressive_disclosure: true
 ---
 
+---
+## ⚠️ Deepseek Mode — Check Before Proceeding
+
+Read `~/.claude/data/agent_mode.json`.
+
+**If `mode == "deepseek"`:**
+This skill writes or modifies code/files. Code work MUST be delegated in deepseek mode.
+- Do NOT execute this skill's implementation steps directly
+- Call `mcp__deepseek-agent__run` with a precise task description (include file paths, constraints, acceptance criteria)
+- After DeepSeek completes: read every changed file yourself and validate
+- You are supervisor; DeepSeek is the worker
+
+**If `mode == "claude"`:** Proceed normally with this skill.
+
+---
+
+
 # GitHub Workflow Automation Skill
 
 ## Overview
