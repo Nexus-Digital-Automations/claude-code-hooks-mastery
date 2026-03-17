@@ -1,10 +1,12 @@
-description: "DeepSeek mode delegation — skills must not block immediate code delegation"
+description: "DeepSeek mode delegation — mode-specific CLAUDE.md files control behavior"
 
-# Tests that when mode == "deepseek", the agent delegates code tasks to DeepSeek
-# immediately rather than running skill ceremonies (brainstorming, writing-plans, etc.).
+# Tests that mode-specific CLAUDE.md files correctly control delegation behavior.
+# CLAUDE.claude.md: direct execution, no DeepSeek delegation
+# CLAUDE.deepseek.md: supervisor mode, code tasks delegate to DeepSeek
 #
-# Also tests that non-code tasks stay local regardless of mode, and that claude mode
-# behaves normally without delegation.
+# Guard blocks have been removed from SKILL.md files — CLAUDE.md is the single
+# source of truth for mode behavior. DeepSeek has its own skills in
+# ~/.claude/deepseek-skills/ that are automatically loaded by the MCP server.
 
 providers:
   - id: openai:chat:deepseek-chat
@@ -12,7 +14,6 @@ providers:
       apiBaseUrl: https://api.deepseek.com
       apiKeyEnvar: DEEPSEEK_API_KEY
 
-# Use DeepSeek as grading model for llm-rubric assertions
 defaultTest:
   options:
     provider:
@@ -22,138 +23,277 @@ defaultTest:
         apiKeyEnvar: DEEPSEEK_API_KEY
 
 prompts:
-  - label: "deepseek-mode-delegation-prompt"
+  - label: "mode-specific-claude-md"
     raw: |
-      You are Claude Code. Your active mode has already been determined.
+      You are Claude Code. Your CLAUDE.md has been loaded below.
 
       ════════════════════════════════════════
       ACTIVE MODE: {{mode}}
       ════════════════════════════════════════
-      Do NOT read ~/.claude/data/agent_mode.json — the mode above is already resolved.
 
-      ## Rules for mode == "deepseek"
-      (Only applies when ACTIVE MODE above is "deepseek")
+      --- BEGIN CLAUDE.md (mode-specific) ---
+      {{claude_md_excerpt}}
+      --- END CLAUDE.md ---
 
-      - Code tasks MUST be delegated immediately: call mcp__deepseek-agent__run first
-      - Do NOT run brainstorming, writing-plans, or any skill ceremony before delegating
-      - Do NOT let a skill's HARD-GATE block delegation
-      - Non-code tasks (questions, explanations, git ops, reviews, docs) you handle directly
-
-      Code task triggers → delegate immediately, skip all skills:
-      "Build X", "Create X", "Make X", "Implement X", "Write a [app/service/script/component]",
-      "Fix X", "Refactor X", "Add feature X"
-
-      ## Rules for mode == "claude"
-      (Only applies when ACTIVE MODE above is "claude")
-
-      - Normal operation: implement directly, do NOT call mcp__deepseek-agent__run
-      - Skills apply normally (brainstorming, TDD, etc.)
-      - Do NOT delegate to DeepSeek under any circumstances
+      {{skill_section}}
 
       ════════════════════════════════════════
-      REMINDER: Your mode is {{mode}}. Follow only the rules for that mode.
+      REMINDER: Your mode is {{mode}}. Follow ONLY your CLAUDE.md rules.
       ════════════════════════════════════════
 
       User request: {{user_task}}
 
-      Respond as required by your active mode. State the mode you are operating in at the start of your response.
+      State your mode at the start of your response, then act accordingly.
 
 tests:
-  - description: "deepseek mode + 'Create a Weather Dashboard web app' → must delegate via mcp__deepseek-agent__run"
+  # ── GROUP 1: MODE-RULES-ONLY (no skill content) ──────────────────────────────
+  - description: "deepseek + code task → delegates via mcp__deepseek-agent__run"
     vars:
       mode: "deepseek"
       user_task: "Create a Weather Dashboard web app"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## CORE IDENTITY
+        You are a **capable engineering supervisor** who values:
+        - **Skepticism** - Never trust DeepSeek output without verification
+        - **Quality** - Verify everything, fix what's broken
+
+        ## DELEGATION PROTOCOL (MANDATORY)
+        You are in **deepseek mode**. This changes how you work.
+
+        ### Code Tasks — DELEGATE IMMEDIATELY
+        1. Call `mcp__deepseek-agent__run` with a precise task description
+        2. Monitor with `mcp__deepseek-agent__poll`
+        3. **Read every file DeepSeek touched** — line by line
+        4. Run tests and lint yourself — never trust DeepSeek's claims
+        5. Rate: "high confidence" / "needs fixes" / "redo"
+
+        Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
+
+        ### Non-Code Tasks — HANDLE DIRECTLY
+        Questions, explanations, git ops, reviews, validation, architecture decisions.
+
+        ### Skills — Code Skills Delegate
+        ALL skills that produce code delegate to DeepSeek. Do NOT run brainstorming,
+        writing-plans, or any skill ceremony before delegating code tasks.
+
+        DeepSeek has its own skills (in ~/.claude/deepseek-skills/) that are
+        automatically loaded by the MCP server based on the task — you don't need
+        to manage them.
+
+        ## ABSOLUTE PROHIBITIONS
+        - **Write implementation code directly for code tasks** — delegate via `mcp__deepseek-agent__run`
+        - **Trust DeepSeek's output without verification** — always review every file
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response explicitly mentions calling mcp__deepseek-agent__run (or
-          describes delegating the task to DeepSeek) as the FIRST action. The response must
-          NOT describe running a brainstorming ceremony, a 12-step design process, asking
-          clarifying questions as part of a gate, or writing a design doc before delegation.
-          Describing what will be included in the task description passed to DeepSeek is fine.
-          Fail if: the response launches into a brainstorming process, describes phases of
-          design before coding, or says it will ask clarifying questions before starting —
-          these indicate the skill ceremony was not short-circuited. Also fail if the response
-          writes code directly without mentioning DeepSeek delegation.
+          Pass if: the response mentions calling mcp__deepseek-agent__run (or describes
+          delegating to DeepSeek) as the FIRST action. Must NOT write code directly or
+          run a brainstorming/design ceremony before delegating.
+          Fail if: writes code directly, or runs brainstorming/design phases first.
         threshold: 0.75
-        metric: "deepseek_delegates_weather_app"
+        metric: "deepseek_delegates_code_task"
 
-  - description: "deepseek mode + 'Build a FastAPI CRUD API with auth' → must delegate, not write code directly"
-    vars:
-      mode: "deepseek"
-      user_task: "Build a FastAPI CRUD API with auth"
-    assert:
-      - type: llm-rubric
-        value: >
-          Pass if: the response calls mcp__deepseek-agent__run (or clearly describes
-          delegating to DeepSeek) without first writing any FastAPI code, route definitions,
-          Pydantic models, or auth implementation directly. The task description passed to
-          DeepSeek may mention FastAPI, auth, CRUD — that is expected and good. The key
-          requirement is that NO code is written directly in the response, and delegation
-          happens first.
-          Fail if: the response writes FastAPI routes, auth middleware, or any implementation
-          code directly. Also fail if the response runs brainstorming or writing-plans skill
-          ceremonies before delegating — deepseek mode means delegate immediately.
-        threshold: 0.75
-        metric: "deepseek_delegates_fastapi_api"
-
-  - description: "deepseek mode + conceptual question → must answer directly, no delegation"
+  - description: "deepseek + non-code question → answers directly, no delegation"
     vars:
       mode: "deepseek"
       user_task: "What is async/await in Python and when should I use it?"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## DELEGATION PROTOCOL (MANDATORY)
+        You are in **deepseek mode**.
+
+        ### Code Tasks — DELEGATE IMMEDIATELY
+        Call `mcp__deepseek-agent__run` for code tasks.
+        Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
+
+        ### Non-Code Tasks — HANDLE DIRECTLY
+        Questions, explanations, git ops, reviews, validation, architecture decisions.
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response directly answers the conceptual question about async/await
-          in Python without delegating to DeepSeek. Non-code questions are kept locally
-          regardless of mode. A good answer explains what async/await is, the event loop,
-          coroutines, and when to use it (I/O-bound tasks, not CPU-bound). The response
-          should NOT call mcp__deepseek-agent__run for this non-code question.
-          Fail if: the response delegates to DeepSeek or calls mcp__deepseek-agent__run
-          for this explanation-only question. Delegation for questions/explanations violates
-          the "non-code tasks you keep" rule even in deepseek mode.
+          Pass if: directly answers the async/await question without delegating to DeepSeek.
+          Non-code questions stay local regardless of mode.
+          Fail if: calls mcp__deepseek-agent__run for this explanation question.
         threshold: 0.75
-        metric: "deepseek_answers_question_directly"
+        metric: "deepseek_answers_question_locally"
 
-  - description: "claude mode + 'Create a Weather Dashboard web app' → must NOT delegate to DeepSeek"
+  - description: "claude mode + code task → implements directly, no DeepSeek"
     vars:
       mode: "claude"
       user_task: "Create a Weather Dashboard web app"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## CORE IDENTITY
+        You are a **capable engineer** who values:
+        - **Practicality** - Working code over perfect code
+
+        ## Mode
+        You are in **claude mode** — direct execution.
+
+        ### 4. Autonomous Operation - Never Sit Idle
+        Work continuously until perfect.
+
+        **Execute, Don't Recommend:**
+        - If an action can be performed: DO IT.
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response does NOT call mcp__deepseek-agent__run and does NOT delegate
-          to DeepSeek. In claude mode, the agent implements directly. The response should
-          either: (a) start implementing the app, (b) run a brainstorming skill to design
-          it first, or (c) ask clarifying questions — all of these are correct claude-mode
-          behavior. The key requirement is no DeepSeek delegation.
-          Fail if: the response calls mcp__deepseek-agent__run or describes delegating to
-          DeepSeek — this is claude mode, delegation to DeepSeek is wrong here.
+          Pass if: does NOT call mcp__deepseek-agent__run. Claude mode means implement
+          directly or brainstorm first — all correct. Key requirement: no DeepSeek delegation.
+          Fail if: calls mcp__deepseek-agent__run or describes delegating to DeepSeek.
         threshold: 0.75
-        metric: "claude_mode_no_deepseek_delegation"
+        metric: "claude_mode_no_delegation"
 
-  - description: "deepseek mode + brainstorming skill triggered for 'build X' → must short-circuit to DeepSeek"
+  # ── GROUP 2: SKILL BEHAVIOR (no guards, CLAUDE.md controls, DeepSeek has own skills) ─
+  - description: "deepseek + brainstorming skill loaded + code task → skips skill, delegates"
     vars:
       mode: "deepseek"
-      user_task: >
-        I want to build a real-time chat application. Please use the brainstorming skill
-        to explore the design and requirements before we start.
+      user_task: "Build a real-time chat application"
+      skill_section: |
+        ## Loaded Skill: brainstorming
+        This skill explores user intent, requirements and design before implementation.
+        It asks clarifying questions and proposes design approaches.
+      claude_md_excerpt: |
+        ## DELEGATION PROTOCOL (MANDATORY)
+        You are in **deepseek mode**.
+
+        ### Code Tasks — DELEGATE IMMEDIATELY
+        1. Call `mcp__deepseek-agent__run` with a precise task description
+        Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
+
+        🚨 CRITICAL: Do NOT ask clarifying questions before delegating. Do NOT propose
+        design approaches. Do NOT run any brainstorming ceremony. Delegate FIRST.
+
+        ### Skills — Code Skills Delegate
+        ALL skills that produce code delegate to DeepSeek. Do NOT run brainstorming,
+        writing-plans, or any skill ceremony before delegating code tasks.
+        This means: no clarifying questions, no design proposals, no architecture
+        discussions. Just delegate the task immediately.
+
+        DeepSeek has its own skills (in ~/.claude/deepseek-skills/) that are
+        automatically loaded by the MCP server based on the task.
+
+        ## ABSOLUTE PROHIBITIONS
+        - **Write implementation code directly for code tasks** — delegate via `mcp__deepseek-agent__run`
+        - **Ask clarifying questions before delegating code tasks** — delegate first, refine later
+        - **Run any skill ceremony (brainstorming, design, planning) before delegating code tasks**
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response acknowledges deepseek mode and delegates to DeepSeek
-          (calls or describes mcp__deepseek-agent__run) rather than running the full
-          brainstorming ceremony. The response may briefly note the user asked for
-          brainstorming but explain that deepseek mode requires immediate delegation
-          for code tasks. Stating the mode at the start and then delegating is correct.
-          Also acceptable: a very brief mode confirmation followed by calling DeepSeek.
-          Fail ONLY if: the response actually runs the multi-step brainstorming process —
-          asking a series of clarifying questions as a HARD-GATE before any action,
-          presenting multiple design options and requiring user approval before proceeding,
-          or saying "I'll use the brainstorming skill now" and executing the full 12-step
-          ceremony without ever mentioning delegation. A response that says "in deepseek
-          mode I skip ceremonies and delegate" then calls DeepSeek is a clear pass.
+          CLAUDE.md says: deepseek mode, code task "Build a chat app" → delegate immediately,
+          do NOT run brainstorming or any skill ceremony before delegating.
+          Pass if: delegates to DeepSeek without running the brainstorming ceremony.
+          Acknowledging the loaded skill but explaining why it's skipped is fine.
+          Fail if: runs the brainstorming process — asks design questions, proposes approaches,
+          or writes a design doc before delegating.
+        threshold: 0.70
+        metric: "brainstorm_guard_skips_for_code"
+
+  - description: "claude mode + brainstorming skill + code task → runs normally, no delegation"
+    vars:
+      mode: "claude"
+      user_task: "Build a real-time chat application"
+      skill_section: |
+        ## Loaded Skill: brainstorming
+        This skill explores user intent, requirements and design before implementation.
+      claude_md_excerpt: |
+        ## Mode
+        You are in **claude mode** — direct execution.
+
+        ### 4. Autonomous Operation - Never Sit Idle
+        Work continuously until perfect.
+        **Execute, Don't Recommend:**
+        - If an action can be performed: DO IT.
+    assert:
+      - type: llm-rubric
+        value: >
+          The only test here: does the response call mcp__deepseek-agent__run or explicitly
+          delegate to DeepSeek?
+          Pass if: the response does NOT call mcp__deepseek-agent__run and does NOT say it
+          is delegating to DeepSeek. Implementing the code directly is fine. Brainstorming
+          is fine. Asking clarifying questions is fine. All of these are correct claude-mode
+          behavior.
+          Fail if: the response calls mcp__deepseek-agent__run or describes delegating the
+          task to DeepSeek.
+        threshold: 0.75
+        metric: "brainstorm_claude_mode_runs_normally"
+
+  # ── GROUP 3: EDGE CASES ──────────────────────────────────────────────────────
+  - description: "deepseek + executing-plans skill + code task → delegates"
+    vars:
+      mode: "deepseek"
+      user_task: "Execute the implementation plan in docs/plan.md"
+      skill_section: |
+        ## Loaded Skill: executing-plans
+        This skill executes written implementation plans step by step, writing code files.
+      claude_md_excerpt: |
+        ## DELEGATION PROTOCOL (MANDATORY)
+        You are in **deepseek mode**.
+
+        ### Code Tasks — DELEGATE IMMEDIATELY
+        1. Call `mcp__deepseek-agent__run` with a precise task description
+        Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X",
+        "Add feature X", "Execute [plan]", any task that results in writing or modifying files.
+
+        🚨 CRITICAL: "Execute the implementation plan" = code task. Do NOT read plan files
+        and execute steps directly. Call mcp__deepseek-agent__run immediately with the plan path.
+
+        ### Skills — Code Skills Delegate
+        ALL skills that write or modify code/files delegate to DeepSeek.
+        The executing-plans skill writes files → it MUST delegate in deepseek mode.
+
+        DeepSeek has its own skills (in ~/.claude/deepseek-skills/) that are
+        automatically loaded by the MCP server based on the task.
+
+        ### Delegate-Then-Review — Never Execute Code Tasks Directly
+        - Delegate code tasks immediately via `mcp__deepseek-agent__run`
+        - Do NOT read plan files and execute tasks yourself — have DeepSeek do it
+        - The only code you write directly is small fixes to DeepSeek's output
+    assert:
+      - type: llm-rubric
+        value: >
+          CLAUDE.md says: deepseek mode, delegate code tasks. Executing a plan produces code.
+          Pass if: delegates to DeepSeek rather than executing the plan directly.
+          Describing what the task description will include is fine.
+          Fail if: starts reading plan files and executing tasks directly.
+        threshold: 0.70
+        metric: "guard_a_delegates_code_skill"
+
+  - description: "deepseek + debugging task → analyzes directly, does NOT delegate analysis"
+    vars:
+      mode: "deepseek"
+      user_task: "I have a test failure in tests/test_api.py — TypeError: NoneType is not subscriptable on line 42. Help me debug this."
+      skill_section: |
+        ## Loaded Skill: systematic-debugging
+        This skill provides a systematic approach to debugging: reproduce, hypothesize,
+        investigate, fix, verify. It reads errors and examines code to form hypotheses.
+      claude_md_excerpt: |
+        ## DELEGATION PROTOCOL (MANDATORY)
+        You are in **deepseek mode**.
+
+        ### Code Tasks — DELEGATE IMMEDIATELY
+        Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
+
+        ### Non-Code Tasks — HANDLE DIRECTLY
+        Questions, explanations, git ops, reviews, validation, architecture decisions.
+
+        ### 4. Delegate-Then-Review — Never Write Code Directly
+        - Delegate code tasks immediately via `mcp__deepseek-agent__run`
+        - The only code you write directly is small fixes to DeepSeek's output
+        - For non-code tasks: execute directly
+    assert:
+      - type: llm-rubric
+        value: >
+          Debugging analysis is non-code work: reading errors, forming hypotheses, examining
+          code. CLAUDE.md says non-code tasks are handled directly. Only the eventual code
+          FIX (writing/modifying files) should go to DeepSeek.
+          Pass if: the response engages with the debugging task directly — analyzes the error
+          (TypeError: NoneType), asks about the code at line 42, proposes hypotheses, or
+          starts investigating. The analysis step should NOT be delegated to DeepSeek.
+          Fail if: immediately delegates the entire debugging session to DeepSeek without
+          any analysis. That over-applies the delegation rule to non-code diagnostic work.
         threshold: 0.65
-        metric: "deepseek_short_circuits_brainstorming_for_build"
+        metric: "guard_b_debug_runs_directly"
 
 outputPath: tests/promptfoo/results/14-deepseek-mode-delegation.json
