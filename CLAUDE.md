@@ -30,6 +30,15 @@ You are in **deepseek mode**. This changes how you work.
    Include this checklist in the task description sent to DeepSeek.
 2. Call `mcp__deepseek-agent__run` with task that **includes the Feature Checklist** as:
    `REQUIRED FEATURES — ALL must be implemented and tested:\n1. ...\n2. ...`
+   Also append to **every** task sent to DeepSeek:
+   ```
+   SELF-REVIEW BEFORE MARKING DONE:
+   - All setInterval/setTimeout calls have cleanup on navigation/teardown
+   - All this.currentX references are null-checked in event handlers
+   - IDs use crypto.randomUUID(), not Date.now().toString()
+   - Every silent failure shows user-visible feedback
+   - Deleting an item removes all state references to it
+   ```
 3. Monitor with `mcp__deepseek-agent__poll`
 4. **Read every file DeepSeek touched** — line by line
 5. **Verify Feature Checklist item by item**:
@@ -37,6 +46,38 @@ You are in **deepseek mode**. This changes how you work.
    - Confirm it is wired to the UI (not dead code, not a stub)
    - alert()/confirm() substituted for a requested modal = incomplete → follow-up task
    - TODO/empty handler where logic should be = incomplete → follow-up task
+
+5a. **Run `superpowers:code-reviewer` on all files DeepSeek wrote — looking for
+    bugs, not just feature presence.** Focus on:
+    - Resource leaks: timers/intervals not cleared on view switches or teardown
+    - Null crashes: references to deleted/missing items in event handlers
+    - ID collisions: `Date.now()` IDs → use `crypto.randomUUID()` instead
+    - Silent failures: functions that return false/null with no user feedback
+    - Stale state: currentDeck/currentCard not cleared when underlying data deleted
+
+    **If any Critical or Medium issues found → fix via DeepSeek follow-up before
+    proceeding to 5b.** Do not skip this step for "simple" apps.
+
+5b. **Write a comprehensive validation Playwright script BEFORE running authorize-stop.**
+    One script, one assertion per feature, structured output format:
+    - For each feature: perform the action, observe the result, log it
+    - Output format REQUIRED: `console.log('[feature:X]', result === expected ? 'PASS: ...' : 'FAIL: ...')`
+    - The script must produce a `[feature:X] PASS` line for EVERY checklist item
+    - Pipe the FULL script output to `check-happy-path.sh`
+    - If any feature produces `FAIL`: fix the code first, then re-run
+
+5c. **Surface-level tests do NOT satisfy feature coverage.** Specifically banned:
+    - "App loaded with 3 decks" → does NOT prove deck-delete works
+    - "Card flipped successfully" → does NOT prove card-edit or card-add works
+    - "Quiz mode active" → does NOT prove quiz-summary modal works
+    - "Import button found" → does NOT prove import actually parses JSON and adds cards
+    Each feature must be exercised end-to-end: trigger it, observe the result.
+
+5d. **Authenticity loop limit: 2 rounds max.** If the reviewer asks about evidence
+    authenticity and you've answered once, do NOT keep providing alternative proof.
+    On the third rejection citing authenticity: respond with feature coverage analysis
+    showing which features ARE covered vs which are missing.
+
 6. Run tests yourself — never trust DeepSeek's claims
 7. Rate: "high confidence" / "needs fixes" / "redo"
 8. Fix issues or send targeted follow-up. Do NOT approve incomplete work.
@@ -59,6 +100,15 @@ If DeepSeek MCP tools are unavailable, implement directly.
 
 ### To switch back
 `bash ~/.claude/commands/toggle-mode.sh claude`
+
+### Banned Validation Patterns
+These patterns NEVER satisfy feature coverage and must not be used:
+- Tests that only check loading state + basic navigation
+- Playwright tests that don't exercise each CRUD operation individually
+- Using deck-count as proxy for deck-delete working
+- Calling a feature "covered" because a related feature was tested
+- Spending authorize-stop attempts on evidence format rather than feature gaps
+- Piping DEBUG=pw:api output where [feature:X] lines are needed (use clean output only)
 
 ---
 
