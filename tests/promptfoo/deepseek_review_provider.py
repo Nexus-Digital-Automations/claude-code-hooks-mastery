@@ -74,7 +74,7 @@ def call_api(prompt, options, context):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": evidence_record},
             ],
-            max_tokens=900,
+            max_tokens=2000,
             temperature=0.1,
         )
 

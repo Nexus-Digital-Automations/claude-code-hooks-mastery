@@ -88,6 +88,8 @@ case "$SUITE" in
   11) run_eval "11" "skills-quality" ;;
   13) run_eval "13" "lazy-execution" ;;
   14) run_eval "14" "deepseek-mode-delegation" ;;
+  15) run_eval "15" "feature-completeness-validation" ;;
+  16) run_eval "16" "feature-checklist-delegation" ;;
   hooks)
     run_eval "01" "agent-routing-directive"
     run_eval "02" "ambiguity-injection"
@@ -116,6 +118,8 @@ case "$SUITE" in
     run_eval "05" "claude-md-eval"
     run_eval "13" "lazy-execution"
     run_eval "14" "deepseek-mode-delegation"
+    run_eval "15" "feature-completeness-validation"
+    run_eval "16" "feature-checklist-delegation"
     for yaml_file in "${AGENTS_DIR}"/*.yaml; do
       agent_name=$(basename "$yaml_file" .yaml)
       run_agent_eval "$agent_name"

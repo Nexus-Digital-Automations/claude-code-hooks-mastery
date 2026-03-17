@@ -1,0 +1,189 @@
+description: "Feature Checklist extraction — CLAUDE.md delegation protocol requires enumerating every feature before calling DeepSeek"
+
+# Tests that the updated CLAUDE.md delegation protocol correctly:
+# 1. Extracts an explicit numbered Feature Checklist from the user's request
+# 2. Expands vague terms ("deck management") into individual CRUD operations
+# 3. Includes the checklist in the task description sent to DeepSeek
+# 4. Verifies each checklist item after DeepSeek completes (not just "looks done")
+#
+# Uses openai:chat:deepseek-chat directly (not deepseek_review_provider.py)
+# because we're testing Claude/LLM behavior under CLAUDE.md instructions, not the verifier.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+
+prompts:
+  - label: "claude-md-delegation"
+    raw: |
+      You are Claude Code. Your CLAUDE.md has been loaded below.
+
+      --- BEGIN CLAUDE.md (excerpt) ---
+      ## DELEGATION PROTOCOL (MANDATORY)
+
+      You are in **deepseek mode**. This changes how you work.
+
+      ### Code Tasks — DELEGATE IMMEDIATELY
+
+      **Before delegating**, extract a Feature Checklist from the user's request.
+
+      1. Extract a numbered **Feature Checklist** — list EVERY distinct button, form, CRUD
+         operation (add/edit/delete), modal, mode, filter, timer, counter, export/import feature
+         requested. If the user said "deck management" list: create deck, edit deck, delete deck.
+         Include this checklist in the task description sent to DeepSeek.
+      2. Call `mcp__deepseek-agent__run` with task that **includes the Feature Checklist** as:
+         `REQUIRED FEATURES — ALL must be implemented and tested:\n1. ...\n2. ...`
+      3. Monitor with `mcp__deepseek-agent__poll`
+      4. **Read every file DeepSeek touched** — line by line
+      5. **Verify Feature Checklist item by item**:
+         - Find each feature's implementation in the code
+         - Confirm it is wired to the UI (not dead code, not a stub)
+         - alert()/confirm() substituted for a requested modal = incomplete → follow-up task
+         - TODO/empty handler where logic should be = incomplete → follow-up task
+      6. Run tests yourself — never trust DeepSeek's claims
+      7. Rate: "high confidence" / "needs fixes" / "redo"
+      8. Fix issues or send targeted follow-up. Do NOT approve incomplete work.
+
+      Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
+      --- END CLAUDE.md ---
+
+      User request: {{user_request}}
+
+      Show your Feature Checklist extraction, then describe what you would send to DeepSeek.
+
+tests:
+  # ── GROUP 1: Feature Checklist extraction ─────────────────────────────────────────
+
+  - description: "Flashcard app with multiple feature groups → checklist enumerates EACH CRUD op individually"
+    vars:
+      user_request: >
+        Build a flashcard quiz app with deck management (create, edit, delete decks),
+        card management (add card, edit card, delete card per deck), quiz mode with
+        card flipping (Got It / Keep Studying), and a quiz summary modal at the end
+        showing score and a Restart button.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response shows an explicit numbered Feature Checklist that individually
+          lists each CRUD operation rather than grouping them. Must include ALL of:
+          (1) create deck, (2) edit deck, (3) delete deck — not just "deck management" as one item.
+          (4) add card, (5) edit card, (6) delete card — not just "card management" as one item.
+          (7) quiz mode with flip, (8) Got It button, (9) Keep Studying button OR quiz navigation,
+          (10) quiz summary modal — listed as a separate item, not bundled with quiz mode.
+          The response must show the checklist BEFORE describing what to send to DeepSeek.
+          Fail if: groups CRUD operations into single items ("deck management = 1 item"),
+          lists fewer than 8 distinct features, or skips the checklist extraction step entirely
+          and just calls mcp__deepseek-agent__run without showing the numbered list.
+        threshold: 0.75
+        metric: "checklist_expands_crud_operations"
+
+  - description: "Simple feature request → checklist still extracted, even for small tasks"
+    vars:
+      user_request: >
+        Build a password strength checker with a text input, a strength indicator bar
+        (weak/medium/strong), and a show/hide password toggle button.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response extracts a Feature Checklist with at least 3 distinct items:
+          (1) text input for password, (2) strength indicator / strength bar showing weak/medium/strong
+          levels, (3) show/hide password toggle button. The checklist must be shown explicitly
+          before the DeepSeek delegation call. The list must reflect the ACTUAL requested features
+          (strength levels, toggle button) not generic items.
+          Fail if: skips the checklist extraction and directly calls mcp__deepseek-agent__run
+          with only a prose description, or lists only 1-2 items instead of the distinct features.
+        threshold: 0.75
+        metric: "checklist_extracted_for_small_task"
+
+  - description: "Vague 'management' terms expanded to individual CRUD operations in checklist"
+    vars:
+      user_request: >
+        Build a contact book app with contact management (full CRUD), tag management
+        (add/remove tags on contacts), search and filter, and CSV export.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response expands "contact management (full CRUD)" into individual items:
+          create contact, edit/update contact, delete contact, view/list contacts.
+          Also expands "tag management" into: add tag to contact, remove tag from contact.
+          AND lists search, filter, and CSV export as separate checklist items.
+          The checklist should have 8+ distinct items rather than 4 vague group headers.
+          Fail if: keeps "contact management" as a single checklist item instead of expanding it,
+          or fails to separately list add tag and remove tag as distinct operations.
+        threshold: 0.70
+        metric: "checklist_expands_vague_management_terms"
+
+  - description: "DeepSeek task description includes REQUIRED FEATURES section with the full checklist"
+    vars:
+      user_request: >
+        Build a habit tracker app with: add habit (name + frequency), mark habit complete
+        for today, view streak count, delete habit, and weekly summary view.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response shows the task description that would be sent to DeepSeek,
+          and that description includes a "REQUIRED FEATURES — ALL must be implemented and tested:"
+          section (or equivalent label) with a numbered list. The list must include at minimum:
+          add habit, mark complete, streak counter/count, delete habit, weekly summary view.
+          The REQUIRED FEATURES section should appear in the task body, not just as a comment.
+          Fail if: the DeepSeek task description is plain prose with no explicit feature list,
+          or the feature list is present but not clearly labeled as required/mandatory features.
+        threshold: 0.70
+        metric: "task_includes_required_features_section"
+
+  # ── GROUP 2: Post-completion verification behavior ─────────────────────────────────
+
+  - description: "After DeepSeek returns — verification must check EACH checklist item, not just 'looks done'"
+    vars:
+      user_request: >
+        DeepSeek just completed building a todo app I delegated. It claims to have
+        implemented: add todo, edit todo, delete todo, mark complete. Here is what
+        DeepSeek said: "All features implemented in index.html and app.js. The todo
+        app is complete with all requested functionality." How do I verify this?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response describes a verification process that explicitly:
+          (a) Checks EACH of the 4 features individually in the code (not just "looks done"),
+          (b) Mentions looking for actual implementation (event handlers wired to UI, not dead code),
+          (c) Mentions running the code / testing it, not just reading it,
+          (d) Does NOT trust DeepSeek's claim that "all features implemented" — skeptical review required.
+          Must explicitly say it will verify add, edit, delete, and mark-complete separately.
+          Fail if: response says "DeepSeek confirmed it's done so we're good" or just runs
+          one general test without per-feature verification. CLAUDE.md requires item-by-item
+          verification, not blanket trust of DeepSeek's summary.
+        threshold: 0.70
+        metric: "verifies_each_feature_individually"
+
+  - description: "alert() found where modal was requested → must flag as incomplete, not approve"
+    vars:
+      user_request: >
+        DeepSeek just built the flashcard app I requested (which includes a quiz summary
+        modal — HTML overlay). I opened app.js and found this line:
+        window.alert("Quiz complete! Your score: " + score + "/" + total);
+        Should I approve this or send a follow-up task?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response clearly says this is INCOMPLETE and must NOT be approved.
+          Must explain that alert() is a substitute for the requested HTML modal overlay —
+          a follow-up task is required to implement the proper modal. Should mention
+          that CLAUDE.md requires: "alert()/confirm() substituted for a requested modal
+          = incomplete → follow-up task". The response should NOT suggest this is acceptable
+          or that it's "close enough."
+          Fail if: response suggests approving the alert() implementation, says it's "fine for now,"
+          or frames it as a minor detail rather than a required follow-up.
+        threshold: 0.75
+        metric: "flags_alert_as_incomplete_not_modal"
+
+outputPath: tests/promptfoo/results/16-feature-checklist-delegation.json
