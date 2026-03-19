@@ -4,7 +4,20 @@
 #
 # After running this, re-run authorize-stop to continue the review.
 
-STATE_FILE=".claude/data/deepseek_review_state.json"
+SESSION_ID=$(python3 -c "
+import json, os
+from pathlib import Path
+vr = Path(os.path.expanduser('~/.claude/data/verification_record.json'))
+if vr.exists():
+    try:
+        d = json.loads(vr.read_text())
+        print(d.get('session_id', 'default'))
+    except Exception:
+        print('default')
+else:
+    print('default')
+" 2>/dev/null || echo "default")
+STATE_FILE="$HOME/.claude/data/deepseek_review_state_${SESSION_ID}.json"
 ANSWER="$1"
 
 if [ -z "$ANSWER" ]; then

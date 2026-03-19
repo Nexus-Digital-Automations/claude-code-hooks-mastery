@@ -55,13 +55,14 @@ def _reset_verification_for_new_task(session_id: str) -> None:
 
     # Also clear the DeepSeek multi-turn conversation state so the reviewer
     # starts fresh for this task (context is rebuilt at stop time from transcript).
-    for ds_file in [
-        Path(".claude/data/deepseek_review_state.json"),
-        Path(".claude/data/deepseek_context.json"),
-    ]:
+    import glob as _glob
+    _claude_data = Path.home() / ".claude" / "data"
+    _ds_files = [_claude_data / "deepseek_context.json"] + [
+        Path(p) for p in _glob.glob(str(_claude_data / "deepseek_review_state_*.json"))
+    ]
+    for ds_file in _ds_files:
         try:
-            if ds_file.exists():
-                ds_file.unlink()
+            ds_file.unlink(missing_ok=True)
         except Exception:
             pass
 

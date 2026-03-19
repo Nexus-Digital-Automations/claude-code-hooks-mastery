@@ -128,7 +128,15 @@ def detect_lint_command(cwd: Path) -> tuple[str, str] | None:
                 return ("npm run lint 2>&1", "Node.js/npm run lint")
         except Exception:
             pass
-        return ("npx eslint . --max-warnings=0 2>&1", "Node.js/eslint")
+        # Guard: only fall back to npx eslint if a config file exists
+        _eslint_cfg_names = [
+            "eslint.config.js", "eslint.config.mjs", "eslint.config.cjs",
+            ".eslintrc", ".eslintrc.js", ".eslintrc.json",
+            ".eslintrc.yaml", ".eslintrc.yml",
+        ]
+        if any((cwd / cfg).exists() for cfg in _eslint_cfg_names):
+            return ("npx eslint . --max-warnings=0 2>&1", "Node.js/eslint")
+        return ("# no-eslint-config", "Node.js/no-eslint-config")
     if (cwd / "Cargo.toml").exists():
         return ("cargo clippy 2>&1", "Rust/cargo clippy")
     if (cwd / "go.mod").exists():
@@ -146,6 +154,8 @@ def check_lint(cwd: Path, timeout: int = 30) -> tuple[str, str]:
     if lint_cmd is None:
         return "skipped", "No supported linter detected for this project type"
     cmd, desc = lint_cmd
+    if cmd == "# no-eslint-config":
+        return "skipped", "No ESLint config found — JS lint not applicable"
     rc, stdout, stderr = _run(cmd, cwd, timeout)
     evidence = f"[auto-lint: {desc}]\n$ {cmd}\nexit: {rc}\n"
     if stdout:

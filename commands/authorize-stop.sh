@@ -3,9 +3,9 @@
 # Gate 1: 10-check verification gate — refuses if any items are still pending.
 # Gate 2: DeepSeek conversational evidence review (if API key is set).
 # Preserves security_scan_complete=true if the scan already passed this cycle.
-AUTH_FILE=".claude/data/stop_authorization.json"
-VR_FILE=".claude/data/verification_record.json"
-mkdir -p ".claude/data"
+AUTH_FILE="$HOME/.claude/data/stop_authorization.json"
+VR_FILE="$HOME/.claude/data/verification_record.json"
+mkdir -p "$HOME/.claude/data"
 
 # Auto-run static checks (upstream_sync, lint) for pending items
 STATIC_CHECKER="$HOME/.claude/hooks/utils/static_checker.py"
@@ -15,7 +15,7 @@ fi
 
 # Auto-run registered dynamic checks
 DYNAMIC_VALIDATOR="$HOME/.claude/hooks/utils/dynamic_validator.py"
-DC_FILE_PATH=".claude/data/dynamic_checks.json"
+DC_FILE_PATH="$HOME/.claude/data/dynamic_checks.json"
 if [ -f "$DYNAMIC_VALIDATOR" ] && [ -f "$DC_FILE_PATH" ]; then
     python3 "$DYNAMIC_VALIDATOR" \
         --run \
@@ -90,7 +90,7 @@ except Exception:
     checks = {}
 
 # Load dynamic checks state
-dc_file = ".claude/data/dynamic_checks.json"
+dc_file = str(Path.home() / ".claude/data/dynamic_checks.json")
 try:
     with open(dc_file) as f:
         dc_data = json.load(f)
@@ -189,8 +189,21 @@ PYEOF
 
 # ── Gate 2: DeepSeek conversational evidence review ──────────────────────────
 DEEPSEEK_VERIFIER="$HOME/.claude/hooks/utils/deepseek_verifier.py"
-CONTEXT_FILE=".claude/data/deepseek_context.json"
-DEEPSEEK_STATE=".claude/data/deepseek_review_state.json"
+CONTEXT_FILE="$HOME/.claude/data/deepseek_context.json"
+SESSION_ID=$(python3 -c "
+import json, os
+from pathlib import Path
+vr = Path(os.path.expanduser('~/.claude/data/verification_record.json'))
+if vr.exists():
+    try:
+        d = json.loads(vr.read_text())
+        print(d.get('session_id', 'default'))
+    except Exception:
+        print('default')
+else:
+    print('default')
+" 2>/dev/null || echo "default")
+DEEPSEEK_STATE="$HOME/.claude/data/deepseek_review_state_${SESSION_ID}.json"
 
 # Refresh deepseek_context.json from the current transcript before calling the
 # verifier. The stop hook writes it once (and it goes stale); authorize-stop
@@ -277,15 +290,6 @@ existing["files_modified"] = files_modified
 context_file.write_text(json.dumps(existing, indent=2))
 REFRESH_EOF
 
-# Clear stale DeepSeek state if evidence was re-recorded since last review.
-# When VR file is newer than state file, Claude updated evidence after a
-# rejection — restart the conversation so DeepSeek reviews fresh.
-if [ -f "$DEEPSEEK_STATE" ] && [ -f "$VR_FILE" ]; then
-    if [ "$VR_FILE" -nt "$DEEPSEEK_STATE" ]; then
-        rm -f "$DEEPSEEK_STATE"
-    fi
-fi
-
 if [ -f "$DEEPSEEK_VERIFIER" ]; then
     python3 "$DEEPSEEK_VERIFIER" \
         --vr-file "$VR_FILE" \
@@ -309,5 +313,4 @@ print("\n✅ Stop authorized.\n")
 AUTHEOF
 
 # Clear DeepSeek state so next task starts fresh
-rm -f ".claude/data/deepseek_review_state.json" \
-       ".claude/data/deepseek_context.json"
+rm -f "$DEEPSEEK_STATE" "$CONTEXT_FILE"

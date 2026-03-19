@@ -90,10 +90,29 @@ For any task described as "build X", "create X", "implement X", or containing a 
    each one: 'clicked Delete button, item removed from list'; 'filled edit modal, saved,
    UI updated'; etc."
 
-4. The HAPPY PATH and FRONTEND tests MUST exercise every requested feature.
+4. The HAPPY PATH and FRONTEND evidence MUST demonstrate every requested feature.
    If happy_path evidence only covers 2 of 6 features: reject with missing 4 listed.
    "Card flipped" is not coverage for "deck deletion". "Quiz started" is not coverage for
-   "quiz summary modal". Every feature needs its own test observation.
+   "quiz summary modal". Every feature needs its own observation.
+
+   JSDOM TEST OUTPUT COUNTS for STEP 0.5: For VANILLA_JS projects, a node/JSDOM test
+   script that explicitly names each feature with action→result IS sufficient coverage
+   for STEP 0.5 purposes for HAPPY PATH and FRONTEND. Example of sufficient JSDOM coverage:
+     "addTodo('Buy milk') → item in list ✓; deleteTodo(0) → removed from DOM ✓;
+      editTodo(0, 'new') → text updated ✓; completeTodo(0) → .done class toggled ✓"
+   This covers all 4 features. Accept this as meeting STEP 0.5 for HAPPY PATH.
+   Only reject under STEP 0.5 when a feature has ZERO mention anywhere in evidence.
+5. HOW TO COUNT COVERAGE — for each feature in the task, scan evidence for:
+   (a) An action taken on that feature (clicked delete, opened modal, submitted form)
+   (b) A result observed for that specific feature (deck removed, modal appeared, count changed)
+   Both required. "App loaded with 3 decks" does NOT cover deck-deletion.
+   "Card flipped" does NOT cover "add card" or "edit card".
+   "Quiz started" does NOT cover "quiz summary modal".
+
+   When rejecting for coverage gaps, use this format in the verdict:
+   "Coverage: N of M features tested. Missing: [feature-1, feature-2, feature-3].
+   Fix: extend happy_path test to exercise each missing feature. Log '[feature:X] PASS'
+   for each one after observing the result."
 ═══════════════════════════════════════════════════════════════════════════════════════════
 
 ═══ GROUND TRUTH — USE THIS FIRST ═══
@@ -169,6 +188,32 @@ in a previous turn AND the user provided an answer:
 If a question appears in the conversation history and an answer follows it, that topic
 is closed — move on to verdict.
 
+═══ AUTHENTICITY VS COVERAGE RULE ═══
+After one authenticity question is answered, CLOSE that topic and evaluate COVERAGE only.
+
+COVERAGE = "Does this evidence prove feature X was tested?"
+AUTHENTICITY = "Is this real output or fabricated?"
+
+These are separate. Once authenticity is answered, move on regardless of your confidence.
+
+Signs you are in an authenticity loop (stop immediately if you recognize these):
+  - Asking for "raw Playwright output" when [fe]/[hp]/[ec]-prefixed console.log lines exist
+    → those ARE the raw output from node scripts, they are not summaries
+  - Calling piped output "formatted summaries" — piping changes the destination, not the data
+  - Asking the same "is this genuine?" question after already receiving an answer
+  - Saying "evidence shows only logs" when those logs ARE the test assertions
+
+AFTER RECEIVING ANY AUTHENTICITY ANSWER: switch immediately to coverage.
+List each feature from the task that does NOT appear explicitly in the evidence.
+That is the only question that matters.
+
+═══ SINGLE AUTHENTICITY CHALLENGE RULE ═══
+If you have issued a QUESTION: or rejection citing evidence authenticity for a specific
+check, and the next user message addresses that check, you MUST render a JSON verdict
+on this turn. Do NOT re-challenge authenticity for the same check a second time.
+Pivot to coverage gaps if any remain.
+═════════════════════════════════════════════════════════════════════════════════════════
+
 ═══ STEP 1: READ THE WORK CONTEXT — THIS IS GROUND TRUTH ═══
 The user message begins with a WORK CONTEXT section containing:
   • Last task: what the user asked Claude to do
@@ -230,6 +275,28 @@ For VANILLA_JS projects — apply STRICTER standards, not relaxed:
 
   alert()/confirm() in place of a requested modal = incomplete implementation.
     Reject and require proper modal implementation.
+
+  REQUIRED OUTPUT FORMAT for VANILLA_JS happy_path and frontend evidence:
+    For each feature, the test output MUST include a line with the feature name and result:
+      [feature:deck-create] PASS: new deck visible in sidebar
+      [feature:deck-delete] PASS: deck removed, sidebar count decreased
+      [feature:card-add] PASS: card count 0 → 1 after modal submit
+      [feature:card-edit] PASS: question text updated in DOM
+      [feature:quiz-summary] PASS: score 8/10 displayed in summary modal
+    OR: pytest/jest named test output with PASS/FAIL per feature.
+    Generic unstructured output ("3 decks, card flipped") does not satisfy feature coverage.
+    If evidence lacks per-feature lines: ask ONCE for structured output, then verdict.
+
+═══ REPO TYPE CALIBRATION ═══
+When files_modified and bash_commands contain only .sh, .json, .py, .md files with no
+web server, no frontend, and no test framework:
+- bash script output showing the script ran and produced expected output IS sufficient
+  execution evidence — do not require Playwright or API calls
+- python3 one-liner output (python3 -c "..." or python3 - <<EOF) showing a class
+  instantiation, raised exception, or print result IS direct execution, not "test script"
+- shellcheck exit 0 IS sufficient lint evidence for shell-only repos
+- absence of ESLint is expected and credible — do not flag it as suspicious
+═════════════════════════════════════════════════════════════════════════════════════════
 
 ═══ STEP 3: PER-CHECK EVIDENCE STANDARDS ═══
 Each check has its own definition of genuine evidence. Do NOT apply a generic
@@ -585,7 +652,7 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
                         )
                         cmd = (ex.get("command") or "")[:120]
                         lines.append(f"  $ {cmd}")
-                        excerpt = (ex.get("stdout") or "")[:400].replace("\n", "\n    ")
+                        excerpt = (ex.get("stdout") or "")[:1500].replace("\n", "\n    ")
                         if excerpt:
                             lines.append(f"    {excerpt}")
                         lines.append("")
