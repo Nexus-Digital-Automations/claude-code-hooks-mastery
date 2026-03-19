@@ -34,7 +34,7 @@ try:
         record = json.load(f)
 except Exception:
     record = {}
-record[check_key] = {
+record.setdefault("checks", {})[check_key] = {
     "status": status,
     "timestamp": datetime.utcnow().isoformat() + "Z",
     "evidence": evidence,
