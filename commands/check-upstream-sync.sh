@@ -3,7 +3,7 @@
 # Normally auto-run by static_checker.py via authorize-stop.sh.
 # Manual skip: bash ~/.claude/commands/check-upstream-sync.sh --skip "not a fork"
 
-VR_FILE=".claude/data/verification_record.json"
+VR_FILE="$HOME/.claude/data/verification_record.json"
 CHECK_KEY="upstream_sync"
 mkdir -p ".claude/data"
 
@@ -15,7 +15,7 @@ skip_reason = skip_reason if skip_reason else None
 evidence = None
 if evidence_file and os.path.exists(evidence_file):
     with open(evidence_file) as ef:
-        evidence = ef.read(2000).strip() or None
+        evidence = ef.read(8000).strip() or None
     try:
         os.unlink(evidence_file)
     except Exception:

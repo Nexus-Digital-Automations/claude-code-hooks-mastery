@@ -35,7 +35,7 @@ def _reset_verification_for_new_task(session_id: str) -> None:
     from being used as proof for the current task's work.
     Mirrors session_start.py:reset_verification_record() but runs per-prompt.
     """
-    vr_file = Path(".claude/data/verification_record.json")
+    vr_file = Path.home() / ".claude/data/verification_record.json"
     try:
         vr_file.parent.mkdir(parents=True, exist_ok=True)
         all_pending = {

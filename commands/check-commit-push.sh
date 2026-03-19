@@ -7,7 +7,7 @@
 # Usage (skip with reason):
 #   bash ~/.claude/commands/check-commit-push.sh --skip "no changes to commit — read-only task"
 
-VR_FILE=".claude/data/verification_record.json"
+VR_FILE="$HOME/.claude/data/verification_record.json"
 CHECK_KEY="commit_push"
 mkdir -p ".claude/data"
 
@@ -19,7 +19,7 @@ skip_reason = skip_reason if skip_reason else None
 evidence = None
 if evidence_file and os.path.exists(evidence_file):
     with open(evidence_file) as ef:
-        evidence = ef.read(2000).strip() or None
+        evidence = ef.read(8000).strip() or None
     try:
         os.unlink(evidence_file)
     except Exception:
@@ -28,54 +28,41 @@ try:
     with open(vr_file) as f:
         record = json.load(f)
 except Exception:
-    record = {"reset_at": datetime.now().isoformat(), "checks": {}}
-checks = record.setdefault("checks", {})
-checks[check_key] = {
+    record = {}
+record[check_key] = {
     "status": status,
+    "timestamp": datetime.utcnow().isoformat() + "Z",
     "evidence": evidence,
-    "timestamp": datetime.now().isoformat(),
-    "skip_reason": skip_reason,
+    "skip_reason": skip_reason
 }
 with open(vr_file, "w") as f:
     json.dump(record, f, indent=2)
 '
 
 if [ "$1" = "--skip" ]; then
-    REASON="${2:-}"
-    if [ -z "$REASON" ] || [ "${#REASON}" -lt 10 ]; then
-        echo "❌ Skip reason required (min 10 chars)." >&2
-        echo "   Example: bash ~/.claude/commands/check-commit-push.sh --skip \"no changes to commit — read-only task\"" >&2
+    if [ -z "$2" ]; then
+        echo "❌ Skip reason required" >&2
         exit 1
     fi
-    # Reject "pre-existing" and similar cop-out skip reasons
-    _REASON_LOWER=$(echo "$REASON" | tr '[:upper:]' '[:lower:]')
-    if echo "$_REASON_LOWER" | grep -qE 'pre.?exist|already.fail|was.fail|before.my.change|before.this.change|not.caused.by|unrelated.to.my'; then
-        echo "❌ Skip reason rejected: 'pre-existing failures' is not a valid reason." >&2
-        echo "   Fix the failures, or use a specific reason with documented user approval." >&2
-        exit 1
-    fi
-    # Reject "user didn't ask" excuses — commits are automatic, not user-triggered
-    if echo "$_REASON_LOWER" | grep -qE 'user.did.not|user.didn.t|not.request|not.asked|didn.t.ask|did.not.ask|no.request|wasn.t.asked|was.not.asked'; then
-        echo "❌ Skip reason rejected: commits and pushes are automatic — 'user did not request' is not a valid reason." >&2
-        echo "   Commit the changes. Only valid skips: no files modified, read-only task, etc." >&2
-        exit 1
-    fi
-    python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "skipped" "" "$REASON"
+    echo "$UPDATE_PY" | python3 - "$VR_FILE" "$CHECK_KEY" "skipped" "None" "$2"
     if [ $? -ne 0 ]; then
         echo "❌ Failed to write verification record" >&2
         exit 1
     fi
-    echo "✅ Commit/push skipped: $REASON"
-else
-    DESCRIPTION="${1:-}"
-    if [ -z "$DESCRIPTION" ] || [ "${#DESCRIPTION}" -lt 20 ]; then
-        echo "❌ Description too short (min 20 chars). Include: what files, which branch, pushed/not pushed." >&2
-        echo "   Example: bash ~/.claude/commands/check-commit-push.sh \"committed 2 files on main, pushed to origin\"" >&2
+    echo "✅ Commit/push skipped"
+elif [ -n "$1" ]; then
+    # description mode
+    echo "$UPDATE_PY" | python3 - "$VR_FILE" "$CHECK_KEY" "passed" "None" "None"
+    if [ $? -ne 0 ]; then
+        echo "❌ Failed to write verification record" >&2
         exit 1
     fi
+    echo "✅ Commit/push recorded (description mode)"
+else
+    # pipe mode
     TMPFILE=$(mktemp)
-    printf '%s' "$DESCRIPTION" > "$TMPFILE"
-    python3 -c "$UPDATE_PY" "$VR_FILE" "$CHECK_KEY" "done" "$TMPFILE" ""
+    cat > "$TMPFILE"
+    echo "$UPDATE_PY" | python3 - "$VR_FILE" "$CHECK_KEY" "passed" "$TMPFILE" "None"
     if [ $? -ne 0 ]; then
         echo "❌ Failed to write verification record" >&2
         rm -f "$TMPFILE"

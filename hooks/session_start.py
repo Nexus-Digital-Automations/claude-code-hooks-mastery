@@ -113,7 +113,7 @@ def reset_verification_record(session_id: str = "unknown") -> None:
     for the current session's work. Called unconditionally on every session
     start (startup, resume, clear).
     """
-    vr_file = Path(".claude/data/verification_record.json")
+    vr_file = Path.home() / ".claude/data/verification_record.json"
     try:
         vr_file.parent.mkdir(parents=True, exist_ok=True)
         all_pending = {
@@ -152,12 +152,26 @@ def load_development_context(source):
 """
     context_parts.append(session_rules)
 
+    # Verify CLAUDE.md matches current mode (auto-fix if mismatched)
+    try:
+        from utils.config_loader import get_config
+        current_mode = get_config().get_agent_mode().get("mode", "claude")
+        claude_dir = Path.home() / ".claude"
+        source_file = claude_dir / f"CLAUDE.{current_mode}.md"
+        dest_file = claude_dir / "CLAUDE.md"
+        if source_file.exists() and dest_file.exists():
+            if source_file.read_text() != dest_file.read_text():
+                import shutil
+                shutil.copy2(str(source_file), str(dest_file))
+    except Exception:
+        pass
+
     # Inject DeepSeek supervisor context if in deepseek mode
     try:
         from utils.config_loader import get_config
         if get_config().is_deepseek_mode():
             session_rules_ds = """
---- DEEPSEEK SUPERVISOR MODE ---
+🚨 DEEPSEEK SUPERVISOR MODE — THIS OVERRIDES CLAUDE.md'S "AUTONOMOUS OPERATION" RULE 🚨
 You are in SUPERVISOR mode. You do NOT write implementation code directly.
 
 DELEGATION PROTOCOL:
@@ -192,7 +206,7 @@ FALLBACK: If DeepSeek is unavailable, implement directly yourself.
 
 You are the quality gate. DeepSeek is the labor. Never rubber-stamp.
 """
-            context_parts.append(session_rules_ds)
+            context_parts.insert(0, session_rules_ds)  # Highest priority — must appear first
     except Exception:
         pass  # Graceful degradation
 

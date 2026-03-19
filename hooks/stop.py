@@ -480,7 +480,7 @@ def _extract_transcript_context(input_data):
     # Entries before this time belong to previous tasks — skip them.
     task_start_ts = ""
     try:
-        vr_data = json.loads(Path(".claude/data/verification_record.json").read_text())
+        vr_data = json.loads((Path.home() / ".claude/data/verification_record.json").read_text())
         task_start_ts = vr_data.get("reset_at", "")
     except Exception:
         pass  # If VR unreadable, fall back to reading full transcript (old behavior)
@@ -862,7 +862,7 @@ _VR_SKIP_CMDS = {
 def read_verification_record() -> dict:
     """Read .claude/data/verification_record.json.
     Returns all-pending default if missing or unreadable."""
-    vr_file = Path(".claude/data/verification_record.json")
+    vr_file = Path.home() / ".claude/data/verification_record.json"
     all_pending = {
         k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
         for k, _ in _VR_CHECKS_ORDER
@@ -1387,7 +1387,7 @@ Verify it, then stop.
         # Reset verification record for next task — all items back to pending
         try:
             from datetime import datetime as _dt
-            _vr_file = Path(".claude/data/verification_record.json")
+            _vr_file = Path.home() / ".claude/data/verification_record.json"
             _all_pending = {
                 k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
                 for k, _ in _VR_CHECKS_ORDER
