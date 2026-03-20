@@ -1208,7 +1208,13 @@ Verify it, then stop.
                 "session_id": input_data.get("session_id", ""),
             }
             (Path.home() / ".claude/data").mkdir(parents=True, exist_ok=True)
-            (Path.home() / ".claude/data/deepseek_context.json").write_text(
+            # Write task-scoped context file (keyed by task_id from current_task.json)
+            _ct_file = Path.home() / ".claude/data/current_task.json"
+            try:
+                _task_id = json.loads(_ct_file.read_text()).get("task_id", "default")
+            except Exception:
+                _task_id = "default"
+            (Path.home() / f".claude/data/deepseek_context_{_task_id}.json").write_text(
                 json.dumps(_ds_ctx, indent=2)
             )
         except Exception:
@@ -1409,14 +1415,16 @@ Verify it, then stop.
         except Exception:
             pass
 
-        # Reset DeepSeek review state for next task
+        # Reset DeepSeek review state for next task — glob for all task-scoped files
         try:
-            for _ds_file in [
-                Path.home() / ".claude/data/deepseek_review_state.json",
-                Path.home() / ".claude/data/deepseek_context.json",
-            ]:
-                if _ds_file.exists():
-                    _ds_file.unlink()
+            import glob as _stop_glob
+            for _pattern in ["deepseek_review_state_*.json", "deepseek_context_*.json",
+                             "deepseek_context.json"]:
+                for _f in _stop_glob.glob(str(Path.home() / ".claude/data" / _pattern)):
+                    try:
+                        Path(_f).unlink()
+                    except Exception:
+                        pass
         except Exception:
             pass
 

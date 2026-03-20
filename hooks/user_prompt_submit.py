@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import sys
+import uuid
 from pathlib import Path
 from datetime import datetime
 
@@ -28,32 +29,76 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).parent))
 
 
-def _record_task_start(session_id: str, prompt: str) -> None:
-    """Write current_task.json with reliable task-start timestamp.
+def _record_task_start(session_id: str, prompt: str) -> tuple:
+    """Write current_task.json with reliable task-start timestamp and task_id.
 
-    This is the authoritative source for transcript filtering in authorize-stop.
-    Unlike the VR's reset_at, this file is NEVER overwritten by stop.py, so it
-    always reflects when the user actually started the current task.
+    Generates a unique task_id (UUID) for state isolation. If this is a follow-up
+    prompt in the same session with non-pending VR checks, preserves the existing
+    task_id to prevent authorize-stop → re-prompt → new task_id cycles (IMP-017).
+
+    Returns (task_id, is_followup) tuple.
     """
     task_file = Path.home() / ".claude/data/current_task.json"
+    vr_file = Path.home() / ".claude/data/verification_record.json"
+    existing_task_id = None
+    is_followup = False
+    existing_data = {}
+
     try:
         task_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Check if this is a follow-up to an existing task
+        if task_file.exists():
+            try:
+                existing_data = json.loads(task_file.read_text())
+                if existing_data.get("session_id") == session_id:
+                    # Same session — check if VR has work in progress
+                    if vr_file.exists():
+                        vr = json.loads(vr_file.read_text())
+                        checks = vr.get("checks", {})
+                        has_progress = any(
+                            c.get("status") != "pending"
+                            for c in checks.values()
+                            if isinstance(c, dict)
+                        )
+                        if has_progress:
+                            existing_task_id = existing_data.get("task_id")
+                            is_followup = True
+            except Exception:
+                pass
+
+        task_id = existing_task_id or str(uuid.uuid4())
         task_file.write_text(json.dumps({
+            "task_id": task_id,
             "session_id": session_id,
-            "task_started_at": datetime.now().isoformat(),
+            "task_started_at": (
+                existing_data.get("task_started_at")
+                if is_followup
+                else datetime.now().isoformat()
+            ),
             "prompt": prompt[:500],
+            "is_followup": is_followup,
         }, indent=2))
+        return task_id, is_followup
     except Exception:
-        pass  # Never block prompt submission
+        return str(uuid.uuid4()), False  # Never block prompt submission
 
 
-def _reset_verification_for_new_task(session_id: str) -> None:
+def _reset_verification_for_new_task(session_id: str, task_id: str,
+                                     is_followup: bool) -> None:
     """Reset verification state at start of each new user prompt.
 
     Prevents stale evidence from a previous task in the same session
     from being used as proof for the current task's work.
     Mirrors session_start.py:reset_verification_record() but runs per-prompt.
+
+    If is_followup is True (same session, VR has non-pending checks), skips
+    the VR reset entirely to preserve check evidence across authorize-stop
+    retry cycles (IMP-017).
     """
+    if is_followup:
+        return  # Preserve existing VR state for follow-up prompts
+
     vr_file = Path.home() / ".claude/data/verification_record.json"
     try:
         vr_file.parent.mkdir(parents=True, exist_ok=True)
@@ -67,23 +112,28 @@ def _reset_verification_for_new_task(session_id: str) -> None:
             json.dump({
                 "reset_at": datetime.now().isoformat(),
                 "session_id": session_id,
+                "task_id": task_id,
                 "checks": all_pending,
             }, f, indent=2)
     except Exception:
         pass  # Never block prompt submission
 
-    # Also clear the DeepSeek multi-turn conversation state so the reviewer
-    # starts fresh for this task (context is rebuilt at stop time from transcript).
+    # Clear DeepSeek state files from PREVIOUS tasks so the reviewer starts
+    # fresh. Only delete task-scoped files (deepseek_context_*.json and
+    # deepseek_review_state_*.json), plus the legacy global file.
     import glob as _glob
     _claude_data = Path.home() / ".claude" / "data"
-    _ds_files = [_claude_data / "deepseek_context.json"] + [
-        Path(p) for p in _glob.glob(str(_claude_data / "deepseek_review_state_*.json"))
+    _patterns = [
+        "deepseek_context.json",        # Legacy global file
+        "deepseek_context_*.json",       # Task-scoped context files
+        "deepseek_review_state_*.json",  # Task-scoped review state files
     ]
-    for ds_file in _ds_files:
-        try:
-            ds_file.unlink(missing_ok=True)
-        except Exception:
-            pass
+    for _pattern in _patterns:
+        for _path_str in _glob.glob(str(_claude_data / _pattern)):
+            try:
+                Path(_path_str).unlink(missing_ok=True)
+            except Exception:
+                pass
 
 
 def store_request_pattern(session_id, prompt, category, cwd):
@@ -548,10 +598,11 @@ def main():
         prompt = input_data.get('prompt', '')
 
         # Record task start time (authoritative timestamp for transcript filtering)
-        _record_task_start(session_id, prompt)
+        task_id, is_followup = _record_task_start(session_id, prompt)
 
         # Reset verification state for new task (per-prompt isolation)
-        _reset_verification_for_new_task(session_id)
+        # Skips reset if this is a follow-up prompt with existing check progress
+        _reset_verification_for_new_task(session_id, task_id, is_followup)
 
         # Log the user prompt
         log_user_prompt(session_id, input_data)

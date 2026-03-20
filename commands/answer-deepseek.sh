@@ -4,20 +4,20 @@
 #
 # After running this, re-run authorize-stop to continue the review.
 
-SESSION_ID=$(python3 -c "
+TASK_ID=$(python3 -c "
 import json, os
 from pathlib import Path
-vr = Path(os.path.expanduser('~/.claude/data/verification_record.json'))
-if vr.exists():
+ct = Path(os.path.expanduser('~/.claude/data/current_task.json'))
+if ct.exists():
     try:
-        d = json.loads(vr.read_text())
-        print(d.get('session_id', 'default'))
+        d = json.loads(ct.read_text())
+        print(d.get('task_id', 'default'))
     except Exception:
         print('default')
 else:
     print('default')
 " 2>/dev/null || echo "default")
-STATE_FILE="$HOME/.claude/data/deepseek_review_state_${SESSION_ID}.json"
+STATE_FILE="$HOME/.claude/data/deepseek_review_state_${TASK_ID}.json"
 ANSWER="$1"
 
 if [ -z "$ANSWER" ]; then

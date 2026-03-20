@@ -190,21 +190,21 @@ PYEOF
 
 # ── Gate 2: DeepSeek conversational evidence review ──────────────────────────
 DEEPSEEK_VERIFIER="$HOME/.claude/hooks/utils/deepseek_verifier.py"
-CONTEXT_FILE="$HOME/.claude/data/deepseek_context.json"
-SESSION_ID=$(python3 -c "
+TASK_ID=$(python3 -c "
 import json, os
 from pathlib import Path
-vr = Path(os.path.expanduser('~/.claude/data/verification_record.json'))
-if vr.exists():
+ct = Path(os.path.expanduser('~/.claude/data/current_task.json'))
+if ct.exists():
     try:
-        d = json.loads(vr.read_text())
-        print(d.get('session_id', 'default'))
+        d = json.loads(ct.read_text())
+        print(d.get('task_id', 'default'))
     except Exception:
         print('default')
 else:
     print('default')
 " 2>/dev/null || echo "default")
-DEEPSEEK_STATE="$HOME/.claude/data/deepseek_review_state_${SESSION_ID}.json"
+CONTEXT_FILE="$HOME/.claude/data/deepseek_context_${TASK_ID}.json"
+DEEPSEEK_STATE="$HOME/.claude/data/deepseek_review_state_${TASK_ID}.json"
 
 # Refresh deepseek_context.json from the current transcript before calling the
 # verifier. The stop hook writes it once (and it goes stale); authorize-stop
@@ -240,20 +240,17 @@ if not transcript_path or not Path(transcript_path).exists():
     else:
         transcript_path = str(candidates[0]) if candidates else ""
 
-# Determine task start time — prefer current_task.json (written by user_prompt_submit,
-# never clobbered by stop.py) over VR reset_at (which stop.py can overwrite mid-task).
+# Determine task start time from current_task.json (written by user_prompt_submit,
+# never clobbered by stop.py). task_id already scopes the context file, so no
+# session_id cross-check is needed.
 task_start_ts = ""
 current_task_file = Path.home() / ".claude/data/current_task.json"
 try:
     ct = json.loads(current_task_file.read_text())
-    # Only use if session_id matches to prevent cross-session contamination
-    ct_session = ct.get("session_id", "")
-    cur_session = existing.get("session_id", "")
-    if ct_session and (not cur_session or ct_session == cur_session):
-        task_start_ts = ct.get("task_started_at", "")
+    task_start_ts = ct.get("task_started_at", "")
 except Exception:
     pass
-# Fall back to VR reset_at if current_task.json unavailable or session mismatch
+# Fall back to VR reset_at if current_task.json unavailable
 if not task_start_ts:
     try:
         task_start_ts = json.loads(vr_file.read_text()).get("reset_at", "")
