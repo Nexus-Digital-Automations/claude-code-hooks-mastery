@@ -40,6 +40,15 @@ def _write_vr(vr_file: Path, key: str, status: str, evidence: str) -> None:
             record = json.loads(vr_file.read_text())
         except Exception:
             record = {"reset_at": datetime.now().isoformat(), "checks": {}}
+        # Session guard: prevent cross-session VR contamination
+        _cur_sid = None
+        try:
+            ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
+            _cur_sid = ct.get("session_id")
+        except Exception:
+            pass
+        if _cur_sid and record.get("session_id") and record["session_id"] != _cur_sid:
+            record = {"reset_at": datetime.now().isoformat(), "session_id": _cur_sid, "checks": {}}
         record.setdefault("checks", {})[key] = {
             "status": status,
             "evidence": evidence[:2000] if evidence else None,
