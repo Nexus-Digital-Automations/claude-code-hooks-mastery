@@ -6,6 +6,163 @@
     "type": "friction",
     "title": "Test execution verification",
     "description": "Running script to generate real execution evidence for happy path validation",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-002",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "friction",
+    "title": "Live Execution Test",
+    "description": "Running script live to capture real output for DeepSeek reviewer evidence",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-003",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Happy Path Live Run",
+    "description": "Running to produce live output evidence for the real verification record",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-004",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Final Verification Run",
+    "description": "Running script for final live execution evidence",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-005",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Happy Path Final",
+    "description": "Final live execution run to produce raw output evidence for reviewer",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-006",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "friction",
+    "title": "Check scripts write to wrong path when CWD is ~/.claude",
+    "description": "The check-*.sh scripts had mkdir -p \".claude/data\" (relative path). When CWD is ~/.claude this created ~/.claude/.claude/data/ instead of ~/.claude/data/. VR_FILE itself was already absolute ($HOME). Fixed: changed all check scripts to use mkdir -p \"$HOME/.claude/data\".",
+    "status": "fixed",
+    "fixed_date": "2026-03-20"
+  },
+  {
+    "id": "IMP-007",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Stop-hook path verification",
+    "description": "Running for live evidence to satisfy stop hook verification",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-008",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "DeepSeek Evidence Run",
+    "description": "This is the actual execution to provide raw output evidence for DeepSeek reviewer",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-009",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "friction",
+    "title": "Verification record path confusion — two files exist",
+    "description": "stop.py had several relative Path('.claude/data/...') paths that resolved incorrectly when CWD is ~/.claude. Fixed: stop.py lines 545, 1210, 1211, 1402, 1415, 1416 now all use Path.home() / '.claude/data/...' to be CWD-independent.",
+    "status": "fixed",
+    "fixed_date": "2026-03-20"
+  },
+  {
+    "id": "IMP-010",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Lint-verify test entry",
+    "description": "Created by feature validation script to verify IMP logging",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-011",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Lint-verify test entry",
+    "description": "Created by feature validation script to verify IMP logging",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-012",
+    "date": "2026-03-17",
+    "source": "claude_code",
+    "type": "improvement",
+    "title": "Happy-path validation run",
+    "description": "Live execution to capture raw output evidence for DeepSeek reviewer verification",
+    "status": "noise"
+  },
+  {
+    "id": "IMP-013",
+    "date": "2026-03-19",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "DeepSeek reviewer confused about project context",
+    "description": "authorize-stop DeepSeek reviewer entered infinite rejection loop after confusing kroger-mcp project with Deepseek_Agent_MCP — started requesting '672 tests' and referencing wrong directory. State from a prior session bled into the reviewer causing it to reject valid evidence from the correct project.",
     "status": "pending"
+  },
+  {
+    "id": "IMP-014",
+    "date": "2026-03-19",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "_build_user_message sends empty evidence to DeepSeek for status=passed checks",
+    "description": "deepseek_verifier.py _build_user_message() was reported to only show evidence for status=='done'. Already fixed in code: line 679 uses `elif status in (\"done\", \"passed\"):` to handle both statuses.",
+    "status": "already-fixed",
+    "fixed_date": "prior"
+  },
+  {
+    "id": "IMP-015",
+    "date": "2026-03-19",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "Shared VR file causes cross-session contamination when concurrent sessions run",
+    "description": "verification_record.json is shared globally across all concurrent Claude sessions. When multiple sessions run simultaneously, their stop hooks overwrite each other's VR evidence. Fix: use session-specific VR files or add project_path key to VR and filter by it.",
+    "status": "pending"
+  },
+  {
+    "id": "IMP-016",
+    "date": "2026-03-19",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "DeepSeek reviewer confuses extensions due to stale check-state",
+    "description": "The authorize-stop DeepSeek reviewer reads stale evidence from a previous extension session and applies it as criteria to a different extension. Root cause: check state files persist cross-session without being scoped to the current project/extension.",
+    "status": "pending"
+  },
+  {
+    "id": "IMP-017",
+    "date": "2026-03-19",
+    "source": "claude_code",
+    "type": "friction",
+    "title": "Stop loop: authorize-stop resets on every stop attempt causing infinite re-authorization cycle",
+    "description": "After Claude responds to a completed task, every subsequent stop attempt re-triggers the hook and requires re-authorization even though no new work was done. Authorization resets after each stop. Possible fix: keep authorization valid for N minutes or until new tool calls are made.",
+    "status": "pending"
+  },
+  {
+    "id": "IMP-018",
+    "date": "2026-03-19",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "Path mismatch: authorize-stop.sh and stop hook reading different stop_authorization.json",
+    "description": "Reported mismatch between authorize-stop.sh ($HOME/.claude/data/stop_authorization.json) and stop.py (.claude/data/stop_authorization.json relative). Already fixed: stop.py line 766 uses Path.home() / '.claude/data/stop_authorization.json' — same as authorize-stop.sh.",
+    "status": "already-fixed",
+    "fixed_date": "prior"
   }
 ]

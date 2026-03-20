@@ -542,7 +542,7 @@ def _extract_transcript_context(input_data):
 def _get_session_task_type(session_id: str) -> str:
     """Get task_type from session data file. Returns 'unknown' on any error."""
     try:
-        _sf = Path(f".claude/data/sessions/{session_id}.json")
+        _sf = Path.home() / f".claude/data/sessions/{session_id}.json"
         if _sf.exists():
             return json.loads(_sf.read_text()).get("task_type", "unknown")
     except Exception:
@@ -1207,8 +1207,8 @@ Verify it, then stop.
                 "transcript_path": input_data.get("transcript_path", ""),
                 "session_id": input_data.get("session_id", ""),
             }
-            Path(".claude/data").mkdir(parents=True, exist_ok=True)
-            Path(".claude/data/deepseek_context.json").write_text(
+            (Path.home() / ".claude/data").mkdir(parents=True, exist_ok=True)
+            (Path.home() / ".claude/data/deepseek_context.json").write_text(
                 json.dumps(_ds_ctx, indent=2)
             )
         except Exception:
@@ -1399,7 +1399,7 @@ Verify it, then stop.
 
         # Reset dynamic checks alongside verification record
         try:
-            _dc_file = Path(".claude/data/dynamic_checks.json")
+            _dc_file = Path.home() / ".claude/data/dynamic_checks.json"
             if _dc_file.exists():
                 _dc_file.write_text(json.dumps({
                     "project_root": str(Path.cwd()),
@@ -1412,8 +1412,8 @@ Verify it, then stop.
         # Reset DeepSeek review state for next task
         try:
             for _ds_file in [
-                Path(".claude/data/deepseek_review_state.json"),
-                Path(".claude/data/deepseek_context.json"),
+                Path.home() / ".claude/data/deepseek_review_state.json",
+                Path.home() / ".claude/data/deepseek_context.json",
             ]:
                 if _ds_file.exists():
                     _ds_file.unlink()

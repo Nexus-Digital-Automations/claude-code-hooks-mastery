@@ -15,7 +15,7 @@
 
 VR_FILE="$HOME/.claude/data/verification_record.json"
 CHECK_KEY="api"
-mkdir -p ".claude/data"
+mkdir -p "$HOME/.claude/data"
 
 UPDATE_PY='
 import json, sys, os
