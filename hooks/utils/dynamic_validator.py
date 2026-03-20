@@ -31,6 +31,8 @@ from pathlib import Path
 import urllib.request
 import urllib.error
 
+sys.path.insert(0, str(Path(__file__).parent))
+
 
 DYNAMIC_CHECK_KEYS = {"tests", "build", "app_starts", "api", "frontend"}
 
@@ -270,38 +272,7 @@ def _run_cmd(command: str, cwd: Path, timeout: int = 60) -> tuple[int, str, str]
         return -1, "", str(e)
 
 
-def _write_vr(vr_file: Path, key: str, status: str, evidence: str) -> None:
-    """Write one check entry to verification_record.json."""
-    try:
-        try:
-            record = json.loads(vr_file.read_text())
-        except Exception:
-            record = {"reset_at": datetime.now().isoformat(), "checks": {}}
-        # Session guard: prevent cross-session VR contamination
-        _cur_sid = None
-        try:
-            ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-            _cur_sid = ct.get("session_id")
-        except Exception:
-            pass
-        if _cur_sid and record.get("session_id") and record["session_id"] != _cur_sid:
-            record = {"reset_at": datetime.now().isoformat(), "session_id": _cur_sid, "checks": {}}
-        record.setdefault("checks", {})[key] = {
-            "status": status,
-            "evidence": evidence[:2000] if evidence else None,
-            "timestamp": datetime.now().isoformat(),
-            "skip_reason": None,
-        }
-        vr_file.write_text(json.dumps(record, indent=2))
-    except Exception:
-        pass
-
-
-def _is_pending(vr_file: Path, key: str) -> bool:
-    try:
-        return json.loads(vr_file.read_text()).get("checks", {}).get(key, {}).get("status", "pending") == "pending"
-    except Exception:
-        return True
+from vr_utils import write_vr as _write_vr, is_pending as _is_pending
 
 
 def run_dynamic_checks(

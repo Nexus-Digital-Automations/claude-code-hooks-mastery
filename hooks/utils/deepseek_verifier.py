@@ -8,7 +8,7 @@ Requires: DEEPSEEK_API_KEY environment variable (or .env file).
 Uses only stdlib (urllib.request, json, os, pathlib) — no pip dependencies.
 
 Multi-turn conversation mode:
-    DeepSeek can ask up to 3 clarifying questions before issuing a verdict.
+    DeepSeek can ask up to 1 clarifying question before issuing a verdict.
     State persists in state_file between authorize-stop.sh invocations.
     Claude answers via `answer-deepseek.sh`; re-running authorize-stop continues.
 """
@@ -21,21 +21,12 @@ import urllib.request
 import urllib.error
 from pathlib import Path
 
-# Checks in canonical order (mirrors stop.py _VR_CHECKS_ORDER — not imported to avoid circular)
-_VR_CHECKS_ORDER = [
-    ("tests",       "TESTS"),
-    ("build",       "BUILD"),
-    ("lint",        "LINT"),
-    ("app_starts",  "APP STARTS"),
-    ("api",         "CODE/SCRIPT/API EXECUTION"),
-    ("frontend",    "FRONTEND VALIDATION"),
-    ("happy_path",  "HAPPY PATH"),
-    ("error_cases", "ERROR CASES"),
-    ("commit_push",  "COMMIT & PUSH"),
-    ("upstream_sync", "UPSTREAM SYNC"),
-]
+import sys as _sys
+import time as _time
+_sys.path.insert(0, str(Path(__file__).parent))
+from vr_utils import VR_CHECKS_ORDER as _VR_CHECKS_ORDER
 
-_MAX_TURNS = 5         # max conversation turns before forcing verdict
+_MAX_TURNS = 2         # max conversation turns before forcing verdict (1 question + 1 verdict)
 _PER_TURN_TIMEOUT = 25 # seconds per API call (slightly longer than single-shot)
 
 _SYSTEM_PROMPT = """\
@@ -186,30 +177,12 @@ Same test output recorded for FRONTEND + HAPPY PATH + ERROR CASES is acceptable
 IF the output demonstrates all three scenarios. Don't reject as "identical evidence."
 
 ═══ EXCUSE DETECTION ═══
+REJECT these patterns: lazy delegation ("Try running"/"You should run"), source-as-validation
+("code review shows"/"source confirms") for runtime checks, "user didn't ask" for ANY check,
+pre-existing failures claimed as not-my-problem, 5+ generic skips, circular claims with no output.
+Display artifacts ("[N chars truncated]", printf formatting) are harmless — do not penalize."""
 
-LAZY DELEGATION: If last_assistant_message says "Try running", "You should run",
-  "you'll need to run" → REJECT. The agent must execute, not recommend.
-
-SOURCE-AS-VALIDATION: "Source verification confirms" / "code review shows" for
-  frontend/happy_path/error_cases → REJECT. Implemented ≠ working.
-
-"USER DIDN'T ASK" FOR ANY CHECK: → REJECT. All checks are automatic when feasible.
-  This applies to ALL checks, not just commit_push. The agent must attempt every
-  check that is technically possible. The user's request determines WHAT to build,
-  not WHETHER to verify it.
-
-PRE-EXISTING FAILURES: "pre-existing", "was already failing", "before my change"
-  → REJECT. Agent must fix failures or skip with explicit user-documented approval.
-
-5+ GENERIC SKIPS: Systematic dodging → flag.
-
-CIRCULAR CLAIMS: "Ran X which verifies X" with no output → reject.
-
-═══ DISPLAY ARTIFACTS — DO NOT PENALIZE ═══
-  • "[N more chars truncated]" — evidence cut for display; more real content exists.
-  • "printf '{...}'" — formatting shorthand; if output follows, command ran."""
-
-_EVIDENCE_TRUNCATE = 800
+_EVIDENCE_TRUNCATE = 1200
 _API_URL = "https://api.deepseek.com/chat/completions"
 _MODEL = "deepseek-chat"
 _TIMEOUT = 20  # legacy single-shot timeout (kept for compatibility)
@@ -267,15 +240,15 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
             write_ext = tool_summary.get("write_extensions", {})
             lines.append("File type summary:")
             lines.append("  Edited:  " + (
-                ", ".join(f"{e}\u00d7{n}" for e, n in sorted(edit_ext.items())) if edit_ext else "(none)"))
+                ", ".join(f"{e}x{n}" for e, n in sorted(edit_ext.items())) if edit_ext else "(none)"))
             lines.append("  Written: " + (
-                ", ".join(f"{e}\u00d7{n}" for e, n in sorted(write_ext.items())) if write_ext else "(none)"))
+                ", ".join(f"{e}x{n}" for e, n in sorted(write_ext.items())) if write_ext else "(none)"))
             lines.append(f"  Bash count: {tool_summary.get('bash_count', 0)}, "
                          f"Read count: {tool_summary.get('read_count', 0)}")
             lines.append("")
 
         # Sandbox execution log (tamper-evident: command + exit code + output)
-        sandbox_log = Path(".claude/data/sandbox_executions.json")
+        sandbox_log = Path.home() / ".claude/data/sandbox_executions.json"
         if sandbox_log.exists():
             try:
                 from datetime import datetime, timezone, timedelta
@@ -386,24 +359,48 @@ def _api_call(api_key: str, messages: list, json_mode: bool = False,
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
     }
-    try:
-        req = urllib.request.Request(_API_URL, data=body, headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            raw = resp.read().decode("utf-8")
-        response_data = json.loads(raw)
-        content = response_data["choices"][0]["message"]["content"]
-        return (True, content)
-    except urllib.error.HTTPError as exc:
-        return (False, f"http_error:{exc.code}")
-    except urllib.error.URLError as exc:
-        reason = str(exc.reason)
-        if "timed out" in reason.lower() or "timeout" in reason.lower():
-            return (False, "timeout")
-        return (False, f"url_error:{reason}")
-    except TimeoutError:
-        return (False, "timeout")
-    except Exception as exc:
-        return (False, f"verifier_error:{type(exc).__name__}")
+
+    last_error = ""
+    for attempt in range(2):  # 1 retry on transient errors
+        t0 = _time.monotonic()
+        try:
+            req = urllib.request.Request(_API_URL, data=body, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                raw = resp.read().decode("utf-8")
+            elapsed = _time.monotonic() - t0
+            print(f"[deepseek_verifier] API call {attempt+1}: {elapsed:.1f}s, ok=True",
+                  file=_sys.stderr)
+            response_data = json.loads(raw)
+            content = response_data["choices"][0]["message"]["content"]
+            return (True, content)
+        except urllib.error.HTTPError as exc:
+            elapsed = _time.monotonic() - t0
+            print(f"[deepseek_verifier] API call {attempt+1}: {elapsed:.1f}s, http_error={exc.code}",
+                  file=_sys.stderr)
+            # Retry on 429 or 5xx
+            if exc.code in (429, 500, 502, 503, 504) and attempt == 0:
+                last_error = f"http_error:{exc.code}"
+                _time.sleep(2)
+                continue
+            return (False, f"http_error:{exc.code}")
+        except (urllib.error.URLError, TimeoutError) as exc:
+            elapsed = _time.monotonic() - t0
+            reason = str(getattr(exc, 'reason', exc))
+            is_timeout = "timed out" in reason.lower() or "timeout" in reason.lower() or isinstance(exc, TimeoutError)
+            tag = "timeout" if is_timeout else f"url_error:{reason}"
+            print(f"[deepseek_verifier] API call {attempt+1}: {elapsed:.1f}s, {tag}",
+                  file=_sys.stderr)
+            if attempt == 0:
+                last_error = tag
+                _time.sleep(2)
+                continue
+            return (False, tag)
+        except Exception as exc:
+            elapsed = _time.monotonic() - t0
+            print(f"[deepseek_verifier] API call {attempt+1}: {elapsed:.1f}s, error={type(exc).__name__}",
+                  file=_sys.stderr)
+            return (False, f"verifier_error:{type(exc).__name__}")
+    return (False, last_error or "retry_exhausted")
 
 
 def _parse_verdict(content: str) -> dict | None:
@@ -539,8 +536,38 @@ def verify_with_deepseek(
                     "questions": question_text,
                 }
 
-            # Non-JSON, non-QUESTION response — try keyword fallback
-            # Note: "false" alone is too broad (matches benign text); require stronger signals
+            # Non-JSON, non-QUESTION response — retry once requesting JSON explicitly
+            history.append({"role": "assistant", "content": content})
+            history.append({"role": "user", "content": (
+                "Your previous response was not valid JSON. "
+                "Please respond ONLY with a JSON object: "
+                '{"approved": true|false, "verdict": "...", '
+                '"suspicious_steps": [...], "instructions": "..."}'
+            )})
+            ok2, content2 = _api_call(api_key, [
+                {"role": "system", "content": _SYSTEM_PROMPT},
+            ] + history, json_mode=True, timeout=_PER_TURN_TIMEOUT)
+            if ok2:
+                verdict2 = _parse_verdict(content2)
+                if verdict2 is not None:
+                    approved = bool(verdict2.get("approved", True))
+                    if state_path and state_path.exists():
+                        try:
+                            state_path.unlink()
+                        except Exception:
+                            pass
+                    return {
+                        "approved": approved,
+                        "verdict": str(verdict2.get("verdict", "")),
+                        "suspicious_steps": list(verdict2.get("suspicious_steps", [])),
+                        "instructions": str(verdict2.get("instructions", "")),
+                        "skipped": False,
+                        "skip_reason": "",
+                        "pending": False,
+                        "questions": "",
+                    }
+
+            # Final fallback: keyword detection
             lower = content.lower()
             if any(kw in lower for kw in ("suspicious", "rejected", "fabricated", "not approved", "insufficient evidence")):
                 return {

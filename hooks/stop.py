@@ -461,96 +461,27 @@ def check_upstream_sync(cwd=None):
 def _extract_transcript_context(input_data):
     """Extract files_modified, bash_commands, and last_user_prompt from transcript JSONL.
 
-    Only processes entries written AFTER the current task's verification reset_at
-    timestamp. This prevents tool calls from previous tasks in the same session
-    from contaminating the DeepSeek reviewer's ground truth context.
-
+    Delegates to vr_utils.parse_transcript for the heavy lifting.
     Returns (files_modified: list[str], bash_commands: list[str], last_user_prompt: str).
-    All fields are always returned; empty when transcript is unavailable.
     """
     transcript_path = input_data.get('transcript_path', '')
-    files_modified = []
-    bash_commands = []
-    last_user_prompt = ""
-
     if not transcript_path or not Path(transcript_path).exists():
-        return files_modified, bash_commands, last_user_prompt
+        return [], [], ""
 
-    # Determine task start time — prefer current_task.json (session-scoped, never
-    # clobbered by other sessions) over VR's reset_at (shared, can be overwritten).
+    # Determine task start time from current_task.json (authoritative source).
     task_start_ts = ""
     try:
         ct_data = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
         task_start_ts = ct_data.get("task_started_at", "")
     except Exception:
         pass
-    if not task_start_ts:
-        try:
-            vr_data = json.loads((Path.home() / ".claude/data/verification_record.json").read_text())
-            # Only trust VR reset_at if its session_id matches current_task's
-            _vr_sid = vr_data.get("session_id", "")
-            _ct_sid = ""
-            try:
-                _ct_sid = json.loads((Path.home() / ".claude/data/current_task.json").read_text()).get("session_id", "")
-            except Exception:
-                pass
-            if not _ct_sid or not _vr_sid or _vr_sid == _ct_sid:
-                task_start_ts = vr_data.get("reset_at", "")
-        except Exception:
-            pass  # If both unreadable, fall back to reading full transcript
 
     try:
-        with open(transcript_path, 'r') as _tf:
-            for _line in _tf:
-                _line = _line.strip()
-                if not _line:
-                    continue
-                try:
-                    _entry = json.loads(_line)
-                except json.JSONDecodeError:
-                    continue
-
-                # Skip entries from before the current task started
-                if task_start_ts:
-                    entry_ts = _entry.get("timestamp", "")
-                    if entry_ts and entry_ts < task_start_ts:
-                        continue
-
-                _msg = _entry.get("message", {})
-                _content = _msg.get("content", [])
-                _role = _msg.get("role", "")
-
-                if _role == "assistant" and isinstance(_content, list):
-                    for _block in _content:
-                        if not isinstance(_block, dict):
-                            continue
-                        if _block.get("type") == "tool_use":
-                            _name = _block.get("name", "")
-                            _inp = _block.get("input", {}) or {}
-                            if _name in ("Edit", "Write", "MultiEdit"):
-                                _fp = _inp.get("file_path", "")
-                                if _fp and _fp not in files_modified:
-                                    files_modified.append(_fp)
-                            elif _name == "Bash":
-                                _cmd = (_inp.get("command") or "").strip()
-                                if _cmd:
-                                    bash_commands.append(_cmd[:200])
-                elif _role == "user":
-                    if isinstance(_content, list):
-                        # Real user messages have type="text" blocks (not tool_result)
-                        for _block in _content:
-                            if isinstance(_block, dict) and _block.get("type") == "text":
-                                _text = (_block.get("text") or "").strip()
-                                if _text:
-                                    last_user_prompt = _text
-                    elif isinstance(_content, str) and _content.strip():
-                        last_user_prompt = _content.strip()
-    except Exception:
-        pass
-
-    # Keep only last 15 bash commands to stay within context budget
-    bash_commands = bash_commands[-30:]
-    return files_modified, bash_commands, last_user_prompt
+        sys.path.insert(0, str(Path(__file__).parent / "utils"))
+        from vr_utils import parse_transcript
+        return parse_transcript(transcript_path, task_start_ts)
+    except ImportError:
+        return [], [], ""
 
 
 def _get_session_task_type(session_id: str) -> str:
@@ -794,18 +725,24 @@ def check_stop_authorization():
 
 # ── Verification record helpers ────────────────────────────────────────────
 
-_VR_CHECKS_ORDER = [
-    ("tests",         "TESTS              "),
-    ("build",         "BUILD              "),
-    ("lint",          "LINT               "),
-    ("app_starts",    "APP STARTS         "),
-    ("api",           "CODE/SCRIPT/API EXECUTION"),
-    ("frontend",      "FRONTEND VALIDATION"),
-    ("happy_path",    "HAPPY PATH         "),
-    ("error_cases",   "ERROR CASES        "),
-    ("commit_push",   "COMMIT & PUSH      "),
-    ("upstream_sync", "UPSTREAM SYNC      "),
-]
+try:
+    sys.path.insert(0, str(Path(__file__).parent / "utils"))
+    from vr_utils import VR_CHECKS_ORDER as _VR_CHECKS_ORDER_RAW
+    # stop.py uses padded labels for display; pad the imported short labels
+    _VR_CHECKS_ORDER = [(k, label.ljust(25)) for k, label in _VR_CHECKS_ORDER_RAW]
+except ImportError:
+    _VR_CHECKS_ORDER = [
+        ("tests",         "TESTS                   "),
+        ("build",         "BUILD                   "),
+        ("lint",          "LINT                    "),
+        ("app_starts",    "APP STARTS              "),
+        ("api",           "CODE/SCRIPT/API EXECUTION"),
+        ("frontend",      "FRONTEND VALIDATION     "),
+        ("happy_path",    "HAPPY PATH              "),
+        ("error_cases",   "ERROR CASES             "),
+        ("commit_push",   "COMMIT & PUSH           "),
+        ("upstream_sync", "UPSTREAM SYNC           "),
+    ]
 
 _VR_RUN_CMDS = {
     "tests":
@@ -874,9 +811,14 @@ _VR_SKIP_CMDS = {
 
 
 def read_verification_record() -> dict:
-    """Read .claude/data/verification_record.json.
-    Returns all-pending default if missing, unreadable, or session mismatch."""
-    vr_file = Path.home() / ".claude/data/verification_record.json"
+    """Read task-scoped verification_record_{task_id}.json.
+    Returns all-pending default if missing or unreadable."""
+    try:
+        ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
+        task_id = ct.get("task_id", "default")
+    except Exception:
+        task_id = "default"
+    vr_file = Path.home() / f".claude/data/verification_record_{task_id}.json"
     all_pending = {
         k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
         for k, _ in _VR_CHECKS_ORDER
@@ -885,18 +827,6 @@ def read_verification_record() -> dict:
     try:
         with open(vr_file, 'r') as f:
             data = json.load(f)
-
-        # Session guard: if VR belongs to a different session, treat as empty
-        _vr_sid = data.get("session_id", "")
-        if _vr_sid:
-            try:
-                _ct_sid = json.loads(
-                    (Path.home() / ".claude/data/current_task.json").read_text()
-                ).get("session_id", "")
-                if _ct_sid and _ct_sid != _vr_sid:
-                    return default
-            except Exception:
-                pass  # If current_task unreadable, trust the VR as-is
 
         # Ensure all keys are present
         checks = data.get("checks", {})
@@ -948,7 +878,7 @@ def build_checklist_message(done_items: list, pending_items: list) -> str:
     step = 0
     for key, label, status, ts_short, ev_short in done_items:
         step += 1
-        mark = "✅" if status == "done" else "⏭ "
+        mark = "✅" if status in ("done", "passed") else "⏭ "
         ev_display = f' — "{ev_short}"' if ev_short else ""
         lines += [
             "",
@@ -1007,7 +937,7 @@ def format_evidence_display(done_items: list, checks: dict) -> str:
         else:
             full_ev = check_data.get("evidence") or ""
             ev_label = "Command output"
-        mark = "✅" if status == "done" else "⏭ "
+        mark = "✅" if status in ("done", "passed") else "⏭ "
         lines.append(f"{mark} Step {i}: {label.strip()}  [{status} @ {ts_short}]")
         lines.append(SEP)
         if full_ev:
@@ -1247,7 +1177,7 @@ Verify it, then stop.
         except Exception:
             pass
 
-        # VERIFICATION CHECKLIST CHECK — blocks stop if any of 8 items are pending
+        # VERIFICATION CHECKLIST CHECK — blocks stop if any of 10 items are pending
         _vr = read_verification_record()
         _vr_complete, _vr_done, _vr_pending = check_verification_complete(_vr)
         if not _vr_complete:
@@ -1301,7 +1231,7 @@ Verify it, then stop.
                 "=" * 70,
                 "",
                 "✅ Root folder is clean.",
-                "✅ All 8 verification checks completed.",
+                "✅ All 10 verification checks completed.",
                 "",
             ]
             if upstream_line:
@@ -1312,7 +1242,7 @@ Verify it, then stop.
                 _blocked_lines.append("")
             # Show each verified item with evidence
             for _vr_key, _vr_label, _vr_status, _vr_ts, _vr_ev in _vr_done:
-                _mark = "✅" if _vr_status == "done" else "⏭ "
+                _mark = "✅" if _vr_status in ("done", "passed") else "⏭ "
                 _ev_display = f' — "{_vr_ev}"' if _vr_ev else ""
                 _blocked_lines.append(
                     f"  {_mark} {_vr_label}  [{_vr_status} @ {_vr_ts}]{_ev_display}"
@@ -1420,7 +1350,12 @@ Verify it, then stop.
         # Reset verification record for next task — all items back to pending
         try:
             from datetime import datetime as _dt
-            _vr_file = Path.home() / ".claude/data/verification_record.json"
+            _task_id = "default"
+            try:
+                _task_id = json.loads((Path.home() / ".claude/data/current_task.json").read_text()).get("task_id", "default")
+            except Exception:
+                pass
+            _vr_file = Path.home() / f".claude/data/verification_record_{_task_id}.json"
             _all_pending = {
                 k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
                 for k, _ in _VR_CHECKS_ORDER

@@ -13,8 +13,9 @@ import argparse
 import json
 import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────
@@ -33,40 +34,7 @@ def _run(cmd: str, cwd: Path, timeout: int = 30) -> tuple[int, str, str]:
         return -1, "", str(e)
 
 
-def _write_vr(vr_file: Path, key: str, status: str, evidence: str) -> None:
-    """Atomically write one check entry to verification_record.json."""
-    try:
-        try:
-            record = json.loads(vr_file.read_text())
-        except Exception:
-            record = {"reset_at": datetime.now().isoformat(), "checks": {}}
-        # Session guard: prevent cross-session VR contamination
-        _cur_sid = None
-        try:
-            ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-            _cur_sid = ct.get("session_id")
-        except Exception:
-            pass
-        if _cur_sid and record.get("session_id") and record["session_id"] != _cur_sid:
-            record = {"reset_at": datetime.now().isoformat(), "session_id": _cur_sid, "checks": {}}
-        record.setdefault("checks", {})[key] = {
-            "status": status,
-            "evidence": evidence[:2000] if evidence else None,
-            "timestamp": datetime.now().isoformat(),
-            "skip_reason": None,
-        }
-        vr_file.write_text(json.dumps(record, indent=2))
-    except Exception:
-        pass  # Never block
-
-
-def _is_pending(vr_file: Path, key: str) -> bool:
-    """Return True if the check is currently pending in the record."""
-    try:
-        record = json.loads(vr_file.read_text())
-        return record.get("checks", {}).get(key, {}).get("status", "pending") == "pending"
-    except Exception:
-        return True  # Assume pending if can't read
+from vr_utils import write_vr as _write_vr, is_pending as _is_pending
 
 
 # ── Upstream sync ──────────────────────────────────────────────────────────
