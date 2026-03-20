@@ -301,6 +301,38 @@ existing["files_modified"] = files_modified
 context_file.write_text(json.dumps(existing, indent=2))
 REFRESH_EOF
 
+# Clear stale rejection history from DeepSeek state file.
+# Preserves state ONLY if there's a pending QUESTION awaiting an answer.
+# Without this, old rejection messages in the conversation history bias
+# DeepSeek to produce nearly identical rejections on re-runs, even when
+# the evidence has improved (the "cached response" problem).
+if [ -f "$DEEPSEEK_STATE" ]; then
+    python3 - "$DEEPSEEK_STATE" << 'STALE_EOF'
+import json, sys
+from pathlib import Path
+
+state_file = Path(sys.argv[1])
+try:
+    data = json.loads(state_file.read_text())
+    messages = data.get("messages", [])
+    # Keep state only if the last assistant message is a QUESTION (pending flow).
+    # For rejections, clear the file so the verifier starts a fresh conversation.
+    has_pending_question = (
+        len(messages) >= 2
+        and messages[-1].get("role") == "assistant"
+        and messages[-1].get("content", "").strip().startswith("QUESTION:")
+    )
+    if not has_pending_question:
+        state_file.unlink(missing_ok=True)
+except Exception:
+    # If state file is corrupt, just delete it
+    try:
+        state_file.unlink(missing_ok=True)
+    except Exception:
+        pass
+STALE_EOF
+fi
+
 if [ -f "$DEEPSEEK_VERIFIER" ]; then
     python3 "$DEEPSEEK_VERIFIER" \
         --vr-file "$VR_FILE" \

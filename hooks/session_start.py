@@ -130,6 +130,22 @@ def reset_verification_record(session_id: str = "unknown") -> None:
     except Exception:
         pass  # Graceful degradation — never block session start
 
+    # Clean up stale DeepSeek context and review state files from previous sessions.
+    # user_prompt_submit.py also does this, but session_start provides a belt-and-
+    # suspenders guarantee even if prompt-submit cleanup fails silently.
+    import glob as _glob
+    _claude_data = Path.home() / ".claude" / "data"
+    for _pattern in [
+        "deepseek_context.json",        # Legacy global file
+        "deepseek_context_*.json",       # Task-scoped context files
+        "deepseek_review_state_*.json",  # Task-scoped review state files
+    ]:
+        for _path_str in _glob.glob(str(_claude_data / _pattern)):
+            try:
+                Path(_path_str).unlink(missing_ok=True)
+            except Exception:
+                pass
+
 
 def load_development_context(source):
     """Load relevant development context based on session source."""
