@@ -56,10 +56,13 @@ if [ "$1" = "--skip" ]; then
     fi
     echo "✅ Frontend validation skipped"
 elif [ -n "$1" ]; then
-    # description mode
-    echo "$UPDATE_PY" | python3 - "$VR_FILE" "$CHECK_KEY" "passed" "None" "None"
+    # description mode — store $1 as evidence via tmpfile
+    TMPFILE=$(mktemp)
+    echo "$1" > "$TMPFILE"
+    echo "$UPDATE_PY" | python3 - "$VR_FILE" "$CHECK_KEY" "passed" "$TMPFILE" "None"
     if [ $? -ne 0 ]; then
         echo "❌ Failed to write verification record" >&2
+        rm -f "$TMPFILE"
         exit 1
     fi
     echo "✅ Frontend validation recorded (description mode)"
