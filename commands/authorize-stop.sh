@@ -33,6 +33,37 @@ from pathlib import Path
 auth_file = sys.argv[1]
 vr_file = sys.argv[2]
 
+# ── Session guard: verify VR belongs to current session ─────────────────────
+ct_file = str(Path.home() / ".claude/data/current_task.json")
+_cur_sid = None
+try:
+    import json as _j2
+    _cur_sid = _j2.loads(Path(ct_file).read_text()).get("session_id")
+except Exception:
+    pass
+
+try:
+    with open(vr_file) as f:
+        _vr_pre = json.load(f)
+except Exception:
+    _vr_pre = {}
+
+if _cur_sid and _vr_pre.get("session_id") and _vr_pre["session_id"] != _cur_sid:
+    print(f"\n⚠️  VR session mismatch: VR belongs to session {_vr_pre['session_id'][:8]}..., "
+          f"but current session is {_cur_sid[:8]}...")
+    print("   Another session overwrote the verification record.")
+    print("   Re-running checks will reset VR for the current session.\n")
+    # Reset VR for current session
+    _fresh = {
+        "reset_at": datetime.now().isoformat(),
+        "session_id": _cur_sid,
+        "checks": {},
+    }
+    with open(vr_file, "w") as f:
+        json.dump(_fresh, f, indent=2)
+    print("   VR reset for current session. Re-run your checks.\n")
+    sys.exit(1)
+
 # ── Verification record check ───────────────────────────────────────────────
 
 CHECKS_ORDER = [

@@ -30,11 +30,19 @@ if evidence_file and os.path.exists(evidence_file):
         os.unlink(evidence_file)
     except Exception:
         pass
+_cur_sid = None
+try:
+    with open(os.path.expanduser("~/.claude/data/current_task.json")) as _ctf:
+        _cur_sid = json.load(_ctf).get("session_id")
+except Exception:
+    pass
 try:
     with open(vr_file) as f:
         record = json.load(f)
 except Exception:
     record = {}
+if _cur_sid and record.get("session_id") and record["session_id"] != _cur_sid:
+    record = {"reset_at": datetime.now().isoformat(), "session_id": _cur_sid, "checks": {}}
 record.setdefault("checks", {})[check_key] = {
     "status": status,
     "timestamp": datetime.utcnow().isoformat() + "Z",

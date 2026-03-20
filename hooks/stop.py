@@ -476,14 +476,28 @@ def _extract_transcript_context(input_data):
     if not transcript_path or not Path(transcript_path).exists():
         return files_modified, bash_commands, last_user_prompt
 
-    # Determine task start time from verification record (reset_at field).
-    # Entries before this time belong to previous tasks — skip them.
+    # Determine task start time — prefer current_task.json (session-scoped, never
+    # clobbered by other sessions) over VR's reset_at (shared, can be overwritten).
     task_start_ts = ""
     try:
-        vr_data = json.loads((Path.home() / ".claude/data/verification_record.json").read_text())
-        task_start_ts = vr_data.get("reset_at", "")
+        ct_data = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
+        task_start_ts = ct_data.get("task_started_at", "")
     except Exception:
-        pass  # If VR unreadable, fall back to reading full transcript (old behavior)
+        pass
+    if not task_start_ts:
+        try:
+            vr_data = json.loads((Path.home() / ".claude/data/verification_record.json").read_text())
+            # Only trust VR reset_at if its session_id matches current_task's
+            _vr_sid = vr_data.get("session_id", "")
+            _ct_sid = ""
+            try:
+                _ct_sid = json.loads((Path.home() / ".claude/data/current_task.json").read_text()).get("session_id", "")
+            except Exception:
+                pass
+            if not _ct_sid or not _vr_sid or _vr_sid == _ct_sid:
+                task_start_ts = vr_data.get("reset_at", "")
+        except Exception:
+            pass  # If both unreadable, fall back to reading full transcript
 
     try:
         with open(transcript_path, 'r') as _tf:
@@ -861,7 +875,7 @@ _VR_SKIP_CMDS = {
 
 def read_verification_record() -> dict:
     """Read .claude/data/verification_record.json.
-    Returns all-pending default if missing or unreadable."""
+    Returns all-pending default if missing, unreadable, or session mismatch."""
     vr_file = Path.home() / ".claude/data/verification_record.json"
     all_pending = {
         k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
@@ -871,6 +885,19 @@ def read_verification_record() -> dict:
     try:
         with open(vr_file, 'r') as f:
             data = json.load(f)
+
+        # Session guard: if VR belongs to a different session, treat as empty
+        _vr_sid = data.get("session_id", "")
+        if _vr_sid:
+            try:
+                _ct_sid = json.loads(
+                    (Path.home() / ".claude/data/current_task.json").read_text()
+                ).get("session_id", "")
+                if _ct_sid and _ct_sid != _vr_sid:
+                    return default
+            except Exception:
+                pass  # If current_task unreadable, trust the VR as-is
+
         # Ensure all keys are present
         checks = data.get("checks", {})
         for k, _ in _VR_CHECKS_ORDER:
