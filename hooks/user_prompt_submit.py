@@ -28,6 +28,25 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).parent))
 
 
+def _record_task_start(session_id: str, prompt: str) -> None:
+    """Write current_task.json with reliable task-start timestamp.
+
+    This is the authoritative source for transcript filtering in authorize-stop.
+    Unlike the VR's reset_at, this file is NEVER overwritten by stop.py, so it
+    always reflects when the user actually started the current task.
+    """
+    task_file = Path.home() / ".claude/data/current_task.json"
+    try:
+        task_file.parent.mkdir(parents=True, exist_ok=True)
+        task_file.write_text(json.dumps({
+            "session_id": session_id,
+            "task_started_at": datetime.now().isoformat(),
+            "prompt": prompt[:500],
+        }, indent=2))
+    except Exception:
+        pass  # Never block prompt submission
+
+
 def _reset_verification_for_new_task(session_id: str) -> None:
     """Reset verification state at start of each new user prompt.
 
@@ -527,6 +546,9 @@ def main():
         # Extract session_id and prompt
         session_id = input_data.get('session_id', 'unknown')
         prompt = input_data.get('prompt', '')
+
+        # Record task start time (authoritative timestamp for transcript filtering)
+        _record_task_start(session_id, prompt)
 
         # Reset verification state for new task (per-prompt isolation)
         _reset_verification_for_new_task(session_id)

@@ -28,6 +28,7 @@ fi
 python3 - "$AUTH_FILE" "$VR_FILE" << 'PYEOF'
 import json, sys
 from datetime import datetime
+from pathlib import Path
 
 auth_file = sys.argv[1]
 vr_file = sys.argv[2]
@@ -239,12 +240,25 @@ if not transcript_path or not Path(transcript_path).exists():
     else:
         transcript_path = str(candidates[0]) if candidates else ""
 
-# Determine task start time from verification record
+# Determine task start time — prefer current_task.json (written by user_prompt_submit,
+# never clobbered by stop.py) over VR reset_at (which stop.py can overwrite mid-task).
 task_start_ts = ""
+current_task_file = Path.home() / ".claude/data/current_task.json"
 try:
-    task_start_ts = json.loads(vr_file.read_text()).get("reset_at", "")
+    ct = json.loads(current_task_file.read_text())
+    # Only use if session_id matches to prevent cross-session contamination
+    ct_session = ct.get("session_id", "")
+    cur_session = existing.get("session_id", "")
+    if ct_session and (not cur_session or ct_session == cur_session):
+        task_start_ts = ct.get("task_started_at", "")
 except Exception:
     pass
+# Fall back to VR reset_at if current_task.json unavailable or session mismatch
+if not task_start_ts:
+    try:
+        task_start_ts = json.loads(vr_file.read_text()).get("reset_at", "")
+    except Exception:
+        pass
 
 files_modified, bash_commands = [], []
 if transcript_path and Path(transcript_path).exists():

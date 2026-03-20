@@ -77,7 +77,7 @@
     "date": "2026-03-17",
     "source": "claude_code",
     "type": "friction",
-    "title": "Verification record path confusion — two files exist",
+    "title": "Verification record path confusion \u2014 two files exist",
     "description": "stop.py had several relative Path('.claude/data/...') paths that resolved incorrectly when CWD is ~/.claude. Fixed: stop.py lines 545, 1210, 1211, 1402, 1415, 1416 now all use Path.home() / '.claude/data/...' to be CWD-independent.",
     "status": "fixed",
     "fixed_date": "2026-03-20"
@@ -115,7 +115,7 @@
     "source": "claude_code",
     "type": "bug",
     "title": "DeepSeek reviewer confused about project context",
-    "description": "authorize-stop DeepSeek reviewer entered infinite rejection loop after confusing kroger-mcp project with Deepseek_Agent_MCP — started requesting '672 tests' and referencing wrong directory. State from a prior session bled into the reviewer causing it to reject valid evidence from the correct project.",
+    "description": "authorize-stop DeepSeek reviewer entered infinite rejection loop after confusing kroger-mcp project with Deepseek_Agent_MCP \u2014 started requesting '672 tests' and referencing wrong directory. State from a prior session bled into the reviewer causing it to reject valid evidence from the correct project.",
     "status": "pending"
   },
   {
@@ -161,8 +161,26 @@
     "source": "claude_code",
     "type": "bug",
     "title": "Path mismatch: authorize-stop.sh and stop hook reading different stop_authorization.json",
-    "description": "Reported mismatch between authorize-stop.sh ($HOME/.claude/data/stop_authorization.json) and stop.py (.claude/data/stop_authorization.json relative). Already fixed: stop.py line 766 uses Path.home() / '.claude/data/stop_authorization.json' — same as authorize-stop.sh.",
+    "description": "Reported mismatch between authorize-stop.sh ($HOME/.claude/data/stop_authorization.json) and stop.py (.claude/data/stop_authorization.json relative). Already fixed: stop.py line 766 uses Path.home() / '.claude/data/stop_authorization.json' \u2014 same as authorize-stop.sh.",
     "status": "already-fixed",
     "fixed_date": "prior"
+  },
+  {
+    "id": "IMP-019",
+    "date": "2026-03-20",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "DeepSeek reviewer conflates prior session git history with current session",
+    "description": "The DeepSeek reviewer in authorize-stop sees commit SHAs and file modifications from PRIOR sessions (visible in git status snapshot) and incorrectly concludes that the CURRENT session modified those files. This causes infinite rejection loops for read-only Q&A sessions. The reviewer should only consider tool calls made in the current conversation, not the pre-existing git status.",
+    "status": "pending"
+  },
+  {
+    "id": "IMP-020",
+    "date": "2026-03-20",
+    "source": "claude_code",
+    "type": "bug",
+    "title": "DeepSeek reviewer sees prior-session bash commands in context causing false contradictions",
+    "description": "authorize-stop.sh REFRESH_EOF block extracts bash_commands from the full transcript but the task_start_ts filter doesn't work reliably \u2014 it includes bash commands from prior sessions (e.g., git commits, python runs) that predate the current task. DeepSeek then sees SHA/file edits it thinks are from the current session and flags contradictions with skip reasons. Fix: filter transcript entries strictly by reset_at timestamp from VR, or pass session_id and only include entries from the current session JSONL.",
+    "status": "pending"
   }
 ]
