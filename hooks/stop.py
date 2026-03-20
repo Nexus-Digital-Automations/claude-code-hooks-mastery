@@ -763,7 +763,7 @@ def check_stop_authorization():
     Check if stop is authorized via file-based configuration.
     Returns True if authorized, False otherwise.
     """
-    auth_file = Path(".claude/data/stop_authorization.json")
+    auth_file = Path.home() / ".claude/data/stop_authorization.json"
 
     # If file doesn't exist, default to NOT authorized (blocked)
     if not auth_file.exists():
@@ -1296,7 +1296,7 @@ Verify it, then stop.
             sys.exit(2)  # Exit code 2 blocks stop
 
         # ── Two-phase security scan gate ──────────────────────────────────────
-        _auth_file = Path(".claude/data/stop_authorization.json")
+        _auth_file = Path.home() / ".claude/data/stop_authorization.json"
         _scan_complete = False
         _prior_report = None
         try:
