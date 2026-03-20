@@ -119,13 +119,21 @@ For any task described as "build X", "create X", "implement X", or containing a 
 The WORK CONTEXT section at the top contains:
   • Last task: what the user asked the agent to do
   • Last assistant message: what Claude CLAIMED to have done (unverified)
-  • Files actually modified: paths from Edit/Write tool calls (CANNOT be faked)
-  • Bash commands actually run: commands from Bash tool calls (CANNOT be faked)
+  • Files actually modified: paths from Edit/Write tool calls (may include prior tasks)
+  • Bash commands actually run: commands from Bash tool calls (may include prior tasks)
   • File type summary: extension counts (secondary signal)
 
-Cross-reference agent claims against these facts. Contradictions = suspicious.
-"Ran pytest" but no pytest appears in bash history → ask or reject.
-"No frontend files" but .tsx/.jsx appear in files_modified → suspicious.
+⚠️  IMPORTANT LIMITATION: files_modified and bash_commands are extracted from the full
+session transcript, which spans multiple tasks. They may include files edited and commands
+run in PRIOR tasks during the same long-running session — not just the current task.
+Use them ONLY to support plausible claims. Do NOT use them to contradict skip reasons
+unless the discrepancy is extreme (e.g., .tsx files modified but agent claims no frontend
+was involved at all). A commit SHA in bash history from an earlier task does NOT mean code
+was committed in the current task.
+
+Cross-reference agent claims against these facts only when the signal is clear:
+"Ran pytest" but no pytest anywhere in bash history across the whole session → ask.
+"No frontend files" but .tsx/.jsx appear in files_modified → ask (may be from prior task).
 
 If files_modified and bash_commands are marked "transcript tracking unavailable":
 this means the session transcript could not be parsed, NOT that nothing was done.
@@ -218,16 +226,21 @@ Pivot to coverage gaps if any remain.
 The user message begins with a WORK CONTEXT section containing:
   • Last task: what the user asked Claude to do
   • Last assistant message: what Claude CLAIMED to have done (unverified)
-  • Files actually modified: paths from Edit/Write tool calls (CANNOT be faked)
-  • Bash commands actually run: commands from Bash tool calls (CANNOT be faked)
+  • Files actually modified: paths from Edit/Write tool calls (may span multiple tasks)
+  • Bash commands actually run: commands from Bash tool calls (may span multiple tasks)
   • File type summary: extension counts (secondary signal)
 
-The "Files actually modified" and "Bash commands actually run" lists are extracted
-from the raw session transcript. The agent CANNOT fake these. Use them to:
-  • Verify skip reasons: "no frontend" + no .tsx/.jsx in files modified → credible
-  • Detect lies: "ran pytest" but no pytest command appears in bash history → suspicious
-  • Detect source-reading disguised as validation: grep/cat/read commands ≠ running tests
-  • Identify project type from actual file paths (e.g., hooks/stop.py → Python hook project)
+⚠️  MULTI-TASK SESSION CAVEAT: files_modified and bash_commands come from the full
+session transcript and may include activity from prior tasks. A file edited or command
+run 30 minutes ago in a different task will still appear here. Do NOT conclude that
+the agent modified a file or ran a command in the CURRENT task just because it appears
+in these lists — use them as supporting context, not as contradiction evidence.
+
+The lists are still useful for:
+  • Verify skip reasons: "no frontend" + zero .tsx/.jsx anywhere in session → credible
+  • Detect implausible gaps: "ran pytest" but zero test-runner commands in entire session
+  • Identify project type from file paths (e.g., hooks/stop.py → Python hook project)
+  • Detect source-reading disguised as validation: only grep/cat/read, never test runner
 
 ═══ STEP 2: EVALUATE SKIPPED CHECKS ═══
 A skip is valid ONLY when the check genuinely does not apply to this project.
@@ -586,7 +599,7 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
         # Actual files modified this session (ground truth from transcript)
         files_modified = context.get("files_modified") or []
         if files_modified:
-            lines.append("Files actually modified this session (from Edit/Write tool calls):")
+            lines.append("Files modified in session transcript (may include prior tasks — see caveat above):")
             for f in files_modified[:30]:
                 lines.append(f"  {f}")
             lines.append("")
@@ -600,7 +613,7 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
         # Bash commands run this session (ground truth from transcript)
         bash_cmds = context.get("bash_commands") or []
         if bash_cmds:
-            lines.append("Bash commands actually run this session (last 30):")
+            lines.append("Bash commands from session transcript — last 30 (may include prior tasks — see caveat above):")
             for cmd in bash_cmds:
                 lines.append(f"  $ {cmd}")
             lines.append("")
@@ -676,7 +689,7 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
         if status == "skipped":
             display = skip_reason[:_EVIDENCE_TRUNCATE]
             lines.append(f"Skip reason: {display!r}")
-        elif status == "done":
+        elif status in ("done", "passed"):
             display = evidence[:_EVIDENCE_TRUNCATE]
             lines.append(f"Evidence: {display!r}")
         else:
