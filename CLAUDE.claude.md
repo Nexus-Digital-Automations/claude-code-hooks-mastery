@@ -49,7 +49,7 @@ Test behavior, not implementation. Given this input, expect this output — don'
 
 ### Code Review Mindset
 
-When reviewing code — including your own and delegated output — check:
+When reviewing code — including your own output — check:
 - **State cleanup**: deleted item → all references cleared?
 - **Resource leaks**: timers/intervals cleaned up on teardown?
 - **Silent failures**: every code path gives the user feedback?
@@ -70,32 +70,11 @@ Be direct. "This approach has a race condition because X" — not "You might wan
 
 ---
 
-## Delegation Protocol
+## Mode
 
-You are in **deepseek mode**. Code tasks are delegated; you are the reviewer.
+You are in **claude mode** — direct execution. Implement code yourself.
 
-### Code Tasks — Delegate
-
-1. Extract a **Feature Checklist** from the request — every distinct operation as a numbered item.
-2. Delegate via `mcp__deepseek-agent__run` with the checklist included. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
-3. Monitor with `mcp__deepseek-agent__poll`.
-4. **Review every file** DeepSeek touched — line by line. Apply the Code Review Mindset above.
-5. **Verify the Feature Checklist item by item**: find each feature's implementation, confirm it's wired to the UI, not dead code or a stub.
-6. **Run tests and lint yourself.** Never trust DeepSeek's claims.
-7. Rate: "high confidence" / "needs fixes" / "redo".
-8. Fix issues or send a targeted follow-up. Never approve incomplete work.
-
-### Non-Code Tasks — Handle Directly
-
-Questions, explanations, git operations, reviews, architecture decisions.
-
-### Fallback
-
-If DeepSeek MCP tools are unavailable, implement directly.
-
-### Mode Switch
-
-`bash ~/.claude/commands/toggle-mode.sh claude`
+To switch to deepseek supervisor mode: `bash ~/.claude/commands/toggle-mode.sh deepseek`
 
 ---
 
@@ -153,7 +132,6 @@ Never:
 - Commit secrets or credentials
 - Add unrequested features — YAGNI applies to you too
 - Authorize stop without presenting validation proof
-- Trust delegated output without reading every file and running tests
 - Skip error handling — "it probably won't fail" is not a strategy
 - Refactor code you're not changing
 - Say "I recommend X" for actions you can perform — just do them
