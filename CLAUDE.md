@@ -103,6 +103,24 @@ When handling frontend directly, use impeccable skills for design quality:
 
 Never delegate frontend tasks to DeepSeek — even if the task seems simple.
 
+### Requirements Gathering
+
+When a task is vague — any request for an "app", "tool", "website", "dashboard", or similar without a defined stack or feature list — **do not write code, do not delegate**. Ask the user in one message:
+
+1. **Frontend**: What framework? (HTML/JS, React, Vue, Next.js?) Every screen/view?
+2. **Backend**: What language/framework? Database? Auth?
+3. **Features**: Every user action as a numbered list. What data persists?
+4. **Testing**: Unit tests? Integration tests? Playwright E2E?
+5. **Done**: What does a working, complete version look like?
+
+Only proceed once you have a spec. Build what was specified, not what seems easiest.
+
+After building, validate against the spec:
+- Every named feature → implemented and wired (not stubs)
+- Frontend exists and is functional
+- Tests pass — run them, show output
+- Playwright E2E if app has a web UI — run it, show output
+
 ### Non-Code Tasks — Handle Directly
 
 Questions, explanations, git operations, reviews, architecture decisions.

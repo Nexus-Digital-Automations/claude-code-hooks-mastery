@@ -468,6 +468,61 @@ def _is_backend_task(prompt: str) -> bool:
     return False
 
 
+_APP_KEYWORDS = {
+    "app", "application", "website", "web app", "webapp", "web tool",
+    "site", "portal", "platform", "tool", "dashboard", "interface",
+    "full stack", "fullstack", "full-stack", "build me", "make me", "create a",
+}
+
+_CLARIFY_FIRST_DIRECTIVE = """\
+⚠️ REQUIREMENTS GATHERING REQUIRED — Do NOT write code yet ⚠️
+
+This task describes an app or tool but lacks a spec. Before delegating to DeepSeek \
+or writing a single line of code, you MUST ask the user these questions in one message:
+
+1. FRONTEND — What UI do you want?
+   • Plain HTML/CSS/JS? React? Vue? Next.js? Other?
+   • List every screen or view (e.g. "list view, add card form, study mode")
+   • Any design requirements? (mobile-first, dark mode, specific colors?)
+
+2. BACKEND — What server/language/framework?
+   • Python (FastAPI/Flask/Django)? Node (Express)? Other?
+   • Database? (SQLite, PostgreSQL, none?) Any auth?
+
+3. FEATURES — What exactly must the app do?
+   • Write out every user action as a numbered list
+   • What data is stored and how does it persist?
+
+4. TESTING — What level of coverage is expected?
+   • Unit tests? Integration tests? Playwright E2E tests?
+   • Any specific workflows to test end-to-end?
+
+5. "DONE" — What does a complete, working app look like to you?
+   • Any acceptance criteria? Screenshots of reference apps?
+
+Do NOT start until you have answers. A precise spec prevents wasted work.\
+"""
+
+
+_EXPLICIT_FRONTEND = re.compile(
+    r'\b(react|vue|angular|svelte|nextjs|next\.js|nuxt|jsx|tsx|tailwind|html|css|scss|frontend|front-end)\b'
+)
+
+
+def _needs_clarification(prompt: str) -> bool:
+    """Detect vague app/tool tasks that need requirements gathered before starting."""
+    prompt_lower = prompt.lower()
+    # Must contain an app/tool keyword to even consider clarification
+    if not any(kw in prompt_lower for kw in _APP_KEYWORDS):
+        return False
+    # Already has explicit backend or frontend tech signals — specified enough
+    if _is_backend_task(prompt):
+        return False
+    if _EXPLICIT_FRONTEND.search(prompt_lower):
+        return False
+    return True
+
+
 def build_deepseek_delegation_directive(prompt, mode_config):
     """Returns a DeepSeek delegation directive string, or None for non-delegatable prompts."""
     prompt_stripped = prompt.strip()
@@ -480,6 +535,10 @@ def build_deepseek_delegation_directive(prompt, mode_config):
     }
     if prompt_stripped.lower() in trivial:
         return None
+
+    # --- Vague app/tool tasks: gather requirements first ---
+    if _needs_clarification(prompt):
+        return _CLARIFY_FIRST_DIRECTIVE
 
     # --- Frontend/backend task routing ---
     is_frontend = _is_frontend_task(prompt)
