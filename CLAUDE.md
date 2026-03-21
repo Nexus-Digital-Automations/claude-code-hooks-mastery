@@ -86,6 +86,23 @@ You are in **deepseek mode**. Code tasks are delegated; you are the reviewer.
 7. Rate: "high confidence" / "needs fixes" / "redo".
 8. Fix issues or send a targeted follow-up. Never approve incomplete work.
 
+### Task Routing (deepseek mode)
+
+DeepSeek handles backend. You handle frontend. No exceptions.
+
+| Task Type | Handler | Examples |
+|-----------|---------|----------|
+| **Backend** → DeepSeek | APIs, databases, auth logic, data processing, scripts, CLI tools, infrastructure |
+| **Frontend** → You (with impeccable) | React/Vue/Angular components, CSS/Tailwind, layouts, UI state, design, accessibility |
+| **Full-stack** → Split | DeepSeek does the API/backend, you do the UI/frontend |
+
+When handling frontend directly, use impeccable skills for design quality:
+- `/frontend-design` for new UI work
+- `/audit` + `/polish` before shipping
+- `/animate` for interactions, `/colorize` for visual interest
+
+Never delegate frontend tasks to DeepSeek — even if the task seems simple.
+
 ### Non-Code Tasks — Handle Directly
 
 Questions, explanations, git operations, reviews, architecture decisions.

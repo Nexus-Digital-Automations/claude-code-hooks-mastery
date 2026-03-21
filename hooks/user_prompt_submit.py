@@ -9,6 +9,7 @@
 import argparse
 import json
 import os
+import re
 import sys
 import uuid
 from pathlib import Path
@@ -29,17 +30,19 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).parent))
 
 
-def _record_task_start(session_id: str, prompt: str) -> tuple:
+def _record_task_start(session_id: str, prompt: str, working_dir: str = "") -> tuple:
     """Write current_task.json with reliable task-start timestamp and task_id.
 
     Generates a unique task_id (UUID) for state isolation. If this is a follow-up
     prompt in the same session with non-pending VR checks, preserves the existing
     task_id to prevent authorize-stop → re-prompt → new task_id cycles (IMP-017).
 
+    A working_dir change within the same session forces a new task (even if VR
+    has progress) to prevent cross-project contamination.
+
     Returns (task_id, is_followup) tuple.
     """
     task_file = Path.home() / ".claude/data/current_task.json"
-    vr_file = Path.home() / ".claude/data/verification_record.json"
     existing_task_id = None
     is_followup = False
     existing_data = {}
@@ -52,18 +55,25 @@ def _record_task_start(session_id: str, prompt: str) -> tuple:
             try:
                 existing_data = json.loads(task_file.read_text())
                 if existing_data.get("session_id") == session_id:
-                    # Same session — check if VR has work in progress
-                    if vr_file.exists():
-                        vr = json.loads(vr_file.read_text())
-                        checks = vr.get("checks", {})
-                        has_progress = any(
-                            c.get("status") != "pending"
-                            for c in checks.values()
-                            if isinstance(c, dict)
-                        )
-                        if has_progress:
-                            existing_task_id = existing_data.get("task_id")
-                            is_followup = True
+                    # Project switch = new task, regardless of VR progress
+                    old_wd = existing_data.get("working_dir", "")
+                    if old_wd and working_dir and old_wd != working_dir:
+                        pass  # is_followup stays False, existing_task_id stays None
+                    else:
+                        # Same project — check if VR has work in progress
+                        _existing_tid = existing_data.get("task_id", "default")
+                        vr_file = Path.home() / f".claude/data/verification_record_{_existing_tid}.json"
+                        if vr_file.exists():
+                            vr = json.loads(vr_file.read_text())
+                            checks = vr.get("checks", {})
+                            has_progress = any(
+                                c.get("status") != "pending"
+                                for c in checks.values()
+                                if isinstance(c, dict)
+                            )
+                            if has_progress:
+                                existing_task_id = existing_data.get("task_id")
+                                is_followup = True
             except Exception:
                 pass
 
@@ -71,6 +81,7 @@ def _record_task_start(session_id: str, prompt: str) -> tuple:
         task_file.write_text(json.dumps({
             "task_id": task_id,
             "session_id": session_id,
+            "working_dir": working_dir,
             "task_started_at": (
                 existing_data.get("task_started_at")
                 if is_followup
@@ -99,7 +110,7 @@ def _reset_verification_for_new_task(session_id: str, task_id: str,
     if is_followup:
         return  # Preserve existing VR state for follow-up prompts
 
-    vr_file = Path.home() / ".claude/data/verification_record.json"
+    vr_file = Path.home() / f".claude/data/verification_record_{task_id}.json"
     try:
         vr_file.parent.mkdir(parents=True, exist_ok=True)
         all_pending = {
@@ -420,6 +431,43 @@ Automatically tracked by Claude Code UserPromptSubmit hook.
         f.write(entry)
 
 
+_FRONTEND_KEYWORDS = {
+    "react", "vue", "angular", "svelte", "nextjs", "next.js", "nuxt",
+    "component", "jsx", "tsx", "css", "scss", "tailwind", "styled-components",
+    "frontend", "front-end", "ui", "ux", "layout", "responsive", "html",
+    "design", "style", "animation", "modal", "form", "button", "navbar",
+    "sidebar", "dashboard", "page", "widget", "theme", "dark mode",
+}
+
+_BACKEND_KEYWORDS = {
+    "api", "endpoint", "database", "migration", "auth", "middleware",
+    "server", "backend", "back-end", "rest", "graphql", "grpc",
+    "celery", "queue", "worker", "cron", "cli", "script",
+    "sql", "orm", "model", "schema", "redis", "kafka",
+    "docker", "terraform", "infrastructure", "deploy",
+}
+
+
+def _is_frontend_task(prompt: str) -> bool:
+    """Detect if prompt describes frontend/UI work."""
+    prompt_lower = prompt.lower()
+    if any(kw in prompt_lower for kw in _FRONTEND_KEYWORDS):
+        return True
+    if re.search(r'\.(tsx|jsx|vue|svelte|css|scss|html)\b', prompt_lower):
+        return True
+    return False
+
+
+def _is_backend_task(prompt: str) -> bool:
+    """Detect if prompt describes backend/systems work."""
+    prompt_lower = prompt.lower()
+    if any(kw in prompt_lower for kw in _BACKEND_KEYWORDS):
+        return True
+    if re.search(r'\.(py|go|rs|java|rb|sql)\b', prompt_lower):
+        return True
+    return False
+
+
 def build_deepseek_delegation_directive(prompt, mode_config):
     """Returns a DeepSeek delegation directive string, or None for non-delegatable prompts."""
     prompt_stripped = prompt.strip()
@@ -433,7 +481,25 @@ def build_deepseek_delegation_directive(prompt, mode_config):
     if prompt_stripped.lower() in trivial:
         return None
 
-    # Check delegation policy against task type
+    # --- Frontend/backend task routing ---
+    is_frontend = _is_frontend_task(prompt)
+    is_backend = _is_backend_task(prompt)
+
+    if is_frontend and not is_backend:
+        # Pure frontend: handle directly, no delegation
+        return ("TASK ROUTING: This is a frontend task. "
+                "Handle it yourself — do NOT delegate to DeepSeek. "
+                "DeepSeek is weak at frontend/UI work. "
+                "Use impeccable skills (/frontend-design, /audit, /polish) for design quality.")
+
+    if is_frontend and is_backend:
+        # Mixed: split the work
+        return ("TASK ROUTING: This is a full-stack task. "
+                "Delegate the backend/API portion to DeepSeek via mcp__deepseek-agent__run. "
+                "Handle the frontend/UI portion yourself using impeccable skills. "
+                "DeepSeek is not good at frontend work.")
+
+    # --- Standard delegation policy check ---
     policy = mode_config.get('delegation_policy', {})
     task_type = classify_task_type(prompt)
 
@@ -598,7 +664,7 @@ def main():
         prompt = input_data.get('prompt', '')
 
         # Record task start time (authoritative timestamp for transcript filtering)
-        task_id, is_followup = _record_task_start(session_id, prompt)
+        task_id, is_followup = _record_task_start(session_id, prompt, input_data.get('cwd', ''))
 
         # Reset verification state for new task (per-prompt isolation)
         # Skips reset if this is a follow-up prompt with existing check progress
