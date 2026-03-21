@@ -1163,6 +1163,7 @@ Verify it, then stop.
                 "bash_commands": _bash_cmds,
                 "transcript_path": input_data.get("transcript_path", ""),
                 "session_id": input_data.get("session_id", ""),
+                "transcript_available": bool(input_data.get("transcript_path", "")),
             }
             (Path.home() / ".claude/data").mkdir(parents=True, exist_ok=True)
             # Write task-scoped context file (keyed by task_id from current_task.json)

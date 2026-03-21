@@ -298,6 +298,72 @@ def run_gate1_check(auth_file: str, vr_file: str) -> None:
     print("\n".join(lines))
 
 
+# ── Auto-skip for design/analysis tasks ──────────────────────────────────
+
+_DESIGN_TASK_SKIPPABLE = {
+    "tests", "build", "app_starts", "api", "frontend",
+    "happy_path", "error_cases", "commit_push",
+}
+
+
+def auto_skip_design_task(vr_file: str, context_file: str | None = None) -> int:
+    """Auto-skip pending checks when transcript confirms no files were modified.
+
+    Returns number of checks skipped.  Returns 0 if files were modified or
+    transcript is unavailable (ambiguous — don't auto-skip).
+    """
+    vr_path = Path(vr_file)
+
+    # Determine transcript path
+    transcript_path = ""
+    task_start_ts = ""
+    if context_file and Path(context_file).exists():
+        try:
+            ctx = json.loads(Path(context_file).read_text())
+            transcript_path = ctx.get("transcript_path", "")
+            task_start_ts = ctx.get("task_started_at", "")
+        except Exception:
+            pass
+
+    if not transcript_path:
+        candidates = sorted(
+            Path.home().glob(".claude/projects/**/*.jsonl"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        transcript_path = str(candidates[0]) if candidates else ""
+
+    # Ambiguous — transcript file doesn't exist, don't auto-skip
+    if not transcript_path or not Path(transcript_path).exists():
+        return 0
+
+    if not task_start_ts:
+        try:
+            ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
+            task_start_ts = ct.get("task_started_at", "")
+        except Exception:
+            pass
+        if not task_start_ts:
+            try:
+                task_start_ts = json.loads(vr_path.read_text()).get("reset_at", "")
+            except Exception:
+                pass
+
+    files_modified, _, _ = parse_transcript(transcript_path, task_start_ts)
+
+    # Normal coding task — don't skip anything
+    if files_modified:
+        return 0
+
+    # Design/analysis task — auto-skip pending checks
+    skipped = 0
+    for key in _DESIGN_TASK_SKIPPABLE:
+        if is_pending(vr_path, key):
+            write_vr(vr_path, key, "skipped", "no files modified — design/analysis task")
+            skipped += 1
+    return skipped
+
+
 # ── Context refresh (used by authorize-stop.sh) ──────────────────────────
 
 def refresh_deepseek_context(context_file: str, vr_file: str) -> None:
@@ -343,6 +409,7 @@ def refresh_deepseek_context(context_file: str, vr_file: str) -> None:
 
     existing["bash_commands"] = bash_commands
     existing["files_modified"] = files_modified
+    existing["transcript_available"] = bool(transcript_path and Path(transcript_path).exists())
     context_path.write_text(json.dumps(existing, indent=2))
 
 

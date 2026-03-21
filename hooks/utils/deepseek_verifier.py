@@ -91,6 +91,15 @@ If a topic was asked about AND answered in conversation history, that topic is C
 Do NOT re-ask. Either accept the answer or explain what's still insufficient.
 After one authenticity challenge is answered, switch to COVERAGE only.
 
+═══ PROPORTIONAL SCRUTINY ═══
+Match your scrutiny to the task's complexity and risk:
+- Config toggles, mode switches, settings changes → MINIMAL scrutiny. If the
+  command ran and produced expected output, approve. Do not demand multi-step
+  verification for trivial operations.
+- Bug fixes, feature additions → MODERATE scrutiny. Standard evidence checks.
+- Production deployments, security changes → HIGH scrutiny. Full evidence.
+Do NOT apply production-deployment-level scrutiny to a config toggle.
+
 ═══ FEATURE COMPLETENESS (for "build/create/implement X" tasks only) ═══
 For tasks with a feature list: extract features from "Last task", verify each has
 implementation evidence. If ANY feature has ZERO evidence → reject with:
@@ -111,6 +120,12 @@ For HOOKS_SCRIPTS projects (important — this is common):
   - py_compile passing = sufficient for "tests" when no test suite exists
   - shellcheck or bash -n = sufficient LINT but NOT execution (see API check)
   - absence of ESLint is expected — do not flag
+  - Config toggles (mode switches, settings changes) with idempotent results are
+    trivial tasks — do NOT demand extensive evidence. If the script ran and
+    produced expected output, that is sufficient for ALL applicable checks.
+  - For config-only repos (~/.claude, dotfiles): most checks (TESTS, BUILD, LINT,
+    APP STARTS, FRONTEND) are correctly skipped. Accept "dotfiles config repo"
+    or "no test suite/build/app exists" as valid skip reasons without challenge.
 
 For VANILLA_JS projects:
   - Custom node/JSDOM test scripts with per-feature pass/fail = genuine
@@ -161,13 +176,18 @@ GENUINE: Error trigger with output, pytest with error-scenario test names, curl 
 NOT GENUINE: "error handling exists in source", "try/except block present".
 
 ── COMMIT & PUSH ──
-MANDATORY for any task that modifies files. The agent MUST commit and push.
-The user does NOT need to ask — commits are automatic after every coding task.
+Expected after coding tasks that produce net file changes.
 REJECT IMMEDIATELY if skipped with ANY variation of:
   "user did not request", "user didn't ask", "not requested", "changes are local",
   "not asked to commit", "user hasn't asked", "no request to commit"
-VALID skip reasons ONLY: "no files modified", "read-only task", "pure research task",
-  "no changes to commit" — i.e., genuinely nothing to commit.
+VALID skip reasons (accept any of these — do NOT challenge further):
+  "no files modified", "read-only task", "pure research task",
+  "no changes to commit", "no net changes", "idempotent operation",
+  "changes reverted", "git diff shows zero changes",
+  "config-only change — no code modified",
+  "dotfiles/config repo — no application code changed"
+Key principle: if git diff confirms zero changes, there is genuinely nothing
+to commit. Do NOT demand a commit when the working tree is clean.
 
 ── UPSTREAM SYNC ──
 Valid skip: "not a fork", "no upstream remote". Auto-checked.
@@ -209,15 +229,19 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
         ]
 
         # Actual files modified this session (ground truth from transcript)
+        transcript_available = context.get("transcript_available", False)
         files_modified = context.get("files_modified") or []
         if files_modified:
             lines.append("Files actually modified this session (from Edit/Write tool calls):")
             for f in files_modified[:30]:
                 lines.append(f"  {f}")
             lines.append("")
+        elif transcript_available:
+            lines.append("Files actually modified this session: NONE (confirmed — "
+                         "transcript parsed, no Edit/Write tool calls found. "
+                         "This is a design/analysis/research task.)")
+            lines.append("")
         else:
-            # Empty list means transcript tracking unavailable for this session,
-            # NOT that no files were modified. Do not include as negative signal.
             lines.append("Files actually modified: (transcript tracking unavailable — "
                          "do NOT interpret as 'no files edited')")
             lines.append("")
@@ -228,6 +252,10 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
             lines.append("Bash commands actually run this session (last 30):")
             for cmd in bash_cmds:
                 lines.append(f"  $ {cmd}")
+            lines.append("")
+        elif transcript_available:
+            lines.append("Bash commands run this session: NONE (confirmed — "
+                         "transcript parsed, no Bash tool calls found.)")
             lines.append("")
         else:
             lines.append("Bash commands run: (transcript tracking unavailable — "

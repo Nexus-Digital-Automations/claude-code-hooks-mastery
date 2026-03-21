@@ -21,6 +21,16 @@ if [ -f "$STATIC_CHECKER" ]; then
     python3 "$STATIC_CHECKER" --vr-file "$VR_FILE" --only-pending 2>/dev/null || true
 fi
 
+# Auto-skip non-static checks for design/analysis tasks (no files modified)
+CONTEXT_FILE_EARLY="$HOME/.claude/data/deepseek_context_${TASK_ID}.json"
+python3 -c "
+import sys; sys.path.insert(0, '$VR_UTILS')
+from vr_utils import auto_skip_design_task
+skipped = auto_skip_design_task('$VR_FILE', '$CONTEXT_FILE_EARLY')
+if skipped:
+    print(f'  Design/analysis task — auto-skipped {skipped} checks (no files modified)')
+" 2>/dev/null || true
+
 # Auto-run registered dynamic checks
 DYNAMIC_VALIDATOR="$HOME/.claude/hooks/utils/dynamic_validator.py"
 DC_FILE_PATH="$HOME/.claude/data/dynamic_checks.json"
