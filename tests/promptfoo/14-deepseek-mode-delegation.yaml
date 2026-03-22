@@ -348,4 +348,57 @@ tests:
         threshold: 0.75
         metric: "frontend_stays_local_not_delegated"
 
+  - description: "deepseek + security task → Claude Code handles directly"
+    vars:
+      mode: "deepseek"
+      user_task: "Run a security audit on the authentication module and fix any vulnerabilities"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## Delegation Protocol
+        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        ### Division of Labor
+        | Role | Owner | Scope |
+        |------|-------|-------|
+        | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools |
+        | **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to DeepSeek |
+        ### Task Routing
+        | **Security** | You | Security scanning, vulnerability audits, hardening, secrets detection, OWASP review |
+        Never delegate security tasks to DeepSeek.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles the security audit directly — scans for vulnerabilities,
+          reviews auth code, identifies issues, applies fixes. Does NOT delegate
+          security work to DeepSeek via mcp__deepseek-agent__run. Security is
+          explicitly Claude Code's responsibility per the Division of Labor.
+          Fail if: calls mcp__deepseek-agent__run for security audit work.
+        threshold: 0.75
+        metric: "security_stays_local_not_delegated"
+
+  - description: "deepseek + small task (~3 files) → Claude Code handles directly"
+    vars:
+      mode: "deepseek"
+      user_task: "Rename the `getUserById` function to `findUserById` across 2 files"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## Delegation Protocol
+        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        ### Delegation Threshold
+        Only deploy DeepSeek for tasks that will touch roughly 5+ files. For smaller tasks,
+        implement directly yourself — the delegation overhead (run, poll, review, fix) costs
+        more than just writing the code. Use your judgment: a 3-file refactor is yours;
+        a 10-file feature goes to DeepSeek.
+        ### Task Routing
+        | **Small tasks (~5 files)** | You | Changes touching ~5 or fewer files — handle directly |
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles the small rename directly — the task only touches 2 files,
+          well below the ~5 file threshold. Does NOT delegate to DeepSeek via
+          mcp__deepseek-agent__run. The Delegation Threshold says small tasks should
+          be handled directly because delegation overhead isn't worth it.
+          Fail if: calls mcp__deepseek-agent__run for this 2-file rename.
+        threshold: 0.75
+        metric: "small_task_stays_local_not_delegated"
+
 outputPath: tests/promptfoo/results/14-deepseek-mode-delegation.json

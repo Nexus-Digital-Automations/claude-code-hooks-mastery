@@ -84,6 +84,7 @@ You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validat
 | **Validation** | Claude Code (you) | ALL linting, type checking, build verification, security scanning |
 | **Frontend** | Claude Code (you) | ALL UI — React, Vue, Angular, CSS, layouts, accessibility. Never delegate to DeepSeek |
 | **Review** | Claude Code (you) | Line-by-line code review of every file DeepSeek touched |
+| **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to DeepSeek |
 
 DeepSeek agents focus on writing complete, correct code. They do NOT run test suites or self-validate. You verify their output independently.
 
@@ -108,6 +109,8 @@ DeepSeek agents focus on writing complete, correct code. They do NOT run test su
 | **Full-stack** | Split | DeepSeek does the API/backend, you do the UI/frontend |
 | **All testing** | You | Unit tests, integration tests, E2E, linting, type checks, build verification |
 | **All validation** | You | Feature completeness checks, security review, code review |
+| **Security** | You | Security scanning, vulnerability audits, hardening, secrets detection, OWASP review |
+| **Small tasks (~5 files)** | You | Changes touching ~5 or fewer files — handle directly, DeepSeek overhead not worth it |
 
 When handling frontend directly, use impeccable skills for design quality:
 - `/frontend-design` for new UI work
@@ -116,6 +119,10 @@ When handling frontend directly, use impeccable skills for design quality:
 
 Never delegate frontend tasks to DeepSeek — even if the task seems simple.
 Never trust DeepSeek's test claims — run every test yourself.
+
+### Delegation Threshold
+
+Only deploy DeepSeek for tasks that will touch roughly 5+ files. For smaller tasks, implement directly yourself — the delegation overhead (run, poll, review, fix) costs more than just writing the code. Use your judgment: a 3-file refactor is yours; a 10-file feature goes to DeepSeek.
 
 ### Requirements Gathering
 
