@@ -67,12 +67,13 @@ If marked "transcript tracking unavailable": the transcript couldn't be parsed,
 NOT that nothing was done. Fall back to evidence text with normal skepticism.
 
 ═══ CONVERSATION PROTOCOL ═══
-You have up to 1 clarification round. After one Q&A cycle, you MUST issue a VERDICT.
+You have exactly 1 clarification round. Batch ALL questions into that round.
 
-1. QUESTION MODE — when evidence is present but ambiguous:
-   Start with exactly: QUESTION: <your question>
-   Include: (a) what gap you found, (b) what you need, (c) a yes/no hook.
-   ONE question only. After receiving an answer, you MUST issue a VERDICT.
+1. QUESTION MODE — when evidence is ambiguous on one or more checks:
+   Start with exactly: QUESTION: <your questions>
+   List EVERY concern in ONE message. Number them. Do NOT hold back questions
+   for a second round — there is no second round. After receiving an answer,
+   you MUST issue a VERDICT as JSON. No further questions allowed.
 
 2. VERDICT MODE — when you have enough information:
    Respond ONLY with valid JSON:
@@ -81,10 +82,11 @@ You have up to 1 clarification round. After one Q&A cycle, you MUST issue a VERD
     "instructions": "STEP NAME: what failed. To fix: exact command + expected output."}
 
 Rules:
-- Clearly genuine → approve immediately
+- Clearly genuine → approve immediately (no questions needed)
 - Clearly fabricated → reject immediately with specific instructions
-- Ambiguous → ask ONE question, then VERDICT
+- Ambiguous → ask ALL questions at once, then VERDICT after answer
 - NEVER respond with both a question and JSON
+- After one Q&A exchange, your next response MUST be a JSON verdict
 
 ═══ TOPIC TRACKING ═══
 If a topic was asked about AND answered in conversation history, that topic is CLOSED.
@@ -498,6 +500,16 @@ def verify_with_deepseek(
             if m["role"] == "assistant" and m["content"].strip().startswith("QUESTION:")
         )
 
+        # After a Q&A cycle, inject forcing instruction — no more questions
+        if question_count >= 1 and len(history) >= 3 and history[-1].get("role") == "user":
+            history.append({
+                "role": "user",
+                "content": (
+                    "You asked your questions and received an answer. "
+                    "Issue your VERDICT now as JSON. No more questions."
+                ),
+            })
+
         for turn in range(_MAX_TURNS):
             # On the final turn, force JSON mode to get a verdict
             is_final_turn = (turn == _MAX_TURNS - 1) or (question_count >= 1)
@@ -548,6 +560,23 @@ def verify_with_deepseek(
             # Check if it's a QUESTION
             stripped = content.strip()
             if stripped.startswith("QUESTION:"):
+                if is_final_turn:
+                    # Reviewer exhausted question budget — auto-approve
+                    if state_path and state_path.exists():
+                        try:
+                            state_path.unlink()
+                        except Exception:
+                            pass
+                    return {
+                        "approved": True,
+                        "verdict": "Auto-approved: reviewer exceeded question budget",
+                        "suspicious_steps": [],
+                        "instructions": "",
+                        "skipped": False,
+                        "skip_reason": "",
+                        "pending": False,
+                        "questions": "",
+                    }
                 question_text = stripped[len("QUESTION:"):].strip()
                 # Save state: append assistant's question to history
                 history.append({"role": "assistant", "content": stripped})

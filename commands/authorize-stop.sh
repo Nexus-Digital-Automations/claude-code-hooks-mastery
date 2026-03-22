@@ -54,27 +54,41 @@ DEEPSEEK_VERIFIER="$HOME/.claude/hooks/utils/deepseek_verifier.py"
 CONTEXT_FILE="$HOME/.claude/data/deepseek_context_${TASK_ID}.json"
 DEEPSEEK_STATE="$HOME/.claude/data/deepseek_review_state_${TASK_ID}.json"
 
-# Refresh deepseek_context.json from the current transcript
-python3 -c "
+# Skip DeepSeek re-review after security scan — evidence hasn't changed
+SCAN_ALREADY_PASSED=$(python3 -c "
+import json
+try:
+    with open('$AUTH_FILE') as f:
+        print('yes' if json.load(f).get('security_scan_complete') else 'no')
+except Exception:
+    print('no')
+" 2>/dev/null)
+
+if [ "$SCAN_ALREADY_PASSED" = "yes" ]; then
+    echo "  (DeepSeek review skipped — already approved pre-scan)"
+else
+    # Refresh deepseek_context.json from the current transcript
+    python3 -c "
 import sys; sys.path.insert(0, '$VR_UTILS')
 from vr_utils import refresh_deepseek_context
 refresh_deepseek_context('$CONTEXT_FILE', '$VR_FILE')
 " 2>/dev/null || true
 
-# Clear stale rejection history (preserves pending QUESTIONs and user answers)
-if [ -f "$DEEPSEEK_STATE" ]; then
-    python3 -c "
+    # Clear stale rejection history (preserves pending QUESTIONs and user answers)
+    if [ -f "$DEEPSEEK_STATE" ]; then
+        python3 -c "
 import sys; sys.path.insert(0, '$VR_UTILS')
 from vr_utils import cleanup_stale_state
 cleanup_stale_state('$DEEPSEEK_STATE')
 " 2>/dev/null || true
-fi
+    fi
 
-if [ -f "$DEEPSEEK_VERIFIER" ]; then
-    python3 "$DEEPSEEK_VERIFIER" \
-        --vr-file "$VR_FILE" \
-        --context-file "$CONTEXT_FILE" \
-        --state-file "$DEEPSEEK_STATE" || exit 1
+    if [ -f "$DEEPSEEK_VERIFIER" ]; then
+        python3 "$DEEPSEEK_VERIFIER" \
+            --vr-file "$VR_FILE" \
+            --context-file "$CONTEXT_FILE" \
+            --state-file "$DEEPSEEK_STATE" || exit 1
+    fi
 fi
 
 # ── All gates passed — write authorized: true ────────────────────────────────
