@@ -90,6 +90,7 @@ case "$SUITE" in
   14) run_eval "14" "deepseek-mode-delegation" ;;
   15) run_eval "15" "feature-completeness-validation" ;;
   16) run_eval "16" "feature-checklist-delegation" ;;
+  17) run_eval "17" "division-of-labor" ;;
   hooks)
     run_eval "01" "agent-routing-directive"
     run_eval "02" "ambiguity-injection"
@@ -97,6 +98,7 @@ case "$SUITE" in
     run_eval "04" "prompt-ab-comparison"
     run_eval "05" "claude-md-eval"
     run_eval "14" "deepseek-mode-delegation"
+    run_eval "17" "division-of-labor"
     ;;
   per-agent)
     # Run each per-agent YAML file individually
@@ -120,6 +122,7 @@ case "$SUITE" in
     run_eval "14" "deepseek-mode-delegation"
     run_eval "15" "feature-completeness-validation"
     run_eval "16" "feature-checklist-delegation"
+    run_eval "17" "division-of-labor"
     for yaml_file in "${AGENTS_DIR}"/*.yaml; do
       agent_name=$(basename "$yaml_file" .yaml)
       run_agent_eval "$agent_name"
@@ -130,7 +133,7 @@ case "$SUITE" in
     done
     ;;
   *)
-    echo "Usage: $0 [01-05|11|13|14|hooks|per-agent|all]"
+    echo "Usage: $0 [01-05|11|13-17|hooks|per-agent|all]"
     exit 1
     ;;
 esac

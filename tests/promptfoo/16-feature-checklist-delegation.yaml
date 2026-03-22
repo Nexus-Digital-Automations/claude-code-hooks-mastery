@@ -31,9 +31,16 @@ prompts:
       --- BEGIN CLAUDE.md (excerpt) ---
       ## DELEGATION PROTOCOL (MANDATORY)
 
-      You are in **deepseek mode**. This changes how you work.
+      You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
 
-      ### Code Tasks — DELEGATE IMMEDIATELY
+      ### Division of Labor
+      | Role | Owner | Scope |
+      |------|-------|-------|
+      | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools |
+      | **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E. Run them yourself |
+      | **Validation** | Claude Code (you) | ALL linting, type checking, build verification |
+
+      ### Workflow: Build then Test then Ship
 
       **Before delegating**, extract a Feature Checklist from the user's request.
 
@@ -50,7 +57,7 @@ prompts:
          - Confirm it is wired to the UI (not dead code, not a stub)
          - alert()/confirm() substituted for a requested modal = incomplete → follow-up task
          - TODO/empty handler where logic should be = incomplete → follow-up task
-      6. Run tests yourself — never trust DeepSeek's claims
+      6. **Run ALL tests yourself**: unit, integration, E2E, linting, type checks, build. Never trust DeepSeek's claims.
       7. Rate: "high confidence" / "needs fixes" / "redo"
       8. Fix issues or send targeted follow-up. Do NOT approve incomplete work.
 
@@ -185,5 +192,24 @@ tests:
           or frames it as a minor detail rather than a required follow-up.
         threshold: 0.75
         metric: "flags_alert_as_incomplete_not_modal"
+
+  # ── GROUP 3: Post-DeepSeek testing ownership ─────────────────────────────────
+
+  - description: "After DeepSeek completes → Claude Code describes running ALL tests itself"
+    vars:
+      user_request: >
+        DeepSeek just finished building the habit tracker. It wrote 4 files.
+        What should I do now before shipping?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: describes running tests (unit, integration, E2E), linting, type checks,
+          and build verification YOURSELF — not delegating testing back to DeepSeek.
+          Must mention reading every file DeepSeek touched and running tests independently.
+          The Division of Labor says Claude Code owns ALL testing and validation.
+          Fail if: suggests delegating testing to DeepSeek, trusting agent output
+          without independent verification, or skipping the review/testing step.
+        threshold: 0.75
+        metric: "claude_runs_tests_after_deepseek"
 
 outputPath: tests/promptfoo/results/16-feature-checklist-delegation.json

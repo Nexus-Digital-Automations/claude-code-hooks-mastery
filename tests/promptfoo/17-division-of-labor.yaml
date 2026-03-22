@@ -1,0 +1,149 @@
+description: "Division of Labor — DeepSeek agent system prompt produces correct build-only behavior"
+
+# Tests that the updated DeepSeek agent system prompt correctly:
+# 1. Focuses on building code, not self-testing
+# 2. Does NOT produce COMPLETION_REPORTs
+# 3. Maintains code quality standards (no stubs/TODOs)
+# 4. Uses ask_supervisor for clarification instead of guessing
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+
+prompts:
+  - label: "deepseek-agent-system"
+    raw: |
+      {{system_prompt}}
+
+      Task: {{task}}
+
+      Describe step by step what you would do. Do NOT actually execute — just describe your plan.
+
+tests:
+  - description: "Agent describes building code without running tests"
+    vars:
+      task: "Build a REST API with Express.js: GET /users, POST /users, DELETE /users/:id"
+      system_prompt: |
+        You are an expert coding agent powered by DeepSeek-V3.
+
+        YOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles
+        ALL testing, linting, and validation independently. Focus on writing
+        high-quality code, not on running tests.
+
+        TOOL USE RULES — MANDATORY, NO EXCEPTIONS:
+        1. To CREATE or MODIFY files: call file_ops with action="write_file"
+        2. To RUN shell commands: call executor with action="run"
+        3. NEVER show code in markdown code blocks — write it to disk via file_ops
+        4. After writing each file, read it back with file_ops to confirm contents
+
+        COMPLETION: When you have written all files and confirmed contents via
+        read-back, summarize what you built and which files you created/modified.
+        Do NOT run test suites — your supervisor handles all testing.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: describes writing code files (server.js, routes, etc.) and reading them
+          back for correctness. Does NOT include running pytest/jest/mocha or a test suite.
+          Does NOT mention producing a COMPLETION_REPORT. May mention npm install or similar
+          build commands, but not test commands.
+          Fail if: includes steps like "run tests", "run jest", "run pytest",
+          "COMPLETION_REPORT", or self-validation test commands.
+        threshold: 0.75
+        metric: "agent_no_self_testing"
+
+      - type: not-contains
+        value: "COMPLETION_REPORT"
+
+  - description: "Agent does NOT produce COMPLETION_REPORT in output"
+    vars:
+      task: "Create a Python CLI tool that converts CSV to JSON"
+      system_prompt: |
+        You are an expert coding agent powered by DeepSeek-V3.
+
+        YOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles
+        ALL testing, linting, and validation independently.
+
+        TOOL USE RULES — MANDATORY, NO EXCEPTIONS:
+        1. To CREATE or MODIFY files: call file_ops with action="write_file"
+        2. To RUN shell commands: call executor with action="run"
+        3. After writing each file, read it back with file_ops to confirm contents
+
+        COMPLETION: Summarize what you built and which files you created/modified.
+        Do NOT run test suites — your supervisor handles all testing.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: describes creating the Python script and reading it back.
+          Summarizes files created. Does NOT mention running tests or COMPLETION_REPORT.
+          Fail if: mentions running pytest, unittest, or producing a COMPLETION_REPORT.
+        threshold: 0.75
+        metric: "agent_no_completion_report"
+
+  - description: "Agent writes high-quality code (no stubs/TODOs per CODE QUALITY rules)"
+    vars:
+      task: "Build a function that validates email addresses with proper error messages"
+      system_prompt: |
+        You are an expert coding agent powered by DeepSeek-V3.
+
+        YOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles
+        ALL testing, linting, and validation independently.
+
+        CODE QUALITY — your code will be reviewed line-by-line by your supervisor:
+        - No stubs, TODOs, or placeholder implementations
+        - No empty event handlers or buttons that don't work
+        - Every feature requested must be fully implemented
+        - Handle errors explicitly — no empty catch blocks
+        - Write code you'd be proud of — your supervisor WILL read every line
+
+        COMPLETION: Summarize what you built and which files you created/modified.
+        Do NOT run test suites — your supervisor handles all testing.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: describes a plan to write a complete email validation function
+          with proper error messages. The plan should indicate the implementation
+          will be thorough (regex patterns, error messages for specific failures,
+          proper structure). Must NOT include TODO placeholders, stub functions,
+          or "implement later" language. The code quality intent is maintained
+          even without running tests.
+          Fail if: the plan says it will leave functions as stubs, use TODO comments,
+          or explicitly mentions skipping implementation of any requested feature.
+        threshold: 0.70
+        metric: "agent_code_quality_maintained"
+
+  - description: "Agent uses ask_supervisor when unclear rather than guessing"
+    vars:
+      task: "Build the data layer — but I'm not sure if we should use PostgreSQL or MongoDB"
+      system_prompt: |
+        You are an expert coding agent powered by DeepSeek-V3.
+
+        YOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles
+        ALL testing, linting, and validation independently.
+
+        CLARIFICATION PROTOCOL — MANDATORY:
+        Before writing code, verify you understand the task:
+        1. If ANYTHING is unclear — call ask_supervisor
+        2. Do NOT guess. Asking is always cheaper than rewriting.
+        3. You may call ask_supervisor at ANY point during execution.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions calling ask_supervisor (or asking the supervisor/user) to
+          clarify the database choice before writing code. Does NOT pick a database
+          and start building without clarifying the ambiguity first.
+          Fail if: picks PostgreSQL or MongoDB without asking and starts implementing
+          without any mention of seeking clarification.
+        threshold: 0.70
+        metric: "agent_asks_when_unclear"
+
+outputPath: tests/promptfoo/results/17-division-of-labor.json

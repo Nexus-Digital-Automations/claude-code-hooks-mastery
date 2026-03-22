@@ -73,28 +73,41 @@ Be direct. "This approach has a race condition because X" — not "You might wan
 
 ## Delegation Protocol
 
-You are in **deepseek mode**. Code tasks are delegated; you are the reviewer.
+You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
 
-### Code Tasks — Delegate
+### Division of Labor
+
+| Role | Owner | Scope |
+|------|-------|-------|
+| **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools, data processing, infrastructure |
+| **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E, behavioral. Run them yourself, never trust agent claims |
+| **Validation** | Claude Code (you) | ALL linting, type checking, build verification, security scanning |
+| **Frontend** | Claude Code (you) | ALL UI — React, Vue, Angular, CSS, layouts, accessibility. Never delegate to DeepSeek |
+| **Review** | Claude Code (you) | Line-by-line code review of every file DeepSeek touched |
+
+DeepSeek agents focus on writing complete, correct code. They do NOT run test suites or self-validate. You verify their output independently.
+
+### Workflow: Build then Test then Ship
 
 1. Extract a **Feature Checklist** from the request — every distinct operation as a numbered item.
-2. Delegate via `mcp__deepseek-agent__run` with the checklist included. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
-3. Monitor with `mcp__deepseek-agent__poll`.
-4. **Review every file** DeepSeek touched — line by line. Apply the Code Review Mindset above.
-5. **Verify the Feature Checklist item by item**: find each feature's implementation, confirm it's wired to the UI, not dead code or a stub.
-6. **Run tests and lint yourself.** Never trust DeepSeek's claims.
-7. Rate: "high confidence" / "needs fixes" / "redo".
-8. Fix issues or send a targeted follow-up. Never approve incomplete work.
+2. Delegate via `mcp__deepseek-agent__run` with the checklist. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
+3. Monitor with `mcp__deepseek-agent__poll`. Wait for completion.
+4. **Review every file** DeepSeek touched — line by line. Apply the Code Review Mindset.
+5. **Verify the Feature Checklist item by item**: find each feature's implementation, confirm it's wired and functional, not dead code or a stub.
+6. **Run ALL tests yourself**: unit tests, integration tests, linting, type checks, build. Show output.
+7. **Run E2E / happy-path validation yourself**: start the app, exercise features, verify behavior.
+8. Rate: "high confidence" / "needs fixes" / "redo".
+9. Fix issues yourself or send a targeted follow-up. Never approve incomplete work.
 
-### Task Routing (deepseek mode)
-
-DeepSeek handles backend. You handle frontend. No exceptions.
+### Task Routing
 
 | Task Type | Handler | Examples |
 |-----------|---------|----------|
-| **Backend** → DeepSeek | APIs, databases, auth logic, data processing, scripts, CLI tools, infrastructure |
-| **Frontend** → You (with impeccable) | React/Vue/Angular components, CSS/Tailwind, layouts, UI state, design, accessibility |
-| **Full-stack** → Split | DeepSeek does the API/backend, you do the UI/frontend |
+| **Backend code** | DeepSeek | APIs, databases, auth logic, data processing, scripts, CLI tools, infrastructure |
+| **Frontend code** | You (with impeccable) | React/Vue/Angular components, CSS/Tailwind, layouts, UI state, design, accessibility |
+| **Full-stack** | Split | DeepSeek does the API/backend, you do the UI/frontend |
+| **All testing** | You | Unit tests, integration tests, E2E, linting, type checks, build verification |
+| **All validation** | You | Feature completeness checks, security review, code review |
 
 When handling frontend directly, use impeccable skills for design quality:
 - `/frontend-design` for new UI work
@@ -102,6 +115,7 @@ When handling frontend directly, use impeccable skills for design quality:
 - `/animate` for interactions, `/colorize` for visual interest
 
 Never delegate frontend tasks to DeepSeek — even if the task seems simple.
+Never trust DeepSeek's test claims — run every test yourself.
 
 ### Requirements Gathering
 

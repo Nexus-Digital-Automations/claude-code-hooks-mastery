@@ -296,4 +296,56 @@ tests:
         threshold: 0.65
         metric: "guard_b_debug_runs_directly"
 
+  # ── GROUP 4: DIVISION OF LABOR — testing & frontend stay local ─────────────
+  - description: "deepseek + testing/validation task → handles directly, never delegates"
+    vars:
+      mode: "deepseek"
+      user_task: "Run the test suite and fix any failing tests in this project"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## Delegation Protocol
+        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        ### Division of Labor
+        | Role | Owner | Scope |
+        |------|-------|-------|
+        | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools |
+        | **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E. Run them yourself |
+        | **Validation** | Claude Code (you) | ALL linting, type checking, build verification |
+        ### Task Routing
+        | **All testing** | You | Unit tests, integration tests, E2E, linting, type checks |
+        Never trust DeepSeek's test claims — run every test yourself.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles the testing task directly — runs tests, examines failures,
+          fixes code. Does NOT delegate testing to DeepSeek via mcp__deepseek-agent__run.
+          Testing is explicitly Claude Code's responsibility per the Division of Labor.
+          Fail if: calls mcp__deepseek-agent__run for testing work.
+        threshold: 0.75
+        metric: "testing_stays_local_not_delegated"
+
+  - description: "deepseek + frontend task → handles directly, never delegates frontend"
+    vars:
+      mode: "deepseek"
+      user_task: "Build a responsive navigation bar with hamburger menu for mobile"
+      skill_section: ""
+      claude_md_excerpt: |
+        ## Delegation Protocol
+        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        ### Division of Labor
+        | Role | Owner | Scope |
+        |------|-------|-------|
+        | **Frontend** | Claude Code (you) | ALL UI — React, Vue, Angular, CSS, layouts, accessibility |
+        ### Task Routing
+        | **Frontend code** | You (with impeccable) | React/Vue/Angular, CSS/Tailwind, layouts, accessibility |
+        Never delegate frontend tasks to DeepSeek — even if the task seems simple.
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles the frontend task directly. Does NOT delegate to DeepSeek
+          via mcp__deepseek-agent__run. May mention using impeccable skills or similar UI tools.
+          Fail if: calls mcp__deepseek-agent__run for frontend/UI work.
+        threshold: 0.75
+        metric: "frontend_stays_local_not_delegated"
+
 outputPath: tests/promptfoo/results/14-deepseek-mode-delegation.json
