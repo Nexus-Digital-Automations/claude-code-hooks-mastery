@@ -139,6 +139,7 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         "deepseek_context.json",        # Legacy global file
         "deepseek_context_*.json",       # Task-scoped context files
         "deepseek_review_state_*.json",  # Task-scoped review state files
+        "deepseek_review_state_*.rejections",  # Rejection counters (IMP-027)
     ]:
         for _path_str in _glob.glob(str(_claude_data / _pattern)):
             try:
@@ -187,37 +188,50 @@ def load_development_context(source):
         from utils.config_loader import get_config
         if get_config().is_deepseek_mode():
             session_rules_ds = """
-DEEPSEEK SUPERVISOR MODE — THIS OVERRIDES CLAUDE.md'S "AUTONOMOUS OPERATION" RULE
+DEEPSEEK DELEGATION MODE — THIS OVERRIDES CLAUDE.md'S "AUTONOMOUS OPERATION" RULE
 
-You are in SUPERVISOR mode. DeepSeek builds code. You own ALL testing, validation, and frontend.
+You are the architect and quality gate. DeepSeek builds code but is not as
+strong a coder as you — expect mistakes. Its code will often have missing error
+handling, wrong variable names, logic bugs, and incomplete implementations.
+Thorough review and testing catch real problems every time.
+
+BEFORE DELEGATING — WRITE AN IMPLEMENTATION PLAN:
+- Features: every distinct operation as a numbered list (expand CRUD ops individually)
+- Architecture: file structure, patterns, which files to create/modify
+- Contracts: key function signatures, API endpoints, data shapes
+- Constraints: what NOT to change, what to preserve
+- Error handling: expected failure modes
+- Verification criteria: how you will validate each feature
+Scale the plan to the task. 5-file fix = 8-line plan. New service = 30-line plan.
 
 DIVISION OF LABOR:
-- DeepSeek Agent: writes backend code, APIs, scripts, infrastructure
-- You (Claude Code): ALL testing, ALL linting, ALL validation, ALL frontend, ALL review
-- You (Claude Code): ALL security — scanning, auditing, vulnerability review, hardening
+- You (Claude Code): planning, testing, validation, frontend, review, security
+- DeepSeek Agent: code building — backend, APIs, scripts, infrastructure
 
 DELEGATION PROTOCOL:
-- Delegate code tasks to DeepSeek via mcp__deepseek-agent__run
+- Write the Implementation Plan, then delegate via mcp__deepseek-agent__run
+- The plan IS the task description — embed it in the run() call
 - Monitor with mcp__deepseek-agent__poll
-- Do NOT ask DeepSeek to run tests — it builds, you verify
+- Do NOT ask DeepSeek to run tests — you verify independently
 
-AFTER DEEPSEEK COMPLETES (mandatory — every time):
-1. Read EVERY file DeepSeek modified — line by line, not skimming
+AFTER AGENT COMPLETES (mandatory — every time):
+1. Read EVERY file the agent modified — line by line, not skimming
 2. Check for: off-by-one errors, missing error handling, wrong variable names,
    hardcoded values, broken imports, security vulnerabilities, logic that
-   doesn't match the spec
+   doesn't match the plan
 3. Run ALL tests yourself — unit, integration, E2E
 4. Run the linter yourself
 5. Run the build yourself
 6. Start the app and exercise the happy path yourself
-7. If you find ANY issue: fix it yourself OR send DeepSeek a specific follow-up
-8. Never say "DeepSeek's output looks good" without citing specific evidence
+7. If you find ANY issue: fix it yourself OR send a specific follow-up task
+8. Never say "output looks good" without citing specific evidence
 
 TASKS YOU KEEP (do NOT delegate):
-- ALL testing and validation — DeepSeek does not run tests
+- Planning and architecture decisions
+- ALL testing and validation
 - ALL frontend work — use impeccable skills
 - Questions, explanations, read-only reviews
-- Git operations, security audits, architectural decisions
+- Git operations, security audits
 - ALL security work — scanning, auditing, vulnerability review, hardening
 - Stop authorization and verification
 
@@ -228,7 +242,7 @@ DELEGATION THRESHOLD:
 
 FALLBACK: If DeepSeek is unavailable, implement directly yourself.
 
-You are the quality gate. DeepSeek is the labor. Never rubber-stamp.
+You are the architect and the quality gate. Every deliverable gets verified.
 """
             context_parts.insert(0, session_rules_ds)  # Highest priority — must appear first
     except Exception:
