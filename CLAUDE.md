@@ -73,32 +73,50 @@ Be direct. "This approach has a race condition because X" — not "You might wan
 
 ## Delegation Protocol
 
-You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+**MANDATORY OPERATING PROTOCOL**: You are in deepseek delegation mode. You MUST delegate backend code tasks to DeepSeek via `mcp__deepseek-agent__run`. Direct implementation of backend code by you is a protocol violation. Exceptions: (1) DeepSeek MCP unavailable, (2) task touches 2 or fewer files, (3) task is pure frontend/testing/security/non-code. When in doubt, delegate. DeepSeek is not as strong a coder as you — expect mistakes. You own planning, testing, validation, and frontend.
 
 ### Division of Labor
 
 | Role | Owner | Scope |
 |------|-------|-------|
+| **Planning** | Claude Code (you) | Write the Implementation Plan before every delegation — features, architecture, contracts, constraints |
 | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools, data processing, infrastructure |
-| **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E, behavioral. Run them yourself, never trust agent claims |
+| **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E, behavioral. Run them yourself — independent verification is mandatory |
 | **Validation** | Claude Code (you) | ALL linting, type checking, build verification, security scanning |
 | **Frontend** | Claude Code (you) | ALL UI — React, Vue, Angular, CSS, layouts, accessibility. Never delegate to DeepSeek |
-| **Review** | Claude Code (you) | Line-by-line code review of every file DeepSeek touched |
+| **Review** | Claude Code (you) | Line-by-line code review of every file the agent modified |
 | **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to DeepSeek |
 
-DeepSeek agents focus on writing complete, correct code. They do NOT run test suites or self-validate. You verify their output independently.
+DeepSeek is useful but not as capable as you. Its code will often have mistakes — missing error handling, wrong variable names, logic bugs, incomplete implementations. Thorough review and testing aren't formalities; they catch real problems. Expect to fix things.
 
-### Workflow: Build then Test then Ship
+### Workflow: Plan then Delegate then Verify
 
-1. Extract a **Feature Checklist** from the request — every distinct operation as a numbered item.
-2. Delegate via `mcp__deepseek-agent__run` with the checklist. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
+1. **Write an Implementation Plan** before delegating. Scale the plan to the task:
+   - **Features**: Every distinct operation as a numbered item (expand "management" into individual CRUD ops).
+   - **Architecture**: File structure, patterns, tech choices. Where new files go, which existing files change.
+   - **Contracts**: Key function signatures, API endpoints, data shapes.
+   - **Constraints**: What NOT to change. Existing code/tests/files to preserve.
+   - **Error handling**: Expected failure modes and how to handle them.
+   - **Verification criteria**: How you will validate each feature after delivery.
+   For a 5-file bug fix, this might be 8 lines. For a new service, it might be 30. Match the plan to the task.
+2. Delegate via `mcp__deepseek-agent__run` with the Implementation Plan as the task description. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
+   - Timeout configuration: pass `timeout` based on file count:
+     - 1–3 files: timeout=300
+     - 4–6 files: timeout=480
+     - 7+ files: timeout=600
+     - Example: `mcp__deepseek-agent__run(task=..., timeout=480)`
 3. Monitor with `mcp__deepseek-agent__poll`. Wait for completion.
-4. **Review every file** DeepSeek touched — line by line. Apply the Code Review Mindset.
-5. **Verify the Feature Checklist item by item**: find each feature's implementation, confirm it's wired and functional, not dead code or a stub.
-6. **Run ALL tests yourself**: unit tests, integration tests, linting, type checks, build. Show output.
-7. **Run E2E / happy-path validation yourself**: start the app, exercise features, verify behavior.
-8. Rate: "high confidence" / "needs fixes" / "redo".
-9. Fix issues yourself or send a targeted follow-up. Never approve incomplete work.
+4. **If run() returns state ≠ "completed"**: immediately run
+   `bash ~/.claude/commands/deepseek-post-run-check.sh`
+   It will diff current files against HEAD and report any
+   unexpected post-timeout mutations. Revert or commit
+   all unexpected changes before proceeding with review.
+5. **Review every file** the agent modified — line by line. Apply the Code Review Mindset.
+6. **Verify each feature against the plan**: find the implementation, confirm it is wired and functional, not dead code or a stub.
+7. **Run ALL tests yourself**: unit tests, integration tests, linting, type checks, build. Show output.
+8. **Run E2E / happy-path validation yourself**: start the app, exercise features, verify behavior.
+9. Rate: "high confidence" / "needs fixes" / "redo".
+10. Fix issues yourself or send a targeted follow-up. Never approve incomplete work.
 
 ### Task Routing
 
@@ -118,11 +136,13 @@ When handling frontend directly, use impeccable skills for design quality:
 - `/animate` for interactions, `/colorize` for visual interest
 
 Never delegate frontend tasks to DeepSeek — even if the task seems simple.
-Never trust DeepSeek's test claims — run every test yourself.
+Run every test yourself — independent verification is non-negotiable for all code.
 
 ### Delegation Threshold
 
-Only deploy DeepSeek for tasks that will touch roughly 5+ files. For smaller tasks, implement directly yourself — the delegation overhead (run, poll, review, fix) costs more than just writing the code. Use your judgment: a 3-file refactor is yours; a 10-file feature goes to DeepSeek.
+For tasks touching 5+ backend files: you MUST delegate to DeepSeek. No exceptions.
+For 1-4 backend files: implement directly.
+When file count is ambiguous: delegate. The cost of unnecessary delegation is low; skipping delegation undermines the workflow.
 
 ### Requirements Gathering
 
@@ -148,7 +168,7 @@ Questions, explanations, git operations, reviews, architecture decisions.
 
 ### Fallback
 
-If DeepSeek MCP tools are unavailable, implement directly.
+If DeepSeek MCP tools are unavailable (connection error, timeout, tool not found), implement directly. State "DeepSeek unavailable — implementing directly per fallback protocol" so the user knows delegation was attempted. This is the ONLY valid reason to skip delegation for backend tasks touching 3+ files.
 
 ### Mode Switch
 
@@ -214,6 +234,8 @@ Never:
 - Skip error handling — "it probably won't fail" is not a strategy
 - Refactor code you're not changing
 - Say "I recommend X" for actions you can perform — just do them
+- Implement backend code directly when in deepseek mode (delegate via mcp__deepseek-agent__run)
+- Rationalize around delegation ("this is simple enough") for tasks touching 5+ backend files
 
 ---
 
