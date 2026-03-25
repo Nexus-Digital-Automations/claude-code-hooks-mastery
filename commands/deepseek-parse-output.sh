@@ -69,6 +69,53 @@ PYEOF
 
 echo ""
 
+# Extract tool call stats
+python3 - "$OUTPUT_FILE" <<'PYEOF'
+import json, sys
+from collections import Counter
+try:
+    data = json.load(open(sys.argv[1]))
+    output = data.get("output", [])
+    tool_calls = [e for e in output if e.get("kind") == "tool_call"]
+    counts = Counter(e.get("content", {}).get("name", "unknown") for e in tool_calls)
+    if counts:
+        print("Tools used:")
+        for name, n in sorted(counts.items(), key=lambda x: -x[1]):
+            print(f"  {name}: {n}")
+    else:
+        print("Tools used: (none)")
+except Exception as e:
+    print(f"Tool stats error: {e}")
+PYEOF
+
+echo ""
+
+# Extract warnings
+python3 - "$OUTPUT_FILE" <<'PYEOF'
+import json, sys
+try:
+    data = json.load(open(sys.argv[1]))
+    output = data.get("output", [])
+    warnings = [e for e in output if e.get("kind") == "warning"]
+    if not warnings:
+        print("Warnings: (none)")
+    else:
+        seen = set()
+        unique = []
+        for w in warnings:
+            msg = str(w.get("content", ""))
+            if msg not in seen:
+                seen.add(msg)
+                unique.append(msg)
+        print(f"Warnings: {len(warnings)} total, {len(unique)} unique")
+        for msg in unique[:3]:
+            print(f"  {msg[:120]}")
+except Exception as e:
+    print(f"Warnings error: {e}")
+PYEOF
+
+echo ""
+
 # Extract last meaningful text content
 # Merges consecutive text_delta events into full messages, prints last 3 non-trivial ones.
 python3 - "$OUTPUT_FILE" <<'PYEOF'
