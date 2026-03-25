@@ -690,8 +690,9 @@ def build_deepseek_delegation_directive(prompt, mode_config, working_dir: str = 
             dir_tree = _get_dir_tree(working_dir)
             directive += (
                 f"\n\n## Working Directory Structure\n```\n{dir_tree}\n```\n"
-                "(Do NOT list directory contents — paths above are authoritative. "
-                "Write files directly to specified paths.)"
+                "(Do NOT call list_dir or any directory listing tool — "
+                "the structure above is complete and authoritative. "
+                "Read files at exact paths; do not verify directory contents before writing.)"
             )
         return directive
 
@@ -718,8 +719,9 @@ def build_deepseek_delegation_directive(prompt, mode_config, working_dir: str = 
         dir_tree = _get_dir_tree(working_dir)
         directive += (
             f"\n\n## Working Directory Structure\n```\n{dir_tree}\n```\n"
-            "(Do NOT list directory contents — paths above are authoritative. "
-            "Write files directly to specified paths.)"
+            "(Do NOT call list_dir or any directory listing tool — "
+            "the structure above is complete and authoritative. "
+            "Read files at exact paths; do not verify directory contents before writing.)"
         )
     return directive
 

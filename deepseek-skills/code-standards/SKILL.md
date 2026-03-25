@@ -51,6 +51,27 @@ When a verification script or test produces unexpected output:
 - If a verification script has a bug (not the production code), fix the script in one attempt then move on
 - Cap self-verification retries at **2 attempts** — if still failing, report the issue and stop
 
+## React Hook Patterns (when working in React codebases)
+
+`setState` functional updates run asynchronously in React 18 — the updater function
+is called during the render phase, NOT during the `setState()` call itself:
+
+```js
+// ❌ WRONG — result is undefined when returned
+const action = (x) => {
+  let result;
+  setState(prev => { result = compute(x); return newState; });
+  return result; // always undefined
+}
+
+// ✅ CORRECT — compute before setState using closure state
+const action = (x) => {
+  const result = compute(currentStateValue, x); // read from closure
+  setState(prev => newState);
+  return result;
+}
+```
+
 ## Before Reporting Done
 
 Evidence, not claims. Run each command and show the output:

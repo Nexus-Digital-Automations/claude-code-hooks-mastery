@@ -81,22 +81,22 @@ try:
     messages = []
     current_text = []
     for entry in output:
-        etype = entry.get("type", "")
+        etype = entry.get("kind", "")
         if etype == "text_delta":
-            current_text.append(entry.get("text", ""))
+            current_text.append(entry.get("content", ""))
         else:
             if current_text:
-                messages.append({"type": "text", "content": "".join(current_text)})
+                messages.append({"kind": "text", "content": "".join(current_text)})
                 current_text = []
-            messages.append({"type": etype, "content": str(entry)})
+            messages.append({"kind": etype, "content": str(entry)})
     if current_text:
-        messages.append({"type": "text", "content": "".join(current_text)})
+        messages.append({"kind": "text", "content": "".join(current_text)})
 
     # Print last 3 non-trivial text messages (>50 chars)
     print("Last messages:")
     shown = 0
     for msg in reversed(messages):
-        if msg["type"] == "text" and len(msg["content"]) > 50:
+        if msg["kind"] == "text" and len(msg["content"]) > 50:
             print(f"\n--- [{shown+1}] ---")
             print(msg["content"][:2000])
             shown += 1
