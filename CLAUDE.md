@@ -73,43 +73,70 @@ Be direct. "This approach has a race condition because X" — not "You might wan
 
 ## Delegation Protocol
 
-**MANDATORY OPERATING PROTOCOL**: You are in deepseek delegation mode. You MUST delegate backend code tasks to DeepSeek via `mcp__deepseek-agent__run`. Direct implementation of backend code by you is a protocol violation. Exceptions: (1) DeepSeek MCP unavailable, (2) task touches 2 or fewer files, (3) task is pure frontend/security/non-code. When in doubt, delegate. DeepSeek is not as strong a coder as you — expect mistakes. You own planning, test qualification, frontend UI, and security.
+**MANDATORY OPERATING PROTOCOL**: You are in deepseek delegation mode. You MUST delegate backend code tasks to DeepSeek via `mcp__deepseek-agent__run`. Direct implementation of backend code by you is a protocol violation. Exceptions: (1) DeepSeek MCP unavailable, (2) task touches 2 or fewer files, (3) task is pure frontend/security/non-code. When in doubt, delegate. DeepSeek is not as strong a coder as you — expect mistakes. You own task description, plan review, test qualification, frontend UI, and security.
 
 ### Division of Labor
 
 | Role | Owner | Scope |
 |------|-------|-------|
-| **Planning** | Claude Code (you) | Write the Implementation Plan before every delegation — features, architecture, contracts, constraints |
-| **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools, data processing, infrastructure |
-| **Test writing** | Both | DeepSeek writes Playwright E2E tests for features it builds. Claude Code writes unit/integration tests and additional Playwright tests for frontend it builds |
-| **Mechanical checks (1st pass)** | DeepSeek Agent | Build, lint, type-check, Playwright — run as part of delegation. Must pass before finishing. Enforced by budget.max_iterations |
-| **Mechanical checks (verify)** | Claude Code (you) | Re-run build + lint + type-check after agent completes — mandatory, not optional. Quick sanity check (seconds if agent passed) |
-| **Test qualification** | Claude Code (you) | Run Playwright as final E2E gate, run unit/integration tests agent didn't cover, review coverage |
-| **Validation** | Claude Code (you) | Feature completeness, security scanning, code review, architecture review |
-| **Frontend UI** | Claude Code (you) | ALL UI implementation — React, Vue, Angular, CSS, layouts, accessibility. Never delegate to DeepSeek |
-| **Review** | Claude Code (you) | Line-by-line code review of every file the agent modified |
-| **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to DeepSeek |
+| **Task description** | Claude Code (you) | Describe WHAT to build — features, constraints, what NOT to change. NOT how. |
+| **Investigation + Planning** | DeepSeek Agent | Read codebase with read-only tools, produce structured plan (file_changes, steps, tools_per_step, verification_steps, diff_previews) |
+| **Plan review** | Claude Code (you) | Review DeepSeek's plan for correctness, investigate suspicious items, approve/edit/reject before code is written |
+| **Code execution** | DeepSeek Agent | Execute the approved plan using full tools |
+| **Mechanical checks** | DeepSeek Agent | Build, lint, type-check, Playwright — run during execution. Must pass before finishing |
+| **Validation** | Claude Code (you) | Code review, re-run build/lint/test, run verification_steps from plan, Playwright final gate |
+| **Frontend UI** | Claude Code (you) | ALL UI — never delegate to DeepSeek |
+| **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening |
 
-DeepSeek is useful but not as capable as you. Its code will often have mistakes — missing error handling, wrong variable names, logic bugs, incomplete implementations. Thorough review and testing aren't formalities; they catch real problems. Expect to fix things.
+DeepSeek is useful but not as capable as you. Its code will often have mistakes. The plan-review step catches wrong approaches before code is written (cheap). Post-execution review catches implementation bugs. Expect to fix things.
 
-### Workflow: Plan then Delegate then Verify
+### Workflow: Describe → Plan-Review → Execute → Validate
 
-1. **Write an Implementation Plan** before delegating. Scale the plan to the task:
-   - **Features**: Every distinct operation as a numbered item (expand "management" into individual CRUD ops).
-   - **Architecture**: File structure, patterns, tech choices. Where new files go, which existing files change.
-   - **Contracts**: Key function signatures, API endpoints, data shapes.
-   - **Constraints**: What NOT to change. Existing code/tests/files to preserve.
-   - **Error handling**: Expected failure modes and how to handle them.
-   - **Verification criteria**: How you will validate each feature after delivery.
-   For a 5-file bug fix, this might be 8 lines. For a new service, it might be 30. Match the plan to the task.
-2. Delegate via `mcp__deepseek-agent__run` with the Implementation Plan as the task description. Use `profile="default-delegation"` for budget controls. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
-3. Monitor with `mcp__deepseek-agent__poll`. Wait for completion.
-4. **Review every file** the agent modified — line by line. Apply the Code Review Mindset.
-5. **Verify each feature against the plan**: find the implementation, confirm it is wired and functional, not dead code or a stub.
-6. **Re-run build + lint + type-check yourself**: mandatory verification, not optional. If DeepSeek passed these, they should pass for you in seconds. If they fail, the agent's work has issues. Then run Playwright yourself as the final E2E gate.
-7. **Run qualification checks yourself**: start the app, exercise the happy path, run any unit/integration tests the agent didn't cover. Own the pass/fail decision.
-8. Rate: "high confidence" / "needs fixes" / "redo".
-9. Fix issues yourself or send a targeted follow-up. Never approve incomplete work.
+**Step 1 — Describe the task** (you write a task description, NOT a full implementation plan):
+- What to build (features as a numbered list)
+- Constraints (what NOT to change, files to preserve)
+- Verification criteria (how to validate each feature)
+- Scale: 5-10 lines for a bug fix, 15-20 for a feature. No architecture details, no function signatures — DeepSeek figures those out by reading the codebase.
+
+**Step 2 — Delegate with plan_mode** (DeepSeek investigates + produces a plan):
+```
+run(task="<task description>", working_dir="...", profile="default-delegation", wait=True, timeout=600)
+```
+DeepSeek reads files, checks git history, explores the codebase with read-only tools. It produces a structured PlanResult with file_changes, steps, tools_per_step, verification_steps, and diff_previews. Returns with `state="awaiting_approval"`.
+
+**Step 3 — Review the plan** (you review before any code is written):
+```
+plan(agent_id, "get")
+```
+Review checklist:
+- Does it modify the right files? (check `file_changes` paths and actions)
+- Does it propose creating unnecessary files?
+- Are `steps` in the right dependency order?
+- Do `diff_previews` look correct? Check for known DeepSeek mistakes:
+  - Variable scope in callbacks (does `result.x` reference the right `result`?)
+  - Test expectations vs code (do thresholds/boundaries match?)
+  - Dead code after guards, code duplication, unused imports
+- Are `verification_steps` executable and behavioral (not just "check file exists")?
+- Any steps that violate constraints?
+
+Three options:
+- `plan(agent_id, "approve")` — plan looks good, execute it
+- `plan(agent_id, "edit", modified_plan={...})` — fix specific issues, auto-approves after edit
+- `plan(agent_id, "reject", reason="...")` — wrong approach entirely, re-delegate with feedback
+
+**Step 4 — Wait for execution**:
+```
+poll(agent_id, timeout=300)
+```
+
+**Step 5 — Validate** (review the actual output):
+- Read every file modified — line by line, apply the Code Review Mindset
+- Verify each feature against the task description
+- Re-run build + lint + type-check yourself (mandatory)
+- Run the `verification_steps` from the plan
+- Run Playwright as final E2E gate
+- Exercise the happy path, run unit/integration tests
+- Fix issues yourself or send a targeted follow-up via `run(task="fix X", agent_id=id)`
 
 ### Task Routing
 
