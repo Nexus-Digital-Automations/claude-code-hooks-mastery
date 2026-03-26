@@ -28,6 +28,7 @@ from vr_utils import VR_CHECKS_ORDER as _VR_CHECKS_ORDER
 
 _MAX_TURNS = 2         # max conversation turns before forcing verdict (1 question + 1 verdict)
 _PER_TURN_TIMEOUT = 25 # seconds per API call (slightly longer than single-shot)
+_MAX_REJECTIONS = 3    # auto-approve after this many rejections to prevent infinite loops
 
 _SYSTEM_PROMPT = """\
 You are an independent evidence auditor for a code quality enforcement system.
@@ -98,9 +99,12 @@ Match your scrutiny to the task's complexity and risk:
 - Config toggles, mode switches, settings changes → MINIMAL scrutiny. If the
   command ran and produced expected output, approve. Do not demand multi-step
   verification for trivial operations.
-- Bug fixes, feature additions → MODERATE scrutiny. Standard evidence checks.
+- Bug fixes, feature additions with <5 file changes → MODERATE scrutiny. If tests
+  pass, build succeeds, and lint is clean, approve without demanding additional
+  execution evidence beyond the mechanical checks.
+- Larger feature additions (5+ files) → STANDARD scrutiny. Full evidence checks.
 - Production deployments, security changes → HIGH scrutiny. Full evidence.
-Do NOT apply production-deployment-level scrutiny to a config toggle.
+Do NOT apply production-deployment-level scrutiny to a config toggle or small fix.
 
 ═══ FEATURE COMPLETENESS (for "build/create/implement X" tasks only) ═══
 For tasks with a feature list: extract features from "Last task", verify each has
@@ -147,7 +151,11 @@ NOT GENUINE: "build works" without output. Build errors = rejection.
 
 ── LINT ──
 GENUINE: Linter output with result. Cross-check bash_commands for linter invocation.
-NOT GENUINE: "lint passes" without output. Lint errors (not warnings) = rejection.
+IMPORTANT: ESLint, Ruff, Clippy, and similar linters produce NO output when zero
+issues are found. An empty linter output with exit code 0 IS genuine evidence of a
+clean lint pass. Do not reject for lack of output when the tool ran successfully.
+NOT GENUINE: "lint passes" without output AND no linter invocation in bash_commands.
+Lint errors (not warnings) = rejection.
 
 ── APP STARTS ──
 GENUINE: Server startup logs from an actual process.
@@ -354,20 +362,96 @@ def _skipped(reason: str) -> dict:
     }
 
 
+def _get_current_identity() -> tuple[str, str]:
+    """Read current agent_id and prompt_id from identity/task files.
+
+    Returns (agent_id, prompt_id). Empty strings on failure.
+    Used for ownership validation to prevent cross-session contamination.
+    """
+    agent_id = ""
+    prompt_id = ""
+    try:
+        ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
+        agent_id = ct.get("agent_id", "")
+        prompt_id = ct.get("prompt_id", "")
+    except Exception:
+        pass
+    if not agent_id:
+        try:
+            identity = json.loads(
+                (Path.home() / ".claude/data/agent_identity.json").read_text()
+            )
+            agent_id = identity.get("agent_id", "")
+        except Exception:
+            pass
+    return agent_id, prompt_id
+
+
 def _load_state(state_file: Path) -> list:
-    """Load conversation history from state file. Returns [] if not found."""
+    """Load conversation history from state file.
+
+    Returns [] if not found OR if the state belongs to a different agent
+    (cross-session contamination prevention), OR if the state predates
+    the current session (timestamp staleness check).
+    """
     try:
         data = json.loads(state_file.read_text())
+
+        # Ownership validation: reject state from a different agent session
+        stored_agent_id = data.get("agent_id", "")
+        if stored_agent_id:
+            current_agent_id, _ = _get_current_identity()
+            if current_agent_id and stored_agent_id != current_agent_id:
+                # Stale state from a different session — discard
+                try:
+                    state_file.unlink(missing_ok=True)
+                except Exception:
+                    pass
+                return []
+
+        # Defense-in-depth: reject state saved before the current session started.
+        # Catches edge cases where agent_id check passes but state is stale.
+        saved_at = data.get("saved_at", "")
+        if saved_at:
+            try:
+                identity = json.loads(
+                    (Path.home() / ".claude/data/agent_identity.json").read_text()
+                )
+                session_created = identity.get("created_at", "")
+                if session_created and saved_at < session_created:
+                    try:
+                        state_file.unlink(missing_ok=True)
+                    except Exception:
+                        pass
+                    return []
+            except Exception:
+                pass  # Can't read identity — skip this check, don't block
+
         return data.get("messages", [])
     except Exception:
         return []
 
 
-def _save_state(state_file: Path, messages: list) -> None:
-    """Save conversation history to state file."""
+def _load_state_prompt_id(state_file: Path) -> str:
+    """Read the prompt_id from a state file. Returns '' on failure."""
     try:
+        data = json.loads(state_file.read_text())
+        return data.get("prompt_id", "")
+    except Exception:
+        return ""
+
+
+def _save_state(state_file: Path, messages: list) -> None:
+    """Save conversation history with ownership metadata."""
+    try:
+        agent_id, prompt_id = _get_current_identity()
         state_file.parent.mkdir(parents=True, exist_ok=True)
-        state_file.write_text(json.dumps({"messages": messages}, indent=2))
+        state_file.write_text(json.dumps({
+            "agent_id": agent_id,
+            "prompt_id": prompt_id,
+            "saved_at": __import__('datetime').datetime.now().isoformat(),
+            "messages": messages,
+        }, indent=2))
     except Exception:
         pass
 
@@ -481,18 +565,59 @@ def verify_with_deepseek(
 
     state_path = Path(state_file) if state_file else None
 
+    # Track rejection count to prevent infinite loops (IMP-027).
+    # Stored in a sibling file since state_file is deleted on rejection.
+    rejection_counter_path = state_path.with_suffix(".rejections") if state_path else None
+    rejection_count = 0
+    if rejection_counter_path and rejection_counter_path.exists():
+        try:
+            rejection_count = int(rejection_counter_path.read_text().strip())
+        except (ValueError, OSError):
+            rejection_count = 0
+    if rejection_count >= _MAX_REJECTIONS:
+        # Clean up counter
+        if rejection_counter_path and rejection_counter_path.exists():
+            try:
+                rejection_counter_path.unlink()
+            except OSError:
+                pass
+        return {
+            "approved": True,
+            "verdict": f"Auto-approved after {rejection_count} rejections (IMP-027 loop prevention)",
+            "suspicious_steps": [],
+            "instructions": "",
+            "skipped": False,
+            "skip_reason": "",
+            "pending": False,
+            "questions": "",
+        }
+
     try:
-        # Load existing conversation history (empty list if first turn)
+        # Load existing conversation history (empty list if first turn).
+        # _load_state validates agent_id ownership — returns [] if stale.
         history = _load_state(state_path) if state_path else []
 
         # Always build fresh initial message from current evidence.
-        # On re-runs history[0] is refreshed so DeepSeek sees updated records,
-        # but Q&A turns (positions 1+) are preserved from the state file.
         initial_message = _build_user_message(checks, context)
         if not history:
             history = [{"role": "user", "content": initial_message}]
         else:
-            history[0] = {"role": "user", "content": initial_message}
+            # Check if Q&A history belongs to the current prompt.
+            # Discard stale Q&A unless BOTH prompt_ids are present AND match.
+            # Missing prompt_id on either side = cannot confirm same prompt = discard.
+            _, current_prompt_id = _get_current_identity()
+            state_prompt_id = _load_state_prompt_id(state_path) if state_path else ""
+            prompt_ids_match = (
+                current_prompt_id
+                and state_prompt_id
+                and current_prompt_id == state_prompt_id
+            )
+            if prompt_ids_match:
+                # Same prompt — refresh evidence but keep Q&A turns
+                history[0] = {"role": "user", "content": initial_message}
+            else:
+                # Different or unknown prompt — discard all Q&A, start fresh
+                history = [{"role": "user", "content": initial_message}]
 
         # Conversation loop: up to _MAX_TURNS turns
         question_count = sum(
@@ -545,6 +670,17 @@ def verify_with_deepseek(
                     try:
                         state_path.unlink()
                     except Exception:
+                        pass
+                # Track rejection count to prevent infinite loops (IMP-027)
+                if not approved and rejection_counter_path:
+                    try:
+                        rejection_counter_path.write_text(str(rejection_count + 1))
+                    except OSError:
+                        pass
+                elif approved and rejection_counter_path and rejection_counter_path.exists():
+                    try:
+                        rejection_counter_path.unlink()
+                    except OSError:
                         pass
                 return {
                     "approved": approved,

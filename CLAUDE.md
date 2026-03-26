@@ -73,7 +73,7 @@ Be direct. "This approach has a race condition because X" — not "You might wan
 
 ## Delegation Protocol
 
-**MANDATORY OPERATING PROTOCOL**: You are in deepseek delegation mode. You MUST delegate backend code tasks to DeepSeek via `mcp__deepseek-agent__run`. Direct implementation of backend code by you is a protocol violation. Exceptions: (1) DeepSeek MCP unavailable, (2) task touches 2 or fewer files, (3) task is pure frontend/testing/security/non-code. When in doubt, delegate. DeepSeek is not as strong a coder as you — expect mistakes. You own planning, testing, validation, and frontend.
+**MANDATORY OPERATING PROTOCOL**: You are in deepseek delegation mode. You MUST delegate backend code tasks to DeepSeek via `mcp__deepseek-agent__run`. Direct implementation of backend code by you is a protocol violation. Exceptions: (1) DeepSeek MCP unavailable, (2) task touches 2 or fewer files, (3) task is pure frontend/security/non-code. When in doubt, delegate. DeepSeek is not as strong a coder as you — expect mistakes. You own planning, test qualification, frontend UI, and security.
 
 ### Division of Labor
 
@@ -81,9 +81,12 @@ Be direct. "This approach has a race condition because X" — not "You might wan
 |------|-------|-------|
 | **Planning** | Claude Code (you) | Write the Implementation Plan before every delegation — features, architecture, contracts, constraints |
 | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools, data processing, infrastructure |
-| **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E, behavioral. Run them yourself — independent verification is mandatory |
-| **Validation** | Claude Code (you) | ALL linting, type checking, build verification, security scanning |
-| **Frontend** | Claude Code (you) | ALL UI — React, Vue, Angular, CSS, layouts, accessibility. Never delegate to DeepSeek |
+| **Test writing** | Both | DeepSeek writes Playwright E2E tests for features it builds. Claude Code writes unit/integration tests and additional Playwright tests for frontend it builds |
+| **Mechanical checks (1st pass)** | DeepSeek Agent | Build, lint, type-check, Playwright — run as part of delegation. Must pass before finishing. Enforced by budget.max_iterations |
+| **Mechanical checks (verify)** | Claude Code (you) | Re-run build + lint + type-check after agent completes — mandatory, not optional. Quick sanity check (seconds if agent passed) |
+| **Test qualification** | Claude Code (you) | Run Playwright as final E2E gate, run unit/integration tests agent didn't cover, review coverage |
+| **Validation** | Claude Code (you) | Feature completeness, security scanning, code review, architecture review |
+| **Frontend UI** | Claude Code (you) | ALL UI implementation — React, Vue, Angular, CSS, layouts, accessibility. Never delegate to DeepSeek |
 | **Review** | Claude Code (you) | Line-by-line code review of every file the agent modified |
 | **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to DeepSeek |
 
@@ -99,34 +102,25 @@ DeepSeek is useful but not as capable as you. Its code will often have mistakes 
    - **Error handling**: Expected failure modes and how to handle them.
    - **Verification criteria**: How you will validate each feature after delivery.
    For a 5-file bug fix, this might be 8 lines. For a new service, it might be 30. Match the plan to the task.
-2. Delegate via `mcp__deepseek-agent__run` with the Implementation Plan as the task description. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
-   - Timeout configuration: pass `timeout` based on file count:
-     - 1–3 files: timeout=300
-     - 4–6 files: timeout=480
-     - 7+ files: timeout=600
-     - Example: `mcp__deepseek-agent__run(task=..., timeout=480)`
+2. Delegate via `mcp__deepseek-agent__run` with the Implementation Plan as the task description. Use `profile="default-delegation"` for budget controls. `working_dir` must be under `/Users/jeremyparker/Desktop/Claude Coding Projects`.
 3. Monitor with `mcp__deepseek-agent__poll`. Wait for completion.
-4. **If run() returns state ≠ "completed"**: immediately run
-   `bash ~/.claude/commands/deepseek-post-run-check.sh`
-   It will diff current files against HEAD and report any
-   unexpected post-timeout mutations. Revert or commit
-   all unexpected changes before proceeding with review.
-5. **Review every file** the agent modified — line by line. Apply the Code Review Mindset.
-6. **Verify each feature against the plan**: find the implementation, confirm it is wired and functional, not dead code or a stub.
-7. **Run ALL tests yourself**: unit tests, integration tests, linting, type checks, build. Show output.
-8. **Run E2E / happy-path validation yourself**: start the app, exercise features, verify behavior.
-9. Rate: "high confidence" / "needs fixes" / "redo".
-10. Fix issues yourself or send a targeted follow-up. Never approve incomplete work.
+4. **Review every file** the agent modified — line by line. Apply the Code Review Mindset.
+5. **Verify each feature against the plan**: find the implementation, confirm it is wired and functional, not dead code or a stub.
+6. **Re-run build + lint + type-check yourself**: mandatory verification, not optional. If DeepSeek passed these, they should pass for you in seconds. If they fail, the agent's work has issues. Then run Playwright yourself as the final E2E gate.
+7. **Run qualification checks yourself**: start the app, exercise the happy path, run any unit/integration tests the agent didn't cover. Own the pass/fail decision.
+8. Rate: "high confidence" / "needs fixes" / "redo".
+9. Fix issues yourself or send a targeted follow-up. Never approve incomplete work.
 
 ### Task Routing
 
 | Task Type | Handler | Examples |
 |-----------|---------|----------|
 | **Backend code** | DeepSeek | APIs, databases, auth logic, data processing, scripts, CLI tools, infrastructure |
-| **Frontend code** | You (with impeccable) | React/Vue/Angular components, CSS/Tailwind, layouts, UI state, design, accessibility |
-| **Full-stack** | Split | DeepSeek does the API/backend, you do the UI/frontend |
-| **All testing** | You | Unit tests, integration tests, E2E, linting, type checks, build verification |
-| **All validation** | You | Feature completeness checks, security review, code review |
+| **Frontend UI** | You (with impeccable) | React/Vue/Angular components, CSS/Tailwind, layouts, UI state, design, accessibility |
+| **Full-stack** | Split | DeepSeek does the API/backend + mechanical checks, you do the UI/frontend + qualification |
+| **Mechanical testing** | Both | DeepSeek runs first (cheap, budget-capped). Claude Code re-runs build+lint+type-check to verify, then runs Playwright as final gate |
+| **Test qualification** | You | Final pass/fail, re-run build/lint/type-check to verify, Playwright as final gate, unit/integration tests for your own code |
+| **Validation** | You | Feature completeness, security review, code review, architecture review |
 | **Security** | You | Security scanning, vulnerability audits, hardening, secrets detection, OWASP review |
 | **Small tasks (~5 files)** | You | Changes touching ~5 or fewer files — handle directly, DeepSeek overhead not worth it |
 
@@ -135,8 +129,56 @@ When handling frontend directly, use impeccable skills for design quality:
 - `/audit` + `/polish` before shipping
 - `/animate` for interactions, `/colorize` for visual interest
 
-Never delegate frontend tasks to DeepSeek — even if the task seems simple.
-Run every test yourself — independent verification is non-negotiable for all code.
+Never delegate frontend UI implementation to DeepSeek — even if the task seems simple.
+DeepSeek runs mechanical checks first (build, lint, type-check, Playwright) under budget limits. You re-run build + lint + type-check as a mandatory verify, then run Playwright as the final E2E gate. Both agents check; DeepSeek catches issues cheaply, you confirm independently.
+
+### Playwright Test Coverage
+
+Comprehensive Playwright E2E tests are mandatory for every frontend feature in projects with a web UI.
+
+**DeepSeek's responsibility** (include in every delegation that touches frontend-facing behavior):
+- Write Playwright tests covering the feature's happy path and key error states
+- Run `npx playwright test` and iterate until all tests pass
+- Update existing Playwright tests if the feature changes existing behavior
+- Tests must pass before the agent reports completion
+
+**Claude Code's responsibility:**
+- Write Playwright tests for frontend work done directly (not delegated)
+- Review DeepSeek's Playwright tests for coverage gaps during code review
+- Run a final Playwright pass as part of qualification — owns the pass/fail decision
+- Add edge-case and accessibility tests as needed
+
+**Rule:** No feature is done until its Playwright tests pass. Both agents enforce this for their own work.
+
+### Budget Controls
+
+Use the `default-delegation` profile for every `run()` call. It enforces:
+
+| Limit | Default | Purpose |
+|-------|---------|---------|
+| `max_iterations` | 200 | Caps tool call cycles — prevents infinite fix/retry loops |
+| `max_cost_usd` | 0.50 | Hard dollar cap per task — prevents runaway API spend |
+
+**Usage:**
+```
+run(task="...", working_dir="...", profile="default-delegation")
+```
+
+**Adjusting per-task:** For larger tasks (new service, major refactor), override inline:
+```
+run(task="...", working_dir="...", profile="default-delegation",
+    config={"budget": {"max_iterations": 400, "max_cost_usd": 1.00}})
+```
+
+**Live adjustment:** If a running agent needs more budget:
+```
+configure(action="update", agent_id=id, config_patch={"budget": {"max_iterations": 300}})
+```
+
+**When agent hits a limit** (`state=limit_reached`): review what it accomplished. Either extend the budget with `configure(action="update")` or take over the remaining work yourself.
+
+**Task description footer** — include in every delegation:
+> "Run build, lint, type-check, and Playwright tests after implementation. If any fail, fix and retry. Do not exceed the iteration budget — if you can't fix it in 3 attempts, stop and report the specific errors."
 
 ### Delegation Threshold
 

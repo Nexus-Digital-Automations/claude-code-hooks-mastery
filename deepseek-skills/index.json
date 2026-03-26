@@ -1,48 +1,115 @@
 {
-  "version": 1,
+  "version": 2,
   "skills_dir": "~/.claude/deepseek-skills",
   "skills": [
     {
+      "name": "backend-scope",
+      "path": "backend-scope/SKILL.md",
+      "description": "Hard constraint: backend only, never generate frontend code",
+      "always_include": true
+    },
+    {
+      "name": "code-standards",
+      "path": "code-standards/SKILL.md",
+      "description": "Backend coding standards, naming conventions, and quality requirements",
+      "always_include": true
+    },
+    {
+      "name": "self-review",
+      "path": "self-review/SKILL.md",
+      "description": "Mandatory self-review checklist before reporting done — variable scope, dead code, test alignment, imports",
+      "always_include": true
+    },
+    {
       "name": "implement-feature",
       "path": "implement-feature/SKILL.md",
-      "description": "Step-by-step feature implementation workflow",
-      "keywords": ["build", "create", "implement", "make", "add", "feature", "app", "service", "component", "dashboard", "page"],
+      "description": "Backend feature implementation workflow with dependency-order building",
+      "keywords": ["build", "create", "implement", "make", "add", "feature", "service", "endpoint", "module"],
       "triggers": ["Build X", "Create X", "Implement X", "Make X", "Add feature X", "Write a X"]
     },
     {
       "name": "fix-bug",
       "path": "fix-bug/SKILL.md",
-      "description": "Systematic bug fix methodology with reproduction and verification",
+      "description": "Systematic server-side bug fixing — root cause first, then minimal fix",
       "keywords": ["fix", "bug", "error", "crash", "broken", "failing", "wrong", "issue", "debug"],
       "triggers": ["Fix X", "Debug X", "Why is X broken"]
     },
     {
       "name": "refactor",
       "path": "refactor/SKILL.md",
-      "description": "Safe refactoring with test preservation",
+      "description": "Backend-specific safe refactoring with test preservation",
       "keywords": ["refactor", "restructure", "reorganize", "clean up", "simplify", "extract", "rename"],
       "triggers": ["Refactor X", "Clean up X", "Restructure X"]
     },
     {
       "name": "tdd-workflow",
       "path": "tdd-workflow/SKILL.md",
-      "description": "Test-driven development: red-green-refactor cycle",
+      "description": "Backend TDD with integration tests — red-green-refactor strictly enforced",
       "keywords": ["test", "tdd", "test-driven", "tests first", "testing"],
       "triggers": ["TDD", "test-driven", "write tests first"]
     },
     {
-      "name": "code-standards",
-      "path": "code-standards/SKILL.md",
-      "description": "Project coding standards, naming conventions, and quality requirements",
-      "keywords": ["standard", "convention", "style", "quality", "lint", "format"],
-      "always_include": true
-    },
-    {
       "name": "api-builder",
       "path": "api-builder/SKILL.md",
-      "description": "REST/GraphQL API design and implementation patterns",
-      "keywords": ["api", "rest", "graphql", "endpoint", "route", "controller", "crud"],
+      "description": "REST API design — pagination, versioning, rate limiting, error format",
+      "keywords": ["api", "rest", "graphql", "endpoint", "route", "controller", "crud", "pagination", "versioning"],
       "triggers": ["Build an API", "Create an endpoint", "REST API"]
+    },
+    {
+      "name": "error-handling",
+      "path": "error-handling/SKILL.md",
+      "description": "Structured errors, logging, retries, and circuit breakers",
+      "keywords": ["error handling", "logging", "retry", "circuit breaker", "structured error", "observability"],
+      "triggers": ["Add error handling", "Implement logging", "Add retries"]
+    },
+    {
+      "name": "database-patterns",
+      "path": "database-patterns/SKILL.md",
+      "description": "Schema design, migrations, queries, ORM usage, and connection management",
+      "keywords": ["database", "schema", "migration", "query", "sql", "orm", "postgres", "mysql", "sqlite", "table", "model"],
+      "triggers": ["Create a database", "Write a migration", "Design the schema"]
+    },
+    {
+      "name": "auth-security",
+      "path": "auth-security/SKILL.md",
+      "description": "JWT, OAuth2, RBAC, OWASP input sanitization, password handling",
+      "keywords": ["auth", "authentication", "authorization", "jwt", "oauth", "rbac", "security", "password", "login", "session", "permission"],
+      "triggers": ["Add authentication", "Implement JWT", "Secure the API"]
+    },
+    {
+      "name": "middleware-patterns",
+      "path": "middleware-patterns/SKILL.md",
+      "description": "Request pipeline ordering, CORS, rate limiting, validation, logging",
+      "keywords": ["middleware", "cors", "rate limit", "request validation", "request pipeline", "interceptor"],
+      "triggers": ["Add middleware", "Configure CORS", "Add rate limiting"]
+    },
+    {
+      "name": "data-processing",
+      "path": "data-processing/SKILL.md",
+      "description": "ETL pipelines, batch processing, file parsing, serialization",
+      "keywords": ["data import", "etl", "batch", "csv", "parse", "pipeline", "transform", "export", "ingest", "serialization"],
+      "triggers": ["Import data", "Build an ETL pipeline", "Parse CSV"]
+    },
+    {
+      "name": "cli-tools",
+      "path": "cli-tools/SKILL.md",
+      "description": "Argument parsing, config management, output formatting, script safety",
+      "keywords": ["cli", "command line", "script", "argparse", "click", "cobra", "shell script", "bash script"],
+      "triggers": ["Build a CLI tool", "Write a script", "Create a command"]
+    },
+    {
+      "name": "infrastructure",
+      "path": "infrastructure/SKILL.md",
+      "description": "Docker, health checks, graceful shutdown, environment management, CI/CD",
+      "keywords": ["docker", "dockerfile", "compose", "health check", "graceful shutdown", "ci/cd", "deploy", "container", "infrastructure"],
+      "triggers": ["Dockerize", "Add health checks", "Set up CI/CD"]
+    },
+    {
+      "name": "async-patterns",
+      "path": "async-patterns/SKILL.md",
+      "description": "Async/await, task queues, WebSockets, event-driven patterns, concurrency",
+      "keywords": ["async", "await", "queue", "celery", "bull", "websocket", "event", "background job", "concurrency", "worker"],
+      "triggers": ["Add a background job", "Implement WebSocket", "Add async processing"]
     }
   ]
 }
