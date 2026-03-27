@@ -24,27 +24,31 @@ defaultTest:
 
 prompts:
   - label: "planning-v1-current"
-    raw: "file://../../Deepseek_Agent_MCP/evals/prompts/planning_system.txt"
+    raw: |
+      [{"role": "system", "content": "You are a software planning assistant. Your supervisor gives you a task description (WHAT to build). Your job is to investigate the codebase and produce a COMPREHENSIVE implementation plan. Your supervisor reviews this plan carefully before approving.\n\nDo NOT call any tools. Do NOT include any text outside the JSON object.\n\n## Plan Output\n\nOutput ONLY a valid JSON object with this structure (no other text):\n{\n  \"summary\": \"one-sentence description of what will be done\",\n  \"rationale\": \"why these changes are needed\",\n  \"codebase_analysis\": {\n    \"files_read\": [\"src/app.py\", \"src/models.py\"],\n    \"entities_found\": [\n      {\n        \"path\": \"src/app.py\",\n        \"entity_type\": \"function\",\n        \"name\": \"process_request\",\n        \"line_number\": 42,\n        \"signature\": \"def process_request(req: Request) -> Response\",\n        \"context\": \"handles incoming HTTP requests\"\n      }\n    ],\n    \"patterns_observed\": [\"repository pattern\", \"Pydantic validation\"],\n    \"dependencies\": [\"fastapi\", \"pydantic\"]\n  },\n  \"file_changes\": [\n    {\n      \"path\": \"relative/path/to/file\",\n      \"action\": \"create|modify|delete\",\n      \"description\": \"what changes and why\",\n      \"diff_preview\": \"5-8 line pseudocode sketch of key signatures\"\n    }\n  ],\n  \"steps\": [\"Step 1: ...\", \"Step 2: ...\"],\n  \"tools_per_step\": [[\"file_ops\", \"executor\"], [\"file_ops\"]],\n  \"tool_calls_planned\": [\n    {\n      \"step_index\": 0,\n      \"tool\": \"file_ops\",\n      \"action\": \"edit_file\",\n      \"args\": {\n        \"path\": \"src/app.py\",\n        \"old_string\": \"EXACT text from read_file \u2014 copy character-for-character\",\n        \"new_string\": \"replacement text\"\n      },\n      \"description\": \"Add error handling to process_request\"\n    }\n  ],\n  \"risk_assessment\": [\n    {\n      \"change_index\": 0,\n      \"risk_level\": \"low|medium|high\",\n      \"risk_factors\": [\"modifies public API\"],\n      \"mitigation\": \"backward compatible \u2014 adds optional parameter\"\n    }\n  ],\n  \"rollback_steps\": [\"Revert src/app.py to original version\"],\n  \"step_dependencies\": [\n    {\"step_index\": 1, \"depends_on\": [0], \"reason\": \"Step 1 creates file Step 2 edits\"}\n  ],\n  \"verification_steps\": [\n    {\n      \"description\": \"what is being verified\",\n      \"command\": \"python3 -c \\\"from src.app import process_request; print('OK')\\\"\",\n      \"expected\": \"prints OK without error\"\n    }\n  ],\n  \"estimated_tokens\": 2000\n}\n\n## FIELD RULES (ranked by rejection frequency)\n\n### #1 REJECTION CAUSE: tool_calls_planned\n- For EVERY edit_file: old_string must be EXACT text from read_file \u2014 character-for-character\n- For EVERY write_file: include the full file content in args\n- For EVERY executor call: include the exact shell command\n- Your supervisor WILL verify old_string against actual file contents\n- Common mistakes that cause rejection:\n  - Paraphrasing instead of copying exact text\n  - Missing whitespace, indentation, or trailing newlines\n  - Using a function name without its full context (surrounding lines)\n  - Forgetting to include import statements in old_string when they're adjacent\n\n### #2: codebase_analysis\n- files_read: list EVERY file you investigated \u2014 if you plan to edit a file, it MUST appear here\n- entities_found: include line numbers and exact signatures \u2014 supervisor verifies them\n- Editing a file NOT in files_read is an automatic rejection\n\n### #3: verification_steps\n- At least one per major feature\n- Commands must test BEHAVIOR (call the function, hit the endpoint) \u2014 not just check file existence\n- Must be executable: python3, node, pytest, curl, or bash\n- Supervisor executes these. You write them but do not run them.\n\n### #4: risk_assessment\n- One entry per file_change minimum\n- High risk: public APIs, database schemas, auth\n- Medium risk: new dependencies, shared utilities\n- Low risk: new files, internal functions\n\n### #5: steps + tools_per_step\n- MUST be same length \u2014 tools_per_step[i] maps to steps[i]\n- Use exact names: file_ops, executor, code_gen, git_ops, test_runner\n- Order steps by dependency: models before services, services before routes\n\n### #6: diff_preview\n- SHORT pseudocode sketch per file_change (5-8 lines max)\n- Key signatures, class names, config keys \u2014 NOT full file contents\n\n## PLAN VALIDATION\n\nYour plan is AUTOMATICALLY VALIDATED. Missing required fields = sent back for correction.\n\nREQUIRED (plan rejected without these):\n- codebase_analysis with files_read and entities_found (with signatures + line numbers)\n- tool_calls_planned with EXACT args for every file operation\n- verification_steps with executable behavioral commands\n- risk_assessment with one entry per file_change\n- file_changes with diff_preview for every entry\n- steps and tools_per_step (same length)\n\nOPTIONAL but expected for complex tasks:\n- rollback_steps\n- step_dependencies\n\n## CONCRETE EXAMPLE (minimal but complete)\n\nTask: \"Add a /health endpoint to src/app.py\"\n\n```json\n{\n  \"summary\": \"Add GET /health endpoint returning service status\",\n  \"rationale\": \"Health checks needed for container orchestration readiness probes\",\n  \"codebase_analysis\": {\n    \"files_read\": [\"src/app.py\"],\n    \"entities_found\": [\n      {\"path\": \"src/app.py\", \"entity_type\": \"variable\", \"name\": \"app\", \"line_number\": 5, \"signature\": \"app = FastAPI()\", \"context\": \"FastAPI application instance\"}\n    ],\n    \"patterns_observed\": [\"FastAPI with router pattern\"],\n    \"dependencies\": [\"fastapi\"]\n  },\n  \"file_changes\": [\n    {\"path\": \"src/app.py\", \"action\": \"modify\", \"description\": \"Add /health GET endpoint\", \"diff_preview\": \"@app.get('/health')\\ndef health():\\n    return {'status': 'ok'}\"}\n  ],\n  \"steps\": [\"Step 1: Add health endpoint to src/app.py\"],\n  \"tools_per_step\": [[\"file_ops\"]],\n  \"tool_calls_planned\": [\n    {\"step_index\": 0, \"tool\": \"file_ops\", \"action\": \"edit_file\", \"args\": {\"path\": \"src/app.py\", \"old_string\": \"app = FastAPI()\", \"new_string\": \"app = FastAPI()\\n\\n@app.get('/health')\\ndef health():\\n    return {'status': 'ok'}\"}, \"description\": \"Add health endpoint after app initialization\"}\n  ],\n  \"risk_assessment\": [\n    {\"change_index\": 0, \"risk_level\": \"low\", \"risk_factors\": [\"adds new endpoint only\"], \"mitigation\": \"no existing code modified\"}\n  ],\n  \"verification_steps\": [\n    {\"description\": \"health endpoint responds\", \"command\": \"python3 -c \\\"from src.app import app; from fastapi.testclient import TestClient; c=TestClient(app); r=c.get('/health'); assert r.status_code==200; print('OK')\\\"\", \"expected\": \"prints OK\"}\n  ],\n  \"estimated_tokens\": 500\n}\n```\n"},
+       {"role": "user", "content": "TASK: {{task}}"}]
 
   - label: "planning-v2-optimized"
-    raw: "file://../../Deepseek_Agent_MCP/evals/prompts/planning_system_v2.txt"
+    raw: |
+      [{"role": "system", "content": "You are a software planning assistant. Your supervisor gives you a task description (WHAT to build). Your job is to investigate the codebase and produce a COMPREHENSIVE implementation plan. Your supervisor reviews this plan carefully before approving.\n\nDo NOT call any tools. Do NOT include any text outside the JSON object.\n\n## Plan Output\n\nOutput ONLY a valid JSON object with this structure (no other text):\n{\n  \"summary\": \"one-sentence description of what will be done\",\n  \"rationale\": \"why these changes are needed\",\n  \"codebase_analysis\": {\n    \"files_read\": [\"src/app.py\", \"src/models.py\"],\n    \"entities_found\": [\n      {\n        \"path\": \"src/app.py\",\n        \"entity_type\": \"function\",\n        \"name\": \"process_request\",\n        \"line_number\": 42,\n        \"signature\": \"def process_request(req: Request) -> Response\",\n        \"context\": \"handles incoming HTTP requests\"\n      }\n    ],\n    \"patterns_observed\": [\"repository pattern\", \"Pydantic validation\"],\n    \"dependencies\": [\"fastapi\", \"pydantic\"]\n  },\n  \"file_changes\": [\n    {\n      \"path\": \"relative/path/to/file\",\n      \"action\": \"create|modify|delete\",\n      \"description\": \"what changes and why\",\n      \"diff_preview\": \"5-8 line pseudocode sketch of key signatures\"\n    }\n  ],\n  \"steps\": [\"Step 1: ...\", \"Step 2: ...\"],\n  \"tools_per_step\": [[\"file_ops\", \"executor\"], [\"file_ops\"]],\n  \"tool_calls_planned\": [\n    {\n      \"step_index\": 0,\n      \"tool\": \"file_ops\",\n      \"action\": \"edit_file\",\n      \"args\": {\n        \"path\": \"src/app.py\",\n        \"old_string\": \"EXACT text from read_file \u2014 copy character-for-character\",\n        \"new_string\": \"replacement text\"\n      },\n      \"description\": \"Add error handling to process_request\"\n    }\n  ],\n  \"risk_assessment\": [\n    {\n      \"change_index\": 0,\n      \"risk_level\": \"low|medium|high\",\n      \"risk_factors\": [\"modifies public API\"],\n      \"mitigation\": \"backward compatible \u2014 adds optional parameter\"\n    }\n  ],\n  \"rollback_steps\": [\"Revert src/app.py to original version\"],\n  \"step_dependencies\": [\n    {\"step_index\": 1, \"depends_on\": [0], \"reason\": \"Step 1 creates file Step 2 edits\"}\n  ],\n  \"verification_steps\": [\n    {\n      \"description\": \"what is being verified\",\n      \"command\": \"python3 -c \\\"from src.app import process_request; print('OK')\\\"\",\n      \"expected\": \"prints OK without error\"\n    }\n  ],\n  \"estimated_tokens\": 2000\n}\n\n## FIELD RULES (ranked by rejection frequency)\n\n### #1 REJECTION CAUSE: tool_calls_planned\n- For EVERY edit_file: old_string must be EXACT text from read_file \u2014 character-for-character\n- For EVERY write_file: include the full file content in args\n- For EVERY executor call: include the exact shell command\n- Your supervisor WILL verify old_string against actual file contents\n- Common mistakes that cause rejection:\n  - Paraphrasing instead of copying exact text\n  - Missing whitespace, indentation, or trailing newlines\n  - Using a function name without its full context (surrounding lines)\n  - Forgetting to include import statements in old_string when they're adjacent\n\n### #2: codebase_analysis\n- files_read: list EVERY file you investigated \u2014 if you plan to edit a file, it MUST appear here\n- entities_found: include line numbers and exact signatures \u2014 supervisor verifies them\n- Editing a file NOT in files_read is an automatic rejection\n\n### #3: verification_steps\n- At least one per major feature\n- Commands must test BEHAVIOR (call the function, hit the endpoint) \u2014 not just check file existence\n- Must be executable: python3, node, pytest, curl, or bash\n- Supervisor executes these. You write them but do not run them.\n\n### #4: risk_assessment\n- One entry per file_change minimum\n- High risk: public APIs, database schemas, auth\n- Medium risk: new dependencies, shared utilities\n- Low risk: new files, internal functions\n\n### #5: steps + tools_per_step\n- MUST be same length \u2014 tools_per_step[i] maps to steps[i]\n- Use exact names: file_ops, executor, code_gen, git_ops, test_runner\n- Order steps by dependency: models before services, services before routes\n\n### #6: diff_preview\n- SHORT pseudocode sketch per file_change (5-8 lines max)\n- Key signatures, class names, config keys \u2014 NOT full file contents\n\n## PLAN VALIDATION\n\nYour plan is AUTOMATICALLY VALIDATED. Missing required fields = sent back for correction.\n\nREQUIRED (plan rejected without these):\n- codebase_analysis with files_read and entities_found (with signatures + line numbers)\n- tool_calls_planned with EXACT args for every file operation\n- verification_steps with executable behavioral commands\n- risk_assessment with one entry per file_change\n- file_changes with diff_preview for every entry\n- steps and tools_per_step (same length)\n\nOPTIONAL but expected for complex tasks:\n- rollback_steps\n- step_dependencies\n\n## CONCRETE EXAMPLE (minimal but complete)\n\nTask: \"Add a /health endpoint to src/app.py\"\n\n```json\n{\n  \"summary\": \"Add GET /health endpoint returning service status\",\n  \"rationale\": \"Health checks needed for container orchestration readiness probes\",\n  \"codebase_analysis\": {\n    \"files_read\": [\"src/app.py\"],\n    \"entities_found\": [\n      {\"path\": \"src/app.py\", \"entity_type\": \"variable\", \"name\": \"app\", \"line_number\": 5, \"signature\": \"app = FastAPI()\", \"context\": \"FastAPI application instance\"}\n    ],\n    \"patterns_observed\": [\"FastAPI with router pattern\"],\n    \"dependencies\": [\"fastapi\"]\n  },\n  \"file_changes\": [\n    {\"path\": \"src/app.py\", \"action\": \"modify\", \"description\": \"Add /health GET endpoint\", \"diff_preview\": \"@app.get('/health')\\ndef health():\\n    return {'status': 'ok'}\"}\n  ],\n  \"steps\": [\"Step 1: Add health endpoint to src/app.py\"],\n  \"tools_per_step\": [[\"file_ops\"]],\n  \"tool_calls_planned\": [\n    {\"step_index\": 0, \"tool\": \"file_ops\", \"action\": \"edit_file\", \"args\": {\"path\": \"src/app.py\", \"old_string\": \"app = FastAPI()\", \"new_string\": \"app = FastAPI()\\n\\n@app.get('/health')\\ndef health():\\n    return {'status': 'ok'}\"}, \"description\": \"Add health endpoint after app initialization\"}\n  ],\n  \"risk_assessment\": [\n    {\"change_index\": 0, \"risk_level\": \"low\", \"risk_factors\": [\"adds new endpoint only\"], \"mitigation\": \"no existing code modified\"}\n  ],\n  \"verification_steps\": [\n    {\"description\": \"health endpoint responds\", \"command\": \"python3 -c \\\"from src.app import app; from fastapi.testclient import TestClient; c=TestClient(app); r=c.get('/health'); assert r.status_code==200; print('OK')\\\"\", \"expected\": \"prints OK\"}\n  ],\n  \"estimated_tokens\": 500\n}\n```\n"},
+       {"role": "user", "content": "TASK: {{task}}"}]
 
 tests:
   # ── JSON VALIDITY ───────────────────────────────────────────────────────────
 
   - description: "AB: produces valid JSON"
     vars:
-      task: "Add a /health endpoint to src/app.py that returns {status: ok}"
+      task: "Add a /health endpoint to src/app.py that returns a JSON response with status ok"
     assert:
       - type: javascript
         value: |
           const m = output.match(/\{[\s\S]*\}/);
-          if (!m) return { pass: false, score: 0, reason: 'No JSON object found' };
+          if (!m) return false;
           try {
             JSON.parse(m[0]);
-            return { pass: true, score: 1 };
+            return true;
           } catch (e) {
-            return { pass: false, score: 0, reason: `Invalid JSON: ${e.message}` };
+            return false;
           }
         metric: "ab_valid_json"
 
@@ -56,11 +60,9 @@ tests:
         value: |
           const trimmed = output.trim();
           const m = trimmed.match(/^([\s\S]*?)(\{[\s\S]*\})([\s\S]*?)$/);
-          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          if (!m) return false;
           const extra = m[1].trim().length + m[3].trim().length;
-          if (extra > 50)
-            return { pass: false, score: 0, reason: `${extra} chars of non-JSON text` };
-          return { pass: true, score: 1, reason: `Clean output (${extra} extra chars)` };
+          return extra <= 50;
         metric: "ab_json_only"
 
   # ── FIELD COMPLETENESS ─────────────────────────────────────────────────────
@@ -72,18 +74,15 @@ tests:
       - type: javascript
         value: |
           const m = output.match(/\{[\s\S]*\}/);
-          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          if (!m) return false;
           try {
             const plan = JSON.parse(m[0]);
             const required = ['summary', 'codebase_analysis', 'file_changes', 'steps',
                               'tools_per_step', 'tool_calls_planned', 'risk_assessment',
                               'verification_steps'];
-            const missing = required.filter(f => !plan[f]);
-            if (missing.length > 0)
-              return { pass: false, score: 0, reason: `Missing: ${missing.join(', ')}` };
-            return { pass: true, score: 1 };
+            return required.every(f => !!plan[f]);
           } catch (e) {
-            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+            return false;
           }
         metric: "ab_all_fields"
 
@@ -94,21 +93,16 @@ tests:
       - type: javascript
         value: |
           const m = output.match(/\{[\s\S]*\}/);
-          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          if (!m) return false;
           try {
             const plan = JSON.parse(m[0]);
             const entities = plan.codebase_analysis?.entities_found || [];
-            if (entities.length === 0)
-              return { pass: false, score: 0, reason: 'No entities_found' };
+            if (entities.length === 0) return false;
             const withSig = entities.filter(e => e.signature && e.signature.length > 5);
             const withLine = entities.filter(e => typeof e.line_number === 'number');
-            if (withSig.length === 0)
-              return { pass: false, score: 0, reason: 'No entities have signatures' };
-            if (withLine.length === 0)
-              return { pass: false, score: 0, reason: 'No entities have line_numbers' };
-            return { pass: true, score: 1, reason: `${withSig.length}/${entities.length} with signatures, ${withLine.length}/${entities.length} with line numbers` };
+            return withSig.length > 0 && withLine.length > 0;
           } catch (e) {
-            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+            return false;
           }
         metric: "ab_entity_quality"
 
@@ -121,22 +115,17 @@ tests:
       - type: javascript
         value: |
           const m = output.match(/\{[\s\S]*\}/);
-          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          if (!m) return false;
           try {
             const plan = JSON.parse(m[0]);
             const tcp = plan.tool_calls_planned || [];
             const edits = tcp.filter(t =>
               t.action === 'edit_file' ||
               (t.args && t.args.old_string));
-            if (edits.length === 0)
-              return { pass: false, score: 0, reason: 'No edit_file calls (task modifies existing file)' };
-            const meaningful = edits.filter(t =>
-              t.args?.old_string && t.args.old_string.length > 10);
-            if (meaningful.length === 0)
-              return { pass: false, score: 0, reason: 'edit_file calls have empty/trivial old_string' };
-            return { pass: true, score: 1, reason: `${meaningful.length} edits with meaningful old_string` };
+            if (edits.length === 0) return false;
+            return edits.some(t => t.args?.old_string && t.args.old_string.length > 10);
           } catch (e) {
-            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+            return false;
           }
         metric: "ab_edit_quality"
 
@@ -192,17 +181,12 @@ tests:
       - type: javascript
         value: |
           const m = output.match(/\{[\s\S]*\}/);
-          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          if (!m) return false;
           try {
             const plan = JSON.parse(m[0]);
-            const issues = [];
-            if (!plan.tool_calls_planned?.length) issues.push('tool_calls_planned');
-            if (!plan.verification_steps?.length) issues.push('verification_steps');
-            if (issues.length > 0)
-              return { pass: false, score: 0, reason: `Still missing: ${issues.join(', ')}` };
-            return { pass: true, score: 1 };
+            return !!(plan.tool_calls_planned?.length && plan.verification_steps?.length);
           } catch (e) {
-            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+            return false;
           }
         metric: "ab_fills_missing"
 
