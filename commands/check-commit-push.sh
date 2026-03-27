@@ -7,7 +7,12 @@
 # Usage (skip with reason):
 #   bash ~/.claude/commands/check-commit-push.sh --skip "no changes to commit — read-only task"
 
-VR_FILE="$HOME/.claude/data/verification_record.json"
+SESSION_ID=$(python3 -c "
+import sys; from pathlib import Path
+sys.path.insert(0, str(Path.home() / '.claude/hooks/utils'))
+from vr_utils import get_session_id; print(get_session_id())
+" 2>/dev/null || echo "default")
+VR_FILE="$HOME/.claude/data/verification_record_${SESSION_ID}.json"
 CHECK_KEY="commit_push"
 mkdir -p "$HOME/.claude/data"
 
@@ -24,10 +29,15 @@ if evidence_file and os.path.exists(evidence_file):
         os.unlink(evidence_file)
     except Exception:
         pass
-_cur_sid = None
+_session_id = None
 try:
-    with open(os.path.expanduser("~/.claude/data/current_task.json")) as _ctf:
-        _cur_sid = json.load(_ctf).get("session_id")
+    # Try session-scoped current_task first, fall back to legacy global
+    import glob as _cg
+    _ct_candidates = sorted(_cg.glob(os.path.expanduser("~/.claude/data/current_task_*.json")), key=os.path.getmtime, reverse=True)
+    _ct_path = _ct_candidates[0] if _ct_candidates else os.path.expanduser("~/.claude/data/current_task.json")
+    with open(_ct_path) as _ctf:
+        _ct = json.load(_ctf)
+        _session_id = _ct.get("session_id")
 except Exception:
     pass
 try:
@@ -35,8 +45,7 @@ try:
         record = json.load(f)
 except Exception:
     record = {}
-if _cur_sid and record.get("session_id") and record["session_id"] != _cur_sid:
-    record = {"reset_at": datetime.now().isoformat(), "session_id": _cur_sid, "checks": {}}
+record.setdefault("session_id", _session_id)
 record.setdefault("checks", {})[check_key] = {
     "status": status,
     "timestamp": datetime.utcnow().isoformat() + "Z",

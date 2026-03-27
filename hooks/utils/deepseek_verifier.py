@@ -363,27 +363,44 @@ def _skipped(reason: str) -> dict:
 
 
 def _get_current_identity() -> tuple[str, str]:
-    """Read current agent_id and prompt_id from identity/task files.
+    """Read current agent_id and prompt_id from session-scoped identity/task files.
 
     Returns (agent_id, prompt_id). Empty strings on failure.
     Used for ownership validation to prevent cross-session contamination.
     """
+    from utils.vr_utils import get_session_id
+    sid = get_session_id()
+
     agent_id = ""
     prompt_id = ""
-    try:
-        ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-        agent_id = ct.get("agent_id", "")
-        prompt_id = ct.get("prompt_id", "")
-    except Exception:
-        pass
-    if not agent_id:
+    # Try session-scoped current_task first
+    for _ct_path in [
+        Path.home() / f".claude/data/current_task_{sid}.json",
+        Path.home() / ".claude/data/current_task.json",
+    ]:
         try:
-            identity = json.loads(
-                (Path.home() / ".claude/data/agent_identity.json").read_text()
-            )
-            agent_id = identity.get("agent_id", "")
+            if _ct_path.exists():
+                ct = json.loads(_ct_path.read_text())
+                agent_id = ct.get("agent_id", "")
+                prompt_id = ct.get("prompt_id", "")
+                if agent_id:
+                    break
         except Exception:
             pass
+    if not agent_id:
+        # Try session-scoped identity file
+        for _id_path in [
+            Path.home() / f".claude/data/agent_identity_{sid}.json",
+            Path.home() / ".claude/data/agent_identity.json",
+        ]:
+            try:
+                if _id_path.exists():
+                    identity = json.loads(_id_path.read_text())
+                    agent_id = identity.get("agent_id", "")
+                    if agent_id:
+                        break
+            except Exception:
+                pass
     return agent_id, prompt_id
 
 
@@ -414,9 +431,12 @@ def _load_state(state_file: Path) -> list:
         saved_at = data.get("saved_at", "")
         if saved_at:
             try:
-                identity = json.loads(
-                    (Path.home() / ".claude/data/agent_identity.json").read_text()
-                )
+                from utils.vr_utils import get_session_id as _get_sid
+                _sid = _get_sid()
+                _id_file = Path.home() / f".claude/data/agent_identity_{_sid}.json"
+                if not _id_file.exists():
+                    _id_file = Path.home() / ".claude/data/agent_identity.json"
+                identity = json.loads(_id_file.read_text())
                 session_created = identity.get("created_at", "")
                 if session_created and saved_at < session_created:
                     try:

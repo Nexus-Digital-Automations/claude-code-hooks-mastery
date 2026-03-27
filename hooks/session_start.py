@@ -106,16 +106,83 @@ def get_recent_issues():
     return None
 
 
-def reset_verification_record(session_id: str = "unknown") -> None:
-    """Clean up stale VR files from previous sessions.
+def _generate_agent_identity(session_id: str) -> str:
+    """Generate a unique agent_id for this session and persist it.
 
-    With task-scoped VR files (verification_record_{task_id}.json), there's no
-    single global file to reset. Instead, delete all task-scoped VR files and
-    the legacy global file so the new session starts clean.
+    The agent_id is a UUID that uniquely identifies this session's agent.
+    It scopes all DeepSeek reviewer state files and prevents cross-session
+    contamination. Written to ~/.claude/data/agent_identity_{session_id}.json
+    (session-scoped to avoid clobbering across concurrent sessions).
+
+    Returns the agent_id string.
+    """
+    import uuid
+    agent_id = str(uuid.uuid4())
+    identity_file = Path.home() / f".claude/data/agent_identity_{session_id}.json"
+    try:
+        identity_file.parent.mkdir(parents=True, exist_ok=True)
+        identity_file.write_text(json.dumps({
+            "agent_id": agent_id,
+            "session_id": session_id,
+            "created_at": datetime.now().isoformat(),
+        }, indent=2))
+    except Exception:
+        pass  # Never block session start
+    return agent_id
+
+
+def _register_active_session(session_id: str, working_dir: str) -> None:
+    """Register this session in active_sessions.json keyed by working_dir.
+
+    This lookup table lets shell scripts (authorize-stop.sh) find the correct
+    session_id for the current working directory without a global singleton file.
+    Multiple concurrent sessions write to different keys, avoiding clobber.
+    """
+    sessions_file = Path.home() / ".claude/data/active_sessions.json"
+    try:
+        sessions = {}
+        if sessions_file.exists():
+            sessions = json.loads(sessions_file.read_text())
+        sessions[working_dir] = session_id
+        sessions_file.write_text(json.dumps(sessions, indent=2))
+    except Exception:
+        pass  # Never block session start
+
+
+def reset_verification_record(session_id: str = "unknown") -> None:
+    """Clean up stale state files from previous sessions.
+
+    Deletes VR files, legacy global files, stale session-scoped identity/task
+    files, and orphaned DeepSeek files so the new session starts clean.
     """
     import glob as _glob
     _claude_data = Path.home() / ".claude" / "data"
     _claude_data.mkdir(parents=True, exist_ok=True)
+
+    # Read previous agent identity (session-scoped) for targeted cleanup
+    _old_agent_id = None
+    _identity_file = _claude_data / f"agent_identity_{session_id}.json"
+    if not _identity_file.exists():
+        # Fallback: check legacy global file
+        _identity_file = _claude_data / "agent_identity.json"
+    try:
+        if _identity_file.exists():
+            _old = json.loads(_identity_file.read_text())
+            _old_agent_id = _old.get("agent_id")
+    except Exception:
+        pass
+
+    # Targeted cleanup: delete state files belonging to the old agent
+    if _old_agent_id:
+        for _suffix in [
+            f"deepseek_context_{_old_agent_id}.json",
+            f"deepseek_review_state_{_old_agent_id}.json",
+            f"deepseek_review_state_{_old_agent_id}.rejections",
+        ]:
+            try:
+                (_claude_data / _suffix).unlink(missing_ok=True)
+            except Exception:
+                pass
 
     # Delete legacy global VR
     legacy = _claude_data / "verification_record.json"
@@ -132,14 +199,42 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         except Exception:
             pass
 
-    # Clean up stale DeepSeek context and review state files from previous sessions.
+    # Clean up stale session-scoped files (not matching current session)
+    for _pattern in [
+        "agent_identity_*.json",         # Session-scoped identity files
+        "current_task_*.json",           # Session-scoped task files
+        "stop_authorization_*.json",     # Session-scoped auth files
+    ]:
+        for _path_str in _glob.glob(str(_claude_data / _pattern)):
+            # Keep the current session's files
+            if session_id != "unknown" and session_id in _path_str:
+                continue
+            try:
+                Path(_path_str).unlink(missing_ok=True)
+            except Exception:
+                pass
+
+    # Clean up legacy global singleton files (replaced by session-scoped versions)
+    for _legacy_name in [
+        "agent_identity.json",
+        "current_task.json",
+        "stop_authorization.json",
+    ]:
+        try:
+            (_claude_data / _legacy_name).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+    # Glob-based fallback: clean up orphaned DeepSeek files from any agent.
     # user_prompt_submit.py also does this, but session_start provides a belt-and-
     # suspenders guarantee even if prompt-submit cleanup fails silently.
     for _pattern in [
         "deepseek_context.json",        # Legacy global file
-        "deepseek_context_*.json",       # Task-scoped context files
-        "deepseek_review_state_*.json",  # Task-scoped review state files
+        "deepseek_context_*.json",       # Agent/task-scoped context files
+        "deepseek_review_state_*.json",  # Agent/task-scoped review state files
         "deepseek_review_state_*.rejections",  # Rejection counters (IMP-027)
+        "deepseek_run_snapshot.json",    # Mutation-detection snapshot
+        "deepseek_delegations.json",     # Delegation ring buffer
     ]:
         for _path_str in _glob.glob(str(_claude_data / _pattern)):
             try:
@@ -148,13 +243,15 @@ def reset_verification_record(session_id: str = "unknown") -> None:
                 pass
 
 
-def load_development_context(source):
+def load_development_context(source, agent_id=""):
     """Load relevant development context based on session source."""
     context_parts = []
 
-    # Add timestamp
+    # Add timestamp and agent identity
     context_parts.append(f"Session started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     context_parts.append(f"Session source: {source}")
+    if agent_id:
+        context_parts.append(f"Agent ID: {agent_id}")
 
     # Add session rules (autonomous + validation, concise)
     session_rules = """
@@ -163,9 +260,12 @@ def load_development_context(source):
 2. VALIDATE: Before declaring any task complete, run actual commands and show output.
    Minimum: tests + build. No claims without evidence.
    Format: Command: <x> | Result: ✅/❌ | Output: <actual snippet>
-3. ROOT CLEAN: Never create files at project root except essential configs.
-4. STOP: Use /authorize-stop after presenting validation proof.
-5. EXECUTE DON'T RECOMMEND: If you can do it, do it. Never say "I recommend X" or "You should Y" for actions within your capability. Ask for user approval only for risky, destructive, or irreversible actions — then execute immediately upon approval.
+3. VERIFICATION PLAN: State your verification commands (pytest, npm test, build, curl) BEFORE
+   implementing. Reading code (find, cat, grep) is investigation, NOT verification.
+   No test/build proof = not done.
+4. ROOT CLEAN: Never create files at project root except essential configs.
+5. STOP: Use /authorize-stop after presenting validation proof.
+6. EXECUTE DON'T RECOMMEND: If you can do it, do it. Never say "I recommend X" or "You should Y" for actions within your capability.
 """
     context_parts.append(session_rules)
 
@@ -195,41 +295,52 @@ strong a coder as you — expect mistakes. Its code will often have missing erro
 handling, wrong variable names, logic bugs, and incomplete implementations.
 Thorough review and testing catch real problems every time.
 
-BEFORE DELEGATING — WRITE AN IMPLEMENTATION PLAN:
-- Features: every distinct operation as a numbered list (expand CRUD ops individually)
-- Architecture: file structure, patterns, which files to create/modify
-- Contracts: key function signatures, API endpoints, data shapes
+BEFORE DELEGATING — WRITE A TASK DESCRIPTION (not a full plan):
+- Features: what to build as a numbered list
 - Constraints: what NOT to change, what to preserve
-- Error handling: expected failure modes
 - Verification criteria: how you will validate each feature
-Scale the plan to the task. 5-file fix = 8-line plan. New service = 30-line plan.
+Scale to the task: 5-10 lines for a bug fix, 15-20 for a feature.
+Do NOT include architecture, function signatures, or file-by-file instructions.
+DeepSeek investigates the codebase and produces its own comprehensive plan.
 
 DIVISION OF LABOR:
-- You (Claude Code): planning, testing, validation, frontend, review, security
-- DeepSeek Agent: code building — backend, APIs, scripts, infrastructure
+- You (Claude Code): task description, plan review, verify build/lint/type-check, final Playwright gate, frontend UI, security
+- DeepSeek Agent: codebase investigation, planning, code building, first-pass mechanical checks (build/lint/type-check/Playwright, budget-capped), Playwright test writing
+- Both: Playwright test coverage — comprehensive E2E tests mandatory for every frontend feature
 
 DELEGATION PROTOCOL:
-- Write the Implementation Plan, then delegate via mcp__deepseek-agent__run
-- The plan IS the task description — embed it in the run() call
+- Write the task description, then delegate via mcp__deepseek-agent__run
+- Use profile="default-delegation" — plan mode is enabled by default
+- DeepSeek investigates the codebase with read-only tools and produces a comprehensive plan
+- Returns state="awaiting_approval" — review the plan before any code is written
 - Monitor with mcp__deepseek-agent__poll
-- Do NOT ask DeepSeek to run tests — you verify independently
+
+PLAN REVIEW (mandatory — before approving):
+- plan(agent_id, "get") to inspect the plan
+- Check codebase_analysis: did it read the right files? Do entity signatures match?
+  READ THE FILES YOURSELF to verify claims.
+- Check tool_calls_planned: do old_string values match actual file contents?
+  READ THE FILES YOURSELF to verify edit strings.
+- Check risk_assessment: are risks identified for each change?
+- Red flags: editing a file not in files_read, empty old_string, no risk assessment
+- plan(agent_id, "approve") / plan(agent_id, "edit", ...) / plan(agent_id, "reject", ...)
 
 AFTER AGENT COMPLETES (mandatory — every time):
 1. Read EVERY file the agent modified — line by line, not skimming
 2. Check for: off-by-one errors, missing error handling, wrong variable names,
    hardcoded values, broken imports, security vulnerabilities, logic that
    doesn't match the plan
-3. Run ALL tests yourself — unit, integration, E2E
-4. Run the linter yourself
-5. Run the build yourself
+3. Re-run build + lint + type-check yourself (mandatory — should pass in seconds if agent passed)
+4. Run Playwright yourself as the final E2E gate
+5. Run any unit/integration tests the agent didn't cover
 6. Start the app and exercise the happy path yourself
 7. If you find ANY issue: fix it yourself OR send a specific follow-up task
 8. Never say "output looks good" without citing specific evidence
 
 TASKS YOU KEEP (do NOT delegate):
-- Planning and architecture decisions
-- ALL testing and validation
-- ALL frontend work — use impeccable skills
+- Plan review and approval — investigate anything suspicious
+- Test qualification — re-run build/lint/type-check, final Playwright gate, unit/integration tests
+- ALL frontend UI work — use impeccable skills (DeepSeek writes Playwright tests for features it adds, not UI code)
 - Questions, explanations, read-only reviews
 - Git operations, security audits
 - ALL security work — scanning, auditing, vulnerability review, hardening
@@ -599,6 +710,12 @@ def main():
         # Reset verification record — prevent stale cross-session evidence
         reset_verification_record(session_id)
 
+        # Generate unique agent identity for this session (scopes DeepSeek state)
+        agent_id = _generate_agent_identity(session_id)
+
+        # Register this session in active_sessions.json for shell script lookups
+        _register_active_session(session_id, os.getcwd())
+
         # Log the session start event
         log_session_start(input_data)
 
@@ -620,7 +737,7 @@ Multi-agent coordination enabled for this session.
 
         # Load development context if requested
         if args.load_context:
-            context = load_development_context(source)
+            context = load_development_context(source, agent_id=agent_id)
             # Add swarm context if initialized
             if swarm_context:
                 context = swarm_context + "\n" + context

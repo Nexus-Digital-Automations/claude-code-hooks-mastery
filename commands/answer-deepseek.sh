@@ -4,20 +4,36 @@
 #
 # After running this, re-run authorize-stop to continue the review.
 
-TASK_ID=$(python3 -c "
-import json, os
+# Use agent_id for state file scoping (prevents cross-session contamination).
+# Falls back to task_id for backward compatibility.
+VR_UTILS="$HOME/.claude/hooks/utils"
+
+# Get session_id for session-scoped file lookup
+SESSION_ID=$(python3 -c "
+import sys; sys.path.insert(0, '$VR_UTILS')
+from vr_utils import get_session_id; print(get_session_id())
+" 2>/dev/null || echo "default")
+
+# Prefer agent_id from session-scoped identity file
+SCOPE_ID=$(python3 -c "
+import json
 from pathlib import Path
-ct = Path(os.path.expanduser('~/.claude/data/current_task.json'))
-if ct.exists():
-    try:
-        d = json.loads(ct.read_text())
-        print(d.get('task_id', 'default'))
-    except Exception:
-        print('default')
-else:
+sid = '$SESSION_ID'
+# Try session-scoped first
+f = Path.home() / f'.claude/data/agent_identity_{sid}.json'
+if not f.exists():
+    f = Path.home() / '.claude/data/agent_identity.json'
+try:
+    d = json.loads(f.read_text())
+    aid = d.get('agent_id', '')
+    if aid:
+        print(aid)
+    else:
+        raise ValueError
+except Exception:
     print('default')
 " 2>/dev/null || echo "default")
-STATE_FILE="$HOME/.claude/data/deepseek_review_state_${TASK_ID}.json"
+STATE_FILE="$HOME/.claude/data/deepseek_review_state_${SCOPE_ID}.json"
 ANSWER="$1"
 
 if [ -z "$ANSWER" ]; then

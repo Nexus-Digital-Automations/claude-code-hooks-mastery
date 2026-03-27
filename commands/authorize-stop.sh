@@ -6,13 +6,35 @@
 
 VR_UTILS="$HOME/.claude/hooks/utils"
 
-TASK_ID=$(python3 -c "
+SESSION_ID=$(python3 -c "
 import sys; sys.path.insert(0, '$VR_UTILS')
-from vr_utils import get_task_id; print(get_task_id())
+from vr_utils import get_session_id; print(get_session_id())
 " 2>/dev/null || echo "default")
 
-AUTH_FILE="$HOME/.claude/data/stop_authorization.json"
-VR_FILE="$HOME/.claude/data/verification_record_${TASK_ID}.json"
+# Agent ID for DeepSeek state file scoping (prevents cross-session contamination)
+# Uses session-scoped identity file; falls back to legacy global
+AGENT_ID=$(python3 -c "
+import json
+from pathlib import Path
+sid = '$SESSION_ID'
+# Try session-scoped first
+f = Path.home() / f'.claude/data/agent_identity_{sid}.json'
+if not f.exists():
+    f = Path.home() / '.claude/data/agent_identity.json'
+try:
+    d = json.loads(f.read_text())
+    print(d.get('agent_id', ''))
+except Exception:
+    print('')
+" 2>/dev/null)
+# Fallback to SESSION_ID if identity file missing or empty
+if [ -z "$AGENT_ID" ]; then
+    AGENT_ID="$SESSION_ID"
+fi
+
+# Session-scoped auth file — prevents cross-session authorization leaks
+AUTH_FILE="$HOME/.claude/data/stop_authorization_${SESSION_ID}.json"
+VR_FILE="$HOME/.claude/data/verification_record_${SESSION_ID}.json"
 mkdir -p "$HOME/.claude/data"
 
 # Auto-run static checks (upstream_sync, lint) for pending items
@@ -22,7 +44,7 @@ if [ -f "$STATIC_CHECKER" ]; then
 fi
 
 # Auto-skip non-static checks for design/analysis tasks (no files modified)
-CONTEXT_FILE_EARLY="$HOME/.claude/data/deepseek_context_${TASK_ID}.json"
+CONTEXT_FILE_EARLY="$HOME/.claude/data/deepseek_context_${AGENT_ID}.json"
 python3 -c "
 import sys; sys.path.insert(0, '$VR_UTILS')
 from vr_utils import auto_skip_design_task
@@ -51,8 +73,8 @@ run_gate1_check('$AUTH_FILE', '$VR_FILE')
 
 # ── Gate 2: DeepSeek conversational evidence review ──────────────────────────
 DEEPSEEK_VERIFIER="$HOME/.claude/hooks/utils/deepseek_verifier.py"
-CONTEXT_FILE="$HOME/.claude/data/deepseek_context_${TASK_ID}.json"
-DEEPSEEK_STATE="$HOME/.claude/data/deepseek_review_state_${TASK_ID}.json"
+CONTEXT_FILE="$HOME/.claude/data/deepseek_context_${AGENT_ID}.json"
+DEEPSEEK_STATE="$HOME/.claude/data/deepseek_review_state_${AGENT_ID}.json"
 
 # Skip DeepSeek re-review after security scan — evidence hasn't changed
 SCAN_ALREADY_PASSED=$(python3 -c "

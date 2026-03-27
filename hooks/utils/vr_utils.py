@@ -70,13 +70,57 @@ def is_pending(vr_file: Path, key: str) -> bool:
         return True  # Assume pending if can't read
 
 
-# ── Task ID helper ────────────────────────────────────────────────────────
+# ── Task / Session ID helpers ─────────────────────────────────────────────
 
 def get_task_id() -> str:
-    """Read task_id from ~/.claude/data/current_task.json.  Returns 'default' on any error."""
+    """Read task_id from session-scoped current_task file. Returns 'default' on any error."""
+    sid = get_session_id()
+    for _ct_path in [
+        Path.home() / f".claude/data/current_task_{sid}.json",
+        Path.home() / ".claude/data/current_task.json",
+    ]:
+        try:
+            if _ct_path.exists():
+                ct = json.loads(_ct_path.read_text())
+                return ct.get("task_id", "default") or "default"
+        except Exception:
+            continue
+    return "default"
+
+
+def get_session_id() -> str:
+    """Read session_id for the current working directory.
+
+    Primary: active_sessions.json (maps working_dir → session_id).
+    This avoids the clobber bug where concurrent sessions overwrite a
+    single global file. Falls back to legacy current_task.json.
+    """
+    import os
+    cwd = os.getcwd()
+    # Primary: active_sessions.json lookup by working_dir
+    try:
+        sessions = json.loads(
+            (Path.home() / ".claude/data/active_sessions.json").read_text()
+        )
+        sid = sessions.get(cwd, "")
+        if sid:
+            return sid
+    except Exception:
+        pass
+    # Fallback: session-scoped current_task files (glob for any)
+    import glob as _g
+    for f in sorted(_g.glob(str(Path.home() / ".claude/data/current_task_*.json")),
+                    key=lambda p: Path(p).stat().st_mtime, reverse=True):
+        try:
+            ct = json.loads(Path(f).read_text())
+            if ct.get("working_dir", "") == cwd:
+                return ct.get("session_id", "default") or "default"
+        except Exception:
+            continue
+    # Final fallback: legacy global file
     try:
         ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-        return ct.get("task_id", "default") or "default"
+        return ct.get("session_id", "default") or "default"
     except Exception:
         return "default"
 
@@ -364,53 +408,125 @@ def auto_skip_design_task(vr_file: str, context_file: str | None = None) -> int:
     return skipped
 
 
+def get_agent_id() -> str:
+    """Read agent_id from session-scoped agent_identity file. Returns '' on error."""
+    try:
+        sid = get_session_id()
+        # Try session-scoped first
+        f = Path.home() / f".claude/data/agent_identity_{sid}.json"
+        if f.exists():
+            return json.loads(f.read_text()).get("agent_id", "")
+        # Fallback: legacy global file
+        f = Path.home() / ".claude/data/agent_identity.json"
+        if f.exists():
+            return json.loads(f.read_text()).get("agent_id", "")
+        return ""
+    except Exception:
+        return ""
+
+
 # ── Context refresh (used by authorize-stop.sh) ──────────────────────────
 
 def refresh_deepseek_context(context_file: str, vr_file: str) -> None:
-    """Refresh deepseek_context.json from the current transcript."""
+    """Refresh deepseek_context.json from current identity, task, and transcript.
+
+    Builds the context dict from scratch using authoritative sources rather
+    than augmenting the existing file, preventing stale fields from prior
+    tasks from leaking into the current review.
+    """
     context_path = Path(context_file)
     vr_path = Path(vr_file)
 
-    # Load existing context
+    # ── Read current identity (authoritative: session_start.py) ──
+    agent_id = ""
+    session_id = ""
+    # Use get_session_id() for concurrent-session-safe lookup
+    _sid = get_session_id()
     try:
-        existing = json.loads(context_path.read_text())
-    except Exception:
-        existing = {}
-
-    # Find transcript path
-    transcript_path = existing.get("transcript_path", "")
-    if not transcript_path or not Path(transcript_path).exists():
-        session_id = existing.get("session_id", "")
-        candidates = sorted(
-            Path.home().glob(".claude/projects/**/*.jsonl"),
-            key=lambda p: p.stat().st_mtime,
-            reverse=True,
-        )
-        if session_id:
-            matched = [p for p in candidates if session_id in p.name]
-            transcript_path = str(matched[0]) if matched else ""
-        else:
-            transcript_path = str(candidates[0]) if candidates else ""
-
-    # Determine task start time
-    task_start_ts = ""
-    try:
-        ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-        task_start_ts = ct.get("task_started_at", "")
+        _id_file = Path.home() / f".claude/data/agent_identity_{_sid}.json"
+        if not _id_file.exists():
+            _id_file = Path.home() / ".claude/data/agent_identity.json"
+        identity = json.loads(_id_file.read_text())
+        agent_id = identity.get("agent_id", "")
+        session_id = identity.get("session_id", "")
     except Exception:
         pass
+
+    # ── Read current task metadata (authoritative: user_prompt_submit.py) ──
+    prompt_id = ""
+    last_user_prompt = ""
+    task_started_at = ""
+    try:
+        _ct_file = Path.home() / f".claude/data/current_task_{_sid}.json"
+        if not _ct_file.exists():
+            _ct_file = Path.home() / ".claude/data/current_task.json"
+        ct = json.loads(_ct_file.read_text())
+        prompt_id = ct.get("prompt_id", "")
+        last_user_prompt = ct.get("prompt", "")
+        task_started_at = ct.get("task_started_at", "")
+    except Exception:
+        pass
+
+    # ── Determine task_start for transcript filtering ──
+    task_start_ts = task_started_at
     if not task_start_ts:
         try:
             task_start_ts = json.loads(vr_path.read_text()).get("reset_at", "")
         except Exception:
             pass
 
+    # ── Find transcript path ──
+    transcript_path = ""
+    candidates = sorted(
+        Path.home().glob(".claude/projects/**/*.jsonl"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    if session_id:
+        matched = [p for p in candidates if session_id in p.name]
+        transcript_path = str(matched[0]) if matched else ""
+    if not transcript_path:
+        transcript_path = str(candidates[0]) if candidates else ""
+
+    # ── Parse transcript for files_modified and bash_commands ──
     files_modified, bash_commands, _ = parse_transcript(transcript_path, task_start_ts)
 
-    existing["bash_commands"] = bash_commands
-    existing["files_modified"] = files_modified
-    existing["transcript_available"] = bool(transcript_path and Path(transcript_path).exists())
-    context_path.write_text(json.dumps(existing, indent=2))
+    # ── Recover stop-hook-written fields only if prompt_id matches ──
+    # stop.py writes last_assistant_message and task_type at stop time.
+    # Only trust these if the existing file belongs to the CURRENT prompt;
+    # otherwise leave empty (safe default — DeepSeek handles empty fields).
+    last_assistant_message = ""
+    task_type = ""
+    tool_summary = {}
+    try:
+        existing = json.loads(context_path.read_text())
+        existing_prompt_id = existing.get("prompt_id", "")
+        if existing_prompt_id and prompt_id and existing_prompt_id == prompt_id:
+            last_assistant_message = existing.get("last_assistant_message", "")
+            task_type = existing.get("task_type", "")
+            tool_summary = existing.get("tool_summary", {})
+            if not last_user_prompt:
+                last_user_prompt = existing.get("last_user_prompt", "")
+    except Exception:
+        pass
+
+    # ── Build fresh context dict ──
+    ctx = {
+        "agent_id": agent_id,
+        "prompt_id": prompt_id,
+        "session_id": session_id,
+        "last_user_prompt": last_user_prompt,
+        "last_assistant_message": last_assistant_message,
+        "task_type": task_type,
+        "files_modified": files_modified,
+        "bash_commands": bash_commands,
+        "transcript_path": transcript_path,
+        "transcript_available": bool(transcript_path and Path(transcript_path).exists()),
+    }
+    if tool_summary:
+        ctx["tool_summary"] = tool_summary
+
+    context_path.write_text(json.dumps(ctx, indent=2))
 
 
 # ── Stale state cleanup (used by authorize-stop.sh) ──────────────────────

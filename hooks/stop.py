@@ -703,12 +703,12 @@ def detect_hedging_language(input_data):
     return (False, '', '', '')
 
 
-def check_stop_authorization():
+def check_stop_authorization(session_id: str = "default"):
     """
-    Check if stop is authorized via file-based configuration.
+    Check if stop is authorized via session-scoped file.
     Returns True if authorized, False otherwise.
     """
-    auth_file = Path.home() / ".claude/data/stop_authorization.json"
+    auth_file = Path.home() / f".claude/data/stop_authorization_{session_id}.json"
 
     # If file doesn't exist, default to NOT authorized (blocked)
     if not auth_file.exists():
@@ -810,15 +810,14 @@ _VR_SKIP_CMDS = {
 }
 
 
-def read_verification_record() -> dict:
-    """Read task-scoped verification_record_{task_id}.json.
-    Returns all-pending default if missing or unreadable."""
-    try:
-        ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-        task_id = ct.get("task_id", "default")
-    except Exception:
-        task_id = "default"
-    vr_file = Path.home() / f".claude/data/verification_record_{task_id}.json"
+def read_verification_record(session_id: str = "default") -> dict:
+    """Read session-scoped verification_record_{session_id}.json.
+    Returns all-pending default if missing or unreadable.
+
+    Accepts session_id directly instead of reading current_task.json,
+    which avoids clobbering issues with concurrent sessions.
+    """
+    vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
     all_pending = {
         k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
         for k, _ in _VR_CHECKS_ORDER
@@ -953,6 +952,40 @@ def format_evidence_display(done_items: list, checks: dict) -> str:
         lines.append("")
     lines.append("=" * 70)
     return "\n".join(lines)
+
+
+def check_request_completion():
+    """Soft check: remind the agent to verify each part of the original request was completed.
+
+    Reads the original user prompt from current_task.json and prints a
+    self-check reminder to stderr. This is informational (never blocks via
+    exit(2)) — the existing verification checklist handles the hard gate.
+    """
+    try:
+        task_file = Path.home() / ".claude/data/current_task.json"
+        if not task_file.exists():
+            return
+        task_data = json.loads(task_file.read_text())
+        prompt = task_data.get("prompt", "").strip()
+        if not prompt or len(prompt) < 20:
+            return
+
+        msg = f"""
+{'=' * 70}
+COMPLETION SELF-CHECK — Did you do what was asked?
+{'=' * 70}
+
+Original request: "{prompt}"
+
+Before stopping, verify EACH part of the request was completed:
+  • Break the request into individual items
+  • For each item: was it implemented? Can you cite evidence?
+  • If any item was NOT completed, go back and finish it now.
+{'=' * 70}
+"""
+        print(msg, file=sys.stderr)
+    except Exception:
+        pass  # Never block stop for a soft check failure
 
 
 def main():
@@ -1151,11 +1184,40 @@ Verify it, then stop.
             print(hedging_msg, file=sys.stderr)
             sys.exit(2)
 
+        # REQUEST COMPLETION SELF-CHECK — remind agent to verify each part of the original request
+        check_request_completion()
+
         # Write DeepSeek review context early (before any blocking checks) so
         # authorize-stop.sh always has fresh context even if agent runs it directly.
         try:
             _files_mod, _bash_cmds, _last_prompt = _extract_transcript_context(input_data)
+
+            # Read agent_id and prompt_id for ownership scoping
+            # Use session-scoped files to avoid clobbering with concurrent sessions
+            _agent_id = ""
+            _prompt_id = ""
+            _sid = input_data.get("session_id", "")
+            try:
+                _id_file = Path.home() / f".claude/data/agent_identity_{_sid}.json"
+                if not _id_file.exists():
+                    _id_file = Path.home() / ".claude/data/agent_identity.json"
+                _identity = json.loads(_id_file.read_text())
+                _agent_id = _identity.get("agent_id", "")
+            except Exception:
+                pass
+            _ct_file = Path.home() / f".claude/data/current_task_{_sid}.json"
+            if not _ct_file.exists():
+                _ct_file = Path.home() / ".claude/data/current_task.json"
+            try:
+                _ct_data = json.loads(_ct_file.read_text())
+                _task_id = _ct_data.get("task_id", "default")
+                _prompt_id = _ct_data.get("prompt_id", "")
+            except Exception:
+                _task_id = "default"
+
             _ds_ctx = {
+                "agent_id": _agent_id,
+                "prompt_id": _prompt_id,
                 "last_user_prompt": _last_prompt or input_data.get("last_user_prompt", ""),
                 "last_assistant_message": input_data.get("last_assistant_message", ""),
                 "task_type": _get_session_task_type(input_data.get("session_id", "")),
@@ -1166,20 +1228,16 @@ Verify it, then stop.
                 "transcript_available": bool(input_data.get("transcript_path", "")),
             }
             (Path.home() / ".claude/data").mkdir(parents=True, exist_ok=True)
-            # Write task-scoped context file (keyed by task_id from current_task.json)
-            _ct_file = Path.home() / ".claude/data/current_task.json"
-            try:
-                _task_id = json.loads(_ct_file.read_text()).get("task_id", "default")
-            except Exception:
-                _task_id = "default"
-            (Path.home() / f".claude/data/deepseek_context_{_task_id}.json").write_text(
+            # Write agent-scoped context file (prefer agent_id, fallback to task_id)
+            _scope_id = _agent_id or _task_id
+            (Path.home() / f".claude/data/deepseek_context_{_scope_id}.json").write_text(
                 json.dumps(_ds_ctx, indent=2)
             )
         except Exception:
             pass
 
         # VERIFICATION CHECKLIST CHECK — blocks stop if any of 10 items are pending
-        _vr = read_verification_record()
+        _vr = read_verification_record(input_data.get("session_id", "default"))
         _vr_complete, _vr_done, _vr_pending = check_verification_complete(_vr)
         if not _vr_complete:
             print(build_checklist_message(_vr_done, _vr_pending), file=sys.stderr)
@@ -1190,7 +1248,7 @@ Verify it, then stop.
         print(_evidence_display, file=sys.stderr)
 
         # AUTHORIZATION CHECK - blocks stop if not authorized
-        if not check_stop_authorization():
+        if not check_stop_authorization(input_data.get("session_id", "default")):
             # Get absolute path to authorize-stop.sh script
             script_dir = Path(__file__).parent
             auth_script = script_dir.parent / "commands" / "authorize-stop.sh"
@@ -1260,7 +1318,7 @@ Verify it, then stop.
             sys.exit(2)  # Exit code 2 blocks stop
 
         # ── Two-phase security scan gate ──────────────────────────────────────
-        _auth_file = Path.home() / ".claude/data/stop_authorization.json"
+        _auth_file = Path.home() / f".claude/data/stop_authorization_{input_data.get('session_id', 'default')}.json"
         _scan_complete = False
         _prior_report = None
         try:
@@ -1351,12 +1409,8 @@ Verify it, then stop.
         # Reset verification record for next task — all items back to pending
         try:
             from datetime import datetime as _dt
-            _task_id = "default"
-            try:
-                _task_id = json.loads((Path.home() / ".claude/data/current_task.json").read_text()).get("task_id", "default")
-            except Exception:
-                pass
-            _vr_file = Path.home() / f".claude/data/verification_record_{_task_id}.json"
+            _session_id = input_data.get("session_id", "default")
+            _vr_file = Path.home() / f".claude/data/verification_record_{_session_id}.json"
             _all_pending = {
                 k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
                 for k, _ in _VR_CHECKS_ORDER
