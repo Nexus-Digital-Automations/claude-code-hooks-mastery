@@ -1,0 +1,218 @@
+description: "DeepSeek system prompt effectiveness — tool discipline, code quality, edit correctness"
+
+# Tests the main system.md prompt that governs DeepSeek agent behavior.
+# Measures: tool use rules, file modification discipline, code quality, clarification protocol.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      temperature: 0.0
+      max_tokens: 2000
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+        temperature: 0.0
+        max_tokens: 2000
+
+prompts:
+  - label: "current-system-prompt"
+    raw: |
+      [{"role": "system", "content": "You are an expert coding agent powered by DeepSeek-V3.\n\nYOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles ALL testing, linting, and validation independently. Focus on writing high-quality code, not on running tests.\n\nTOOL USE RULES — MANDATORY, NO EXCEPTIONS:\n1. To MODIFY existing files: file_ops edit_file(path, old_string, new_string)\n   - ALWAYS read_file first to get the exact text\n   - old_string must appear exactly ONCE in the file\n   - Only the matched text is replaced — everything else is preserved\n   - If old_string not found: read the file again and copy exact text\n   - If old_string found multiple times: add more surrounding context\n2. To CREATE new files: file_ops write_file(path, content)\n   - write_file is BLOCKED on existing files — use edit_file instead\n   - 300-line limit; use append_file for remaining sections\n3. To ADD content to end of file: file_ops append_file(path, content)\n4. To UNDO a bad edit: file_ops undo_file(path)\n5. To RUN shell commands: executor run(command)\n6. NEVER show code in markdown blocks — write it to disk with tools\n7. After every edit, read_file to verify the change is correct\n\nCODE QUALITY — your code will be reviewed line-by-line by your supervisor:\n- No stubs, TODOs, or placeholder implementations\n- No empty event handlers or buttons that don't work\n- No alert()/confirm() in place of proper UI\n- Every feature requested must be fully implemented\n- Handle errors explicitly — no empty catch blocks\n- Write code you'd be proud of — your supervisor WILL read every line\n\nCOMPLETION: When you have written all files and confirmed contents via read-back, summarize what you built and which files you created/modified. Do NOT run test suites — your supervisor handles all testing.\n\nThink step by step. Use tools to DO the work, not to describe it.\n\nCLARIFICATION PROTOCOL — MANDATORY:\nBefore writing code, verify you understand the task:\n1. Read the files referenced in the implementation plan\n2. If ANYTHING is unclear — architecture, patterns, naming, edge cases — call ask_supervisor\n3. Do NOT guess. Asking is always cheaper than rewriting.\n4. You may call ask_supervisor at ANY point during execution.\n\nFILE MODIFICATION RULES — MANDATORY:\n1. ALWAYS read_file BEFORE editing — you need the exact text to match\n2. Use edit_file(path, old_string, new_string) — NOT write_file — for all changes\n3. old_string must be copied EXACTLY from the read_file output\n4. Preserve function signatures, exports, class names, module structure\n5. To INSERT new code: find surrounding context, replace it with context + new code\n6. write_file is ONLY for brand new files — it is BLOCKED on existing files\n7. After every edit, read_file to verify — do NOT assume it worked\n8. Changing return types, removing exports, or breaking APIs is FORBIDDEN\n   unless the plan explicitly says to do so\n9. If you accidentally damage a file, call undo_file(path) to restore from backup"},
+      {"role": "user", "content": "{{user_task}}"}]
+
+tests:
+  # ── TOOL DISCIPLINE ──────────────────────────────────────────────────────────
+
+  - description: "reads file before editing — never blind edits"
+    vars:
+      user_task: "Add a validate_email() function to the existing file src/utils.py"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response mentions reading src/utils.py first (read_file)
+          BEFORE proposing any edit_file call. The read step must come first.
+          Fail if: proposes edit_file or write_file without first reading the file.
+        threshold: 0.75
+        metric: "reads_before_editing"
+
+  - description: "uses edit_file for existing files, not write_file"
+    vars:
+      user_task: "Modify the existing file src/app.py to add a /health endpoint"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response uses edit_file (not write_file) to modify the
+          existing file src/app.py. write_file is blocked on existing files.
+          Fail if: proposes write_file for the existing file, or doesn't mention
+          which tool to use for the modification.
+        threshold: 0.75
+        metric: "edit_file_for_existing"
+
+  - description: "verifies edits with read_file after modifying"
+    vars:
+      user_task: "Edit src/config.py to change the default port from 3000 to 8080"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response includes a verification step — reading the file
+          back after editing to confirm the change was applied correctly.
+          Fail if: edits the file and moves on without any verification/read-back.
+        threshold: 0.70
+        metric: "verifies_after_edit"
+
+  - description: "uses write_file only for new files"
+    vars:
+      user_task: "Create a new file src/middleware/rate_limiter.py with a rate limiting class"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: uses write_file (or file_ops write_file) for the NEW file since
+          it doesn't exist yet. Creating a new file is the correct use of write_file.
+          Fail if: tries to use edit_file on a file that doesn't exist.
+        threshold: 0.75
+        metric: "write_file_for_new"
+
+  - description: "does not show code in markdown blocks — uses tools instead"
+    vars:
+      user_task: "Create a Python function that validates email addresses using regex"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response describes using file_ops tools (write_file or edit_file)
+          to write the code to disk. It should use tools to DO the work.
+          Fail if: the response shows the complete implementation in a markdown code
+          block without mentioning writing it to a file using tools. Describing what
+          the code will do is fine; dumping the full implementation in markdown is not.
+        threshold: 0.70
+        metric: "tools_not_markdown"
+
+  # ── CODE QUALITY ─────────────────────────────────────────────────────────────
+
+  - description: "no stubs or TODOs in implementation"
+    vars:
+      user_task: "Implement a user registration endpoint POST /api/users that validates email, hashes password with bcrypt, and stores the user in the database"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response describes or shows a COMPLETE implementation with
+          actual logic for email validation, password hashing, and database storage.
+          No TODO comments, no placeholder functions, no "implement later" notes.
+          Fail if: uses TODO, FIXME, "implement this", stub functions, pass statements,
+          or placeholder comments instead of real implementations.
+        threshold: 0.75
+        metric: "no_stubs_or_todos"
+
+  - description: "handles errors explicitly — no empty catch blocks"
+    vars:
+      user_task: "Write a function that reads a JSON config file and returns its contents"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response includes explicit error handling for file not found,
+          JSON parse errors, and/or permission errors. Catch blocks have real handling
+          (logging, re-raising, returning error response).
+          Fail if: uses bare except/catch, empty catch blocks, or swallows errors silently.
+        threshold: 0.70
+        metric: "explicit_error_handling"
+
+  - description: "every feature fully implemented — no partial work"
+    vars:
+      user_task: "Build a CRUD API for a Todo model with fields: id, title, completed, created_at. Endpoints: list all, create, get by id, update, delete."
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response plans or implements ALL 5 endpoints (list, create,
+          get, update, delete) — not just 2-3 and leaving the rest as "similar pattern".
+          Each endpoint must be addressed individually.
+          Fail if: implements only some endpoints and says "the rest follow the same
+          pattern" or leaves endpoints as stubs/TODOs.
+        threshold: 0.75
+        metric: "all_features_implemented"
+
+  # ── CLARIFICATION PROTOCOL ──────────────────────────────────────────────────
+
+  - description: "asks supervisor when task is ambiguous"
+    vars:
+      user_task: "Refactor the auth module"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response mentions needing to read existing code first, OR
+          asks for clarification about what specific refactoring is needed (what
+          auth module? what files? what patterns to apply?), OR calls ask_supervisor.
+          A vague task like "refactor the auth module" has many unknowns.
+          Fail if: immediately starts writing code without reading existing files
+          or asking any clarifying questions about scope.
+        threshold: 0.65
+        metric: "asks_when_ambiguous"
+
+  - description: "does not run tests — supervisor handles testing"
+    vars:
+      user_task: "Implement the user service with create, read, update, delete operations. After implementation, verify everything works."
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response implements the code and verifies by reading files
+          back, but does NOT run test suites (pytest, npm test, etc.). The system
+          prompt says "Do NOT run test suites — your supervisor handles all testing."
+          Fail if: the response includes running pytest, npm test, vitest, or any
+          test runner command as part of verification.
+        threshold: 0.70
+        metric: "no_test_execution"
+
+  # ── EDGE CASES ──────────────────────────────────────────────────────────────
+
+  - description: "handles edit_file old_string not found — re-reads file"
+    vars:
+      user_task: |
+        You tried to edit src/models.py but got this error:
+        {"error": "old_string not found in file"}
+        The edit_file call failed. What do you do next?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response says to re-read the file (read_file) to get the
+          exact current contents, then retry the edit with the correct old_string
+          copied exactly from the file.
+          Fail if: gives up, tries a different approach without re-reading, or
+          uses write_file to overwrite the entire file.
+        threshold: 0.75
+        metric: "handles_edit_failure"
+
+  - description: "uses undo_file for accidental damage"
+    vars:
+      user_task: |
+        You just ran edit_file on src/routes.py but the read-back shows the file
+        is now corrupted — the replacement broke the syntax. How do you recover?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions using undo_file to restore the file from backup,
+          then re-reading and attempting a corrected edit.
+          Fail if: tries to manually fix the corruption without using undo_file,
+          or suggests rewriting the entire file from scratch.
+        threshold: 0.70
+        metric: "uses_undo_for_recovery"
+
+  - description: "preserves API contracts — no breaking changes"
+    vars:
+      user_task: "Add input validation to the existing create_user(name, email, password) function in src/services/user.py"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response preserves the function signature create_user(name, email, password)
+          and adds validation logic INSIDE the function. Does not change the function name,
+          parameters, or return type.
+          Fail if: changes the function signature, renames it, adds new required parameters,
+          or changes the return type without noting this is a breaking change.
+        threshold: 0.75
+        metric: "preserves_api_contracts"
+
+outputPath: tests/promptfoo/results/22-deepseek-system-prompt.json

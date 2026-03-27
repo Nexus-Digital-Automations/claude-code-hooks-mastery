@@ -1,59 +1,25 @@
 ---
 name: api-builder
-description: REST/GraphQL API design and implementation patterns
+description: REST API design — pagination, versioning, rate limiting, error format
 ---
 
 # API Builder
 
-You are building an API. Follow these patterns for clean, maintainable endpoints.
-
 ## REST Conventions
+Plural nouns for resources (`/users`, `/orders`). Nested: `/users/{id}/orders`.
+GET=read, POST=create, PUT=replace, PATCH=update, DELETE=remove.
 
-- Use nouns for resources: `/users`, `/orders`, `/products`
-- Use HTTP methods correctly: GET (read), POST (create), PUT (replace), PATCH (update), DELETE (remove)
-- Use plural nouns: `/users` not `/user`
-- Nest related resources: `/users/{id}/orders`
-- Return appropriate status codes: 200, 201, 204, 400, 401, 403, 404, 422, 500
+## Status Codes
+200 success · 201 created (+ Location header) · 204 no body (DELETE) · 400 malformed · 401 no auth · 403 forbidden · 404 not found · 409 conflict · 422 validation fail · 429 rate limit (+ Retry-After) · 500 server error
 
-## Input Validation
+## Error Format
+`{"error": {"code": "VALIDATION_ERROR", "message": "Human-readable", "details": [{"field": "email", "message": "Invalid format"}]}}`
 
-- Validate ALL input at the boundary (request handlers)
-- Return 400/422 with specific error messages for invalid input
-- Never trust client-provided data — validate types, ranges, formats
-- Sanitize string inputs to prevent injection
+## Pagination
+Cursor-based for large sets. Response: `{"data": [...], "pagination": {"next_cursor": "abc", "has_more": true}}`. Default 20, max 100.
 
-## Error Response Format
-
-Use a consistent error response structure:
-```json
-{
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Human-readable description",
-    "details": [{"field": "email", "message": "Invalid email format"}]
-  }
-}
-```
-
-## Authentication & Authorization
-
-- Place auth middleware BEFORE route handlers
-- Validate tokens/sessions on every protected endpoint
-- Return 401 for missing/invalid credentials, 403 for insufficient permissions
-- Never expose internal auth details in error messages
+## Rate Limiting
+Per-endpoint (writes stricter). Headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`. 429 + `Retry-After`.
 
 ## Implementation Order
-
-1. Define routes and request/response schemas
-2. Implement input validation
-3. Write the business logic
-4. Add error handling
-5. Write integration tests for each endpoint
-6. Test edge cases: invalid input, missing auth, not found
-
-## Testing
-
-- Test each endpoint with valid and invalid input
-- Test authentication and authorization separately
-- Test error responses match the expected format
-- Use the actual HTTP layer (integration tests), not just unit tests
+1. Routes + schemas → 2. Input validation → 3. Service layer → 4. Error handling → 5. Integration tests → 6. Edge cases

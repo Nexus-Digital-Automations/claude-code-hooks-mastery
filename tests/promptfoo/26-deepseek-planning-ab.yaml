@@ -1,0 +1,209 @@
+description: "DeepSeek planning prompt A/B — current v1 vs optimized v2 planning prompts"
+
+# Compares planning_system.txt (v1) vs planning_system_v2.txt (v2).
+# Key improvements in v2: concrete example, ranked rejection causes,
+# common mistake warnings, clearer field rules.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      temperature: 0.0
+      max_tokens: 8192
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+        temperature: 0.0
+        max_tokens: 8192
+
+prompts:
+  - label: "planning-v1-current"
+    raw: "file://../../Deepseek_Agent_MCP/evals/prompts/planning_system.txt"
+
+  - label: "planning-v2-optimized"
+    raw: "file://../../Deepseek_Agent_MCP/evals/prompts/planning_system_v2.txt"
+
+tests:
+  # ── JSON VALIDITY ───────────────────────────────────────────────────────────
+
+  - description: "AB: produces valid JSON"
+    vars:
+      task: "Add a /health endpoint to src/app.py that returns {status: ok}"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON object found' };
+          try {
+            JSON.parse(m[0]);
+            return { pass: true, score: 1 };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Invalid JSON: ${e.message}` };
+          }
+        metric: "ab_valid_json"
+
+  - description: "AB: JSON only — no surrounding prose"
+    vars:
+      task: "Add input validation to POST /api/users in src/routes.py"
+    assert:
+      - type: javascript
+        value: |
+          const trimmed = output.trim();
+          const m = trimmed.match(/^([\s\S]*?)(\{[\s\S]*\})([\s\S]*?)$/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          const extra = m[1].trim().length + m[3].trim().length;
+          if (extra > 50)
+            return { pass: false, score: 0, reason: `${extra} chars of non-JSON text` };
+          return { pass: true, score: 1, reason: `Clean output (${extra} extra chars)` };
+        metric: "ab_json_only"
+
+  # ── FIELD COMPLETENESS ─────────────────────────────────────────────────────
+
+  - description: "AB: all required fields present"
+    vars:
+      task: "Add rate limiting to the API endpoints in src/routes/api.py using a sliding window algorithm"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const required = ['summary', 'codebase_analysis', 'file_changes', 'steps',
+                              'tools_per_step', 'tool_calls_planned', 'risk_assessment',
+                              'verification_steps'];
+            const missing = required.filter(f => !plan[f]);
+            if (missing.length > 0)
+              return { pass: false, score: 0, reason: `Missing: ${missing.join(', ')}` };
+            return { pass: true, score: 1 };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "ab_all_fields"
+
+  - description: "AB: entities_found has signatures and line numbers"
+    vars:
+      task: "Modify the user service in src/services/user.py to add email verification support"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const entities = plan.codebase_analysis?.entities_found || [];
+            if (entities.length === 0)
+              return { pass: false, score: 0, reason: 'No entities_found' };
+            const withSig = entities.filter(e => e.signature && e.signature.length > 5);
+            const withLine = entities.filter(e => typeof e.line_number === 'number');
+            if (withSig.length === 0)
+              return { pass: false, score: 0, reason: 'No entities have signatures' };
+            if (withLine.length === 0)
+              return { pass: false, score: 0, reason: 'No entities have line_numbers' };
+            return { pass: true, score: 1, reason: `${withSig.length}/${entities.length} with signatures, ${withLine.length}/${entities.length} with line numbers` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "ab_entity_quality"
+
+  # ── TOOL CALL QUALITY ──────────────────────────────────────────────────────
+
+  - description: "AB: edit_file calls have meaningful old_string"
+    vars:
+      task: "Add error handling to the existing create_order function in src/services/order.py. The function currently has no try/except blocks."
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const tcp = plan.tool_calls_planned || [];
+            const edits = tcp.filter(t =>
+              t.action === 'edit_file' ||
+              (t.args && t.args.old_string));
+            if (edits.length === 0)
+              return { pass: false, score: 0, reason: 'No edit_file calls (task modifies existing file)' };
+            const meaningful = edits.filter(t =>
+              t.args?.old_string && t.args.old_string.length > 10);
+            if (meaningful.length === 0)
+              return { pass: false, score: 0, reason: 'edit_file calls have empty/trivial old_string' };
+            return { pass: true, score: 1, reason: `${meaningful.length} edits with meaningful old_string` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "ab_edit_quality"
+
+  # ── BEHAVIORAL TESTS ───────────────────────────────────────────────────────
+
+  - description: "AB: respects file constraints"
+    vars:
+      task: "Add caching to src/services/product.py. Constraint: do NOT modify src/models.py or any files in tests/."
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the plan JSON does NOT include src/models.py or any tests/ files
+          in file_changes. These are explicitly forbidden.
+          Fail if: file_changes includes the forbidden files.
+        threshold: 0.75
+        metric: "ab_respects_constraints"
+
+  - description: "AB: correct dependency ordering in steps"
+    vars:
+      task: "Build a notification system: 1) Create model in src/models/notification.py, 2) Create service in src/services/notification.py, 3) Add endpoint in src/routes/notifications.py"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: steps follow dependency order — model first (no dependencies),
+          then service (depends on model), then route (depends on service).
+          Fail if: steps are out of order (route before model, etc.).
+        threshold: 0.70
+        metric: "ab_step_ordering"
+
+  - description: "AB: verification commands test behavior not existence"
+    vars:
+      task: "Add a discount calculation function to src/services/pricing.py that applies 10% off for orders over $100"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: verification_steps include commands that actually TEST the discount
+          logic (call the function with inputs, assert outputs) — not just check
+          that the file exists or imports correctly.
+          Fail if: verification only checks file existence or successful import
+          without testing actual discount calculation behavior.
+        threshold: 0.70
+        metric: "ab_behavioral_verification"
+
+  - description: "AB: fills in missing fields after correction"
+    vars:
+      task: |
+        Your plan was parsed but is INCOMPLETE. Fix:
+        1. MISSING tool_calls_planned
+        2. MISSING verification_steps
+        Original task: Add logging to src/api.py
+        Output the COMPLETE plan JSON.
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const issues = [];
+            if (!plan.tool_calls_planned?.length) issues.push('tool_calls_planned');
+            if (!plan.verification_steps?.length) issues.push('verification_steps');
+            if (issues.length > 0)
+              return { pass: false, score: 0, reason: `Still missing: ${issues.join(', ')}` };
+            return { pass: true, score: 1 };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "ab_fills_missing"
+
+outputPath: tests/promptfoo/results/26-deepseek-planning-ab.json

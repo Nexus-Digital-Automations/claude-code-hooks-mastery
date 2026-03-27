@@ -1,0 +1,264 @@
+description: "DeepSeek skills effectiveness — do always-included skills meaningfully change agent behavior?"
+
+# A/B tests: same task with and without skill injection.
+# Measures whether each core skill produces measurable behavioral change.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      temperature: 0.0
+      max_tokens: 1500
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+        temperature: 0.0
+        max_tokens: 1500
+
+prompts:
+  - label: "with-skills"
+    raw: |
+      [{"role": "system", "content": "You are an expert coding agent.\n\n{{skill_content}}\n\nUse tools to write code. Think step by step."},
+       {"role": "user", "content": "{{user_task}}"}]
+
+  - label: "without-skills"
+    raw: |
+      [{"role": "system", "content": "You are an expert coding agent.\n\nUse tools to write code. Think step by step."},
+       {"role": "user", "content": "{{user_task}}"}]
+
+tests:
+  # ── BACKEND-SCOPE SKILL ─────────────────────────────────────────────────────
+
+  - description: "backend-scope: refuses React component request"
+    vars:
+      skill_content: |
+        # Backend Scope
+        You are a backend-only coding agent. This constraint is non-negotiable.
+        You NEVER generate: React, Vue, Angular, Svelte, CSS, Tailwind, HTML templates,
+        frontend build configs, browser JavaScript, or frontend tests.
+        If the entire task is purely frontend, state it's outside your scope.
+      user_task: "Create a React component for a user profile card with avatar, name, and bio"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response states this task is outside backend scope, or refuses
+          to create a React component. May describe what backend API support it would need.
+          Fail if: writes React/JSX code, creates a component file, or implements the
+          frontend task without objecting.
+        threshold: 0.75
+        metric: "backend_scope_refuses_frontend"
+
+  - description: "backend-scope: implements only API portion of full-stack task"
+    vars:
+      skill_content: |
+        # Backend Scope
+        You are a backend-only coding agent. This constraint is non-negotiable.
+        You handle: APIs, databases, auth logic, middleware, data processing, scripts.
+        You NEVER generate: React, Vue, Angular, CSS, HTML, frontend code.
+        When a task involves frontend: implement ONLY the API/backend portion.
+      user_task: "Build a user dashboard that shows recent orders with a search bar and filters"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: implements only the backend API — endpoints for fetching orders,
+          search/filter query params, pagination. Does NOT create HTML/CSS/JS frontend.
+          Fail if: creates frontend HTML, CSS, JavaScript, or React components.
+        threshold: 0.70
+        metric: "backend_only_api_portion"
+
+  # ── SELF-REVIEW SKILL ──────────────────────────────────────────────────────
+
+  - description: "self-review: catches variable scope issue in callback"
+    vars:
+      skill_content: |
+        # Self-Review Before Done
+        Before reporting complete, check every file:
+        1. Variable Reference Audit: For every variable in .forEach, .map, .filter callbacks,
+           verify it references the correct scope (outer vs callback parameter).
+        2. Dead Code Scan: After every early return, verify code below is reachable.
+        3. Import Audit: Verify every import is actually used.
+      user_task: |
+        Review this code for issues:
+        ```javascript
+        function processUsers(users) {
+          const result = [];
+          users.forEach(user => {
+            const transformed = { name: users.name, email: user.email };
+            result.push(transformed);
+          });
+          return result;
+        }
+        ```
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: identifies the bug — `users.name` should be `user.name` (wrong
+          scope: using the outer array instead of the callback parameter).
+          Fail if: misses the scope bug or says the code looks correct.
+        threshold: 0.75
+        metric: "self_review_catches_scope_bug"
+
+  # ── ERROR-HANDLING SKILL ────────────────────────────────────────────────────
+
+  - description: "error-handling: produces structured error response envelope"
+    vars:
+      skill_content: |
+        # Error Handling
+        Every API error uses this structure:
+        {"error": {"code": "ERROR_CODE", "message": "Human-readable", "request_id": "req_abc", "details": []}}
+        Client errors (4xx): include details for caller to fix. Server errors (5xx): log trace, return generic message.
+        Structured logging as JSON with: level, message, request_id, timestamp, service, error.
+      user_task: "Write error handling for a POST /api/orders endpoint that can fail due to invalid input, item out of stock, or database errors"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the error responses follow the structured envelope format with
+          code, message, and details fields. Different error types (validation,
+          business logic, server) get different HTTP status codes. Server errors
+          don't expose internals.
+          Fail if: uses unstructured error strings, inconsistent formats, or exposes
+          stack traces/internals in client-facing error responses.
+        threshold: 0.70
+        metric: "structured_error_envelope"
+
+  # ── API-BUILDER SKILL ──────────────────────────────────────────────────────
+
+  - description: "api-builder: follows REST conventions"
+    vars:
+      skill_content: |
+        # API Builder — REST Conventions
+        - Nouns for resources: /users, /orders. Plural nouns.
+        - HTTP methods: GET read, POST create, PUT replace, PATCH update, DELETE remove.
+        - Status codes: 200 success, 201 created with Location header, 204 no body (DELETE),
+          400 malformed, 401 no auth, 403 forbidden, 404 not found, 409 conflict, 422 validation, 429 rate limit.
+        - Error format: {"error": {"code": "X", "message": "Y", "details": [...]}}
+        - Pagination: cursor-based for large sets, default page size 20, max 100.
+      user_task: "Design the API endpoints for a blog platform with posts and comments"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: uses plural nouns (/posts, /comments), correct HTTP methods for
+          each operation, appropriate status codes (201 for creation, 204 for delete),
+          and nested resources (/posts/{id}/comments).
+          Fail if: uses verbs in URLs (/createPost), wrong HTTP methods (POST for read),
+          wrong status codes, or singular nouns.
+        threshold: 0.70
+        metric: "rest_conventions_followed"
+
+  # ── TDD-WORKFLOW SKILL ─────────────────────────────────────────────────────
+
+  - description: "tdd-workflow: writes test before implementation"
+    vars:
+      skill_content: |
+        # TDD Workflow
+        Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.
+        Red: Write a failing test for the next piece of functionality. Run it — must fail.
+        Green: Write the SIMPLEST code to make the test pass. Run all tests — no regressions.
+        Refactor: Improve code. Run tests after EVERY change.
+        Wrote code before the test? Delete it. Start over.
+      user_task: "Implement a discount calculator that applies 10% off for orders over $100, 20% off for over $500"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response describes writing tests FIRST (red phase) — test cases
+          for the discount thresholds — BEFORE writing the calculator implementation.
+          Shows the test-first, then implement pattern.
+          Fail if: writes the implementation first and tests after, or doesn't mention
+          tests at all.
+        threshold: 0.70
+        metric: "test_before_implementation"
+
+  # ── AUTH-SECURITY SKILL ────────────────────────────────────────────────────
+
+  - description: "auth-security: uses bcrypt/argon2 not MD5/SHA"
+    vars:
+      skill_content: |
+        # Auth & Security
+        Password Handling: Hash with bcrypt or argon2 — NEVER MD5, SHA-1, or plain SHA-256.
+        Cost factor >= 12 for bcrypt. Rate limit login attempts. Never store plaintext.
+        JWT: Store signing secret in env var. Short access token expiry (15-30 min).
+        Input Sanitization: parameterized queries always, escape HTML, validate file paths.
+      user_task: "Implement user registration with password storage"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: uses bcrypt or argon2 for password hashing — NOT MD5, SHA-1, or
+          plain SHA-256. Mentions appropriate cost factor. Stores hash, not plaintext.
+          Fail if: uses MD5, SHA-1, SHA-256 alone, or stores plaintext passwords.
+        threshold: 0.75
+        metric: "secure_password_hashing"
+
+  # ── DATABASE-PATTERNS SKILL ─────────────────────────────────────────────────
+
+  - description: "database-patterns: uses parameterized queries not string concat"
+    vars:
+      skill_content: |
+        # Database Patterns
+        Query Patterns: Parameterized queries ALWAYS — never concatenate user input into SQL.
+        N+1 detection: if you query inside a loop, rewrite as JOIN or IN clause.
+        SELECT specific columns — avoid SELECT *. EXPLAIN queries on large tables.
+      user_task: "Write a function to search users by name from a PostgreSQL database"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: uses parameterized queries (placeholders like $1, %s, ?, or ORM
+          query builders) — NOT string concatenation or f-strings with user input.
+          Fail if: builds SQL by concatenating user input strings directly.
+        threshold: 0.80
+        metric: "parameterized_queries"
+
+  # ── CODE-STANDARDS SKILL ────────────────────────────────────────────────────
+
+  - description: "code-standards: reads existing code before writing"
+    vars:
+      skill_content: |
+        # Backend Code Standards
+        Read Before Writing:
+        - Read existing files in the same directory to match style
+        - Use the same naming convention as surrounding code
+        - Follow the same import organization pattern
+        - Reuse existing utilities — don't reinvent them
+      user_task: "Add a new endpoint to the existing API in src/routes/"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions reading existing route files first to understand patterns,
+          naming conventions, and existing utilities before writing new code.
+          Fail if: starts writing code without referencing existing patterns in the codebase.
+        threshold: 0.65
+        metric: "reads_existing_code_first"
+
+  # ── MIDDLEWARE-PATTERNS SKILL ───────────────────────────────────────────────
+
+  - description: "middleware-patterns: correct ordering (CORS before auth)"
+    vars:
+      skill_content: |
+        # Middleware Patterns — Ordering (Critical)
+        1. CORS — handle preflight before anything else
+        2. Request ID — generate correlation ID
+        3. Request logging — log method, path, start time
+        4. Rate limiting — reject before expensive work
+        5. Authentication — verify identity
+        6. Authorization — verify permissions
+        7. Input validation
+        8. Route handler
+        9. Error handling — catch-all
+        10. Response logging
+      user_task: "Set up the middleware stack for an Express.js API server"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: CORS middleware comes before authentication middleware in the stack.
+          Rate limiting comes before route handlers. Error handling is at the end.
+          Fail if: authentication comes before CORS, or error handling is not last,
+          or rate limiting comes after route handlers.
+        threshold: 0.70
+        metric: "correct_middleware_ordering"
+
+outputPath: tests/promptfoo/results/24-deepseek-skills-effectiveness.json

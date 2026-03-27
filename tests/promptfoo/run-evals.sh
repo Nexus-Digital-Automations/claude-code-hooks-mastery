@@ -91,6 +91,33 @@ case "$SUITE" in
   15) run_eval "15" "feature-completeness-validation" ;;
   16) run_eval "16" "feature-checklist-delegation" ;;
   17) run_eval "17" "division-of-labor" ;;
+  18) run_eval "18" "routing-v2-ab" ;;
+  19) run_eval "19" "ambiguity-v2-ab" ;;
+  20) run_eval "20" "validation-v2-ab" ;;
+  21) run_eval "21" "delegation-edge-cases" ;;
+  22) run_eval "22" "deepseek-system-prompt" ;;
+  23) run_eval "23" "deepseek-planning-prompt" ;;
+  24) run_eval "24" "deepseek-skills-effectiveness" ;;
+  25) run_eval "25" "deepseek-prompt-ab" ;;
+  26) run_eval "26" "deepseek-planning-ab" ;;
+  ab)
+    run_eval "18" "routing-v2-ab"
+    run_eval "19" "ambiguity-v2-ab"
+    run_eval "20" "validation-v2-ab"
+    run_eval "21" "delegation-edge-cases"
+    ;;
+  deepseek)
+    run_eval "14" "deepseek-mode-delegation"
+    run_eval "22" "deepseek-system-prompt"
+    run_eval "23" "deepseek-planning-prompt"
+    run_eval "24" "deepseek-skills-effectiveness"
+    run_eval "25" "deepseek-prompt-ab"
+    run_eval "26" "deepseek-planning-ab"
+    ;;
+  deepseek-ab)
+    run_eval "25" "deepseek-prompt-ab"
+    run_eval "26" "deepseek-planning-ab"
+    ;;
   hooks)
     run_eval "01" "agent-routing-directive"
     run_eval "02" "ambiguity-injection"
@@ -123,6 +150,15 @@ case "$SUITE" in
     run_eval "15" "feature-completeness-validation"
     run_eval "16" "feature-checklist-delegation"
     run_eval "17" "division-of-labor"
+    run_eval "18" "routing-v2-ab"
+    run_eval "19" "ambiguity-v2-ab"
+    run_eval "20" "validation-v2-ab"
+    run_eval "21" "delegation-edge-cases"
+    run_eval "22" "deepseek-system-prompt"
+    run_eval "23" "deepseek-planning-prompt"
+    run_eval "24" "deepseek-skills-effectiveness"
+    run_eval "25" "deepseek-prompt-ab"
+    run_eval "26" "deepseek-planning-ab"
     for yaml_file in "${AGENTS_DIR}"/*.yaml; do
       agent_name=$(basename "$yaml_file" .yaml)
       run_agent_eval "$agent_name"
@@ -133,7 +169,7 @@ case "$SUITE" in
     done
     ;;
   *)
-    echo "Usage: $0 [01-05|11|13-17|hooks|per-agent|all]"
+    echo "Usage: $0 [01-05|11|13-26|ab|deepseek|deepseek-ab|hooks|per-agent|all]"
     exit 1
     ;;
 esac

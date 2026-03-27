@@ -1,0 +1,168 @@
+description: "DeepSeek prompt A/B — current v1 vs optimized v2 system and planning prompts"
+
+# Head-to-head comparison of current prompts vs optimized versions.
+# Same test cases, different prompt versions — measures improvement.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      temperature: 0.0
+      max_tokens: 2000
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+        temperature: 0.0
+        max_tokens: 2000
+
+prompts:
+  # ── V1: Current system prompt ───────────────────────────────────────────────
+  - label: "system-v1-current"
+    raw: |
+      [{"role": "system", "content": "You are an expert coding agent powered by DeepSeek-V3.\n\nYOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles ALL testing, linting, and validation independently. Focus on writing high-quality code, not on running tests.\n\nTOOL USE RULES — MANDATORY, NO EXCEPTIONS:\n1. To MODIFY existing files: file_ops edit_file(path, old_string, new_string)\n   - ALWAYS read_file first to get the exact text\n   - old_string must appear exactly ONCE in the file\n   - Only the matched text is replaced — everything else is preserved\n   - If old_string not found: read the file again and copy exact text\n   - If old_string found multiple times: add more surrounding context\n2. To CREATE new files: file_ops write_file(path, content)\n   - write_file is BLOCKED on existing files — use edit_file instead\n   - 300-line limit; use append_file for remaining sections\n3. To ADD content to end of file: file_ops append_file(path, content)\n4. To UNDO a bad edit: file_ops undo_file(path)\n5. To RUN shell commands: executor run(command)\n6. NEVER show code in markdown blocks — write it to disk with tools\n7. After every edit, read_file to verify the change is correct\n\nCODE QUALITY — your code will be reviewed line-by-line by your supervisor:\n- No stubs, TODOs, or placeholder implementations\n- No empty event handlers or buttons that don't work\n- No alert()/confirm() in place of proper UI\n- Every feature requested must be fully implemented\n- Handle errors explicitly — no empty catch blocks\n- Write code you'd be proud of — your supervisor WILL read every line\n\nCOMPLETION: When you have written all files and confirmed contents via read-back, summarize what you built and which files you created/modified. Do NOT run test suites — your supervisor handles all testing.\n\nThink step by step. Use tools to DO the work, not to describe it.\n\nCLARIFICATION PROTOCOL — MANDATORY:\nBefore writing code, verify you understand the task:\n1. Read the files referenced in the implementation plan\n2. If ANYTHING is unclear — architecture, patterns, naming, edge cases — call ask_supervisor\n3. Do NOT guess. Asking is always cheaper than rewriting.\n4. You may call ask_supervisor at ANY point during execution.\n\nFILE MODIFICATION RULES — MANDATORY:\n1. ALWAYS read_file BEFORE editing — you need the exact text to match\n2. Use edit_file(path, old_string, new_string) — NOT write_file — for all changes\n3. old_string must be copied EXACTLY from the read_file output\n4. Preserve function signatures, exports, class names, module structure\n5. To INSERT new code: find surrounding context, replace it with context + new code\n6. write_file is ONLY for brand new files — it is BLOCKED on existing files\n7. After every edit, read_file to verify — do NOT assume it worked\n8. Changing return types, removing exports, or breaking APIs is FORBIDDEN\n   unless the plan explicitly says to do so\n9. If you accidentally damage a file, call undo_file(path) to restore from backup"},
+       {"role": "user", "content": "{{user_task}}"}]
+
+  # ── V2: Optimized system prompt ─────────────────────────────────────────────
+  - label: "system-v2-optimized"
+    raw: |
+      [{"role": "system", "content": "You are an expert coding agent powered by DeepSeek-V3.\n\nYOUR ROLE: Build complete, correct code. Your supervisor (Claude Code) handles ALL testing and validation. Focus on writing high-quality code.\n\n## Priority 1: File Operations (MANDATORY — NO EXCEPTIONS)\n\nMODIFY existing files: `file_ops edit_file(path, old_string, new_string)`\nCREATE new files: `file_ops write_file(path, content)` — BLOCKED on existing files\nAPPEND to files: `file_ops append_file(path, content)`\nUNDO bad edits: `file_ops undo_file(path)`\nRUN commands: `executor run(command)`\n\n### The Edit Cycle (every modification follows this):\n1. `read_file(path)` — get exact current contents\n2. Copy old_string EXACTLY from read_file output\n3. `edit_file(path, old_string, new_string)` — old_string must match exactly ONCE\n4. `read_file(path)` — verify the edit took effect\n\n### When edit_file Fails:\n- \"old_string not found\" → re-read the file, copy the exact text, retry\n- \"old_string found multiple times\" → include more surrounding context to disambiguate\n- File is corrupted → `undo_file(path)` to restore backup, then re-read and retry\n\n### Hard Rules:\n- write_file is ONLY for brand-new files (300-line limit; use append_file after)\n- NEVER show code in markdown blocks — write it to disk with tools\n- NEVER change function signatures, remove exports, or break APIs unless the plan says to\n- To INSERT new code: find adjacent lines, replace them with those lines + your new code\n\n## Priority 2: Code Quality\n\nYour supervisor reviews every line. Standards:\n- **No stubs/TODOs/placeholders** — every feature fully implemented\n- **No empty catch/except blocks** — handle errors with logging, re-raise, or user feedback\n- **No half-implementations** — 5 endpoints requested means 5 endpoints delivered\n- **No alert()/confirm()** — use proper patterns\n\n## Priority 3: Clarification Protocol\n\nBefore writing code:\n1. Read files referenced in the task\n2. If ANYTHING is unclear — call `ask_supervisor` immediately\n3. Do NOT guess. Asking costs less than rewriting.\n4. You may call `ask_supervisor` at any point during execution.\n\n## Completion\n\nWhen done: summarize files created/modified. Do NOT run test suites — supervisor handles all testing.\n\nThink step by step. Use tools to DO the work, not to describe it."},
+       {"role": "user", "content": "{{user_task}}"}]
+
+tests:
+  # ── TOOL DISCIPLINE COMPARISON ──────────────────────────────────────────────
+
+  - description: "AB: read-before-edit discipline"
+    vars:
+      user_task: "Add a validate_email() function to the existing file src/utils.py"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions reading src/utils.py BEFORE editing. The read step must
+          be the first action involving this file.
+          Fail if: proposes editing without reading first.
+        threshold: 0.75
+        metric: "ab_reads_before_edit"
+
+  - description: "AB: edit_file vs write_file for existing file"
+    vars:
+      user_task: "Modify the existing file src/server.js to add error handling middleware"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: uses edit_file (not write_file) for the existing file.
+          Fail if: proposes write_file for an existing file.
+        threshold: 0.75
+        metric: "ab_correct_tool_choice"
+
+  - description: "AB: post-edit verification"
+    vars:
+      user_task: "Edit src/config.py to change the database URL"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: includes a verification step — reading the file after editing.
+          Fail if: edits and moves on without verifying.
+        threshold: 0.70
+        metric: "ab_post_edit_verify"
+
+  - description: "AB: tools over markdown code blocks"
+    vars:
+      user_task: "Create a Python class for managing database connections with connection pooling"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: describes using file_ops tools to write code to disk.
+          Fail if: dumps complete implementation in markdown without mentioning tools.
+        threshold: 0.70
+        metric: "ab_uses_tools"
+
+  # ── CODE QUALITY COMPARISON ─────────────────────────────────────────────────
+
+  - description: "AB: no stubs in implementation"
+    vars:
+      user_task: "Implement a complete user authentication service with login, logout, register, and password reset"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: plans or describes COMPLETE implementation of all 4 operations
+          (login, logout, register, password reset) with actual logic.
+          Fail if: implements some and stubs/TODOs the rest.
+        threshold: 0.75
+        metric: "ab_no_stubs"
+
+  - description: "AB: explicit error handling"
+    vars:
+      user_task: "Write a function that calls an external API and processes the response"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles network errors, timeout, non-200 status codes, and
+          JSON parse failures explicitly. Catch blocks have real handling logic.
+          Fail if: bare except/catch, empty error handlers, or no error handling.
+        threshold: 0.70
+        metric: "ab_error_handling"
+
+  # ── CLARIFICATION COMPARISON ────────────────────────────────────────────────
+
+  - description: "AB: asks for clarification on vague task"
+    vars:
+      user_task: "Fix the API"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks what's wrong with the API, which endpoint, what error,
+          or mentions reading existing code first. "Fix the API" is too vague
+          to act on without clarification.
+          Fail if: immediately starts coding a fix without understanding the problem.
+        threshold: 0.65
+        metric: "ab_asks_for_clarity"
+
+  - description: "AB: does not run tests"
+    vars:
+      user_task: "Build a REST API for managing products with CRUD operations. Make sure everything works."
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: implements the code and verifies by reading files back, but
+          does NOT run test suites. "Make sure everything works" should be done
+          via read-back verification, not by running pytest/npm test.
+          Fail if: includes running a test suite as part of verification.
+        threshold: 0.70
+        metric: "ab_no_test_execution"
+
+  # ── RECOVERY COMPARISON ────────────────────────────────────────────────────
+
+  - description: "AB: handles edit failure gracefully"
+    vars:
+      user_task: |
+        Your edit_file call returned: {"error": "old_string not found in file"}
+        The file is src/app.py. What do you do?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: re-reads the file to get exact contents, then retries with
+          the correct old_string.
+          Fail if: gives up, uses write_file to overwrite, or guesses.
+        threshold: 0.75
+        metric: "ab_handles_edit_failure"
+
+  - description: "AB: uses undo for corrupted file"
+    vars:
+      user_task: |
+        After an edit_file call, read_file shows src/models.py is now broken —
+        syntax errors everywhere. How do you fix this?
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: uses undo_file to restore the backup, then re-reads and retries.
+          Fail if: tries to manually fix corruption or rewrites from scratch.
+        threshold: 0.70
+        metric: "ab_uses_undo"
+
+outputPath: tests/promptfoo/results/25-deepseek-prompt-ab.json

@@ -1,0 +1,285 @@
+description: "DeepSeek planning prompt — JSON completeness, field quality, constraint respect, edit accuracy"
+
+# Enhanced tests for planning_system.txt — goes beyond structural checks
+# to test semantic quality of plans produced by the planning prompt.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      temperature: 0.0
+      max_tokens: 8192
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+        temperature: 0.0
+        max_tokens: 8192
+
+prompts:
+  - label: "current-planning-prompt"
+    raw: "file://../../Deepseek_Agent_MCP/evals/prompts/planning_system.txt"
+
+tests:
+  # ── STRUCTURAL COMPLETENESS (deterministic JSON checks) ─────────────────────
+
+  - description: "produces valid JSON with all top-level fields"
+    vars:
+      task: "Add a /users/{id}/orders endpoint to the FastAPI app in src/app.py that returns paginated orders for a user"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON object found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const required = ['summary', 'codebase_analysis', 'file_changes', 'steps',
+                              'tools_per_step', 'tool_calls_planned', 'risk_assessment',
+                              'verification_steps'];
+            const missing = required.filter(f => !plan[f]);
+            if (missing.length > 0) {
+              return { pass: false, score: 0, reason: `Missing fields: ${missing.join(', ')}` };
+            }
+            return { pass: true, score: 1, reason: 'All required fields present' };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "all_required_fields"
+
+  - description: "codebase_analysis has files_read and entities_found"
+    vars:
+      task: "Add rate limiting middleware to the Express app in src/server.js using express-rate-limit"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const ca = plan.codebase_analysis;
+            if (!ca) return { pass: false, score: 0, reason: 'Missing codebase_analysis' };
+            if (!ca.files_read || ca.files_read.length === 0)
+              return { pass: false, score: 0, reason: 'files_read is empty' };
+            if (!ca.entities_found || ca.entities_found.length === 0)
+              return { pass: false, score: 0, reason: 'entities_found is empty' };
+            const hasSignature = ca.entities_found.some(e => e.signature);
+            if (!hasSignature)
+              return { pass: false, score: 0, reason: 'entities_found has no signatures' };
+            return { pass: true, score: 1, reason: `${ca.files_read.length} files, ${ca.entities_found.length} entities` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "codebase_analysis_quality"
+
+  - description: "tool_calls_planned has edit_file with old_string and new_string"
+    vars:
+      task: "Modify the existing authentication middleware in src/middleware/auth.js to add JWT refresh token support. The file currently validates access tokens."
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const tcp = plan.tool_calls_planned;
+            if (!tcp || tcp.length === 0)
+              return { pass: false, score: 0, reason: 'No tool_calls_planned' };
+            const editCalls = tcp.filter(t => t.action === 'edit_file' || (t.tool === 'file_ops' && t.action === 'edit_file'));
+            if (editCalls.length === 0)
+              return { pass: false, score: 0, reason: 'No edit_file calls planned (task modifies existing file)' };
+            const hasOldString = editCalls.some(t => t.args && t.args.old_string && t.args.old_string.length > 5);
+            if (!hasOldString)
+              return { pass: false, score: 0, reason: 'edit_file calls lack meaningful old_string values' };
+            return { pass: true, score: 1, reason: `${editCalls.length} edit_file calls with old_string` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "tool_calls_have_edit_args"
+
+  - description: "risk_assessment has one entry per file_change"
+    vars:
+      task: "Refactor the database layer: modify src/db/connection.js, src/db/queries.js, and src/models/user.js to use connection pooling"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const fc = plan.file_changes || [];
+            const ra = plan.risk_assessment || [];
+            if (ra.length === 0) return { pass: false, score: 0, reason: 'No risk_assessment entries' };
+            if (ra.length < fc.length)
+              return { pass: false, score: 0, reason: `Only ${ra.length} risks for ${fc.length} file_changes` };
+            return { pass: true, score: 1, reason: `${ra.length} risks for ${fc.length} changes` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "risk_per_file_change"
+
+  - description: "verification_steps have executable commands"
+    vars:
+      task: "Add input validation to POST /api/users endpoint in src/routes/users.py using Pydantic"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const vs = plan.verification_steps || [];
+            if (vs.length === 0) return { pass: false, score: 0, reason: 'No verification_steps' };
+            const executable = vs.filter(s => s.command && s.command.trim().length > 10);
+            if (executable.length === 0)
+              return { pass: false, score: 0, reason: 'No steps with executable commands (>10 chars)' };
+            const behavioral = executable.some(s =>
+              s.command.includes('python') || s.command.includes('node') ||
+              s.command.includes('curl') || s.command.includes('pytest') ||
+              s.command.includes('bash'));
+            if (!behavioral)
+              return { pass: false, score: 0, reason: 'Commands are not behavioral tests (no python/node/curl/pytest)' };
+            return { pass: true, score: 1, reason: `${executable.length} executable verification steps` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "executable_verification"
+
+  - description: "steps and tools_per_step are parallel arrays"
+    vars:
+      task: "Create a caching layer: new file src/cache.py with Redis client, modify src/routes/products.py to use cache"
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            if (!plan.steps || !plan.tools_per_step)
+              return { pass: false, score: 0, reason: 'Missing steps or tools_per_step' };
+            if (plan.steps.length !== plan.tools_per_step.length)
+              return { pass: false, score: 0, reason: `Mismatch: ${plan.steps.length} steps vs ${plan.tools_per_step.length} tools_per_step` };
+            if (plan.steps.length < 2)
+              return { pass: false, score: 0, reason: `Only ${plan.steps.length} step — task requires multiple steps` };
+            return { pass: true, score: 1, reason: `${plan.steps.length} aligned steps` };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "parallel_arrays"
+
+  # ── BEHAVIORAL QUALITY (semantic checks) ────────────────────────────────────
+
+  - description: "respects do-not-modify constraints"
+    vars:
+      task: "Add request logging middleware. Constraint: do NOT modify src/auth.py, src/config.py, or any test files."
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the plan JSON does NOT list src/auth.py, src/config.py, or any
+          files in tests/ directory in file_changes. The constraint explicitly forbids
+          modifying those files.
+          Fail if: file_changes includes any of the forbidden files.
+        threshold: 0.75
+        metric: "respects_constraints"
+
+  - description: "does not create unnecessary files"
+    vars:
+      task: "Add a helper function to the existing utils module at src/utils.py. Do not create new files."
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: file_changes only includes modify actions on src/utils.py.
+          No new files created — the task says to add to the existing module.
+          Fail if: file_changes includes any "create" actions or proposes new files
+          like src/utils/helpers.py or src/helpers.py.
+        threshold: 0.75
+        metric: "no_unnecessary_files"
+
+  - description: "diff_preview is concise (5-8 lines), not full file content"
+    vars:
+      task: "Add a new GET /api/stats endpoint to the FastAPI app in src/main.py"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: each file_change entry has a diff_preview field containing a
+          SHORT sketch (roughly 5-8 lines) showing key function signatures or
+          structural changes — not the full file content.
+          Fail if: diff_preview is missing, empty, or contains 20+ lines of full
+          implementation code instead of a concise sketch.
+        threshold: 0.70
+        metric: "concise_diff_preview"
+
+  - description: "plan output is ONLY JSON — no surrounding text"
+    vars:
+      task: "Add CORS configuration to the Express server in src/app.js"
+    assert:
+      - type: javascript
+        value: |
+          const trimmed = output.trim();
+          // Check if the output starts with { (possibly after whitespace)
+          const startsWithJson = /^\s*\{/.test(trimmed);
+          // Check if there's significant non-JSON text before or after
+          const m = trimmed.match(/^([\s\S]*?)(\{[\s\S]*\})([\s\S]*?)$/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON object found' };
+          const before = m[1].trim();
+          const after = m[3].trim();
+          const extraText = before.length + after.length;
+          if (extraText > 50) {
+            return { pass: false, score: 0, reason: `${extraText} chars of non-JSON text (before: "${before.slice(0,30)}...", after: "${after.slice(0,30)}...")` };
+          }
+          return { pass: true, score: 1, reason: startsWithJson ? 'Clean JSON output' : `Minor preamble (${before.length} chars)` };
+        metric: "json_only_output"
+
+  - description: "handles multi-file task with correct dependency ordering"
+    vars:
+      task: "Build a new notification system: 1) Create src/models/notification.py with SQLAlchemy model, 2) Create src/services/notification.py with send logic, 3) Add POST /api/notifications endpoint to src/routes/notifications.py"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the steps array shows dependency-correct ordering — model created
+          before service (service depends on model), service before route handler
+          (route depends on service). The step_dependencies field documents these
+          relationships.
+          Fail if: steps are in wrong order (e.g., route handler before model), or
+          step_dependencies is missing/empty despite clear dependencies.
+        threshold: 0.70
+        metric: "correct_step_ordering"
+
+  # ── RECOVERY / CORRECTION ───────────────────────────────────────────────────
+
+  - description: "fills in missing fields after validation feedback"
+    vars:
+      task: |
+        Your plan was parsed but is INCOMPLETE. Fix these issues:
+
+        1. MISSING codebase_analysis.files_read — list every file investigated
+        2. MISSING tool_calls_planned — include exact tool calls with args
+        3. MISSING verification_steps — include executable commands
+
+        Original task: Add pagination to GET /api/products in src/routes/products.py
+
+        Output the COMPLETE plan JSON with all fields filled in.
+    assert:
+      - type: javascript
+        value: |
+          const m = output.match(/\{[\s\S]*\}/);
+          if (!m) return { pass: false, score: 0, reason: 'No JSON found' };
+          try {
+            const plan = JSON.parse(m[0]);
+            const issues = [];
+            if (!plan.codebase_analysis?.files_read?.length) issues.push('codebase_analysis.files_read');
+            if (!plan.tool_calls_planned?.length) issues.push('tool_calls_planned');
+            if (!plan.verification_steps?.length) issues.push('verification_steps');
+            if (issues.length > 0)
+              return { pass: false, score: 0, reason: `Still missing: ${issues.join(', ')}` };
+            return { pass: true, score: 1, reason: 'All previously missing fields now present' };
+          } catch (e) {
+            return { pass: false, score: 0, reason: `Parse error: ${e.message}` };
+          }
+        metric: "fills_missing_fields"
+
+outputPath: tests/promptfoo/results/23-deepseek-planning-prompt.json
