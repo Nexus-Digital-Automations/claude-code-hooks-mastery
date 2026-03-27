@@ -17,42 +17,6 @@ for var in ['PYTHONHOME', 'PYTHONPATH']:
     if var in os.environ:
         del os.environ[var]
 
-def get_pattern_context():
-    """
-    Query patterns from Claude-Mem and PatternLearner.
-    Returns context string or empty string if no patterns.
-    """
-    context_parts = []
-
-    # 1. Query Claude-Mem for recent patterns
-    try:
-        from utils.claude_mem import ClaudeMemClient
-        client = ClaudeMemClient()
-        patterns = client.retrieve('recent_patterns', [])
-        if patterns:
-            context_parts.append("--- Recent Learned Patterns ---")
-            for p in patterns[-3:]:
-                context_parts.append(f"- {p.get('summary', 'Pattern')}")
-    except Exception:
-        pass  # Graceful degradation
-
-    # 2. Query PatternLearner for strategies
-    try:
-        from utils.pattern_learner import PatternLearner
-        learner = PatternLearner()
-        strategies = learner.get_recommended_strategies(limit=2)
-        if strategies:
-            context_parts.append("--- Recommended Strategies ---")
-            for s in strategies:
-                desc = s.get('description', s.get('pattern_key', ''))
-                if desc:
-                    context_parts.append(f"- {desc}")
-    except Exception:
-        pass  # Graceful degradation
-
-    return "\n".join(context_parts) if context_parts else ""
-
-
 def get_current_focus(cwd):
     """
     Find the first unfinished task in FEATURES.md.
@@ -65,106 +29,32 @@ def get_current_focus(cwd):
 
     try:
         content = features_file.read_text()
-        # Find first unchecked item: - [ ] task description
         match = re.search(r'^- \[ \] (.+)$', content, re.MULTILINE)
         if match:
             return match.group(1).strip()
     except Exception:
         pass
 
-    return None  # All tasks complete or file unreadable
-
-
-def get_neural_context(tool_name):
-    """
-    Query neural patterns for tool-specific insights.
-    Returns context string or empty string.
-    """
-    try:
-        from utils.neural_client import get_neural_client
-        client = get_neural_client(timeout=3.0)
-
-        # Query cognitive patterns for the current tool
-        result = client.analyze_patterns(
-            action='predict',
-            operation=f'tool:{tool_name}',
-            metadata={'context': 'pre_tool'}
-        )
-        if result and result.get('patterns'):
-            patterns = result['patterns']
-            if isinstance(patterns, list) and len(patterns) > 0:
-                return f"--- Neural Patterns for {tool_name} ---\n" + \
-                       "\n".join([f"• {p.get('description', '')[:100]}" for p in patterns[:2]])
-    except Exception:
-        pass
-    return ""
-
-
-def get_swarm_context():
-    """
-    Get current swarm status for coordination awareness.
-    Returns context string or empty string.
-    """
-    try:
-        from utils.swarm_client import get_swarm_client
-        client = get_swarm_client(timeout=3.0)
-
-        status = client.swarm_status(verbose=False)
-        if status and status.get('status') == 'active':
-            topology = status.get('topology', 'unknown')
-            agent_count = status.get('agentCount', 0)
-            if agent_count > 0:
-                return f"--- Active Swarm: {topology} ({agent_count} agents) ---"
-    except Exception:
-        pass
-    return ""
-
-
-def get_github_context(tool_name, tool_input):
-    """
-    Get GitHub context for repository operations.
-    Returns context string or empty string.
-    """
-    # Only add GitHub context for relevant tools
-    if tool_name not in ['Bash', 'Read', 'Write', 'Edit', 'Task']:
-        return ""
-
-    try:
-        from utils.github_client import get_github_client
-        client = get_github_client(timeout=3.0)
-
-        # Check if we're in a git repo
-        repo = client.get_current_repo()
-        if repo:
-            # Get repo metrics if available
-            metrics = client.repo_metrics(repo)
-            if metrics:
-                prs = metrics.get('open_prs', 0)
-                issues = metrics.get('open_issues', 0)
-                if prs > 0 or issues > 0:
-                    return f"--- GitHub: {repo} ({prs} PRs, {issues} issues) ---"
-    except Exception:
-        pass
-    return ""
+    return None
 
 
 def get_context_injection(cwd, tool_name, tool_input=None):
     """
-    Build context injection from FEATURES.md, MCP tools, and tool-specific files.
+    Build lightweight context injection: current task, security reminder,
+    and tool-specific docs only. Speculative context sources removed.
     """
     docs_dir = Path(cwd) / "docs" / "development"
     hooks_dir = docs_dir / "hooks"
     injections = []
-    tool_input = tool_input or {}
 
     # 1. Auto-derive focus from first unfinished task in FEATURES.md
     current_task = get_current_focus(cwd)
     if current_task:
-        injections.append(f"📌 CURRENT TASK: {current_task}")
+        injections.append(f"CURRENT TASK: {current_task}")
 
     # 2. Security reminder for Write/Edit operations
     if tool_name in ['Write', 'Edit', 'MultiEdit']:
-        injections.append("🔐 SECURITY: Never write secrets (API keys, passwords, tokens) outside of .env files or gitignored files")
+        injections.append("SECURITY: Never write secrets (API keys, passwords, tokens) outside of .env files or gitignored files")
 
     # 3. Inject tool-specific context if exists
     tool_map = {
@@ -180,104 +70,74 @@ def get_context_injection(cwd, tool_name, tool_input=None):
             try:
                 content = tool_file.read_text().strip()
                 if content:
-                    injections.append(f"🔧 {tool_name}: {content[:150]}")
+                    injections.append(f"{tool_name}: {content[:150]}")
             except Exception:
                 pass
-
-    # 4. Query patterns from Claude-Mem and PatternLearner
-    pattern_ctx = get_pattern_context()
-    if pattern_ctx:
-        injections.append(pattern_ctx)
-
-    # 5. Query ReasoningBank via Claude Flow - tool-specific patterns
-    try:
-        from utils.claude_flow import ClaudeFlowClient, get_tool_patterns, query_reasoning_patterns
-        cf = ClaudeFlowClient(timeout=5.0)  # Shorter timeout for pre-tool queries
-
-        # Only query if ReasoningBank is available
-        if cf.is_reasoningbank_available():
-            # Get tool-specific patterns first
-            tool_patterns = get_tool_patterns(tool_name)
-            if tool_patterns:
-                injections.append(f"--- {tool_name} Patterns ---\n{tool_patterns[:200]}")
-            # Also get general debugging patterns
-            rb_patterns = query_reasoning_patterns(tool_name, namespace='debugging')
-            if rb_patterns:
-                injections.append(f"--- ReasoningBank ---\n{rb_patterns[:200]}")
-    except Exception:
-        pass  # Graceful degradation
-
-    # 6. Query Claude-Mem for tool-specific observations
-    try:
-        from utils.claude_mem import get_patterns_for_tool
-        mem_patterns = get_patterns_for_tool(tool_name)
-        if mem_patterns and len(mem_patterns) > 0:
-            injections.append(f"--- Claude-Mem {tool_name} History ---")
-            for p in mem_patterns[:2]:
-                response = p.get('tool_response', '')[:100]
-                if response:
-                    injections.append(f"• {response}")
-    except Exception:
-        pass  # Graceful degradation
-
-    # 7. NEW: Neural pattern query for cognitive insights
-    neural_ctx = get_neural_context(tool_name)
-    if neural_ctx:
-        injections.append(neural_ctx)
-
-    # 8. NEW: Swarm status for coordination awareness
-    swarm_ctx = get_swarm_context()
-    if swarm_ctx:
-        injections.append(swarm_ctx)
-
-    # 9. NEW: GitHub context for repository operations
-    github_ctx = get_github_context(tool_name, tool_input)
-    if github_ctx:
-        injections.append(github_ctx)
-
-    # 10. NEW: Plugin context injection from New Tools marketplace
-    try:
-        from utils.plugin_resolver import get_plugin_context_for_tool
-        plugin_ctx = get_plugin_context_for_tool(tool_name, tool_input)
-        if plugin_ctx:
-            injections.append(plugin_ctx)
-    except Exception:
-        pass  # Graceful degradation
 
     return "\n".join(injections) if injections else None
 
 
-DEEPSEEK_BASE_PATH = "/Users/jeremyparker/Desktop/Claude Coding Projects"
+# IMP-9: Read from the same env var that the DeepSeek server uses so the two
+# systems never drift apart.  Falls back to the historical default.
+DEEPSEEK_BASE_PATH = os.environ.get(
+    "DEEPSEEK_PROJECTS_ROOT",
+    "/Users/jeremyparker/Desktop/Claude Coding Projects",
+)
+
+
+def _path_within_base(path_str: str, base: str) -> bool:
+    """Return True iff path_str is strictly inside base (not equal to base)."""
+    resolved = str(Path(path_str).resolve())
+    return resolved != base and resolved.startswith(base + "/")
 
 
 def check_deepseek_working_dir(tool_name, tool_input):
     """
-    Block mcp__deepseek-agent__run calls that lack a working_dir or point
-    outside BASE_PATH.  The base path itself is not valid — only subpaths.
+    Block mcp__deepseek-agent__run calls whose working_dir (or allowed_dirs)
+    fall outside DEEPSEEK_BASE_PATH.
+
+    Allowed without working_dir:
+      - agent_id is set (reusing an existing agent — working_dir already locked in)
+      - config.scope.allowed_dirs is non-empty and all entries are within base path
 
     Returns (blocked: bool, reason: str | None).
     """
     if tool_name != "mcp__deepseek-agent__run":
         return False, None
 
-    working_dir = tool_input.get("working_dir", "").strip()
-    if not working_dir:
-        return True, (
-            "BLOCKED: mcp__deepseek-agent__run requires a working_dir.\n"
-            f"working_dir must be a subdirectory of: {DEEPSEEK_BASE_PATH}\n"
-            "Example: working_dir=\"/Users/jeremyparker/Desktop/Claude Coding Projects/my-project\""
-        )
-
-    # Normalise to an absolute, resolved path string for comparison
-    resolved = str(Path(working_dir).resolve())
     base = str(Path(DEEPSEEK_BASE_PATH).resolve())
 
-    # Must be strictly *inside* base (not equal to base itself)
-    if resolved == base or not resolved.startswith(base + "/"):
+    # IMP-10: Reusing an existing agent — working_dir was validated at creation.
+    if tool_input.get("agent_id"):
+        return False, None
+
+    working_dir = (tool_input.get("working_dir") or "").strip()
+
+    if not working_dir:
+        # IMP-10: Allow if config.scope.allowed_dirs is set and all entries are in base.
+        allowed_dirs = (
+            tool_input.get("config", {})
+            .get("scope", {})
+            .get("allowed_dirs", [])
+        )
+        if allowed_dirs and all(_path_within_base(d, base) for d in allowed_dirs):
+            return False, None
+
+        return True, (
+            "BLOCKED: mcp__deepseek-agent__run requires a working_dir "
+            "(or agent_id to reuse an existing agent).\n"
+            f"working_dir must be a subdirectory of: {DEEPSEEK_BASE_PATH}\n"
+            "Example: working_dir=\"/Users/jeremyparker/Desktop/Claude Coding Projects/my-project\"\n"
+            "Tip: set DEEPSEEK_PROJECTS_ROOT env var to change the allowed root."
+        )
+
+    # Validate working_dir is strictly inside base
+    if not _path_within_base(working_dir, base):
         return True, (
             f"BLOCKED: working_dir '{working_dir}' is outside the allowed workspace.\n"
             f"Allowed: subdirectories of {DEEPSEEK_BASE_PATH}\n"
-            "The base path itself is not a valid working directory — specify a named subproject."
+            "The base path itself is not a valid working directory — specify a named subproject.\n"
+            "Tip: set DEEPSEEK_PROJECTS_ROOT env var to change the allowed root."
         )
 
     return False, None
