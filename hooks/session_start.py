@@ -225,20 +225,21 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         except Exception:
             pass
 
-    # Glob-based fallback: clean up orphaned DeepSeek files from any agent.
-    # user_prompt_submit.py also does this, but session_start provides a belt-and-
-    # suspenders guarantee even if prompt-submit cleanup fails silently.
+    # Clean up orphaned DeepSeek files — only delete files older than 1 hour
+    # to avoid racing with concurrent sessions.
+    import time as _time
+    _one_hour_ago = _time.time() - 3600
     for _pattern in [
-        "deepseek_context.json",        # Legacy global file
-        "deepseek_context_*.json",       # Agent/task-scoped context files
-        "deepseek_review_state_*.json",  # Agent/task-scoped review state files
-        "deepseek_review_state_*.rejections",  # Rejection counters (IMP-027)
-        "deepseek_run_snapshot.json",    # Mutation-detection snapshot
-        "deepseek_delegations.json",     # Delegation ring buffer
+        "deepseek_context.json",
+        "deepseek_context_*.json",
+        "deepseek_review_state_*.json",
+        "deepseek_review_state_*.rejections",
+        "deepseek_run_snapshot.json",
     ]:
         for _path_str in _glob.glob(str(_claude_data / _pattern)):
             try:
-                Path(_path_str).unlink(missing_ok=True)
+                if Path(_path_str).stat().st_mtime < _one_hour_ago:
+                    Path(_path_str).unlink(missing_ok=True)
             except Exception:
                 pass
 
@@ -404,290 +405,34 @@ You are the architect and the quality gate. Every deliverable gets verified.
     return "\n".join(context_parts)
 
 
-def assess_task_complexity(prompt: str) -> dict:
+def _create_default_vr(session_id: str) -> None:
+    """Create a default verification record with all checks pending.
+
+    Ensures stop.py always has a well-formed VR to read, preventing
+    the case where a missing file blocks stop forever.
     """
-    Assess task complexity to determine if swarm orchestration is beneficial.
-
-    Analyzes prompt for indicators of multi-agent potential:
-    - Multi-component: frontend, backend, API, database mentions
-    - Large scope: Long prompt with many requirements
-    - Comprehensive: Keywords suggesting full-system work
-    - Parallel: Multiple independent subtasks
-
-    Returns:
-        dict with complexity scores and swarm recommendation
-    """
-    prompt_lower = prompt.lower()
-    indicators = {}
-
-    # Multi-component indicators
-    multi_component_keywords = ['frontend', 'backend', 'api', 'database', 'server',
-                                'client', 'ui', 'service', 'microservice', 'component']
-    indicators['multi_component'] = sum(1 for kw in multi_component_keywords if kw in prompt_lower)
-
-    # Large scope indicators
-    indicators['large_scope'] = len(prompt) > 500 or prompt.count('\n') > 5
-
-    # Comprehensive work indicators
-    comprehensive_keywords = ['comprehensive', 'complete', 'full', 'entire', 'all',
-                             'refactor', 'redesign', 'overhaul', 'migrate', 'upgrade']
-    indicators['comprehensive'] = any(kw in prompt_lower for kw in comprehensive_keywords)
-
-    # Parallel subtask indicators
-    parallel_keywords = ['and also', 'additionally', 'as well as', 'plus', 'along with',
-                        '1.', '2.', '- ', '* ', 'first', 'second', 'then']
-    indicators['parallel_tasks'] = sum(1 for kw in parallel_keywords if kw in prompt)
-
-    # Plugin match count enrichment
-    try:
-        from utils.plugin_resolver import get_resolver
-        resolver = get_resolver()
-        plugin_matches = resolver.resolve_by_task(prompt)
-        indicators['plugin_matches'] = len(plugin_matches)
-    except Exception:
-        indicators['plugin_matches'] = 0
-
-    # Calculate complexity score
-    complexity_score = (
-        indicators['multi_component'] * 2 +
-        (3 if indicators['large_scope'] else 0) +
-        (4 if indicators['comprehensive'] else 0) +
-        indicators['parallel_tasks'] +
-        min(indicators.get('plugin_matches', 0), 3)  # Up to 3 bonus from plugin matches
-    )
-
-    # Recommend swarm if complexity is high enough
-    recommend_swarm = complexity_score >= 5
-
-    # Determine topology based on task type
-    if indicators['multi_component'] >= 3:
-        recommended_topology = "hierarchical"  # Queen coordinates specialists
-    elif indicators['parallel_tasks'] >= 3:
-        recommended_topology = "mesh"  # Peer agents work in parallel
-    else:
-        recommended_topology = "adaptive"  # Dynamic switching
-
-    return {
-        'complexity_score': complexity_score,
-        'recommend_swarm': recommend_swarm,
-        'recommended_topology': recommended_topology,
-        'indicators': indicators
+    vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+    if vr_file.exists():
+        return  # Don't overwrite existing
+    check_keys = [
+        "tests", "build", "lint", "app_starts",
+        "frontend", "commit_push", "upstream_sync",
+    ]
+    record = {
+        "session_id": session_id,
+        "reset_at": datetime.now().isoformat(),
+        "checks": {
+            key: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
+            for key in check_keys
+        },
     }
-
-
-def auto_init_swarm(complexity: dict, session_id: str) -> dict:
-    """
-    Initialize swarm orchestration if complexity assessment recommends it.
-    Uses MCP-based swarm client for direct tool integration.
-
-    Args:
-        complexity: Result from assess_task_complexity
-        session_id: Session ID for tracking
-
-    Returns:
-        dict with swarm initialization results
-    """
-    if not complexity.get('recommend_swarm', False):
-        return {'initialized': False, 'reason': 'complexity below threshold'}
-
-    results = {
-        'initialized': False,
-        'topology': complexity.get('recommended_topology', 'adaptive'),
-        'swarm_id': None,
-        'agents_spawned': 0,
-        'neural_loaded': False
-    }
-
-    # 1. Try MCP-based swarm initialization first (new integration)
     try:
-        from utils.swarm_client import get_swarm_client
-        client = get_swarm_client(timeout=10.0)
-
-        # Initialize swarm with recommended topology
-        swarm_result = client.init_swarm(
-            topology=results['topology'],
-            strategy='adaptive',
-            max_agents=8
-        )
-
-        if swarm_result:
-            results['initialized'] = True
-            results['swarm_id'] = swarm_result.get('swarmId', session_id[:12])
-
-            # Store session context in swarm memory
-            from utils.mcp_client import get_mcp_client
-            mcp = get_mcp_client(timeout=5.0)
-            mcp.memory_store(
-                key=f'session/{session_id[:8]}',
-                value=json.dumps({
-                    'session_id': session_id,
-                    'topology': results['topology'],
-                    'complexity_score': complexity.get('complexity_score', 0),
-                    'initialized_at': datetime.now().isoformat()
-                }),
-                namespace='swarm_sessions',
-                ttl=86400  # 24 hour TTL
-            )
+        vr_file.parent.mkdir(parents=True, exist_ok=True)
+        vr_file.write_text(json.dumps(record, indent=2))
     except Exception:
-        pass  # Graceful degradation
-
-    # 2. Fallback to legacy claude_flow client if MCP fails
-    if not results['initialized']:
-        try:
-            from utils.claude_flow import ClaudeFlowClient
-            cf = ClaudeFlowClient(timeout=5.0)
-
-            swarm_result = cf.swarm_init(topology=results['topology'])
-            if swarm_result:
-                results['initialized'] = True
-                results['swarm_id'] = swarm_result.get('swarm_id', session_id[:12])
-
-                cf.memory_store(
-                    f"swarm_{session_id[:8]}",
-                    {
-                        "session_id": session_id,
-                        "topology": results['topology'],
-                        "complexity_score": complexity.get('complexity_score', 0),
-                        "initialized_at": datetime.now().isoformat()
-                    },
-                    namespace="swarm_sessions",
-                    confidence=0.7
-                )
-        except Exception:
-            pass  # Graceful degradation
-
-    # 3. NEW: Load neural patterns for session
-    try:
-        from utils.neural_client import get_neural_client
-        neural = get_neural_client(timeout=5.0)
-
-        # Get neural status
-        status = neural.neural_status()
-        if status:
-            results['neural_loaded'] = True
-    except Exception:
-        pass  # Graceful degradation
-
-    return results
+        pass  # Never block session start
 
 
-def load_workflow_context(session_id: str) -> str:
-    """
-    Load workflow context from workflow client.
-    Returns context string or empty string.
-    """
-    try:
-        from utils.workflow_client import get_workflow_client
-        client = get_workflow_client(timeout=5.0)
-
-        # Get recent workflows
-        workflows = client.workflow_list(limit=3)
-        if workflows:
-            lines = ["--- Recent Workflows ---"]
-            for w in workflows[:2]:
-                name = w.get('name', 'Unnamed')
-                status = w.get('status', 'unknown')
-                lines.append(f"- {name} ({status})")
-            return "\n".join(lines)
-    except Exception:
-        pass
-    return ""
-
-
-def load_analytics_context() -> str:
-    """
-    Load recent performance metrics from analytics client.
-    Returns context string or empty string.
-    """
-    try:
-        from utils.analytics_client import get_analytics_client
-        client = get_analytics_client(timeout=5.0)
-
-        # Get health check
-        health = client.health_check()
-        if health and health.get('status') == 'healthy':
-            return "✓ Analytics system healthy"
-    except Exception:
-        pass
-    return ""
-
-
-def get_initial_prompt(input_data: dict) -> str:
-    """Extract initial prompt from session data if available."""
-    # Check various locations for initial prompt
-    prompt = ""
-
-    # Check conversation history
-    conversation = input_data.get('conversation', [])
-    if conversation:
-        for msg in conversation:
-            if msg.get('role') == 'user':
-                content = msg.get('content', '')
-                if isinstance(content, str):
-                    prompt = content
-                elif isinstance(content, list):
-                    prompt = ' '.join(c.get('text', '') for c in content if isinstance(c, dict))
-                break
-
-    # Check direct prompt field
-    if not prompt:
-        prompt = input_data.get('prompt', '') or input_data.get('initial_prompt', '')
-
-    return prompt
-
-
-def load_reasoning_context() -> str:
-    """Load patterns and strategies from Claude-Mem, PatternLearner, and ReasoningBank."""
-    context_parts = []
-
-    # Try to load from Claude-Mem (port 37777)
-    try:
-        from utils.claude_mem import load_recent_context
-        context_str = load_recent_context()
-        if context_str:
-            context_parts.append(context_str)
-    except Exception:
-        pass  # Graceful degradation
-
-    # Try to load from PatternLearner
-    try:
-        from utils.pattern_learner import PatternLearner
-        learner = PatternLearner()
-        strategies = learner.get_recommended_strategies(limit=3)
-        if strategies:
-            context_parts.append("--- Recommended Strategies ---")
-            for s in strategies:
-                desc = s.get('description', s.get('pattern_key', 'Unknown'))
-                rate = s.get('success_rate', 0)
-                context_parts.append(f"- {desc} ({rate:.0%} success)")
-    except Exception:
-        pass  # Graceful degradation
-
-    # Try to load from Claude Flow ReasoningBank with status reporting
-    try:
-        from utils.claude_flow import ClaudeFlowClient
-        cf = ClaudeFlowClient(timeout=10.0)
-
-        # Check if ReasoningBank is available
-        if cf.is_reasoningbank_available():
-            rb_context = cf.memory_query("session patterns", namespace="sessions", limit=3)
-            if rb_context:
-                context_parts.append("--- ReasoningBank Patterns ---")
-                context_parts.append(rb_context[:500])
-            else:
-                context_parts.append("✓ ReasoningBank initialized (no patterns yet)")
-
-            # Also try to get stats
-            stats = cf.memory_stats()
-            if stats and isinstance(stats, dict):
-                total = stats.get('total_memories', stats.get('raw', 'unknown'))
-                context_parts.append(f"  Memory entries: {total}")
-        else:
-            context_parts.append("⚠ ReasoningBank not available (run: npx claude-flow@alpha memory stats)")
-    except Exception as e:
-        context_parts.append(f"⚠ ReasoningBank error: {str(e)[:50]}")
-
-    return "\n".join(context_parts) if context_parts else ""
 
 
 def main():
@@ -710,49 +455,30 @@ def main():
         # Reset verification record — prevent stale cross-session evidence
         reset_verification_record(session_id)
 
+        # Create default VR so stop.py always has a well-formed file
+        _create_default_vr(session_id)
+
         # Generate unique agent identity for this session (scopes DeepSeek state)
         agent_id = _generate_agent_identity(session_id)
 
         # Register this session in active_sessions.json for shell script lookups
+        # Register both CWD and git root to handle cd-into-subdirectory lookups
         _register_active_session(session_id, os.getcwd())
+        try:
+            sys.path.insert(0, str(Path(__file__).parent / "utils"))
+            from project_config import get_git_root
+            git_root = get_git_root()
+            if git_root != os.getcwd():
+                _register_active_session(session_id, git_root)
+        except Exception:
+            pass
 
         # Log the session start event
         log_session_start(input_data)
 
-        # Assess task complexity and auto-init swarm if beneficial
-        initial_prompt = get_initial_prompt(input_data)
-        swarm_context = ""
-        if initial_prompt and len(initial_prompt) > 50:
-            complexity = assess_task_complexity(initial_prompt)
-            if complexity.get('recommend_swarm', False):
-                swarm_result = auto_init_swarm(complexity, session_id)
-                if swarm_result.get('initialized', False):
-                    swarm_context = f"""
---- Swarm Mode Activated ---
-Topology: {swarm_result.get('topology', 'adaptive')}
-Complexity Score: {complexity.get('complexity_score', 0)}
-Swarm ID: {swarm_result.get('swarm_id', 'N/A')}
-Multi-agent coordination enabled for this session.
-"""
-
         # Load development context if requested
         if args.load_context:
             context = load_development_context(source, agent_id=agent_id)
-            # Add swarm context if initialized
-            if swarm_context:
-                context = swarm_context + "\n" + context
-            # Add reasoning context (patterns, strategies)
-            reasoning_ctx = load_reasoning_context()
-            if reasoning_ctx:
-                context = context + "\n\n" + reasoning_ctx if context else reasoning_ctx
-            # NEW: Add workflow context
-            workflow_ctx = load_workflow_context(session_id)
-            if workflow_ctx:
-                context = context + "\n\n" + workflow_ctx if context else workflow_ctx
-            # NEW: Add analytics context
-            analytics_ctx = load_analytics_context()
-            if analytics_ctx:
-                context = context + "\n\n" + analytics_ctx if context else analytics_ctx
             if context:
                 # Using JSON output to add context
                 output = {

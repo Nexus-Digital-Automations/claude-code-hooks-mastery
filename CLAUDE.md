@@ -266,13 +266,17 @@ Route generated output automatically: charts → `output/charts/`, reports → `
 
 ### Validation Before Stopping
 
-The stop hook requires authorization. Before stopping:
-1. All requested work is complete.
-2. Tests pass — run them, show output.
-3. Root folder is clean.
-4. Present a validation report with actual command output as proof.
+The stop hook uses a rules-based verification system. Each project has a `.claude-project.json`
+that declares what checks are required (tests, build, lint, frontend, etc.).
 
-Authorize: `bash ~/.claude/commands/authorize-stop.sh` (one-time use, resets after stop).
+The `post_tool_use` hook auto-observes Bash commands and records results — when you run `pytest`
+or `ruff check`, the system automatically records the check as passed/failed. No manual piping.
+
+Before stopping:
+1. Run tests, lint, and any required checks for the project.
+2. Commit and push your work.
+3. Run `bash ~/.claude/commands/authorize-stop.sh` — it auto-runs any missing checks that
+   have a `run_command` in the project config, then authorizes if all pass.
 
 For significant changes, run `architect-review` agent before authorizing stop.
 
