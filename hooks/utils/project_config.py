@@ -82,6 +82,32 @@ def auto_detect_config(project_root: Path) -> dict:
         "checks": {},
     }
 
+    # Detect Playwright/Cypress regardless of project type
+    _pw_configs = ("playwright.config.ts", "playwright.config.js",
+                   "playwright.config.mjs", "playwright.config.cjs")
+    _cy_configs = ("cypress.config.ts", "cypress.config.js",
+                   "cypress.config.mjs", "cypress.config.cjs")
+    _has_playwright = any((project_root / f).exists() for f in _pw_configs)
+    _has_cypress = any((project_root / f).exists() for f in _cy_configs)
+
+    if _has_playwright or _has_cypress:
+        config["has_frontend"] = True
+        # Auto-set run_command for frontend check
+        if _has_playwright:
+            config["checks"]["frontend"] = {
+                "command_patterns": ["playwright test", "npx playwright"],
+                "pass_patterns": [r"\d+ passed"],
+                "fail_patterns": [r"\d+ failed", "failed", "FAIL"],
+                "run_command": "npx playwright test",
+            }
+        elif _has_cypress:
+            config["checks"]["frontend"] = {
+                "command_patterns": ["cypress run"],
+                "pass_patterns": [r"All specs passed"],
+                "fail_patterns": ["failed", "FAIL"],
+                "run_command": "npx cypress run",
+            }
+
     # Python
     if (project_root / "pyproject.toml").exists() or (project_root / "setup.py").exists():
         config["project_type"] = "python"
@@ -97,11 +123,15 @@ def auto_detect_config(project_root: Path) -> dict:
             config["has_tests"] = "test" in scripts
             config["has_build"] = "build" in scripts
             config["has_app"] = "start" in scripts or "dev" in scripts
-            config["has_frontend"] = any(
-                (project_root / f).exists()
-                for f in ("playwright.config.ts", "playwright.config.js",
-                          "cypress.config.ts", "cypress.config.js")
-            ) or "test:e2e" in scripts
+            if "test:e2e" in scripts:
+                config["has_frontend"] = True
+                if "frontend" not in config["checks"]:
+                    config["checks"]["frontend"] = {
+                        "command_patterns": ["npm run test:e2e"],
+                        "pass_patterns": [r"passed"],
+                        "fail_patterns": ["failed", "FAIL"],
+                        "run_command": "npm run test:e2e",
+                    }
         except Exception:
             config["has_tests"] = True
 
@@ -139,8 +169,14 @@ def get_required_checks(config: dict, files_modified: bool = True) -> list[str]:
         required.append("build")
     if config.get("has_app", False):
         required.append("app_starts")
+    # execution: required if config defines it or project has scripts/CLI
+    if config.get("has_execution", False) or "execution" in config.get("checks", {}):
+        required.append("execution")
     if config.get("has_frontend", False):
         required.append("frontend")
+    # happy_path: required if config defines it (user specifies what "happy path" means)
+    if "happy_path" in config.get("checks", {}):
+        required.append("happy_path")
     if files_modified:
         required.append("commit_push")
 
@@ -177,9 +213,17 @@ _GENERIC_PATTERNS: list[tuple[list[str], str, list[str], list[str]]] = [
     (["cargo build"], "build",
      [], [r"^error"]),
 
-    # Frontend
-    (["playwright test", "npx playwright", "cypress run"], "frontend",
-     [r"passed"], ["failed", "FAIL"]),
+    # Execution (running scripts, CLI tools, API calls)
+    (["curl ", "curl\t", "httpie ", "http "], "execution",
+     [r"200", r"HTTP/"], [r"Connection refused", r"Could not resolve"]),
+    (["python3 ", "python ", "node ", "ruby ", "go run "], "execution",
+     [], [r"Traceback", r"Error:", r"SyntaxError", r"Cannot find"]),
+    (["bash ", "sh ", "./"], "execution",
+     [], [r"command not found", r"No such file"]),
+
+    # Frontend (Playwright / Cypress E2E tests)
+    (["playwright test", "npx playwright", "cypress run", "npm run test:e2e"], "frontend",
+     [r"\d+ passed", r"All specs passed"], ["failed", "FAIL", r"\d+ failed"]),
 
     # App starts
     (["npm start", "npm run dev", "yarn dev", "uvicorn", "flask run", "python.*app"], "app_starts",

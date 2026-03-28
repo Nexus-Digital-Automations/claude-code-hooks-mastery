@@ -415,8 +415,8 @@ def _create_default_vr(session_id: str) -> None:
     if vr_file.exists():
         return  # Don't overwrite existing
     check_keys = [
-        "tests", "build", "lint", "app_starts",
-        "frontend", "commit_push", "upstream_sync",
+        "tests", "build", "lint", "app_starts", "execution",
+        "frontend", "happy_path", "commit_push", "upstream_sync",
     ]
     record = {
         "session_id": session_id,
