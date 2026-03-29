@@ -258,13 +258,18 @@ def detect_rate_limit(input_data):
 # ── Session ID resolution ────────────────────────────────────────────────
 
 def _resolve_session_id(session_id: str) -> str:
-    if (Path.home() / f".claude/data/verification_record_{session_id}.json").exists():
-        return session_id
+    """Resolve the canonical session ID for VR/auth file lookups.
+
+    Prefers active_sessions.json (authoritative for the current session) over
+    stale VR files from prior sessions. Old VR files persist after session
+    restarts, causing the harness-provided session_id to resolve to a stale
+    session while authorize-stop.sh writes auth for the current one.
+    """
+    # 1. Check active_sessions.json first — most authoritative for current session
     try:
         sessions_file = Path.home() / ".claude/data/active_sessions.json"
         if sessions_file.exists():
             sessions = json.loads(sessions_file.read_text())
-            # Try git root first, then CWD
             try:
                 sys.path.insert(0, str(Path(__file__).parent / "utils"))
                 from project_config import get_git_root
@@ -280,6 +285,9 @@ def _resolve_session_id(session_id: str) -> str:
                     return resolved
     except Exception:
         pass
+    # 2. Fall back to harness-provided session_id if its VR file exists
+    if (Path.home() / f".claude/data/verification_record_{session_id}.json").exists():
+        return session_id
     return session_id
 
 
