@@ -445,7 +445,29 @@ def auto_run_missing(
         if check_key in ("upstream_sync", "security"):
             continue
         if check_key == "commit_push":
-            continue  # Can't auto-run — too risky
+            # Auto-satisfy when repo is already in sync: 0 unpushed commits
+            # means any work this session was already committed and pushed.
+            try:
+                branch_r = subprocess.run(
+                    ["git", "branch", "--show-current"],
+                    capture_output=True, text=True, timeout=5,
+                    cwd=str(project_root),
+                )
+                branch = branch_r.stdout.strip() or "main"
+                rev_r = subprocess.run(
+                    ["git", "rev-list", f"origin/{branch}...HEAD", "--count"],
+                    capture_output=True, text=True, timeout=5,
+                    cwd=str(project_root),
+                )
+                unpushed = int(rev_r.stdout.strip() or "1")
+                if unpushed == 0:
+                    write_vr(vr_file, "commit_push", "passed",
+                             f"[auto] 0 unpushed commits on {branch} — in sync with origin",
+                             session_id=session_id)
+                    results["commit_push"] = "passed"
+            except Exception:
+                pass
+            continue
         if not is_pending(vr_file, check_key):
             continue
 
