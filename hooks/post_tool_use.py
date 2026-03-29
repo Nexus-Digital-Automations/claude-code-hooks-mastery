@@ -237,7 +237,7 @@ def _invalidate_stale_checks(session_id: str, file_path: str) -> None:
         # Determine which checks to invalidate
         to_invalidate: set[str] = set()
         if ext in _SOURCE_EXTS:
-            to_invalidate.update(["tests", "typecheck", "execution", "happy_path"])
+            to_invalidate.update(["tests", "typecheck", "execution", "happy_path", "security"])
         if ext in _FRONTEND_EXTS:
             to_invalidate.add("frontend")
         if name in _CONFIG_FILES:

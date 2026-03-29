@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-# ── Canonical check order (10 items) ─────────────────────────────────────
+# ── Canonical check order (11 items) ─────────────────────────────────────
 # Which of these are *required* is determined by the project config
 # (see project_config.get_required_checks).  This list defines the
 # display order and the set of valid check keys.
@@ -24,6 +24,7 @@ VR_CHECKS_ORDER: list[tuple[str, str]] = [
     ("execution",     "EXECUTION"),
     ("frontend",      "FRONTEND"),
     ("happy_path",    "HAPPY PATH"),
+    ("security",      "SECURITY"),
     ("commit_push",   "COMMIT & PUSH"),
     ("upstream_sync", "UPSTREAM SYNC"),
 ]

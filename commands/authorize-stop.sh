@@ -83,17 +83,10 @@ try:
 except Exception:
     state = {}
 
-scan_done = state.get("security_scan_complete", False)
-
 lines = [f"\n\u2705 All {len(done)} required checks verified"]
 for key, label, status, ts_short, ev in done:
     mark = "\u2705" if status in ("done", "passed") else "\u23ed "
     lines.append(f'   {mark} {label:<18} [{status} @ {ts_short}] — "{ev}"')
-
-if scan_done:
-    lines += ["", "   (scan already passed — will proceed to stop)"]
-else:
-    lines += ["", "   (security scan will run on next stop)"]
 
 state["authorized"] = True
 auth_file.write_text(json.dumps(state))

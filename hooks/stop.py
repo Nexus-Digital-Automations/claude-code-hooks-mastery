@@ -491,81 +491,11 @@ def main():
             )
             sys.exit(2)
 
-        # 7. Security scan gate (two-phase)
+        # 7. Final reset — one-time use
         resolved_sid = _resolve_session_id(session_id)
         auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"
-        scan_complete = False
-        prior_report = None
         try:
-            auth_state = json.loads(auth_file.read_text())
-            scan_complete = auth_state.get("security_scan_complete", False)
-            prior_report = auth_state.get("security_report_path")
-        except Exception:
-            pass
-
-        if not scan_complete:
-            print("\nRunning security scan...", file=sys.stderr, flush=True)
-            critical = 0
-            warnings = 0
-            report_path = ""
-            try:
-                from utils.security_scanner import run_security_scan
-                critical, warnings, report_path = run_security_scan(
-                    Path.cwd(), timeout_per_tool=8, global_timeout=45,
-                )
-            except Exception:
-                pass
-
-            try:
-                auth_file.write_text(json.dumps({
-                    "authorized": False,
-                    "security_scan_complete": True,
-                    "security_report_path": report_path,
-                }))
-            except Exception:
-                pass
-
-            # Read security config from project
-            try:
-                sec_config = config.get("security", {}) if config else {}
-            except Exception:
-                sec_config = {}
-            block_on_warnings = sec_config.get("block_on_warnings", True)
-            max_warnings = sec_config.get("allow_warning_count", 0)
-
-            should_block = (
-                critical > 0
-                or (block_on_warnings and warnings > max_warnings)
-            )
-
-            if should_block:
-                findings_detail = f"Critical: {critical}, Warnings: {warnings}"
-                print(
-                    f"\nSECURITY SCAN BLOCKED — {findings_detail}\n"
-                    f"Report: {report_path}\n"
-                    "Fix findings, then run /authorize-stop to re-scan.\n",
-                    file=sys.stderr,
-                )
-                sys.exit(2)
-            else:
-                print(
-                    f"\nSECURITY SCAN PASSED\n"
-                    f"Critical: {critical}, Warnings: {warnings}  Report: {report_path}\n"
-                    "Run /authorize-stop once more to complete.\n",
-                    file=sys.stderr,
-                )
-                sys.exit(2)
-        else:
-            if prior_report:
-                print(f"\nSecurity scan previously passed. Report: {prior_report}\n", file=sys.stderr)
-
-        # 8. Final reset — one-time use
-        try:
-            auth_file.write_text(json.dumps({
-                "authorized": False,
-                "security_scan_complete": False,
-                "security_report_path": None,
-            }))
+            auth_file.write_text(json.dumps({"authorized": False}))
         except Exception:
             pass
 

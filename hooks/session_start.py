@@ -416,7 +416,7 @@ def _create_default_vr(session_id: str) -> None:
         return  # Don't overwrite existing
     check_keys = [
         "tests", "build", "lint", "typecheck", "app_starts", "execution",
-        "frontend", "happy_path", "commit_push", "upstream_sync",
+        "frontend", "happy_path", "security", "commit_push", "upstream_sync",
     ]
     record = {
         "session_id": session_id,

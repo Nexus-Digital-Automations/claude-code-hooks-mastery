@@ -205,7 +205,7 @@ def get_required_checks(config: dict, files_modified: bool = True) -> list[str]:
 
     *files_modified* controls whether commit_push is required.
     """
-    required = ["lint", "upstream_sync"]  # Always required
+    required = ["lint", "security", "upstream_sync"]  # Always required
 
     if config.get("has_tests", False):
         required.insert(0, "tests")
@@ -384,8 +384,14 @@ def auto_run_missing(
         write_vr(vr_file, "upstream_sync", status, evidence, session_id=session_id)
         results["upstream_sync"] = status
 
+    # security is always auto-run (uses security_scanner, not a shell command)
+    if "security" in required and is_pending(vr_file, "security"):
+        status, evidence = _run_security_scan(project_root, config)
+        write_vr(vr_file, "security", status, evidence, session_id=session_id)
+        results["security"] = status
+
     for check_key in required:
-        if check_key == "upstream_sync":
+        if check_key in ("upstream_sync", "security"):
             continue
         if check_key == "commit_push":
             continue  # Can't auto-run — too risky
@@ -431,6 +437,36 @@ def auto_run_missing(
             results[check_key] = "failed"
 
     return results
+
+
+def _run_security_scan(project_root: Path, config: dict) -> tuple[str, str]:
+    """Run the security scanner. Returns (status, evidence)."""
+    try:
+        from .security_scanner import run_security_scan
+    except ImportError:
+        try:
+            from security_scanner import run_security_scan
+        except ImportError:
+            return "passed", "Security scanner not available — skipped"
+
+    try:
+        critical, warnings, report_path = run_security_scan(
+            project_root, timeout_per_tool=8, global_timeout=45,
+        )
+    except Exception as exc:
+        return "passed", f"Security scan error (non-blocking): {exc}"
+
+    sec_config = config.get("security", {})
+    block_on_warnings = sec_config.get("block_on_warnings", True)
+    max_warnings = sec_config.get("allow_warning_count", 0)
+
+    evidence = (
+        f"Critical: {critical}, Warnings: {warnings}\n"
+        f"Report: {report_path}"
+    )
+
+    should_fail = critical > 0 or (block_on_warnings and warnings > max_warnings)
+    return ("failed" if should_fail else "passed"), evidence
 
 
 def _run_upstream_sync(project_root: Path) -> tuple[str, str]:
