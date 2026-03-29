@@ -526,13 +526,27 @@ def main():
             evidence_display = build_evidence_display(done, session_id)
             print(evidence_display, file=sys.stderr)
 
-            # 6. Require authorization
-            auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
-            print(
-                f"\nAll checks passed. Now authorize: bash {auth_script}\n",
-                file=sys.stderr,
-            )
-            sys.exit(2)
+            # 6. All checks passed — auto-authorize and allow stop.
+            #    The VR evidence IS the proof. Blocking here to ask for an
+            #    explicit auth token causes an infinite loop: the "now authorize"
+            #    message consumes a turn, triggering another stop attempt that
+            #    hits this same block again. If checks pass, stop is safe.
+            # Reset VR for next task
+            try:
+                from datetime import datetime as _dt
+                from utils.vr_utils import VR_CHECKS_ORDER
+                vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+                all_pending = {
+                    k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
+                    for k, _ in VR_CHECKS_ORDER
+                }
+                vr_file.write_text(json.dumps({
+                    "reset_at": _dt.now().isoformat(),
+                    "checks": all_pending,
+                }))
+            except Exception:
+                pass
+            # fall through to logging (step 9)
 
         # 9. Logging
         parser = argparse.ArgumentParser()
