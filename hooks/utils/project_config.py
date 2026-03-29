@@ -113,6 +113,20 @@ def auto_detect_config(project_root: Path) -> dict:
     if _pyproject.exists() or (project_root / "setup.py").exists():
         config["project_type"] = "python"
         config["has_tests"] = (project_root / "tests").is_dir()
+        # Detect ruff linter
+        _has_ruff = (project_root / ".ruff_cache").exists()
+        if not _has_ruff and _pyproject.exists():
+            try:
+                _has_ruff = "[tool.ruff]" in _pyproject.read_text()
+            except Exception:
+                pass
+        if _has_ruff:
+            config["checks"]["lint"] = {
+                "command_patterns": ["ruff check", "ruff ."],
+                "pass_patterns": [r"All checks passed", r"^$"],
+                "fail_patterns": [r"Found \d+ error"],
+                "run_command": "ruff check .",
+            }
         # Detect mypy config
         _has_mypy = (project_root / "mypy.ini").exists() or (
             project_root / ".mypy.ini"
@@ -150,6 +164,22 @@ def auto_detect_config(project_root: Path) -> dict:
             config["has_tests"] = "test" in scripts
             config["has_build"] = "build" in scripts
             config["has_app"] = "start" in scripts or "dev" in scripts
+            # Detect ESLint
+            _eslint_configs = (
+                ".eslintrc.js", ".eslintrc.cjs", ".eslintrc.json", ".eslintrc.yml",
+                "eslint.config.mjs", "eslint.config.js", "eslint.config.cjs",
+            )
+            _has_eslint = "lint" in scripts or any(
+                (project_root / f).exists() for f in _eslint_configs
+            )
+            if _has_eslint:
+                _lint_cmd = "npm run lint" if "lint" in scripts else "npx eslint ."
+                config["checks"]["lint"] = {
+                    "command_patterns": ["npm run lint", "npx eslint", "eslint"],
+                    "pass_patterns": [r"no problems", r"0 errors"],
+                    "fail_patterns": [r"\d+ error", r"\d+ warning"],
+                    "run_command": _lint_cmd,
+                }
             if "test:e2e" in scripts:
                 config["has_frontend"] = True
                 if "frontend" not in config["checks"]:

@@ -20,7 +20,7 @@ for var in ['PYTHONHOME', 'PYTHONPATH']:
 
 # Add parent directory to path for local imports
 sys.path.insert(0, str(Path(__file__).parent))
-from utils.get_project_name import get_project_name
+from utils.get_project_name import get_project_name  # noqa: E402
 
 try:
     from dotenv import load_dotenv

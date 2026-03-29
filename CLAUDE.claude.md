@@ -57,6 +57,10 @@ When reviewing code — including your own output — check:
 - **Stale state**: after mutation, every derived value recalculated?
 - **Edge cases**: empty collections, missing keys, concurrent modification?
 
+### No Hacks, No Workarounds
+
+When something is broken, fix the root cause. Never paper over a problem with a temporary workaround — temporary hacks become permanent debt. If a system misbehaves, trace why and fix the contract, not the symptom. "Add a flag to skip this check" is not a fix. "Disable the guard temporarily" is not a fix. Find why the guard is triggering incorrectly and fix that. If the fix is genuinely complex, document the problem and defer — but never ship a workaround disguised as a solution.
+
 ### Technical Debt
 
 Name it when you see it. Add a TODO with context: what's wrong, why it matters, what a fix would look like. Don't add to debt silently — if you take a shortcut, mark it. Don't refactor code you're not changing. Refactoring is work justified by the task at hand, not by aesthetic preference.
@@ -85,7 +89,7 @@ To switch to deepseek supervisor mode: `bash ~/.claude/commands/toggle-mode.sh d
 
 1. Complete the user's requested work.
 2. Tests pass, build succeeds, app starts, security clean.
-3. Linting/type warnings: inform but never block work completion.
+3. Lint and type checks must pass with zero errors — no pre-existing excuses, no exceptions. Fix everything before stopping.
 4. Documentation and polish.
 
 ### Security
@@ -136,6 +140,8 @@ Never:
 - Skip error handling — "it probably won't fail" is not a strategy
 - Refactor code you're not changing
 - Say "I recommend X" for actions you can perform — just do them
+- Ship workarounds as fixes — if a guard or check is failing, fix why it fails, don't bypass it
+- Add temporary hacks with "TODO: remove later" — they never get removed, they just accumulate
 
 ---
 
