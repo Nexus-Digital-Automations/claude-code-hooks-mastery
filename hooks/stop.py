@@ -472,81 +472,59 @@ def main():
         except Exception:
             config = {}
 
-        # 4. Pre-authorization fast path — valid auth token bypasses VR check.
-        #    authorize-stop.sh already ran all required checks and wrote the token.
-        #    If the VR got reset by a new user prompt between then and now, the
-        #    token is still proof the user explicitly authorized this stop.
+        # 4a. Force fresh full-project lint — never trust a cached partial result
         resolved_sid = _resolve_session_id(session_id)
-        if check_stop_authorization(session_id):
-            auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"
-            try:
-                auth_file.write_text(json.dumps({"authorized": False}))
-            except Exception:
-                pass
-            # Show whatever VR evidence is available (may be partial after a reset)
-            _, done, _ = check_verification(session_id)
-            if done:
-                print(build_evidence_display(done, session_id), file=sys.stderr)
-            # Reset VR for next task
-            try:
-                from datetime import datetime as _dt
-                from utils.vr_utils import VR_CHECKS_ORDER
-                vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
-                all_pending = {
-                    k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
-                    for k, _ in VR_CHECKS_ORDER
-                }
-                vr_file.write_text(json.dumps({
-                    "reset_at": _dt.now().isoformat(),
-                    "checks": all_pending,
-                }))
-            except Exception:
-                pass
-            # fall through to logging (step 9)
+        try:
+            from project_config import auto_run_missing, get_git_root
+            from vr_utils import write_vr as _write_vr
+            _vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+            # Reset lint to pending so auto_run_missing always re-runs it project-wide
+            _write_vr(_vr_file, "lint", "pending", "", session_id=None)
+            auto_run_missing(resolved_sid, config, _vr_file, Path(get_git_root()))
+        except Exception:
+            pass  # Never block on errors; check_verification will catch any failure
 
-        else:
-            # 4a. Force fresh full-project lint — never trust a cached partial result
-            try:
-                from project_config import auto_run_missing, get_git_root
-                from vr_utils import write_vr as _write_vr
-                _vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
-                # Reset lint to pending so auto_run_missing always re-runs it project-wide
-                _write_vr(_vr_file, "lint", "pending", "", session_id=None)
-                auto_run_missing(resolved_sid, config, _vr_file, Path(get_git_root()))
-            except Exception:
-                pass  # Never block on errors; check_verification will catch any failure
+        # 4b. Config-driven verification gate
+        all_passed, done, missing = check_verification(session_id)
+        if not all_passed:
+            print(build_blocked_message(done, missing, config), file=sys.stderr)
+            sys.exit(2)
 
-            # 4b. Config-driven verification gate
-            all_passed, done, missing = check_verification(session_id)
-            if not all_passed:
-                print(build_blocked_message(done, missing, config), file=sys.stderr)
-                sys.exit(2)
+        # 5. Show evidence summary
+        evidence_display = build_evidence_display(done, session_id)
+        print(evidence_display, file=sys.stderr)
 
-            # 5. Show evidence summary
-            evidence_display = build_evidence_display(done, session_id)
-            print(evidence_display, file=sys.stderr)
+        # 6. Authorization check — explicit authorization required every time
+        if not check_stop_authorization(session_id):
+            auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
+            print(
+                f"\nAll checks passed. Now authorize: bash {auth_script}\n",
+                file=sys.stderr,
+            )
+            sys.exit(2)
 
-            # 6. All checks passed — auto-authorize and allow stop.
-            #    The VR evidence IS the proof. Blocking here to ask for an
-            #    explicit auth token causes an infinite loop: the "now authorize"
-            #    message consumes a turn, triggering another stop attempt that
-            #    hits this same block again. If checks pass, stop is safe.
-            # Reset VR for next task
-            try:
-                from datetime import datetime as _dt
-                from utils.vr_utils import VR_CHECKS_ORDER
-                vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
-                all_pending = {
-                    k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
-                    for k, _ in VR_CHECKS_ORDER
-                }
-                vr_file.write_text(json.dumps({
-                    "reset_at": _dt.now().isoformat(),
-                    "checks": all_pending,
-                }))
-            except Exception:
-                pass
-            # fall through to logging (step 9)
+        # 7. Final reset — one-time use
+        auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"
+        try:
+            auth_file.write_text(json.dumps({"authorized": False}))
+        except Exception:
+            pass
+
+        # Reset VR for next task
+        try:
+            from datetime import datetime as _dt
+            from utils.vr_utils import VR_CHECKS_ORDER
+            vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+            all_pending = {
+                k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
+                for k, _ in VR_CHECKS_ORDER
+            }
+            vr_file.write_text(json.dumps({
+                "reset_at": _dt.now().isoformat(),
+                "checks": all_pending,
+            }))
+        except Exception:
+            pass
 
         # 9. Logging
         parser = argparse.ArgumentParser()
