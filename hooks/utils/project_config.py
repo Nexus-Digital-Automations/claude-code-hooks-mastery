@@ -189,6 +189,15 @@ def auto_detect_config(project_root: Path) -> dict:
                         "fail_patterns": ["failed", "FAIL"],
                         "run_command": "npm run test:e2e",
                     }
+            # Detect frontend frameworks from package.json dependencies
+            _all_deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
+            _frontend_frameworks = {
+                "react", "react-dom", "vue", "@angular/core", "svelte",
+                "next", "@remix-run/react", "nuxt", "gatsby", "solid-js",
+                "astro", "@astrojs/astro",
+            }
+            if any(fw in _all_deps for fw in _frontend_frameworks):
+                config["has_frontend"] = True
         except Exception:
             config["has_tests"] = True
         # TypeScript type-checking
@@ -224,6 +233,17 @@ def auto_detect_config(project_root: Path) -> dict:
     if (project_root / "Gemfile").exists():
         config["project_type"] = "ruby"
         config["has_tests"] = (project_root / "spec").is_dir() or (project_root / "test").is_dir()
+
+    # File-based frontend detection (catches projects without npm deps)
+    _frontend_files = [
+        "src/App.tsx", "src/App.jsx", "src/App.vue", "src/App.svelte",
+        "src/main.tsx", "src/main.ts", "src/index.tsx", "src/index.ts",
+        "app/layout.tsx", "app/layout.jsx", "app/page.tsx", "app/page.jsx",
+        "pages/index.tsx", "pages/index.jsx", "pages/index.vue",
+        "public/index.html",
+    ]
+    if any((project_root / f).exists() for f in _frontend_files):
+        config["has_frontend"] = True
 
     return config
 
@@ -445,8 +465,8 @@ def auto_run_missing(
         if check_key in ("upstream_sync", "security"):
             continue
         if check_key == "commit_push":
-            # Auto-satisfy when repo is already in sync: 0 unpushed commits
-            # means any work this session was already committed and pushed.
+            # Auto-satisfy only when repo is fully clean: 0 unpushed commits
+            # AND no uncommitted changes to tracked files.
             try:
                 branch_r = subprocess.run(
                     ["git", "branch", "--show-current"],
@@ -460,9 +480,16 @@ def auto_run_missing(
                     cwd=str(project_root),
                 )
                 unpushed = int(rev_r.stdout.strip() or "1")
-                if unpushed == 0:
+                # Also check for uncommitted changes to tracked files
+                diff_r = subprocess.run(
+                    ["git", "diff", "HEAD", "--name-only"],
+                    capture_output=True, text=True, timeout=5,
+                    cwd=str(project_root),
+                )
+                has_uncommitted = bool(diff_r.stdout.strip())
+                if unpushed == 0 and not has_uncommitted:
                     write_vr(vr_file, "commit_push", "passed",
-                             f"[auto] 0 unpushed commits on {branch} — in sync with origin",
+                             f"[auto] 0 unpushed commits, 0 uncommitted changes on {branch}",
                              session_id=session_id)
                     results["commit_push"] = "passed"
             except Exception:

@@ -95,6 +95,65 @@ def detect_emergency_mode(attempts):
     return (False, count, 0)
 
 
+# ── Spec acceptance criteria validation ──────────────────────────────────
+
+def check_spec_completion(cwd=None):
+    """Check active spec files for uncompleted acceptance criteria.
+
+    Returns (all_done, summary_lines) where summary_lines is a list of
+    human-readable strings describing spec completion status.
+    Never raises — informational only.
+    """
+    try:
+        specs_dir = Path(cwd or os.getcwd()) / "specs"
+        if not specs_dir.is_dir():
+            return (True, [])
+
+        results = []
+        all_done = True
+        for spec_file in sorted(specs_dir.glob("*.md")):
+            try:
+                content = spec_file.read_text(errors='replace')
+                if not content.startswith("---"):
+                    continue
+                parts = content.split("---", 2)
+                if len(parts) < 3:
+                    continue
+                fm = parts[1]
+                status = ""
+                title = ""
+                for line in fm.split("\n"):
+                    line = line.strip()
+                    if line.startswith("status:"):
+                        status = line[7:].strip()
+                    elif line.startswith("title:"):
+                        title = line[6:].strip().strip("'\"")
+                if status not in ("active", "in-progress"):
+                    continue
+                body = parts[2]
+                unchecked = body.count("- [ ]")
+                checked = body.count("- [x]")
+                total = unchecked + checked
+                if total == 0:
+                    continue
+                if unchecked > 0:
+                    all_done = False
+                    results.append(
+                        f"  \u26a0  {spec_file.name}: {title} — "
+                        f"{checked}/{total} criteria met, {unchecked} remaining"
+                    )
+                else:
+                    results.append(
+                        f"  \u2705 {spec_file.name}: {title} — "
+                        f"{total}/{total} criteria met"
+                    )
+            except Exception:
+                continue
+        return (all_done, results)
+    except Exception:
+        return (True, [])
+
+
 # ── Root cleanliness ─────────────────────────────────────────────────────
 
 def check_root_cleanliness():
@@ -121,7 +180,7 @@ def check_root_cleanliness():
         'src', 'tests', 'test', 'docs', 'scripts', 'config',
         'public', 'static', 'assets', 'lib',
         'node_modules', '__pycache__', '.cache', 'venv', '.venv',
-        'output', 'reports', 'mcp_server',
+        'output', 'reports', 'mcp_server', 'specs',
         '.pre-commit-config.yaml', '.husky',
         '.claude', 'data', 'plans', 'projects', 'todos', 'statsig',
         'shell-snapshots', 'session-env', 'file-history', 'paste-cache',
@@ -472,6 +531,25 @@ def main():
             )
             sys.exit(2)
 
+        # 3b. Spec acceptance criteria check (informational — warns but doesn't block)
+        spec_done, spec_summary = check_spec_completion()
+        if spec_summary:
+            lines = [
+                "",
+                "=" * 60,
+                "SPEC COMPLETION STATUS",
+                "=" * 60,
+                "",
+            ]
+            lines.extend(spec_summary)
+            if not spec_done:
+                lines.append("")
+                lines.append("WARNING: Some spec acceptance criteria are incomplete.")
+                lines.append("Verify all requirements are met before stopping.")
+            lines.append("")
+            lines.append("=" * 60)
+            print("\n".join(lines), file=sys.stderr)
+
         # Load project config (used by verification gate and security scan)
         try:
             sys.path.insert(0, str(Path(__file__).parent / "utils"))
@@ -497,6 +575,85 @@ def main():
         if not all_passed:
             print(build_blocked_message(done, missing, config), file=sys.stderr)
             sys.exit(2)
+
+        # 4c. Perfection gate — every completed check must PASS, not just complete
+        failed_checks = [
+            (key, label, status, ts_short, ev)
+            for key, label, status, ts_short, ev in done
+            if status == "failed"
+        ]
+        if failed_checks:
+            lines = [
+                "",
+                "=" * 60,
+                "STOP BLOCKED \u2014 PERFECTION REQUIRED",
+                "=" * 60,
+                "",
+                "All verification checks must PASS. The following failed:",
+                "",
+            ]
+            for key, label, status, ts_short, ev in failed_checks:
+                ev_display = f' \u2014 "{ev}"' if ev else ""
+                lines.append(f"  \u274c {label:<18} [{status} @ {ts_short}]{ev_display}")
+            lines += [
+                "",
+                "Fix ALL failures and re-run checks. No exceptions.",
+                "=" * 60,
+                "",
+            ]
+            print("\n".join(lines), file=sys.stderr)
+            sys.exit(2)
+
+        # 4d. Frontend Playwright enforcement — if frontend exists, E2E tests are mandatory
+        if config.get("has_frontend", False):
+            try:
+                from project_config import get_git_root
+                _project_root = Path(get_git_root())
+            except Exception:
+                _project_root = Path.cwd()
+            _pw_configs = ("playwright.config.ts", "playwright.config.js",
+                           "playwright.config.mjs", "playwright.config.cjs")
+            _cy_configs = ("cypress.config.ts", "cypress.config.js",
+                           "cypress.config.mjs", "cypress.config.cjs")
+            _has_e2e = (any((_project_root / f).exists() for f in _pw_configs) or
+                        any((_project_root / f).exists() for f in _cy_configs))
+            if not _has_e2e:
+                print(
+                    "\n" + "=" * 60 +
+                    "\nSTOP BLOCKED \u2014 PLAYWRIGHT TESTS REQUIRED\n" +
+                    "=" * 60 +
+                    "\n\nFrontend detected but no E2E test framework configured.\n"
+                    "Set up Playwright: npx playwright init\n"
+                    "Write and pass ALL E2E tests before stopping.\n\n" +
+                    "=" * 60 + "\n",
+                    file=sys.stderr,
+                )
+                sys.exit(2)
+
+            # Belt-and-suspenders: verify Playwright evidence has zero failures
+            _resolved = _resolve_session_id(session_id)
+            _vr_path = Path.home() / f".claude/data/verification_record_{_resolved}.json"
+            try:
+                import re as _re
+                _vr_data = json.loads(_vr_path.read_text())
+                _fe_check = _vr_data.get("checks", {}).get("frontend", {})
+                _fe_evidence = _fe_check.get("evidence", "")
+                if _fe_evidence:
+                    _fail_match = _re.search(r'(\d+)\s+failed', _fe_evidence)
+                    if _fail_match and int(_fail_match.group(1)) > 0:
+                        print(
+                            "\n" + "=" * 60 +
+                            "\nSTOP BLOCKED \u2014 PLAYWRIGHT FAILURES\n" +
+                            "=" * 60 +
+                            f"\n\n{_fail_match.group(1)} Playwright test(s) failed.\n"
+                            "ALL tests must pass. Zero failures tolerated.\n"
+                            "Fix and re-run: npx playwright test\n\n" +
+                            "=" * 60 + "\n",
+                            file=sys.stderr,
+                        )
+                        sys.exit(2)
+            except Exception:
+                pass  # VR read errors should not block
 
         # 5. Show evidence summary
         evidence_display = build_evidence_display(done, session_id)
