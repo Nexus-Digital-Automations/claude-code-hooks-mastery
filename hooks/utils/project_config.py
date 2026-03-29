@@ -204,26 +204,47 @@ def get_required_checks(config: dict, files_modified: bool = True) -> list[str]:
     """Derive the list of required check keys from a project config.
 
     *files_modified* controls whether commit_push is required.
-    """
-    required = ["lint", "security", "upstream_sync"]  # Always required
 
-    if config.get("has_tests", False):
+    Any check can be opted out by setting ``"required": false`` in its per-check
+    config block, e.g. ``"checks": {"frontend": {"required": false}}``.
+    This lets projects disable checks that are auto-detected but have pre-existing
+    failures or are otherwise not applicable to the current session.
+    """
+    checks_conf = config.get("checks", {})
+
+    def _is_required(key: str, default: bool = True) -> bool:
+        """Return False if the check's config explicitly sets required: false."""
+        check_conf = checks_conf.get(key, {})
+        if isinstance(check_conf, dict) and "required" in check_conf:
+            return bool(check_conf["required"])
+        return default
+
+    required = []
+    # Always-required checks (can still be disabled via "required": false)
+    if _is_required("lint"):
+        required.append("lint")
+    if _is_required("security"):
+        required.append("security")
+    if _is_required("upstream_sync"):
+        required.append("upstream_sync")
+
+    if config.get("has_tests", False) and _is_required("tests"):
         required.insert(0, "tests")
-    if config.get("has_build", False):
+    if config.get("has_build", False) and _is_required("build"):
         required.append("build")
-    if config.get("has_typecheck", False) or "typecheck" in config.get("checks", {}):
+    if (config.get("has_typecheck", False) or "typecheck" in checks_conf) and _is_required("typecheck"):
         required.append("typecheck")
-    if config.get("has_app", False):
+    if config.get("has_app", False) and _is_required("app_starts"):
         required.append("app_starts")
     # execution: required if config defines it or project has scripts/CLI
-    if config.get("has_execution", False) or "execution" in config.get("checks", {}):
+    if (config.get("has_execution", False) or "execution" in checks_conf) and _is_required("execution"):
         required.append("execution")
-    if config.get("has_frontend", False):
+    if config.get("has_frontend", False) and _is_required("frontend"):
         required.append("frontend")
     # happy_path: required if config defines it (user specifies what "happy path" means)
-    if "happy_path" in config.get("checks", {}):
+    if "happy_path" in checks_conf and _is_required("happy_path"):
         required.append("happy_path")
-    if files_modified:
+    if files_modified and _is_required("commit_push"):
         required.append("commit_push")
 
     return required

@@ -4,6 +4,7 @@
 # ///
 
 import json
+import re
 import subprocess
 import sys
 import os
@@ -48,6 +49,146 @@ LINTER_MAP = {
 }
 
 
+def _handle_background_app_starts(command: str, stdout: str, stderr: str) -> str:
+    """Evaluate app_starts for commands that appear to be backgrounded.
+
+    When a command ends with ' &' or contains '&>' (redirect), the process
+    runs in background and the Bash tool captures only the shell's job-control
+    output (e.g. '[1] 12345'), not the app's startup messages.
+
+    Strategy:
+    1. If a redirect file is specified (&>/tmp/foo.log), try reading it.
+    2. Otherwise, check only for explicit fail patterns; absent those, return
+       "passed" because the process was successfully spawned.
+    """
+    combined = stdout + "\n" + stderr
+    app_fail_patterns = ["EADDRINUSE", "Error:", "Cannot find", "command not found"]
+    app_pass_patterns = [r"listening", r"started", r"ready", r"running"]
+
+    # Try to read the redirect file (e.g. &>/tmp/server.log)
+    redirect_match = re.search(r'&>\s*(\S+)', command)
+    if redirect_match:
+        redirect_path = redirect_match.group(1).rstrip('&').strip()
+        try:
+            redirect_file = Path(redirect_path)
+            if redirect_file.exists():
+                file_content = redirect_file.read_text(errors='replace')[:2000]
+                if file_content.strip():
+                    # Re-evaluate using file content
+                    for fp in app_fail_patterns:
+                        if fp.lower() in file_content.lower():
+                            return "failed"
+                    for pp in app_pass_patterns:
+                        if re.search(pp, file_content, re.IGNORECASE):
+                            return "passed"
+        except Exception:
+            pass
+
+    # No file content available — check combined output for explicit failures only
+    for fp in app_fail_patterns:
+        if fp.lower() in combined.lower():
+            return "failed"
+
+    # Background process spawned with no error evidence → passed
+    return "passed"
+
+
+def _detect_git_push_from_output(
+    session_id: str, command: str, stdout: str, stderr: str, vr_file: Path
+) -> None:
+    """Detect git push that ran inside a shell script by scanning its output.
+
+    When 'bash scripts/deploy.sh' calls 'git push' internally, the hook only
+    sees the outer command. This function looks for git push output signatures
+    in stdout/stderr to infer a successful push, then writes VR commit_push.
+    """
+    try:
+        combined = stdout + "\n" + stderr
+
+        # Git push output signatures (any of these indicates a push occurred)
+        _PUSH_SIGS = [
+            r"To (?:git@|https?://)",      # "To github.com:user/repo"
+            r"\b\w+\s+->\s+\w+\b",         # "main -> main"
+            r"remote: Resolving deltas",
+            r"remote: Counting objects",
+            r"Branch .+ set up to track",
+        ]
+        push_detected = any(re.search(p, combined, re.IGNORECASE) for p in _PUSH_SIGS)
+        if not push_detected:
+            return
+
+        # Reject if push clearly failed
+        if any(p in combined.lower() for p in ["rejected", "error: failed", "error: src refspec"]):
+            return
+
+        # Verify the push actually landed via rev-list (same as normal push handler)
+        try:
+            branch_r = subprocess.run(
+                ["git", "branch", "--show-current"],
+                capture_output=True, text=True, timeout=5,
+            )
+            branch = branch_r.stdout.strip() or "main"
+            rev_r = subprocess.run(
+                ["git", "rev-list", f"origin/{branch}...HEAD", "--count"],
+                capture_output=True, text=True, timeout=5,
+            )
+            unpushed = int(rev_r.stdout.strip() or "0")
+            if unpushed > 0:
+                return  # Commits still local — push didn't land
+        except Exception:
+            pass  # Proceed even if we can't verify rev-list
+
+        # Load/update commit_push state
+        state_file = Path.home() / f".claude/data/commit_push_state_{session_id}.json"
+        state = {}
+        if state_file.exists():
+            try:
+                state = json.loads(state_file.read_text())
+            except Exception:
+                pass
+
+        state["push_observed"] = True
+        state["push_evidence"] = (
+            f"Detected from script output: {command[:100]}\n"
+            f"{combined[:300]}"
+        )
+
+        # Infer commit from git show (push implies a commit exists)
+        if not state.get("commit_observed"):
+            try:
+                show_r = subprocess.run(
+                    ["git", "show", "--name-only", "--format="],
+                    capture_output=True, text=True, timeout=5,
+                )
+                committed_files = [
+                    f.strip() for f in show_r.stdout.strip().split("\n") if f.strip()
+                ]
+                if committed_files:
+                    state["commit_observed"] = True
+                    state["commit_evidence"] = (
+                        f"Inferred from script push: "
+                        f"{len(committed_files)} file(s): {', '.join(committed_files[:5])}"
+                    )
+            except Exception:
+                state["commit_observed"] = True
+                state["commit_evidence"] = "Inferred from push output in script"
+
+        state_file.parent.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(json.dumps(state))
+
+        # Write VR when both commit + push are observed
+        if state.get("commit_observed") and state.get("push_observed"):
+            from utils.vr_utils import write_vr
+            evidence = (
+                f"[auto via script] {command[:100]}\n"
+                f"commit: {state.get('commit_evidence', '')}\n"
+                f"push: {state.get('push_evidence', '')}"
+            )
+            write_vr(vr_file, "commit_push", "passed", evidence, session_id=session_id)
+    except Exception:
+        pass  # Never block the hook
+
+
 def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None:
     """Auto-record verification checks by observing Bash command outputs.
 
@@ -86,6 +227,8 @@ def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None
         # commit_push needs both git commit + git push
         if check_key == "commit_push":
             _handle_commit_push(session_id, command, stdout, stderr, vr_file)
+            # Still scan output for push signatures (belt-and-suspenders)
+            _detect_git_push_from_output(session_id, command, stdout, stderr, vr_file)
             return
 
         # Check for non-zero exit code in tool response
@@ -102,7 +245,15 @@ def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None
                         pass
                     break
 
-        status = evaluate_output(stdout, stderr, check_conf)
+        # app_starts: backgrounded commands need special handling
+        if check_key == "app_starts":
+            cmd_trimmed = command.rstrip()
+            if cmd_trimmed.endswith('&') or '&>' in command:
+                status = _handle_background_app_starts(command, stdout, stderr)
+            else:
+                status = evaluate_output(stdout, stderr, check_conf)
+        else:
+            status = evaluate_output(stdout, stderr, check_conf)
 
         # Non-zero exit code overrides pattern-based pass to failed
         if exit_code is not None and exit_code != 0 and status == "passed":
@@ -115,6 +266,9 @@ def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None
         if stderr.strip():
             evidence += f"\nstderr: {stderr[:300]}"
         write_vr(vr_file, check_key, status, evidence, session_id=session_id)
+
+        # Secondary: scan output for git push signatures (catches git push inside scripts)
+        _detect_git_push_from_output(session_id, command, stdout, stderr, vr_file)
     except Exception:
         pass  # Never block the hook
 

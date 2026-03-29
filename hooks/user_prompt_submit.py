@@ -119,8 +119,72 @@ def _record_task_start(session_id: str, prompt: str, working_dir: str = "") -> t
         return str(uuid.uuid4()), str(uuid.uuid4()), False  # Never block prompt submission
 
 
+def _try_inherit_previous_vr(session_id: str, task_id: str, working_dir: str) -> bool:
+    """Inherit VR state from the most recent previous session for the same project.
+
+    Handles interrupted sessions: when Claude restarts with a new session_id for
+    the same working_dir, completed checks from the interrupted session are preserved
+    so the user doesn't have to re-run everything.
+
+    Returns True if a previous VR with completed checks was found and copied.
+    """
+    try:
+        import time
+        data_dir = Path.home() / ".claude/data"
+        best_sid = None
+        best_mtime = 0.0
+
+        for task_path in data_dir.glob("current_task_*.json"):
+            # Skip the current session's task file
+            if session_id in task_path.name:
+                continue
+            try:
+                mtime = task_path.stat().st_mtime
+                if mtime < time.time() - 24 * 3600:  # Ignore files older than 24h
+                    continue
+                data = json.loads(task_path.read_text())
+                if data.get("working_dir") == working_dir:
+                    if mtime > best_mtime:
+                        best_mtime = mtime
+                        best_sid = data.get("session_id")
+            except Exception:
+                continue
+
+        if not best_sid:
+            return False
+
+        old_vr_file = data_dir / f"verification_record_{best_sid}.json"
+        if not old_vr_file.exists():
+            return False
+
+        old_record = json.loads(old_vr_file.read_text())
+        old_checks = old_record.get("checks", {})
+
+        # Only inherit if there are non-pending checks worth preserving
+        if not any(
+            isinstance(c, dict) and c.get("status") not in ("pending", None)
+            for c in old_checks.values()
+        ):
+            return False
+
+        # Copy old VR into the new session (updating session_id/task_id)
+        new_vr_file = data_dir / f"verification_record_{session_id}.json"
+        new_record = {
+            "reset_at": datetime.now().isoformat(),
+            "session_id": session_id,
+            "task_id": task_id,
+            "inherited_from": best_sid,
+            "checks": old_checks,
+        }
+        new_vr_file.write_text(json.dumps(new_record, indent=2))
+        return True
+    except Exception:
+        return False  # Never block prompt submission
+
+
 def _reset_verification_for_new_task(session_id: str, task_id: str,
-                                     is_followup: bool) -> None:
+                                     is_followup: bool,
+                                     working_dir: str = "") -> None:
     """Reset verification state at start of each new user prompt.
 
     Prevents stale evidence from a previous task in the same session
@@ -132,59 +196,32 @@ def _reset_verification_for_new_task(session_id: str, task_id: str,
     cycles (IMP-017). DeepSeek review state is ALWAYS cleaned regardless
     of follow-up status to prevent cross-task contamination.
     """
-    # ── DeepSeek state cleanup — runs for ALL prompts (follow-up or not) ──
-    # Prevents stale Q&A history and context from prior prompts from
-    # contaminating the reviewer's next invocation.
-    _claude_data = Path.home() / ".claude" / "data"
-    try:
-        # Read session-scoped identity; fall back to legacy global
-        _identity_file = _claude_data / f"agent_identity_{session_id}.json"
-        if not _identity_file.exists():
-            _identity_file = _claude_data / "agent_identity.json"
-        if _identity_file.exists():
-            _identity = json.loads(_identity_file.read_text())
-            _aid = _identity.get("agent_id", "")
-            if _aid:
-                for _suffix in [
-                    f"deepseek_context_{_aid}.json",
-                    f"deepseek_review_state_{_aid}.json",
-                    f"deepseek_review_state_{_aid}.rejections",
-                ]:
-                    try:
-                        (_claude_data / _suffix).unlink(missing_ok=True)
-                    except Exception:
-                        pass
-    except Exception:
-        pass
-    # Glob-based fallback for legacy/orphaned files
-    import glob as _glob
-    _patterns = [
-        "deepseek_context.json",        # Legacy global file
-        "deepseek_context_*.json",       # Agent/task-scoped context files
-        "deepseek_review_state_*.json",  # Agent/task-scoped review state files
-        "deepseek_review_state_*.rejections",  # Rejection counters
-    ]
-    for _pattern in _patterns:
-        for _path_str in _glob.glob(str(_claude_data / _pattern)):
-            try:
-                Path(_path_str).unlink(missing_ok=True)
-            except Exception:
-                pass
+    # DeepSeek state cleanup consolidated to session_start.py.
+    # authorize-stop.sh clears per-agent state after each authorization.
 
     # ── VR reset — guarded by follow-up check (IMP-017) ──
     if is_followup:
         return  # Preserve existing VR state for follow-up prompts
+
+    # Cross-session continuity: inherit completed checks from a previous session
+    # for the same project. Handles interrupted sessions (Ctrl+C restarts).
+    if working_dir and _try_inherit_previous_vr(session_id, task_id, working_dir):
+        return
 
     # Use session_id — matches how stop.py, check-*.sh, and authorize-stop.sh read VR files.
     # Previous bug: used task_id here, creating ghost files nobody reads.
     vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
     try:
         vr_file.parent.mkdir(parents=True, exist_ok=True)
+        # Canonical check keys matching VR_CHECKS_ORDER in vr_utils.py
         all_pending = {
             k: {"status": "pending", "evidence": None, "timestamp": None,
                 "skip_reason": None}
-            for k in ["tests", "build", "lint", "app_starts", "api",
-                      "frontend", "happy_path", "error_cases"]
+            for k in [
+                "tests", "build", "lint", "typecheck", "app_starts",
+                "execution", "frontend", "happy_path", "security",
+                "commit_push", "upstream_sync",
+            ]
         }
         with open(vr_file, "w") as f:
             json.dump({
@@ -195,28 +232,6 @@ def _reset_verification_for_new_task(session_id: str, task_id: str,
             }, f, indent=2)
     except Exception:
         pass  # Never block prompt submission
-
-
-def store_request_pattern(session_id, prompt, category, cwd):
-    """Store request pattern to Claude-Mem for full-text search across sessions."""
-    try:
-        from utils.claude_mem import ClaudeMemClient
-        project = Path(cwd).name if cwd else "unknown"
-        mem_client = ClaudeMemClient(timeout=0.5)
-        mem_client.init_session(
-            session_id=session_id,
-            project=project,
-            prompt=prompt
-        )
-        mem_client.store_observation(
-            session_id=session_id,
-            tool_name="_user_request",
-            tool_input={"category": category, "prompt": prompt[:500],
-                        "project": project},
-            tool_response=""
-        )
-    except Exception:
-        pass  # Service may not be running; fail silently
 
 
 def log_user_prompt(session_id, input_data):
@@ -860,13 +875,33 @@ def main():
         # Extract session_id and prompt
         session_id = input_data.get('session_id', 'unknown')
         prompt = input_data.get('prompt', '')
+        cwd = input_data.get('cwd', os.getcwd())
+
+        # Refresh active_sessions.json so check-*.sh scripts resolve the
+        # correct session_id. session_start.py writes this once; we refresh
+        # it here on every prompt to self-heal stale mappings (e.g., after
+        # smoke tests or concurrent sessions corrupt the file).
+        if session_id and session_id != 'unknown' and cwd:
+            try:
+                _sessions_file = Path.home() / ".claude/data/active_sessions.json"
+                _sessions = {}
+                if _sessions_file.exists():
+                    try:
+                        _sessions = json.loads(_sessions_file.read_text())
+                    except Exception:
+                        _sessions = {}
+                _sessions[cwd] = session_id
+                _sessions_file.write_text(json.dumps(_sessions, indent=2))
+            except Exception:
+                pass  # Never block prompt submission
 
         # Record task start time (authoritative timestamp for transcript filtering)
-        task_id, prompt_id, is_followup = _record_task_start(session_id, prompt, input_data.get('cwd', ''))
+        task_id, prompt_id, is_followup = _record_task_start(session_id, prompt, cwd)
 
         # Reset verification state for new task (per-prompt isolation)
-        # Skips reset if this is a follow-up prompt with existing check progress
-        _reset_verification_for_new_task(session_id, task_id, is_followup)
+        # Skips reset if this is a follow-up prompt with existing check progress.
+        # Passes working_dir so interrupted sessions can inherit previous VR state.
+        _reset_verification_for_new_task(session_id, task_id, is_followup, working_dir=cwd)
 
         # Log the user prompt
         log_user_prompt(session_id, input_data)
@@ -876,8 +911,6 @@ def main():
             manage_session_data(session_id, prompt, name_agent=args.name_agent)
 
         # Track requests in docs/development/ if cwd is available
-        cwd = input_data.get('cwd', '')
-
         if cwd and args.store_last_prompt:
             try:
                 category, is_trackable = categorize_prompt(prompt)
@@ -888,7 +921,6 @@ def main():
                     if category == 'feature':
                         update_features(cwd, prompt, session_id)
 
-                    store_request_pattern(session_id, prompt, category, cwd)
             except Exception:
                 pass
         
