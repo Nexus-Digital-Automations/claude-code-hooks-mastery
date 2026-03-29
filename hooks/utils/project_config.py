@@ -109,9 +109,36 @@ def auto_detect_config(project_root: Path) -> dict:
             }
 
     # Python
-    if (project_root / "pyproject.toml").exists() or (project_root / "setup.py").exists():
+    _pyproject = project_root / "pyproject.toml"
+    if _pyproject.exists() or (project_root / "setup.py").exists():
         config["project_type"] = "python"
         config["has_tests"] = (project_root / "tests").is_dir()
+        # Detect mypy config
+        _has_mypy = (project_root / "mypy.ini").exists() or (
+            project_root / ".mypy.ini"
+        ).exists()
+        if not _has_mypy and _pyproject.exists():
+            try:
+                _has_mypy = "[tool.mypy]" in _pyproject.read_text()
+            except Exception:
+                pass
+        if _has_mypy:
+            config["has_typecheck"] = True
+            config["checks"]["typecheck"] = {
+                "command_patterns": ["mypy"],
+                "pass_patterns": [r"Success", r"0 error"],
+                "fail_patterns": [r"error:", r"Found \d+ error"],
+                "run_command": "mypy .",
+            }
+        # Detect pyright
+        if (project_root / "pyrightconfig.json").exists():
+            config["has_typecheck"] = True
+            config["checks"]["typecheck"] = {
+                "command_patterns": ["pyright"],
+                "pass_patterns": [r"0 error"],
+                "fail_patterns": [r"error:", r"Found \d+ error"],
+                "run_command": "pyright",
+            }
 
     # Node.js
     pkg_json = project_root / "package.json"
@@ -134,12 +161,29 @@ def auto_detect_config(project_root: Path) -> dict:
                     }
         except Exception:
             config["has_tests"] = True
+        # TypeScript type-checking
+        if (project_root / "tsconfig.json").exists():
+            config["has_typecheck"] = True
+            if "typecheck" not in config["checks"]:
+                config["checks"]["typecheck"] = {
+                    "command_patterns": ["tsc --noEmit", "tsc -noEmit", "npx tsc"],
+                    "pass_patterns": [r"0 errors", r"^$"],
+                    "fail_patterns": [r"error TS\d+", r"Found \d+ error"],
+                    "run_command": "npx tsc --noEmit",
+                }
 
     # Rust
     if (project_root / "Cargo.toml").exists():
         config["project_type"] = "rust"
         config["has_tests"] = True
         config["has_build"] = True
+        config["has_typecheck"] = True  # cargo check is Rust's type-checker
+        config["checks"]["typecheck"] = {
+            "command_patterns": ["cargo check"],
+            "pass_patterns": [],
+            "fail_patterns": [r"^error"],
+            "run_command": "cargo check",
+        }
 
     # Go
     if (project_root / "go.mod").exists():
@@ -167,6 +211,8 @@ def get_required_checks(config: dict, files_modified: bool = True) -> list[str]:
         required.insert(0, "tests")
     if config.get("has_build", False):
         required.append("build")
+    if config.get("has_typecheck", False) or "typecheck" in config.get("checks", {}):
+        required.append("typecheck")
     if config.get("has_app", False):
         required.append("app_starts")
     # execution: required if config defines it or project has scripts/CLI
@@ -208,9 +254,17 @@ _GENERIC_PATTERNS: list[tuple[list[str], str, list[str], list[str]]] = [
      [], [r"^#"]),
 
     # Build
-    (["npm run build", "npx tsc", "tsc --noEmit", "vite build"], "build",
+    (["npm run build", "vite build"], "build",
      [r"Successfully compiled", r"built in"], ["error TS", "ERROR", "Build failed"]),
     (["cargo build"], "build",
+     [], [r"^error"]),
+
+    # Type checking
+    (["tsc --noEmit", "tsc -noEmit", "npx tsc"], "typecheck",
+     [r"0 errors", r"^$"], [r"error TS\d+", r"Found \d+ error"]),
+    (["mypy", "dmypy run", "pyright"], "typecheck",
+     [r"Success", r"0 error"], [r"error:", r"Found \d+ error"]),
+    (["cargo check"], "typecheck",
      [], [r"^error"]),
 
     # Execution (running scripts, CLI tools, API calls)
@@ -343,9 +397,11 @@ def auto_run_missing(
             continue
 
         try:
+            # Frontend (Playwright/Cypress) gets a longer timeout
+            timeout = 300 if check_key == "frontend" else 120
             r = subprocess.run(
                 cmd, shell=True, capture_output=True, text=True,
-                timeout=120, cwd=str(project_root),
+                timeout=timeout, cwd=str(project_root),
             )
             stdout = r.stdout or ""
             stderr = r.stderr or ""

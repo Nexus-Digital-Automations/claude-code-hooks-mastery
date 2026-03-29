@@ -88,8 +88,30 @@ def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None
             _handle_commit_push(session_id, command, stdout, stderr, vr_file)
             return
 
+        # Check for non-zero exit code in tool response
+        # Claude Code Bash tool includes "Exit code N" on failure
+        exit_code = None
+        raw = stdout if isinstance(tool_response, str) else str(tool_response)
+        if "Exit code" in raw:
+            for line in raw.split("\n"):
+                stripped = line.strip()
+                if stripped.startswith("Exit code"):
+                    try:
+                        exit_code = int(stripped.split()[-1])
+                    except (ValueError, IndexError):
+                        pass
+                    break
+
         status = evaluate_output(stdout, stderr, check_conf)
-        evidence = f"[auto] $ {command[:200]}\n{stdout[:1500]}"
+
+        # Non-zero exit code overrides pattern-based pass to failed
+        if exit_code is not None and exit_code != 0 and status == "passed":
+            status = "failed"
+
+        evidence = f"[auto] $ {command[:200]}"
+        if exit_code is not None:
+            evidence += f"\nexit_code={exit_code}"
+        evidence += f"\n{stdout[:1500]}"
         if stderr.strip():
             evidence += f"\nstderr: {stderr[:300]}"
         write_vr(vr_file, check_key, status, evidence, session_id=session_id)
@@ -98,7 +120,12 @@ def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None
 
 
 def _handle_commit_push(session_id: str, command: str, stdout: str, stderr: str, vr_file: Path) -> None:
-    """Track git commit + git push as two sub-states for the commit_push check."""
+    """Track git commit + git push as two sub-states for the commit_push check.
+
+    Verifications beyond pattern matching:
+    - Commit: checks git show --name-only to reject empty commits
+    - Push: checks git rev-list to verify commits actually reached the remote
+    """
     try:
         from utils.vr_utils import write_vr
 
@@ -116,24 +143,154 @@ def _handle_commit_push(session_id: str, command: str, stdout: str, stderr: str,
         combined = stdout + "\n" + stderr
 
         if "git commit" in cmd_lower and "git commit --amend" not in cmd_lower:
-            # Check for actual commit (not just a failed one)
             if any(p in combined.lower() for p in ["files changed", "insertion", "create mode", "file changed"]):
-                state["commit_observed"] = True
-                state["commit_evidence"] = f"$ {command[:100]}\n{stdout[:300]}"
+                # Verify commit is not empty
+                try:
+                    show_r = subprocess.run(
+                        ["git", "show", "--name-only", "--format="],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    committed_files = [f.strip() for f in show_r.stdout.strip().split("\n") if f.strip()]
+                    if committed_files:
+                        state["commit_observed"] = True
+                        state["commit_evidence"] = (
+                            f"$ {command[:100]}\n"
+                            f"{len(committed_files)} file(s): {', '.join(committed_files[:5])}"
+                        )
+                    else:
+                        state["commit_observed"] = False
+                        state["commit_evidence"] = "Commit was empty — no files"
+                except Exception:
+                    # Fallback: trust output-based check
+                    state["commit_observed"] = True
+                    state["commit_evidence"] = f"$ {command[:100]}\n{stdout[:300]}"
 
         if "git push" in cmd_lower and "--dry-run" not in cmd_lower:
             if "rejected" not in combined.lower() and "error" not in combined.lower():
-                state["push_observed"] = True
-                state["push_evidence"] = f"$ {command[:100]}\n{stdout[:300]}"
+                # Verify push actually landed via rev-list
+                try:
+                    branch_r = subprocess.run(
+                        ["git", "branch", "--show-current"],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    branch = branch_r.stdout.strip() or "main"
+                    rev_r = subprocess.run(
+                        ["git", "rev-list", f"origin/{branch}...HEAD", "--count"],
+                        capture_output=True, text=True, timeout=5,
+                    )
+                    unpushed = int(rev_r.stdout.strip() or "0")
+                    if unpushed == 0:
+                        state["push_observed"] = True
+                        state["push_evidence"] = (
+                            f"$ {command[:100]}\n"
+                            f"Verified: 0 unpushed commits on {branch}"
+                        )
+                    else:
+                        state["push_observed"] = False
+                        state["push_evidence"] = f"Push ran but {unpushed} commit(s) still unpushed"
+                except Exception:
+                    # Fallback: trust output-based check
+                    state["push_observed"] = True
+                    state["push_evidence"] = f"$ {command[:100]}\n{stdout[:300]}"
 
         state_file.write_text(json.dumps(state))
 
         # Write VR when both are observed
         if state.get("commit_observed") and state.get("push_observed"):
-            evidence = f"[auto] commit: {state.get('commit_evidence', '')}\npush: {state.get('push_evidence', '')}"
+            evidence = (
+                f"[auto] commit: {state.get('commit_evidence', '')}\n"
+                f"push: {state.get('push_evidence', '')}"
+            )
             write_vr(vr_file, "commit_push", "passed", evidence, session_id=session_id)
     except Exception:
         pass
+
+
+# ── VR invalidation on code edit ──────────────────────────────────────────
+# File extension → check keys to reset when that extension is edited.
+# Editing source code after tests passed means tests must re-run.
+
+_SOURCE_EXTS = frozenset((
+    ".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
+    ".go", ".rs", ".rb", ".java", ".cs", ".cpp", ".c", ".h",
+))
+_FRONTEND_EXTS = frozenset((".tsx", ".jsx", ".css", ".scss", ".html", ".vue", ".svelte"))
+_CONFIG_FILES = frozenset((
+    "package.json", "tsconfig.json", "Cargo.toml", "pyproject.toml",
+    "go.mod", "webpack.config.js", "vite.config.js", "vite.config.ts",
+))
+
+
+def _invalidate_stale_checks(session_id: str, file_path: str) -> None:
+    """Reset verification checks that are stale due to a code edit.
+
+    When source files change after a check was recorded, those checks
+    must re-run to verify the new code. Never raises.
+    """
+    try:
+        if not file_path:
+            return
+
+        ext = Path(file_path).suffix.lower()
+        name = Path(file_path).name
+
+        # Determine which checks to invalidate
+        to_invalidate: set[str] = set()
+        if ext in _SOURCE_EXTS:
+            to_invalidate.update(["tests", "typecheck", "execution", "happy_path"])
+        if ext in _FRONTEND_EXTS:
+            to_invalidate.add("frontend")
+        if name in _CONFIG_FILES:
+            to_invalidate.add("build")
+
+        if not to_invalidate:
+            return
+
+        vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+        if not vr_file.exists():
+            return
+
+        record = json.loads(vr_file.read_text())
+
+        # Session guard
+        if record.get("session_id") and record["session_id"] != session_id:
+            return
+
+        checks = record.get("checks", {})
+        changed = False
+        now = datetime.now().isoformat()
+
+        for key in to_invalidate:
+            item = checks.get(key, {})
+            status = item.get("status", "pending")
+            if status in ("pending", None):
+                continue  # Already pending, nothing to invalidate
+            # Don't invalidate checks recorded within the last 2 seconds
+            # (avoids race with the current tool invocation)
+            ts = item.get("timestamp", "")
+            if ts and ts > now[:17]:  # Same minute — check seconds
+                try:
+                    from datetime import datetime as _dt
+                    check_time = _dt.fromisoformat(ts.replace("Z", "+00:00").rstrip("+00:00"))
+                    now_time = _dt.now()
+                    if abs((now_time - check_time).total_seconds()) < 2:
+                        continue
+                except Exception:
+                    pass
+
+            checks[key] = {
+                "status": "pending",
+                "evidence": f"[invalidated] {name} edited after {key} was recorded",
+                "timestamp": now,
+                "skip_reason": None,
+            }
+            changed = True
+
+        if changed:
+            record["checks"] = checks
+            vr_file.write_text(json.dumps(record, indent=2))
+    except Exception:
+        pass  # Never block
 
 
 def update_tool_tracking(session_id: str, tool_name: str, tool_input: dict) -> None:
@@ -256,6 +413,10 @@ def main():
                     print(f"LINT ERRORS in {file_path}:", file=sys.stderr)
                     print(lint_output[:1000], file=sys.stderr)
                     sys.exit(2)  # Exit code 2 blocks the operation
+
+        # Invalidate stale verification checks when source files change
+        if session_id and tool_name in ("Write", "Edit", "MultiEdit"):
+            _invalidate_stale_checks(session_id, tool_input.get("file_path", ""))
 
         # Auto-observe Bash commands for verification checks
         if session_id and tool_name == "Bash":

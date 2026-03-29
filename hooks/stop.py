@@ -464,15 +464,17 @@ def main():
             )
             sys.exit(2)
 
+        # Load project config (used by verification gate and security scan)
+        try:
+            sys.path.insert(0, str(Path(__file__).parent / "utils"))
+            from project_config import get_git_root, load_config
+            config = load_config(Path(get_git_root()))
+        except Exception:
+            config = {}
+
         # 4. Config-driven verification gate
         all_passed, done, missing = check_verification(session_id)
         if not all_passed:
-            try:
-                sys.path.insert(0, str(Path(__file__).parent / "utils"))
-                from project_config import get_git_root, load_config
-                config = load_config(Path(get_git_root()))
-            except Exception:
-                config = {}
             print(build_blocked_message(done, missing, config), file=sys.stderr)
             sys.exit(2)
 
@@ -523,18 +525,32 @@ def main():
             except Exception:
                 pass
 
-            if critical > 0:
+            # Read security config from project
+            try:
+                sec_config = config.get("security", {}) if config else {}
+            except Exception:
+                sec_config = {}
+            block_on_warnings = sec_config.get("block_on_warnings", True)
+            max_warnings = sec_config.get("allow_warning_count", 0)
+
+            should_block = (
+                critical > 0
+                or (block_on_warnings and warnings > max_warnings)
+            )
+
+            if should_block:
+                findings_detail = f"Critical: {critical}, Warnings: {warnings}"
                 print(
-                    f"\nSECURITY SCAN BLOCKED — {critical} critical finding(s)\n"
+                    f"\nSECURITY SCAN BLOCKED — {findings_detail}\n"
                     f"Report: {report_path}\n"
-                    "Fix critical issues, then run /authorize-stop to re-scan.\n",
+                    "Fix findings, then run /authorize-stop to re-scan.\n",
                     file=sys.stderr,
                 )
                 sys.exit(2)
             else:
                 print(
                     f"\nSECURITY SCAN PASSED\n"
-                    f"Warnings: {warnings}  Report: {report_path}\n"
+                    f"Critical: {critical}, Warnings: {warnings}  Report: {report_path}\n"
                     "Run /authorize-stop once more to complete.\n",
                     file=sys.stderr,
                 )
