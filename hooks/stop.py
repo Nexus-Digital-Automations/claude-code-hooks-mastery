@@ -3,6 +3,7 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "python-dotenv",
+#     "openai",
 # ]
 # ///
 
@@ -655,6 +656,44 @@ def main():
             except Exception:
                 pass  # VR read errors should not block
 
+        # 4e. GPT-5 Mini protocol reviewer gate
+        try:
+            from utils.reviewer import check_approval, run_review, load_reviewer_config
+
+            _rev_config = load_reviewer_config()
+            if _rev_config.enabled and os.getenv("OPENAI_API_KEY"):
+                if not check_approval(resolved_sid):
+                    _rev_result = run_review(resolved_sid)
+                    if not _rev_result.approved:
+                        _rev_lines = [
+                            "",
+                            "=" * 60,
+                            "STOP BLOCKED \u2014 PROTOCOL REVIEWER FINDINGS",
+                            "=" * 60,
+                            "",
+                            f"Round {_rev_result.round_count} of {_rev_config.max_rounds}",
+                            "",
+                        ]
+                        for _finding in _rev_result.findings:
+                            _sev_icon = "\U0001f6ab" if _finding.get("severity") == "blocking" else "\u26a0\ufe0f"
+                            _cat = _finding.get("category", "?")
+                            _desc = _finding.get("description", "")
+                            _rev_lines.append(f"  {_sev_icon} [{_cat}] {_desc}")
+                            if _finding.get("evidence_needed"):
+                                _rev_lines.append(f"     \u2192 {_finding['evidence_needed']}")
+                            _rev_lines.append("")
+                        _rev_lines += [
+                            f"Summary: {_rev_result.summary}",
+                            "",
+                            "Address the blocking findings, then retry stop.",
+                            "=" * 60,
+                            "",
+                        ]
+                        print("\n".join(_rev_lines), file=sys.stderr)
+                        sys.exit(2)
+        except Exception:
+            pass  # Never block stop on reviewer infrastructure failure
+
         # 5. Show evidence summary
         evidence_display = build_evidence_display(done, session_id)
         print(evidence_display, file=sys.stderr)
@@ -672,6 +711,14 @@ def main():
         auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"
         try:
             auth_file.write_text(json.dumps({"authorized": False}))
+        except Exception:
+            pass
+
+        # Reset reviewer approval for next task
+        try:
+            from utils.reviewer import reset_approval, clear_conversation
+            reset_approval(resolved_sid)
+            clear_conversation(resolved_sid)
         except Exception:
             pass
 
