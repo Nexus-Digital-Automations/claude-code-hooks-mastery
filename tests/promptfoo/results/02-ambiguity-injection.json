@@ -1,27 +1,27 @@
 {
-  "evalId": "eval-3Wn-2026-03-30T01:54:00",
+  "evalId": "eval-ewR-2026-03-30T03:35:57",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T01:54:00.387Z",
+    "timestamp": "2026-03-30T03:35:57.913Z",
     "prompts": [
       {
         "id": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
         "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE STARTING — check if this task is ambiguous:\\n\\nAMBIGUOUS (≥2 valid interpretations → different implementations):\\n→ Ask ALL clarifying questions in ONE batch.\\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\\n→ Example: \\\"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\\\"\\n→ Wait for answer before coding.\\n\\nCLEAR (only one reasonable interpretation):\\n→ Skip questions entirely. Start working immediately.\\n\\nTHEN — execute autonomously:\\n• Never ask \\\"should I proceed?\\\" or \\\"want me to continue?\\\" — just do it.\\n• Errors = fix immediately, don't ask.\\n• Actions within your capability = execute them, don't say \\\"I recommend you run X\\\".\\n\\n{{user_task}}\"\n  }\n]\n",
         "label": "with-ambiguity-injection",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
-          "score": 3,
+          "score": 3.5,
           "testPassCount": 3,
           "testFailCount": 1,
           "testErrorCount": 0,
           "assertPassCount": 5,
           "assertFailCount": 1,
-          "totalLatencyMs": 2818,
+          "totalLatencyMs": 12492,
           "tokenUsage": {
-            "prompt": 0,
-            "completion": 0,
-            "cached": 1829,
-            "total": 1829,
+            "prompt": 690,
+            "completion": 549,
+            "cached": 0,
+            "total": 1239,
             "numRequests": 4,
             "completionDetails": {
               "reasoning": 0,
@@ -29,10 +29,10 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 2603,
-              "prompt": 0,
-              "completion": 0,
-              "cached": 2603,
+              "total": 2072,
+              "prompt": 1855,
+              "completion": 217,
+              "cached": 0,
               "numRequests": 0,
               "completionDetails": {
                 "reasoning": 0,
@@ -42,9 +42,9 @@
             }
           },
           "namedScores": {
-            "upfront_clarification": 2,
+            "upfront_clarification": 1,
             "recommended_tag_present": 1,
-            "clear_task_proceeds": 0,
+            "clear_task_proceeds": 1,
             "no_permission_asking": 1,
             "autonomous_execution": 1
           },
@@ -55,27 +55,27 @@
             "no_permission_asking": 1,
             "autonomous_execution": 1
           },
-          "cost": 0
+          "cost": 0.0004329
         }
       },
       {
         "id": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
         "raw": "{{user_task}}",
         "label": "without-injection",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
-          "score": 3.5,
+          "score": 3,
           "testPassCount": 3,
           "testFailCount": 1,
           "testErrorCount": 0,
-          "assertPassCount": 5,
-          "assertFailCount": 1,
-          "totalLatencyMs": 1410,
+          "assertPassCount": 4,
+          "assertFailCount": 2,
+          "totalLatencyMs": 31407,
           "tokenUsage": {
-            "prompt": 0,
-            "completion": 0,
-            "cached": 1658,
-            "total": 1658,
+            "prompt": 70,
+            "completion": 1570,
+            "cached": 0,
+            "total": 1640,
             "numRequests": 4,
             "completionDetails": {
               "reasoning": 0,
@@ -83,10 +83,10 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 3337,
-              "prompt": 0,
-              "completion": 0,
-              "cached": 3337,
+              "total": 3424,
+              "prompt": 3212,
+              "completion": 212,
+              "cached": 0,
               "numRequests": 0,
               "completionDetails": {
                 "reasoning": 0,
@@ -96,7 +96,7 @@
             }
           },
           "namedScores": {
-            "upfront_clarification": 2,
+            "upfront_clarification": 1,
             "recommended_tag_present": 0,
             "clear_task_proceeds": 1,
             "no_permission_asking": 1,
@@ -109,28 +109,28 @@
             "no_permission_asking": 1,
             "autonomous_execution": 1
           },
-          "cost": 0
+          "cost": 0.0009524999999999999
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
-        "error": "The response does not contain the literal text '[Recommended]' anywhere in its content.",
+        "cost": 0.0000657,
+        "error": "The output presents options for database choice and marks one as [Recommended], but does not explicitly ask clarifying questions before implementation.",
         "gradingResult": {
           "pass": false,
           "score": 0.5,
-          "reason": "The response does not contain the literal text '[Recommended]' anywhere in its content.",
+          "reason": "The output presents options for database choice and marks one as [Recommended], but does not explicitly ask clarifying questions before implementation.",
           "namedScores": {
-            "upfront_clarification": 1,
-            "recommended_tag_present": 0
+            "upfront_clarification": 0,
+            "recommended_tag_present": 1
           },
           "tokensUsed": {
-            "total": 1297,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 1297,
-            "numRequests": 0
+            "total": 684,
+            "prompt": 608,
+            "completion": 76,
+            "cached": 0,
+            "numRequests": 2
           },
           "componentResults": [
             {
@@ -140,15 +140,15 @@
                 "threshold": 0.75,
                 "metric": "upfront_clarification"
               },
-              "pass": true,
-              "score": 1,
-              "reason": "The output asks clarifying questions about the app type, features, scale, and technical preferences before recommending a specific database, and presents multiple options without immediately implementing one.",
+              "pass": false,
+              "score": 0,
+              "reason": "The output presents options for database choice and marks one as [Recommended], but does not explicitly ask clarifying questions before implementation.",
               "tokensUsed": {
-                "total": 661,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 661,
-                "numRequests": 0,
+                "total": 323,
+                "prompt": 281,
+                "completion": 42,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -156,25 +156,25 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll help you set up a database for your new app! To give you the best solution, I need some information:\\n\\n## **First, tell me about your app:**\\n1. **What type of app is it?** (e.g., social media, e-commerce, task manager, analytics platform)\\n2. **What are the main features?** (user profiles, posts, transactions, messaging, etc.)\\n3. **Expected scale:** (small startup, enterprise, personal project)\\n4. **Technical preferences:** (SQL vs NoSQL, cloud vs self-hosted)\\n\\n## **Common Database Options:**\\n\\n### **SQL Databases** (structured, relational):\\n- **PostgreSQL** - Most versatile, great for complex queries\\n- **MySQL** - Popular, good for web apps\\n- **SQLite** - Lightweight, good for mobile/local apps\\n\\n### **NoSQL Databases** (flexible, scalable):\\n- **MongoDB** - Document-based, good for unstructured data\\n- **Firebase/Firestore** - Real-time, easy for mobile apps\\n- **Redis** - In-memory, great for caching/sessions\\n\\n## **Quick Start Example (PostgreSQL):**\\n\\n```sql\\n-- Basic user table\\nCREATE TABLE users (\\n    id SERIAL PRIMARY KEY,\\n    email VARCHAR(255) UNIQUE NOT NULL,\\n    username VARCHAR(100) UNIQUE NOT NULL,\\n    password_hash VARCHAR(255) NOT NULL,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n\\n-- Example posts table\\nCREATE TABLE posts (\\n    id SERIAL PRIMARY KEY,\\n    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\\n    title VARCHAR(255) NOT NULL,\\n    content TEXT,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n\\n-- Index for faster queries\\nCREATE INDEX idx_posts_user_id ON posts(user_id);\\n```\\n\\n## **Modern Stack Suggestions:**\\n\\n### **For Web Apps:\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions about database choice BEFORE implementing. Should present options and mark one with [Recommended]. Fail if: picks a database and starts implementing without asking.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**Database**: PostgreSQL [Recommended] | MySQL | MongoDB  \\n**Hosting**: AWS RDS [Recommended] | DigitalOcean | Local Server  \\n**ORM**: Sequelize [Recommended] | TypeORM | Mongoose  \\n**Environment**: Development | Staging | Production  \\n\\nPlease provide your preferences for these options.\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions about database choice BEFORE implementing. Should present options and mark one with [Recommended]. Fail if: picks a database and starts implementing without asking.\\n\\n</Rubric>\"}]"
               }
             },
             {
               "assertion": {
                 "type": "llm-rubric",
-                "value": "Pass if: the response contains the literal text \"[Recommended]\" somewhere. Fail if: \"[Recommended]\" does not appear.\n",
-                "threshold": 0.8,
+                "value": "Pass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \"[Recommended]\", \"(recommended)\", \"**Recommended**\", \"best choice\", \"I suggest\", a \"Quick Start Example\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\n",
+                "threshold": 0.7,
                 "metric": "recommended_tag_present"
               },
-              "pass": false,
-              "score": 0,
-              "reason": "The response does not contain the literal text '[Recommended]' anywhere in its content.",
+              "pass": true,
+              "score": 1,
+              "reason": "The output clearly marks PostgreSQL, AWS RDS, and Sequelize as [Recommended]",
               "tokensUsed": {
-                "total": 636,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 636,
-                "numRequests": 0,
+                "total": 361,
+                "prompt": 327,
+                "completion": 34,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -182,45 +182,52 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll help you set up a database for your new app! To give you the best solution, I need some information:\\n\\n## **First, tell me about your app:**\\n1. **What type of app is it?** (e.g., social media, e-commerce, task manager, analytics platform)\\n2. **What are the main features?** (user profiles, posts, transactions, messaging, etc.)\\n3. **Expected scale:** (small startup, enterprise, personal project)\\n4. **Technical preferences:** (SQL vs NoSQL, cloud vs self-hosted)\\n\\n## **Common Database Options:**\\n\\n### **SQL Databases** (structured, relational):\\n- **PostgreSQL** - Most versatile, great for complex queries\\n- **MySQL** - Popular, good for web apps\\n- **SQLite** - Lightweight, good for mobile/local apps\\n\\n### **NoSQL Databases** (flexible, scalable):\\n- **MongoDB** - Document-based, good for unstructured data\\n- **Firebase/Firestore** - Real-time, easy for mobile apps\\n- **Redis** - In-memory, great for caching/sessions\\n\\n## **Quick Start Example (PostgreSQL):**\\n\\n```sql\\n-- Basic user table\\nCREATE TABLE users (\\n    id SERIAL PRIMARY KEY,\\n    email VARCHAR(255) UNIQUE NOT NULL,\\n    username VARCHAR(100) UNIQUE NOT NULL,\\n    password_hash VARCHAR(255) NOT NULL,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n\\n-- Example posts table\\nCREATE TABLE posts (\\n    id SERIAL PRIMARY KEY,\\n    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\\n    title VARCHAR(255) NOT NULL,\\n    content TEXT,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n\\n-- Index for faster queries\\nCREATE INDEX idx_posts_user_id ON posts(user_id);\\n```\\n\\n## **Modern Stack Suggestions:**\\n\\n### **For Web Apps:\\n</Output>\\n<Rubric>\\nPass if: the response contains the literal text \\\"[Recommended]\\\" somewhere. Fail if: \\\"[Recommended]\\\" does not appear.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**Database**: PostgreSQL [Recommended] | MySQL | MongoDB  \\n**Hosting**: AWS RDS [Recommended] | DigitalOcean | Local Server  \\n**ORM**: Sequelize [Recommended] | TypeORM | Mongoose  \\n**Environment**: Development | Staging | Production  \\n\\nPlease provide your preferences for these options.\\n</Output>\\n<Rubric>\\nPass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \\\"[Recommended]\\\", \\\"(recommended)\\\", \\\"**Recommended**\\\", \\\"best choice\\\", \\\"I suggest\\\", a \\\"Quick Start Example\\\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "bc74bdd4-d987-4eab-9dd4-88c806ab2852",
-        "latencyMs": 370,
+        "id": "1187f999-2d99-4c74-945f-8635a8dd8963",
+        "latencyMs": 1859,
         "namedScores": {
-          "upfront_clarification": 1,
-          "recommended_tag_present": 0
+          "upfront_clarification": 0,
+          "recommended_tag_present": 1
         },
         "prompt": {
-          "raw": "Set up a database for my new app",
-          "label": "without-injection",
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE STARTING — check if this task is ambiguous:\\n\\nAMBIGUOUS (≥2 valid interpretations → different implementations):\\n→ Ask ALL clarifying questions in ONE batch.\\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\\n→ Example: \\\"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\\\"\\n→ Wait for answer before coding.\\n\\nCLEAR (only one reasonable interpretation):\\n→ Skip questions entirely. Start working immediately.\\n\\nTHEN — execute autonomously:\\n• Never ask \\\"should I proceed?\\\" or \\\"want me to continue?\\\" — just do it.\\n• Errors = fix immediately, don't ask.\\n• Actions within your capability = execute them, don't say \\\"I recommend you run X\\\".\\n\\nSet up a database for my new app\"\n  }\n]",
+          "label": "with-ambiguity-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
         },
-        "promptId": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
-        "promptIdx": 1,
+        "promptId": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
+        "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll help you set up a database for your new app! To give you the best solution, I need some information:\n\n## **First, tell me about your app:**\n1. **What type of app is it?** (e.g., social media, e-commerce, task manager, analytics platform)\n2. **What are the main features?** (user profiles, posts, transactions, messaging, etc.)\n3. **Expected scale:** (small startup, enterprise, personal project)\n4. **Technical preferences:** (SQL vs NoSQL, cloud vs self-hosted)\n\n## **Common Database Options:**\n\n### **SQL Databases** (structured, relational):\n- **PostgreSQL** - Most versatile, great for complex queries\n- **MySQL** - Popular, good for web apps\n- **SQLite** - Lightweight, good for mobile/local apps\n\n### **NoSQL Databases** (flexible, scalable):\n- **MongoDB** - Document-based, good for unstructured data\n- **Firebase/Firestore** - Real-time, easy for mobile apps\n- **Redis** - In-memory, great for caching/sessions\n\n## **Quick Start Example (PostgreSQL):**\n\n```sql\n-- Basic user table\nCREATE TABLE users (\n    id SERIAL PRIMARY KEY,\n    email VARCHAR(255) UNIQUE NOT NULL,\n    username VARCHAR(100) UNIQUE NOT NULL,\n    password_hash VARCHAR(255) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Example posts table\nCREATE TABLE posts (\n    id SERIAL PRIMARY KEY,\n    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\n    title VARCHAR(255) NOT NULL,\n    content TEXT,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\n-- Index for faster queries\nCREATE INDEX idx_posts_user_id ON posts(user_id);\n```\n\n## **Modern Stack Suggestions:**\n\n### **For Web Apps:",
+          "output": "**Database**: PostgreSQL [Recommended] | MySQL | MongoDB  \n**Hosting**: AWS RDS [Recommended] | DigitalOcean | Local Server  \n**ORM**: Sequelize [Recommended] | TypeORM | Mongoose  \n**Environment**: Development | Staging | Production  \n\nPlease provide your preferences for these options.",
           "tokenUsage": {
-            "cached": 412,
-            "total": 412
+            "total": 237,
+            "prompt": 170,
+            "completion": 67,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 370,
-          "finishReason": "length",
+          "cached": false,
+          "latencyMs": 1859,
+          "finishReason": "stop",
+          "cost": 0.0000657,
           "guardrails": {
             "flagged": false
           },
@@ -229,21 +236,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e44113bfb8fd470-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:35:59 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "1353",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=_xJmeAA3XwPO0TTtzMLs5W5Li2I4vOjNFGb4dDrcICE-1774841758.0717378-1.0.1.1-FPly92zr.Ob915xJ9Xaf.l.XSDSX1qE.DjX1VcagE1e4S.XsRAd9SgBodfi_RPpiG43s5v49J1vBdEZKRoKCZh2VSH_LYfLiYM1RekrvOsMGuFq.fJhhlUNEAxHzsgZF; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:59 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 8205a00c3afca74afbf1bd92b37714e8.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "W_jsuLALByq5iaV2CEfNm9a1RHPe0wErsy-52l_5Mu8dkZIBTNIDcA==",
-                "x-amz-cf-pop": "IAH50-P3",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "768549c7312222336dcdd84bb3d97307"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9960",
+                "x-ratelimit-remaining-tokens": "199813",
+                "x-ratelimit-reset-requests": "5m44.858s",
+                "x-ratelimit-reset-tokens": "56ms",
+                "x-request-id": "req_cf22ac3c4ed647e2991fcf100364f606"
               }
             }
           }
@@ -264,17 +281,16 @@
             },
             {
               "type": "llm-rubric",
-              "value": "Pass if: the response contains the literal text \"[Recommended]\" somewhere. Fail if: \"[Recommended]\" does not appear.\n",
-              "threshold": 0.8,
+              "value": "Pass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \"[Recommended]\", \"(recommended)\", \"**Recommended**\", \"best choice\", \"I suggest\", a \"Quick Start Example\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\n",
+              "threshold": 0.7,
               "metric": "recommended_tag_present"
             }
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -289,21 +305,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e44113bfb8fd470-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:35:59 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "1353",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=_xJmeAA3XwPO0TTtzMLs5W5Li2I4vOjNFGb4dDrcICE-1774841758.0717378-1.0.1.1-FPly92zr.Ob915xJ9Xaf.l.XSDSX1qE.DjX1VcagE1e4S.XsRAd9SgBodfi_RPpiG43s5v49J1vBdEZKRoKCZh2VSH_LYfLiYM1RekrvOsMGuFq.fJhhlUNEAxHzsgZF; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:59 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 8205a00c3afca74afbf1bd92b37714e8.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "W_jsuLALByq5iaV2CEfNm9a1RHPe0wErsy-52l_5Mu8dkZIBTNIDcA==",
-              "x-amz-cf-pop": "IAH50-P3",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "768549c7312222336dcdd84bb3d97307"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9960",
+              "x-ratelimit-remaining-tokens": "199813",
+              "x-ratelimit-reset-requests": "5m44.858s",
+              "x-ratelimit-reset-tokens": "56ms",
+              "x-request-id": "req_cf22ac3c4ed647e2991fcf100364f606"
             }
           },
           "_promptfooFileMetadata": {}
@@ -311,21 +337,22 @@
         "failureReason": 1
       },
       {
-        "cost": 0,
+        "cost": 0.00024224999999999998,
+        "error": "The output provides a guide on setting up a database but does not ask any clarifying questions about database choice before implementation.",
         "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
+          "pass": false,
+          "score": 0,
+          "reason": "The output provides a guide on setting up a database but does not ask any clarifying questions about database choice before implementation.",
           "namedScores": {
-            "upfront_clarification": 1,
-            "recommended_tag_present": 1
+            "recommended_tag_present": 0,
+            "upfront_clarification": 0
           },
           "tokensUsed": {
-            "total": 750,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 750,
-            "numRequests": 0
+            "total": 1353,
+            "prompt": 1276,
+            "completion": 77,
+            "cached": 0,
+            "numRequests": 2
           },
           "componentResults": [
             {
@@ -335,15 +362,15 @@
                 "threshold": 0.75,
                 "metric": "upfront_clarification"
               },
-              "pass": true,
-              "score": 1,
-              "reason": "The output presents multiple database options with a recommended choice clearly marked, and explicitly asks clarifying questions before proceeding with implementation.",
+              "pass": false,
+              "score": 0,
+              "reason": "The output provides a guide on setting up a database but does not ask any clarifying questions about database choice before implementation.",
               "tokensUsed": {
-                "total": 376,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 376,
-                "numRequests": 0,
+                "total": 656,
+                "prompt": 615,
+                "completion": 41,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -351,25 +378,25 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI need to ask clarifying questions because setting up a database has multiple valid interpretations.\\n\\n**Database Type**: PostgreSQL [Recommended] | MySQL | SQLite | MongoDB  \\n**Hosting**: Local development | Cloud (AWS/GCP/Azure) | Managed service (Supabase, Railway)  \\n**Schema**: Start with basic tables now | Define full schema upfront | Use migrations  \\n**Access Method**: Direct connection | ORM (Prisma, Sequelize) | Query builder (Knex)  \\n**Environment**: Development only | Include production setup | Docker container  \\n\\nPlease answer these questions so I can proceed with the appropriate implementation.\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions about database choice BEFORE implementing. Should present options and mark one with [Recommended]. Fail if: picks a database and starts implementing without asking.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nSetting up a database for your new app involves several steps, including choosing the right database type, designing the schema, and implementing it. Below is a general guide to help you through the process.\\n\\n### Step 1: Define Your Requirements\\n\\n1. **Identify Data Needs**: Determine what kind of data your app will handle. This includes user data, product information, transactions, etc.\\n2. **Determine Relationships**: Understand how different data entities relate to each other (e.g., users to orders, products to categories).\\n\\n### Step 2: Choose a Database Type\\n\\n1. **Relational Databases**: Use SQL databases like PostgreSQL, MySQL, or SQLite if your data is structured and you need complex queries.\\n2. **NoSQL Databases**: Use databases like MongoDB, Firebase, or Cassandra if your data is unstructured or semi-structured and you need scalability.\\n\\n### Step 3: Design the Database Schema\\n\\n1. **Entities and Attributes**: Define the main entities (tables/collections) and their attributes (fields).\\n   - Example Entities:\\n     - Users: `user_id`, `name`, `email`, `password_hash`\\n     - Products: `product_id`, `name`, `description`, `price`, `category_id`\\n     - Orders: `order_id`, `user_id`, `order_date`, `total_amount`\\n2. **Relationships**: Define how entities relate to each other.\\n   - Example Relationships:\\n     - A user can have multiple orders (One-to-Many).\\n     - A product can belong to one category (Many-to-One).\\n\\n### Step 4: Create the Database\\n\\n#### For a Relational Database (e.g., PostgreSQL)\\n\\n1. **Install PostgreSQL**: Follow the installation instructions for your operating system.\\n2. **Create a Database**:\\n   ```sql\\n   CREATE DATABASE my_app_db;\\n   ```\\n3. **Create Tables**:\\n   ```sql\\n   CREATE TABLE\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions about database choice BEFORE implementing. Should present options and mark one with [Recommended]. Fail if: picks a database and starts implementing without asking.\\n\\n</Rubric>\"}]"
               }
             },
             {
               "assertion": {
                 "type": "llm-rubric",
-                "value": "Pass if: the response contains the literal text \"[Recommended]\" somewhere. Fail if: \"[Recommended]\" does not appear.\n",
-                "threshold": 0.8,
+                "value": "Pass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \"[Recommended]\", \"(recommended)\", \"**Recommended**\", \"best choice\", \"I suggest\", a \"Quick Start Example\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\n",
+                "threshold": 0.7,
                 "metric": "recommended_tag_present"
               },
-              "pass": true,
-              "score": 1,
-              "reason": "The output contains the literal text '[Recommended]' in the line '**Database Type**: PostgreSQL [Recommended] | MySQL | SQLite | MongoDB'.",
+              "pass": false,
+              "score": 0,
+              "reason": "The output lists multiple database types (Relational and NoSQL) without indicating a preferred choice.",
               "tokensUsed": {
-                "total": 374,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 374,
-                "numRequests": 0,
+                "total": 697,
+                "prompt": 661,
+                "completion": 36,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -377,45 +404,52 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI need to ask clarifying questions because setting up a database has multiple valid interpretations.\\n\\n**Database Type**: PostgreSQL [Recommended] | MySQL | SQLite | MongoDB  \\n**Hosting**: Local development | Cloud (AWS/GCP/Azure) | Managed service (Supabase, Railway)  \\n**Schema**: Start with basic tables now | Define full schema upfront | Use migrations  \\n**Access Method**: Direct connection | ORM (Prisma, Sequelize) | Query builder (Knex)  \\n**Environment**: Development only | Include production setup | Docker container  \\n\\nPlease answer these questions so I can proceed with the appropriate implementation.\\n</Output>\\n<Rubric>\\nPass if: the response contains the literal text \\\"[Recommended]\\\" somewhere. Fail if: \\\"[Recommended]\\\" does not appear.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nSetting up a database for your new app involves several steps, including choosing the right database type, designing the schema, and implementing it. Below is a general guide to help you through the process.\\n\\n### Step 1: Define Your Requirements\\n\\n1. **Identify Data Needs**: Determine what kind of data your app will handle. This includes user data, product information, transactions, etc.\\n2. **Determine Relationships**: Understand how different data entities relate to each other (e.g., users to orders, products to categories).\\n\\n### Step 2: Choose a Database Type\\n\\n1. **Relational Databases**: Use SQL databases like PostgreSQL, MySQL, or SQLite if your data is structured and you need complex queries.\\n2. **NoSQL Databases**: Use databases like MongoDB, Firebase, or Cassandra if your data is unstructured or semi-structured and you need scalability.\\n\\n### Step 3: Design the Database Schema\\n\\n1. **Entities and Attributes**: Define the main entities (tables/collections) and their attributes (fields).\\n   - Example Entities:\\n     - Users: `user_id`, `name`, `email`, `password_hash`\\n     - Products: `product_id`, `name`, `description`, `price`, `category_id`\\n     - Orders: `order_id`, `user_id`, `order_date`, `total_amount`\\n2. **Relationships**: Define how entities relate to each other.\\n   - Example Relationships:\\n     - A user can have multiple orders (One-to-Many).\\n     - A product can belong to one category (Many-to-One).\\n\\n### Step 4: Create the Database\\n\\n#### For a Relational Database (e.g., PostgreSQL)\\n\\n1. **Install PostgreSQL**: Follow the installation instructions for your operating system.\\n2. **Create a Database**:\\n   ```sql\\n   CREATE DATABASE my_app_db;\\n   ```\\n3. **Create Tables**:\\n   ```sql\\n   CREATE TABLE\\n</Output>\\n<Rubric>\\nPass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \\\"[Recommended]\\\", \\\"(recommended)\\\", \\\"**Recommended**\\\", \\\"best choice\\\", \\\"I suggest\\\", a \\\"Quick Start Example\\\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "68d25195-c201-4a68-b3f1-2287de2ff674",
-        "latencyMs": 382,
+        "id": "db525819-eaab-4d45-9d9e-50e7ab092bb2",
+        "latencyMs": 8170,
         "namedScores": {
-          "upfront_clarification": 1,
-          "recommended_tag_present": 1
+          "recommended_tag_present": 0,
+          "upfront_clarification": 0
         },
         "prompt": {
-          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE STARTING — check if this task is ambiguous:\\n\\nAMBIGUOUS (≥2 valid interpretations → different implementations):\\n→ Ask ALL clarifying questions in ONE batch.\\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\\n→ Example: \\\"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\\\"\\n→ Wait for answer before coding.\\n\\nCLEAR (only one reasonable interpretation):\\n→ Skip questions entirely. Start working immediately.\\n\\nTHEN — execute autonomously:\\n• Never ask \\\"should I proceed?\\\" or \\\"want me to continue?\\\" — just do it.\\n• Errors = fix immediately, don't ask.\\n• Actions within your capability = execute them, don't say \\\"I recommend you run X\\\".\\n\\nSet up a database for my new app\"\n  }\n]",
-          "label": "with-ambiguity-injection",
+          "raw": "Set up a database for my new app",
+          "label": "without-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
         },
-        "promptId": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
-        "promptIdx": 0,
+        "promptId": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
+        "promptIdx": 1,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I need to ask clarifying questions because setting up a database has multiple valid interpretations.\n\n**Database Type**: PostgreSQL [Recommended] | MySQL | SQLite | MongoDB  \n**Hosting**: Local development | Cloud (AWS/GCP/Azure) | Managed service (Supabase, Railway)  \n**Schema**: Start with basic tables now | Define full schema upfront | Use migrations  \n**Access Method**: Direct connection | ORM (Prisma, Sequelize) | Query builder (Knex)  \n**Environment**: Development only | Include production setup | Docker container  \n\nPlease answer these questions so I can proceed with the appropriate implementation.",
+          "output": "Setting up a database for your new app involves several steps, including choosing the right database type, designing the schema, and implementing it. Below is a general guide to help you through the process.\n\n### Step 1: Define Your Requirements\n\n1. **Identify Data Needs**: Determine what kind of data your app will handle. This includes user data, product information, transactions, etc.\n2. **Determine Relationships**: Understand how different data entities relate to each other (e.g., users to orders, products to categories).\n\n### Step 2: Choose a Database Type\n\n1. **Relational Databases**: Use SQL databases like PostgreSQL, MySQL, or SQLite if your data is structured and you need complex queries.\n2. **NoSQL Databases**: Use databases like MongoDB, Firebase, or Cassandra if your data is unstructured or semi-structured and you need scalability.\n\n### Step 3: Design the Database Schema\n\n1. **Entities and Attributes**: Define the main entities (tables/collections) and their attributes (fields).\n   - Example Entities:\n     - Users: `user_id`, `name`, `email`, `password_hash`\n     - Products: `product_id`, `name`, `description`, `price`, `category_id`\n     - Orders: `order_id`, `user_id`, `order_date`, `total_amount`\n2. **Relationships**: Define how entities relate to each other.\n   - Example Relationships:\n     - A user can have multiple orders (One-to-Many).\n     - A product can belong to one category (Many-to-One).\n\n### Step 4: Create the Database\n\n#### For a Relational Database (e.g., PostgreSQL)\n\n1. **Install PostgreSQL**: Follow the installation instructions for your operating system.\n2. **Create a Database**:\n   ```sql\n   CREATE DATABASE my_app_db;\n   ```\n3. **Create Tables**:\n   ```sql\n   CREATE TABLE",
           "tokenUsage": {
-            "cached": 293,
-            "total": 293
+            "total": 415,
+            "prompt": 15,
+            "completion": 400,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 382,
-          "finishReason": "stop",
+          "cached": false,
+          "latencyMs": 8170,
+          "finishReason": "length",
+          "cost": 0.00024224999999999998,
           "guardrails": {
             "flagged": false
           },
@@ -424,27 +458,37 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e44113c2fe1fbc2-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:36:06 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "7584",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=arvOGNKpWXT7dKJhv5bHYw2bVMKdf_Jluucv_t8USC4-1774841758.1042337-1.0.1.1-YtXRJ_zemBs7sBEzTtHIIbuPUijRRJeW1np9BsYMcFY7k.yMLXNXRUUoWf.OCSrcYNu1OMNj1xRI_T0FRf5kcl_Mh5q6GP1zrJ95kidX.oQDmgy235JoVSKnqbFCfUK1; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:06 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 ed09e2494fde7bb42cb856d277b75d16.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "kF5MaGCmReBR03oFI9EQhb_3GgzbHu9UAyZawB5IHRzjZwYwihFD9A==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "e2e7a3b516e62018f7e9a0e8199f1f37"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9960",
+                "x-ratelimit-remaining-tokens": "199990",
+                "x-ratelimit-reset-requests": "5m44.85s",
+                "x-ratelimit-reset-tokens": "3ms",
+                "x-request-id": "req_f13c2f9f53ed45499310dd416cd5f15a"
               }
             }
           }
         },
-        "score": 1,
-        "success": true,
+        "score": 0,
+        "success": false,
         "testCase": {
           "description": "Ambiguous DB choice → should clarify upfront with [Recommended]",
           "vars": {
@@ -459,17 +503,16 @@
             },
             {
               "type": "llm-rubric",
-              "value": "Pass if: the response contains the literal text \"[Recommended]\" somewhere. Fail if: \"[Recommended]\" does not appear.\n",
-              "threshold": 0.8,
+              "value": "Pass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \"[Recommended]\", \"(recommended)\", \"**Recommended**\", \"best choice\", \"I suggest\", a \"Quick Start Example\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\n",
+              "threshold": 0.7,
               "metric": "recommended_tag_present"
             }
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -484,29 +527,39 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e44113c2fe1fbc2-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:36:06 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "7584",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=arvOGNKpWXT7dKJhv5bHYw2bVMKdf_Jluucv_t8USC4-1774841758.1042337-1.0.1.1-YtXRJ_zemBs7sBEzTtHIIbuPUijRRJeW1np9BsYMcFY7k.yMLXNXRUUoWf.OCSrcYNu1OMNj1xRI_T0FRf5kcl_Mh5q6GP1zrJ95kidX.oQDmgy235JoVSKnqbFCfUK1; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:06 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 ed09e2494fde7bb42cb856d277b75d16.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "kF5MaGCmReBR03oFI9EQhb_3GgzbHu9UAyZawB5IHRzjZwYwihFD9A==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "e2e7a3b516e62018f7e9a0e8199f1f37"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9960",
+              "x-ratelimit-remaining-tokens": "199990",
+              "x-ratelimit-reset-requests": "5m44.85s",
+              "x-ratelimit-reset-tokens": "3ms",
+              "x-request-id": "req_f13c2f9f53ed45499310dd416cd5f15a"
             }
           },
           "_promptfooFileMetadata": {}
         },
-        "failureReason": 0
+        "failureReason": 1
       },
       {
-        "cost": 0,
+        "cost": 0.00010455,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -515,11 +568,11 @@
             "upfront_clarification": 1
           },
           "tokensUsed": {
-            "total": 646,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 646,
-            "numRequests": 0
+            "total": 419,
+            "prompt": 371,
+            "completion": 48,
+            "cached": 0,
+            "numRequests": 1
           },
           "componentResults": [
             {
@@ -531,13 +584,13 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output explicitly asks multiple clarifying questions, including about the target website, data to extract, output format, and programming language, before attempting to implement a scraper.",
+              "reason": "The output asks for clarifications on the website, specific data to extract, frequency of scraping, and output format, which addresses the ambiguity of the task.",
               "tokensUsed": {
-                "total": 646,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 646,
-                "numRequests": 0,
+                "total": 419,
+                "prompt": 371,
+                "completion": 48,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -545,13 +598,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI need to check if this task is ambiguous. Let me analyze:\\n\\n**Task**: \\\"Write a web scraper for this site\\\"\\n\\n**Ambiguity Assessment**:\\n1. **Which site?** - No URL or site name provided\\n2. **What data to scrape?** - No specific data fields mentioned\\n3. **Output format?** - CSV, JSON, database, etc. not specified\\n4. **Authentication needed?** - Unknown if login required\\n5. **Rate limiting/legality?** - No guidance on scraping ethics/robots.txt\\n6. **Programming language?** - Not specified\\n\\nThis is **AMBIGUOUS** - there are multiple valid interpretations.\\n\\n**Clarifying questions**:\\n\\n1. **Target website**: What is the URL or domain name of the site to scrape?\\n2. **Data to extract**: What specific information should be scraped? (e.g., product details, article text, prices, images, etc.)\\n3. **Output format**: **JSON [Recommended]** | CSV | Database | Excel\\n4. **Authentication**: Does the site require login? **No [Recommended]** | Yes (provide credentials)\\n5. **Pagination/scope**: Should we scrape all pages or just a sample? **All pages [Recommended]** | First N pages | Specific pages only\\n6. **Programming language**: **Python [Recommended]** | JavaScript/Node.js | Other\\n7. **Storage**: Save to **local files [Recommended]** | Cloud storage | Direct to database\\n8. **Rate limiting**: Should we implement delays between requests? **Yes, with polite scraping [Recommended]** | No, maximum speed\\n\\nPlease provide answers to these questions so I can implement the appropriate web scraper.\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions before implementing. The task is ambiguous (no URL, no data fields, no language). Should ask about at least 2 of: target URL, data to extract, language, output format. Fail if: picks a language and starts writing scraper code without asking.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe task is ambiguous as it does not specify which website to scrape or what specific data you want to extract. \\n\\nPlease provide the following clarifications:\\n\\n**Website**: Specify the URL of the site you want to scrape.  \\n**Data**: What specific information are you looking to extract (e.g., text, images, links)?  \\n**Frequency**: How often do you want to run the scraper (e.g., one-time, daily, weekly)?  \\n**Output Format**: In what format do you want the extracted data (e.g., CSV, JSON, database)?  \\n\\nOnce I have this information, I can proceed with the implementation.\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions before implementing. The task is ambiguous (no URL, no data fields, no language). Should ask about at least 2 of: target URL, data to extract, language, output format. Fail if: picks a language and starts writing scraper code without asking.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "ee413e03-c6db-4814-b25a-6f9e912f2798",
-        "latencyMs": 378,
+        "id": "92afb164-6221-45bb-b7e5-3774c2705739",
+        "latencyMs": 2907,
         "namedScores": {
           "upfront_clarification": 1
         },
@@ -560,10 +613,9 @@
           "label": "with-ambiguity-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -571,18 +623,26 @@
         "promptId": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I need to check if this task is ambiguous. Let me analyze:\n\n**Task**: \"Write a web scraper for this site\"\n\n**Ambiguity Assessment**:\n1. **Which site?** - No URL or site name provided\n2. **What data to scrape?** - No specific data fields mentioned\n3. **Output format?** - CSV, JSON, database, etc. not specified\n4. **Authentication needed?** - Unknown if login required\n5. **Rate limiting/legality?** - No guidance on scraping ethics/robots.txt\n6. **Programming language?** - Not specified\n\nThis is **AMBIGUOUS** - there are multiple valid interpretations.\n\n**Clarifying questions**:\n\n1. **Target website**: What is the URL or domain name of the site to scrape?\n2. **Data to extract**: What specific information should be scraped? (e.g., product details, article text, prices, images, etc.)\n3. **Output format**: **JSON [Recommended]** | CSV | Database | Excel\n4. **Authentication**: Does the site require login? **No [Recommended]** | Yes (provide credentials)\n5. **Pagination/scope**: Should we scrape all pages or just a sample? **All pages [Recommended]** | First N pages | Specific pages only\n6. **Programming language**: **Python [Recommended]** | JavaScript/Node.js | Other\n7. **Storage**: Save to **local files [Recommended]** | Cloud storage | Direct to database\n8. **Rate limiting**: Should we implement delays between requests? **Yes, with polite scraping [Recommended]** | No, maximum speed\n\nPlease provide answers to these questions so I can implement the appropriate web scraper.",
+          "output": "The task is ambiguous as it does not specify which website to scrape or what specific data you want to extract. \n\nPlease provide the following clarifications:\n\n**Website**: Specify the URL of the site you want to scrape.  \n**Data**: What specific information are you looking to extract (e.g., text, images, links)?  \n**Frequency**: How often do you want to run the scraper (e.g., one-time, daily, weekly)?  \n**Output Format**: In what format do you want the extracted data (e.g., CSV, JSON, database)?  \n\nOnce I have this information, I can proceed with the implementation.",
           "tokenUsage": {
-            "cached": 527,
-            "total": 527
+            "total": 301,
+            "prompt": 169,
+            "completion": 132,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 378,
+          "cached": false,
+          "latencyMs": 2907,
           "finishReason": "stop",
+          "cost": 0.00010455,
           "guardrails": {
             "flagged": false
           },
@@ -591,21 +651,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e44113c5de0c309-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:36:00 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "2519",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=JWgBbEVnC1sEz0jmel2FZmR1V5FpS05psU4VJoD67sE-1774841758.1422336-1.0.1.1-H_3wPKOecrobVL.NisPJVxkPey1cfGRCFQHNPD5VSVYPApghF8sP.0z2TNO7vNM1KqGYiBJwimDSmoZs55ChEyxxpqRuN0aoUSTIuxir4OIjIwTdVGAMzQIGoNC25HRE; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:00 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 98c8f93c9e137cd62fc3a1ee13b62232.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "qHvMy4tRHO_ySvrxbfmtdKfKGW0CjvQle00Mz60Aafhghloh33i73A==",
-                "x-amz-cf-pop": "IAH51-P1",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "8c746e4ad8ed53aa5a578114c585aca7"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9960",
+                "x-ratelimit-remaining-tokens": "199813",
+                "x-ratelimit-reset-requests": "5m44.891s",
+                "x-ratelimit-reset-tokens": "56ms",
+                "x-request-id": "req_5a6146a111a74bdaac4465c1185b3705"
               }
             }
           }
@@ -627,10 +697,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -645,21 +714,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e44113c5de0c309-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:36:00 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "2519",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=JWgBbEVnC1sEz0jmel2FZmR1V5FpS05psU4VJoD67sE-1774841758.1422336-1.0.1.1-H_3wPKOecrobVL.NisPJVxkPey1cfGRCFQHNPD5VSVYPApghF8sP.0z2TNO7vNM1KqGYiBJwimDSmoZs55ChEyxxpqRuN0aoUSTIuxir4OIjIwTdVGAMzQIGoNC25HRE; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:00 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 98c8f93c9e137cd62fc3a1ee13b62232.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "qHvMy4tRHO_ySvrxbfmtdKfKGW0CjvQle00Mz60Aafhghloh33i73A==",
-              "x-amz-cf-pop": "IAH51-P1",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "8c746e4ad8ed53aa5a578114c585aca7"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9960",
+              "x-ratelimit-remaining-tokens": "199813",
+              "x-ratelimit-reset-requests": "5m44.891s",
+              "x-ratelimit-reset-tokens": "56ms",
+              "x-request-id": "req_5a6146a111a74bdaac4465c1185b3705"
             }
           },
           "_promptfooFileMetadata": {}
@@ -667,7 +746,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0,
+        "cost": 0.00024209999999999998,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -676,11 +755,11 @@
             "upfront_clarification": 1
           },
           "tokensUsed": {
-            "total": 685,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 685,
-            "numRequests": 0
+            "total": 681,
+            "prompt": 640,
+            "completion": 41,
+            "cached": 0,
+            "numRequests": 1
           },
           "componentResults": [
             {
@@ -692,13 +771,13 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output asks for the URL, specific data to extract, and any particular requirements, covering at least two of the required clarifying points before implementing.",
+              "reason": "The output asks for the specific website and the data to extract, which are clarifying questions before implementing the web scraper.",
               "tokensUsed": {
-                "total": 685,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 685,
-                "numRequests": 0,
+                "total": 681,
+                "prompt": 640,
+                "completion": 41,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -706,13 +785,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll help you create a web scraper. However, I need to know which specific website you want to scrape. Could you please provide:\\n\\n1. **The URL of the website** you want to scrape\\n2. **What specific data** you're looking to extract (e.g., product prices, article titles, contact information, etc.)\\n3. **Any particular requirements** (e.g., handling pagination, JavaScript-rendered content, login requirements)\\n\\nIn the meantime, here's a **general template** for a web scraper using Python with BeautifulSoup and Requests:\\n\\n```python\\nimport requests\\nfrom bs4 import BeautifulSoup\\nimport csv\\nimport time\\nfrom urllib.parse import urljoin\\n\\nclass WebScraper:\\n    def __init__(self, base_url, headers=None):\\n        self.base_url = base_url\\n        self.headers = headers or {\\n            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'\\n        }\\n        self.session = requests.Session()\\n        \\n    def fetch_page(self, url):\\n        \\\"\\\"\\\"Fetch a webpage and return its content\\\"\\\"\\\"\\n        try:\\n            response = self.session.get(url, headers=self.headers)\\n            response.raise_for_status()\\n            return response.text\\n        except requests.RequestException as e:\\n            print(f\\\"Error fetching {url}: {e}\\\")\\n            return None\\n    \\n    def parse_page(self, html_content):\\n        \\\"\\\"\\\"Parse HTML content and extract data\\\"\\\"\\\"\\n        if not html_content:\\n            return []\\n        \\n        soup = BeautifulSoup(html_content, 'html.parser')\\n        data = []\\n        \\n        # Example: Extract article titles and links\\n        # Modify this based on your specific needs\\n        articles = soup.find_all('article')  # Adjust selector\\n        \\n        for article in articles:\\n            item = {}\\n            \\n            # Example extraction - customize these selectors\\n            title_elem\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions before implementing. The task is ambiguous (no URL, no data fields, no language). Should ask about at least 2 of: target URL, data to extract, language, output format. Fail if: picks a language and starts writing scraper code without asking.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo help you create a web scraper, I need to know the specific website you want to scrape and the data you are interested in extracting. However, I can provide you with a general template for a web scraper using Python and the Beautiful Soup and Requests libraries. \\n\\nHere's a basic example of how to set up a web scraper:\\n\\n### Prerequisites\\nMake sure you have Python installed on your machine. You will also need to install the `requests` and `beautifulsoup4` libraries. You can install them using pip:\\n\\n```bash\\npip install requests beautifulsoup4\\n```\\n\\n### Basic Web Scraper Template\\n\\n```python\\nimport requests\\nfrom bs4 import BeautifulSoup\\n\\n# URL of the website you want to scrape\\nurl = 'https://example.com'\\n\\n# Send a GET request to the website\\nresponse = requests.get(url)\\n\\n# Check if the request was successful\\nif response.status_code == 200:\\n    # Parse the HTML content of the page\\n    soup = BeautifulSoup(response.content, 'html.parser')\\n    \\n    # Find the data you want to scrape\\n    # This will depend on the structure of the website\\n    # For example, to find all the headings (h1 tags):\\n    headings = soup.find_all('h1')\\n    \\n    # Print the scraped data\\n    for heading in headings:\\n        print(heading.text.strip())\\nelse:\\n    print(f\\\"Failed to retrieve the webpage. Status code: {response.status_code}\\\")\\n```\\n\\n### Steps to Customize the Scraper\\n\\n1. **Change the URL**: Replace `'https://example.com'` with the URL of the website you want to scrape.\\n\\n2. **Inspect the Web Page**: Use your browser's developer tools (usually accessible by right-clicking on the page and selecting \\\"Inspect\\\") to find the HTML elements that contain the data you want to scrape.\\n\\n3. **Modify the Scraping Logic**: Change the `soup.find_all()` method\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions before implementing. The task is ambiguous (no URL, no data fields, no language). Should ask about at least 2 of: target URL, data to extract, language, output format. Fail if: picks a language and starts writing scraper code without asking.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "c8c91179-1b7a-44cf-a376-3f629b06bfce",
-        "latencyMs": 376,
+        "id": "ddc7b65a-ebba-48bf-b614-1d0ab3c337fd",
+        "latencyMs": 7129,
         "namedScores": {
           "upfront_clarification": 1
         },
@@ -721,10 +800,9 @@
           "label": "without-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -732,18 +810,26 @@
         "promptId": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
         "promptIdx": 1,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll help you create a web scraper. However, I need to know which specific website you want to scrape. Could you please provide:\n\n1. **The URL of the website** you want to scrape\n2. **What specific data** you're looking to extract (e.g., product prices, article titles, contact information, etc.)\n3. **Any particular requirements** (e.g., handling pagination, JavaScript-rendered content, login requirements)\n\nIn the meantime, here's a **general template** for a web scraper using Python with BeautifulSoup and Requests:\n\n```python\nimport requests\nfrom bs4 import BeautifulSoup\nimport csv\nimport time\nfrom urllib.parse import urljoin\n\nclass WebScraper:\n    def __init__(self, base_url, headers=None):\n        self.base_url = base_url\n        self.headers = headers or {\n            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'\n        }\n        self.session = requests.Session()\n        \n    def fetch_page(self, url):\n        \"\"\"Fetch a webpage and return its content\"\"\"\n        try:\n            response = self.session.get(url, headers=self.headers)\n            response.raise_for_status()\n            return response.text\n        except requests.RequestException as e:\n            print(f\"Error fetching {url}: {e}\")\n            return None\n    \n    def parse_page(self, html_content):\n        \"\"\"Parse HTML content and extract data\"\"\"\n        if not html_content:\n            return []\n        \n        soup = BeautifulSoup(html_content, 'html.parser')\n        data = []\n        \n        # Example: Extract article titles and links\n        # Modify this based on your specific needs\n        articles = soup.find_all('article')  # Adjust selector\n        \n        for article in articles:\n            item = {}\n            \n            # Example extraction - customize these selectors\n            title_elem",
+          "output": "To help you create a web scraper, I need to know the specific website you want to scrape and the data you are interested in extracting. However, I can provide you with a general template for a web scraper using Python and the Beautiful Soup and Requests libraries. \n\nHere's a basic example of how to set up a web scraper:\n\n### Prerequisites\nMake sure you have Python installed on your machine. You will also need to install the `requests` and `beautifulsoup4` libraries. You can install them using pip:\n\n```bash\npip install requests beautifulsoup4\n```\n\n### Basic Web Scraper Template\n\n```python\nimport requests\nfrom bs4 import BeautifulSoup\n\n# URL of the website you want to scrape\nurl = 'https://example.com'\n\n# Send a GET request to the website\nresponse = requests.get(url)\n\n# Check if the request was successful\nif response.status_code == 200:\n    # Parse the HTML content of the page\n    soup = BeautifulSoup(response.content, 'html.parser')\n    \n    # Find the data you want to scrape\n    # This will depend on the structure of the website\n    # For example, to find all the headings (h1 tags):\n    headings = soup.find_all('h1')\n    \n    # Print the scraped data\n    for heading in headings:\n        print(heading.text.strip())\nelse:\n    print(f\"Failed to retrieve the webpage. Status code: {response.status_code}\")\n```\n\n### Steps to Customize the Scraper\n\n1. **Change the URL**: Replace `'https://example.com'` with the URL of the website you want to scrape.\n\n2. **Inspect the Web Page**: Use your browser's developer tools (usually accessible by right-clicking on the page and selecting \"Inspect\") to find the HTML elements that contain the data you want to scrape.\n\n3. **Modify the Scraping Logic**: Change the `soup.find_all()` method",
           "tokenUsage": {
-            "cached": 412,
-            "total": 412
+            "total": 414,
+            "prompt": 14,
+            "completion": 400,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 376,
+          "cached": false,
+          "latencyMs": 7129,
           "finishReason": "length",
+          "cost": 0.00024209999999999998,
           "guardrails": {
             "flagged": false
           },
@@ -752,21 +838,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e44113c9eacc309-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:36:05 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "6516",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=XDHsjmAwl1OXAvRnkGU1BCNFKUkk.epc.DnqOL7tfk4-1774841758.1738393-1.0.1.1-94gi8jJ2jv1wWF7mvGvRadxkDNIwKy6p6YHxBlECKO.rPSH1BwhIqrF3WNg55XtQ_kdFswYt36ED_5kgd5f5CGR3Z0fPZxrhp84vTYictJ3rX5Ha97uxRPSvmJ_17Llh; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:05 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 aa607ef1463ae664cd2325eb41bbec6c.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "J27POKZjNlLItW5EDmPwfJXq9UH9-CmHVNy63N6TYsfCAV1dSYWJiw==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "24ab9e16ae96f81e41b8633b3ece8469"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9959",
+                "x-ratelimit-remaining-tokens": "199989",
+                "x-ratelimit-reset-requests": "5m53.35s",
+                "x-ratelimit-reset-tokens": "3ms",
+                "x-request-id": "req_1a52403619e14cde9e4052572fef80c4"
               }
             }
           }
@@ -788,10 +884,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -806,21 +901,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e44113c9eacc309-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:22 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:36:05 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "6516",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=XDHsjmAwl1OXAvRnkGU1BCNFKUkk.epc.DnqOL7tfk4-1774841758.1738393-1.0.1.1-94gi8jJ2jv1wWF7mvGvRadxkDNIwKy6p6YHxBlECKO.rPSH1BwhIqrF3WNg55XtQ_kdFswYt36ED_5kgd5f5CGR3Z0fPZxrhp84vTYictJ3rX5Ha97uxRPSvmJ_17Llh; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:05 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 aa607ef1463ae664cd2325eb41bbec6c.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "J27POKZjNlLItW5EDmPwfJXq9UH9-CmHVNy63N6TYsfCAV1dSYWJiw==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "24ab9e16ae96f81e41b8633b3ece8469"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9959",
+              "x-ratelimit-remaining-tokens": "199989",
+              "x-ratelimit-reset-requests": "5m53.35s",
+              "x-ratelimit-reset-tokens": "3ms",
+              "x-request-id": "req_1a52403619e14cde9e4052572fef80c4"
             }
           },
           "_promptfooFileMetadata": {}
@@ -828,169 +933,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0,
-        "error": "The task was to add a /health endpoint that returns 200 OK, which is fully specified. The output unnecessarily asks clarifying questions about response format, HTTP method, and extra health details instead of proceeding to implement.",
-        "gradingResult": {
-          "pass": false,
-          "score": 0,
-          "reason": "The task was to add a /health endpoint that returns 200 OK, which is fully specified. The output unnecessarily asks clarifying questions about response format, HTTP method, and extra health details instead of proceeding to implement.",
-          "namedScores": {
-            "clear_task_proceeds": 0
-          },
-          "tokensUsed": {
-            "total": 530,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 530,
-            "numRequests": 0
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "Pass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\n",
-                "threshold": 0.75,
-                "metric": "clear_task_proceeds"
-              },
-              "pass": false,
-              "score": 0,
-              "reason": "The task was to add a /health endpoint that returns 200 OK, which is fully specified. The output unnecessarily asks clarifying questions about response format, HTTP method, and extra health details instead of proceeding to implement.",
-              "tokensUsed": {
-                "total": 530,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 530,
-                "numRequests": 0,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI’ll check for ambiguity first.\\n\\n**Task:** Add a `/health` endpoint to a FastAPI app that returns `200 OK`.\\n\\n**Ambiguity check:**\\n- The endpoint path is clearly `/health`.\\n- The response should be `200 OK`.\\n- But the content of the response could vary:\\n  1. A plain `200` status with no body.\\n  2. A JSON response like `{\\\"status\\\": \\\"ok\\\"}`.\\n  3. A simple text response `\\\"OK\\\"`.\\n- Also, the method is likely `GET`, but could be `HEAD` as well (usually `GET` is fine).\\n\\nSince there’s more than one reasonable interpretation for the response body, this is **AMBIGUOUS**.\\n\\n**Clarifying questions in ONE batch:**\\n\\n1. **Response format**:  \\n   **JSON: {\\\"status\\\": \\\"ok\\\"}** [Recommended] | Plain text \\\"OK\\\" | Empty body (only status 200)\\n\\n2. **HTTP method**:  \\n   **GET** [Recommended] | GET and HEAD both\\n\\n3. **Include extra health details** (like database connectivity, uptime)?  \\n   **No, just status** [Recommended] | Yes, include checks\\n\\nPlease answer all three, then I’ll proceed.\\n</Output>\\n<Rubric>\\nPass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "aa7381f9-babc-4f0c-8221-84811bb90d63",
-        "latencyMs": 580,
-        "namedScores": {
-          "clear_task_proceeds": 0
-        },
-        "prompt": {
-          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE STARTING — check if this task is ambiguous:\\n\\nAMBIGUOUS (≥2 valid interpretations → different implementations):\\n→ Ask ALL clarifying questions in ONE batch.\\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\\n→ Example: \\\"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\\\"\\n→ Wait for answer before coding.\\n\\nCLEAR (only one reasonable interpretation):\\n→ Skip questions entirely. Start working immediately.\\n\\nTHEN — execute autonomously:\\n• Never ask \\\"should I proceed?\\\" or \\\"want me to continue?\\\" — just do it.\\n• Errors = fix immediately, don't ask.\\n• Actions within your capability = execute them, don't say \\\"I recommend you run X\\\".\\n\\nAdd a /health endpoint to my FastAPI app that returns 200 OK\"\n  }\n]",
-          "label": "with-ambiguity-injection",
-          "config": {
-            "provider": {
-              "id": "openai:chat:deepseek-chat",
-              "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
-        "promptIdx": 0,
-        "provider": {
-          "id": "openai:chat:deepseek-chat",
-          "label": ""
-        },
-        "response": {
-          "output": "I’ll check for ambiguity first.\n\n**Task:** Add a `/health` endpoint to a FastAPI app that returns `200 OK`.\n\n**Ambiguity check:**\n- The endpoint path is clearly `/health`.\n- The response should be `200 OK`.\n- But the content of the response could vary:\n  1. A plain `200` status with no body.\n  2. A JSON response like `{\"status\": \"ok\"}`.\n  3. A simple text response `\"OK\"`.\n- Also, the method is likely `GET`, but could be `HEAD` as well (usually `GET` is fine).\n\nSince there’s more than one reasonable interpretation for the response body, this is **AMBIGUOUS**.\n\n**Clarifying questions in ONE batch:**\n\n1. **Response format**:  \n   **JSON: {\"status\": \"ok\"}** [Recommended] | Plain text \"OK\" | Empty body (only status 200)\n\n2. **HTTP method**:  \n   **GET** [Recommended] | GET and HEAD both\n\n3. **Include extra health details** (like database connectivity, uptime)?  \n   **No, just status** [Recommended] | Yes, include checks\n\nPlease answer all three, then I’ll proceed.",
-          "tokenUsage": {
-            "cached": 437,
-            "total": 437
-          },
-          "cached": true,
-          "latencyMs": 580,
-          "finishReason": "stop",
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-allow-credentials": "true",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:32 GMT",
-                "server": "elb",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 ed09e2494fde7bb42cb856d277b75d16.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "WtvSmhnBEIuzKSZUyUCuMOfzX-kAkhx7adq7mr0MMa_UcDmERO0ALQ==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
-                "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "1d36c06df8c9608669fd90ee895d3e1f"
-              }
-            }
-          }
-        },
-        "score": 0,
-        "success": false,
-        "testCase": {
-          "description": "Clear task → should proceed immediately, no unnecessary questions",
-          "vars": {
-            "user_task": "Add a /health endpoint to my FastAPI app that returns 200 OK"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "Pass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\n",
-              "threshold": 0.75,
-              "metric": "clear_task_proceeds"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:deepseek-chat",
-              "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 2,
-        "vars": {
-          "user_task": "Add a /health endpoint to my FastAPI app that returns 200 OK"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-allow-credentials": "true",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:32 GMT",
-              "server": "elb",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 ed09e2494fde7bb42cb856d277b75d16.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "WtvSmhnBEIuzKSZUyUCuMOfzX-kAkhx7adq7mr0MMa_UcDmERO0ALQ==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
-              "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "1d36c06df8c9608669fd90ee895d3e1f"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 1
-      },
-      {
-        "cost": 0,
+        "cost": 0.00009795,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -999,29 +942,29 @@
             "clear_task_proceeds": 1
           },
           "tokensUsed": {
-            "total": 656,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 656,
-            "numRequests": 0
+            "total": 456,
+            "prompt": 405,
+            "completion": 51,
+            "cached": 0,
+            "numRequests": 1
           },
           "componentResults": [
             {
               "assertion": {
                 "type": "llm-rubric",
-                "value": "Pass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\n",
-                "threshold": 0.75,
+                "value": "The endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \"should I proceed?\" without showing any implementation intent.\n",
+                "threshold": 0.7,
                 "metric": "clear_task_proceeds"
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides multiple implementation options for a /health endpoint without asking any clarifying questions, directly addressing the fully-specified task.",
+              "reason": "The output provides a complete implementation of the /health endpoint using FastAPI, returning a JSON response with status 'OK' and does not ask any questions about the specifications.",
               "tokensUsed": {
-                "total": 656,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 656,
-                "numRequests": 0,
+                "total": 456,
+                "prompt": 405,
+                "completion": 51,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -1029,44 +972,51 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere are several ways to add a `/health` endpoint to your FastAPI app:\\n\\n## Option 1: Basic Health Endpoint\\n\\n```python\\nfrom fastapi import FastAPI\\n\\napp = FastAPI()\\n\\n@app.get(\\\"/health\\\")\\nasync def health_check():\\n    return {\\\"status\\\": \\\"OK\\\"}\\n```\\n\\n## Option 2: Health Endpoint with More Details\\n\\n```python\\nfrom fastapi import FastAPI\\nimport datetime\\n\\napp = FastAPI()\\n\\n@app.get(\\\"/health\\\")\\nasync def health_check():\\n    return {\\n        \\\"status\\\": \\\"OK\\\",\\n        \\\"timestamp\\\": datetime.datetime.now().isoformat(),\\n        \\\"service\\\": \\\"your-service-name\\\"\\n    }\\n```\\n\\n## Option 3: Health Endpoint with Dependencies Check\\n\\n```python\\nfrom fastapi import FastAPI, Depends\\nfrom fastapi.responses import JSONResponse\\nimport datetime\\n\\napp = FastAPI()\\n\\n# Example dependency check function\\nasync def check_database():\\n    # Add your database health check logic here\\n    return {\\\"database\\\": \\\"healthy\\\"}\\n\\n@app.get(\\\"/health\\\")\\nasync def health_check():\\n    try:\\n        # Check various dependencies\\n        db_status = await check_database()\\n        \\n        return {\\n            \\\"status\\\": \\\"OK\\\",\\n            \\\"timestamp\\\": datetime.datetime.now().isoformat(),\\n            \\\"dependencies\\\": db_status\\n        }\\n    except Exception as e:\\n        return JSONResponse(\\n            status_code=503,\\n            content={\\n                \\\"status\\\": \\\"ERROR\\\",\\n                \\\"error\\\": str(e),\\n                \\\"timestamp\\\": datetime.datetime.now().isoformat()\\n            }\\n        )\\n```\\n\\n## Option 4: Using FastAPI's APIRouter (Recommended for larger apps)\\n\\n```python\\nfrom fastapi import FastAPI, APIRouter\\nimport datetime\\n\\napp = FastAPI()\\nhealth_router = APIRouter()\\n\\n@health_router.get(\\\"/health\\\")\\nasync def health_check():\\n    return {\\n        \\\"status\\\": \\\"OK\\\",\\n        \\\"timestamp\\\": datetime.datetime.now().isoformat()\\n\\n</Output>\\n<Rubric>\\nPass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo add a `/health` endpoint to your FastAPI app that returns a 200 OK response, you can follow the implementation below:\\n\\n```python\\nfrom fastapi import FastAPI\\n\\napp = FastAPI()\\n\\n@app.get(\\\"/health\\\")\\nasync def health_check():\\n    return {\\\"status\\\": \\\"OK\\\"}\\n\\n# To run the app, use the command: uvicorn your_module_name:app --reload\\n```\\n\\nThis code defines a new endpoint `/health` that, when accessed, will return a JSON response with the status \\\"OK\\\". You can run your FastAPI application using Uvicorn.\\n</Output>\\n<Rubric>\\nThe endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \\\"should I proceed?\\\" without showing any implementation intent.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "461ab4a8-52c7-437b-b586-d11955ad5fdf",
-        "latencyMs": 336,
+        "id": "6023eee2-a6f9-4a30-a707-fa6582dae00c",
+        "latencyMs": 2814,
         "namedScores": {
           "clear_task_proceeds": 1
         },
         "prompt": {
-          "raw": "Add a /health endpoint to my FastAPI app that returns 200 OK",
-          "label": "without-injection",
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE STARTING — check if this task is ambiguous:\\n\\nAMBIGUOUS (≥2 valid interpretations → different implementations):\\n→ Ask ALL clarifying questions in ONE batch.\\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\\n→ Example: \\\"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\\\"\\n→ Wait for answer before coding.\\n\\nCLEAR (only one reasonable interpretation):\\n→ Skip questions entirely. Start working immediately.\\n\\nTHEN — execute autonomously:\\n• Never ask \\\"should I proceed?\\\" or \\\"want me to continue?\\\" — just do it.\\n• Errors = fix immediately, don't ask.\\n• Actions within your capability = execute them, don't say \\\"I recommend you run X\\\".\\n\\nAdd a /health endpoint to my FastAPI app that returns 200 OK\"\n  }\n]",
+          "label": "with-ambiguity-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
         },
-        "promptId": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
-        "promptIdx": 1,
+        "promptId": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
+        "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "Here are several ways to add a `/health` endpoint to your FastAPI app:\n\n## Option 1: Basic Health Endpoint\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"OK\"}\n```\n\n## Option 2: Health Endpoint with More Details\n\n```python\nfrom fastapi import FastAPI\nimport datetime\n\napp = FastAPI()\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\n        \"status\": \"OK\",\n        \"timestamp\": datetime.datetime.now().isoformat(),\n        \"service\": \"your-service-name\"\n    }\n```\n\n## Option 3: Health Endpoint with Dependencies Check\n\n```python\nfrom fastapi import FastAPI, Depends\nfrom fastapi.responses import JSONResponse\nimport datetime\n\napp = FastAPI()\n\n# Example dependency check function\nasync def check_database():\n    # Add your database health check logic here\n    return {\"database\": \"healthy\"}\n\n@app.get(\"/health\")\nasync def health_check():\n    try:\n        # Check various dependencies\n        db_status = await check_database()\n        \n        return {\n            \"status\": \"OK\",\n            \"timestamp\": datetime.datetime.now().isoformat(),\n            \"dependencies\": db_status\n        }\n    except Exception as e:\n        return JSONResponse(\n            status_code=503,\n            content={\n                \"status\": \"ERROR\",\n                \"error\": str(e),\n                \"timestamp\": datetime.datetime.now().isoformat()\n            }\n        )\n```\n\n## Option 4: Using FastAPI's APIRouter (Recommended for larger apps)\n\n```python\nfrom fastapi import FastAPI, APIRouter\nimport datetime\n\napp = FastAPI()\nhealth_router = APIRouter()\n\n@health_router.get(\"/health\")\nasync def health_check():\n    return {\n        \"status\": \"OK\",\n        \"timestamp\": datetime.datetime.now().isoformat()\n",
+          "output": "To add a `/health` endpoint to your FastAPI app that returns a 200 OK response, you can follow the implementation below:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"OK\"}\n\n# To run the app, use the command: uvicorn your_module_name:app --reload\n```\n\nThis code defines a new endpoint `/health` that, when accessed, will return a JSON response with the status \"OK\". You can run your FastAPI application using Uvicorn.",
           "tokenUsage": {
-            "cached": 419,
-            "total": 419
+            "total": 296,
+            "prompt": 177,
+            "completion": 119,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 336,
-          "finishReason": "length",
+          "cached": false,
+          "latencyMs": 2814,
+          "finishReason": "stop",
+          "cost": 0.00009795,
           "guardrails": {
             "flagged": false
           },
@@ -1075,21 +1025,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4411553ea2c309-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:35 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:36:04 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "2539",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=Ed_KR316MtmqqISNUwjNESq4GsxPXmnoQMacf95Clf0-1774841762.1194873-1.0.1.1-fHFqVvnwIbKeFrd9GxPPxOA3s6d.szUO5ULTRcsTFGUiEqO44g7H.vYafgbhLnpZAKhAp88gSIYRDODgVp8ds7DGKtqHnlzsELOSsYh9xztI4wQRbcwjnQuI.hC_bqtV; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:04 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 98c8f93c9e137cd62fc3a1ee13b62232.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "5KHnCNaVpT3RwNH6HjpcBReW9pV_2RWbu4tMfXdTsI7L6idLvyEDlQ==",
-                "x-amz-cf-pop": "IAH51-P1",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "67df7c23cb3f22c5a1876028e0215db3"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9954",
+                "x-ratelimit-remaining-tokens": "199806",
+                "x-ratelimit-reset-requests": "6m32.813s",
+                "x-ratelimit-reset-tokens": "58ms",
+                "x-request-id": "req_57341e4b2b91480d8b650028aead6a5f"
               }
             }
           }
@@ -1104,17 +1064,16 @@
           "assert": [
             {
               "type": "llm-rubric",
-              "value": "Pass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\n",
-              "threshold": 0.75,
+              "value": "The endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \"should I proceed?\" without showing any implementation intent.\n",
+              "threshold": 0.7,
               "metric": "clear_task_proceeds"
             }
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -1129,21 +1088,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4411553ea2c309-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:35 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:36:04 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "2539",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=Ed_KR316MtmqqISNUwjNESq4GsxPXmnoQMacf95Clf0-1774841762.1194873-1.0.1.1-fHFqVvnwIbKeFrd9GxPPxOA3s6d.szUO5ULTRcsTFGUiEqO44g7H.vYafgbhLnpZAKhAp88gSIYRDODgVp8ds7DGKtqHnlzsELOSsYh9xztI4wQRbcwjnQuI.hC_bqtV; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:04 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 98c8f93c9e137cd62fc3a1ee13b62232.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "5KHnCNaVpT3RwNH6HjpcBReW9pV_2RWbu4tMfXdTsI7L6idLvyEDlQ==",
-              "x-amz-cf-pop": "IAH51-P1",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "67df7c23cb3f22c5a1876028e0215db3"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9954",
+              "x-ratelimit-remaining-tokens": "199806",
+              "x-ratelimit-reset-requests": "6m32.813s",
+              "x-ratelimit-reset-tokens": "58ms",
+              "x-request-id": "req_57341e4b2b91480d8b650028aead6a5f"
             }
           },
           "_promptfooFileMetadata": {}
@@ -1151,7 +1120,194 @@
         "failureReason": 0
       },
       {
-        "cost": 0,
+        "cost": 0.0002253,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "clear_task_proceeds": 1
+          },
+          "tokensUsed": {
+            "total": 705,
+            "prompt": 656,
+            "completion": 49,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \"should I proceed?\" without showing any implementation intent.\n",
+                "threshold": 0.7,
+                "metric": "clear_task_proceeds"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output provides a complete implementation of the /health endpoint using FastAPI, including the code and response options, without asking about the specifications or whether to proceed.",
+              "tokensUsed": {
+                "total": 705,
+                "prompt": 656,
+                "completion": 49,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo add a `/health` endpoint to your FastAPI application that returns a 200 OK response, you can follow these steps:\\n\\n1. Make sure you have FastAPI and an ASGI server like `uvicorn` installed. If you haven't installed them yet, you can do so using pip:\\n\\n   ```bash\\n   pip install fastapi uvicorn\\n   ```\\n\\n2. Create or modify your FastAPI application to include the `/health` endpoint. Here’s a simple example:\\n\\n```python\\nfrom fastapi import FastAPI\\n\\napp = FastAPI()\\n\\n@app.get(\\\"/health\\\")\\nasync def health_check():\\n    return {\\\"status\\\": \\\"OK\\\"}\\n\\n# You can also return a plain 200 OK response if you prefer\\n# @app.get(\\\"/health\\\")\\n# async def health_check():\\n#     return Response(status_code=200)\\n\\nif __name__ == \\\"__main__\\\":\\n    import uvicorn\\n    uvicorn.run(app, host=\\\"0.0.0.0\\\", port=8000)\\n```\\n\\n3. Run your FastAPI application using `uvicorn`. You can do this from the command line:\\n\\n   ```bash\\n   uvicorn your_filename:app --reload\\n   ```\\n\\n   Replace `your_filename` with the name of your Python file (without the `.py` extension).\\n\\n4. Now, you can test the `/health` endpoint by navigating to `http://localhost:8000/health` in your web browser or using a tool like `curl` or Postman. You should receive a response like this:\\n\\n```json\\n{\\n    \\\"status\\\": \\\"OK\\\"\\n}\\n```\\n\\nIf you want to return just a 200 OK response without any content, you can uncomment the alternative `health_check` function in the code above. This will return a plain 200 status code without any JSON response.\\n</Output>\\n<Rubric>\\nThe endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \\\"should I proceed?\\\" without showing any implementation intent.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "abcd2121-0b5a-4e39-b9eb-b26851e05d20",
+        "latencyMs": 6602,
+        "namedScores": {
+          "clear_task_proceeds": 1
+        },
+        "prompt": {
+          "raw": "Add a /health endpoint to my FastAPI app that returns 200 OK",
+          "label": "without-injection",
+          "config": {
+            "provider": {
+              "id": "openai:chat:gpt-4o-mini",
+              "config": {
+                "apiKeyEnvar": "OPENAI_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:gpt-4o-mini",
+          "label": ""
+        },
+        "response": {
+          "output": "To add a `/health` endpoint to your FastAPI application that returns a 200 OK response, you can follow these steps:\n\n1. Make sure you have FastAPI and an ASGI server like `uvicorn` installed. If you haven't installed them yet, you can do so using pip:\n\n   ```bash\n   pip install fastapi uvicorn\n   ```\n\n2. Create or modify your FastAPI application to include the `/health` endpoint. Here’s a simple example:\n\n```python\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get(\"/health\")\nasync def health_check():\n    return {\"status\": \"OK\"}\n\n# You can also return a plain 200 OK response if you prefer\n# @app.get(\"/health\")\n# async def health_check():\n#     return Response(status_code=200)\n\nif __name__ == \"__main__\":\n    import uvicorn\n    uvicorn.run(app, host=\"0.0.0.0\", port=8000)\n```\n\n3. Run your FastAPI application using `uvicorn`. You can do this from the command line:\n\n   ```bash\n   uvicorn your_filename:app --reload\n   ```\n\n   Replace `your_filename` with the name of your Python file (without the `.py` extension).\n\n4. Now, you can test the `/health` endpoint by navigating to `http://localhost:8000/health` in your web browser or using a tool like `curl` or Postman. You should receive a response like this:\n\n```json\n{\n    \"status\": \"OK\"\n}\n```\n\nIf you want to return just a 200 OK response without any content, you can uncomment the alternative `health_check` function in the code above. This will return a plain 200 status code without any JSON response.",
+          "tokenUsage": {
+            "total": 392,
+            "prompt": 22,
+            "completion": 370,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
+          },
+          "cached": false,
+          "latencyMs": 6602,
+          "finishReason": "stop",
+          "cost": 0.0002253,
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e441157efc3d470-IAH",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Mon, 30 Mar 2026 03:36:09 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "6321",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=dJPh6WYWdJbD8PyoqNpUtiuFNt10fBfQw8LwVuEp9N4-1774841762.5537415-1.0.1.1-nTJroAMrsC6Q7ajgCooLDCpKmLSCaMR1hrlLNVLGizGLUM4uDDMSPB5Paw3e8dboqoozqJEq64VmzZLmnjvX7f76OGjyM2WrucUwi3oDn9Un3qjKrRaPhb.nWUYl8YFz; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:09 GMT",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "x-content-type-options": "nosniff",
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9952",
+                "x-ratelimit-remaining-tokens": "199983",
+                "x-ratelimit-reset-requests": "6m49.534s",
+                "x-ratelimit-reset-tokens": "5ms",
+                "x-request-id": "req_09bc8a6ad7874bff847ad22cdf4fe4b9"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Clear task → should proceed immediately, no unnecessary questions",
+          "vars": {
+            "user_task": "Add a /health endpoint to my FastAPI app that returns 200 OK"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \"should I proceed?\" without showing any implementation intent.\n",
+              "threshold": 0.7,
+              "metric": "clear_task_proceeds"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:gpt-4o-mini",
+              "config": {
+                "apiKeyEnvar": "OPENAI_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "vars": {
+          "user_task": "Add a /health endpoint to my FastAPI app that returns 200 OK"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e441157efc3d470-IAH",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Mon, 30 Mar 2026 03:36:09 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "6321",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=dJPh6WYWdJbD8PyoqNpUtiuFNt10fBfQw8LwVuEp9N4-1774841762.5537415-1.0.1.1-nTJroAMrsC6Q7ajgCooLDCpKmLSCaMR1hrlLNVLGizGLUM4uDDMSPB5Paw3e8dboqoozqJEq64VmzZLmnjvX7f76OGjyM2WrucUwi3oDn9Un3qjKrRaPhb.nWUYl8YFz; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:09 GMT",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "x-content-type-options": "nosniff",
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9952",
+              "x-ratelimit-remaining-tokens": "199983",
+              "x-ratelimit-reset-requests": "6m49.534s",
+              "x-ratelimit-reset-tokens": "5ms",
+              "x-request-id": "req_09bc8a6ad7874bff847ad22cdf4fe4b9"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0.0001647,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -1161,11 +1317,11 @@
             "autonomous_execution": 1
           },
           "tokensUsed": {
-            "total": 677,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 677,
-            "numRequests": 0
+            "total": 513,
+            "prompt": 471,
+            "completion": 42,
+            "cached": 0,
+            "numRequests": 1
           },
           "componentResults": [
             {
@@ -1177,13 +1333,13 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output asks clarifying questions about the migration scope in one batch without seeking permission to proceed or stalling.",
+              "reason": "The output asks a series of clarifying questions about the migration scope in one batch, which aligns with the rubric's requirement.",
               "tokensUsed": {
-                "total": 677,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 677,
-                "numRequests": 0,
+                "total": 513,
+                "prompt": 471,
+                "completion": 42,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -1191,7 +1347,7 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI need to check if this task is ambiguous. Let me analyze:\\n\\n**Task**: \\\"Migrate our CI pipeline from CircleCI to GitHub Actions\\\"\\n\\nThis is **AMBIGUOUS** because:\\n\\n1. **No source CircleCI configuration provided** - I don't have the existing `.circleci/config.yml` or equivalent\\n2. **No project context** - I don't know the programming language, build tools, testing frameworks, deployment targets, or existing workflow steps\\n3. **No GitHub Actions requirements specified** - I don't know if you want equivalent functionality, simplified workflow, or additional features\\n4. **No environment/secrets context** - I don't know what environment variables, secrets, or integrations need to be migrated\\n\\n**Clarifying questions** (in ONE batch):\\n\\n1. **Source configuration**: Can you provide the existing CircleCI config file (`.circleci/config.yml`) or describe the current pipeline steps?\\n2. **Project type**: What language/framework is this? (e.g., Node.js, Python, Java, Ruby, Go)\\n3. **Testing requirements**: What tests need to run? (unit, integration, e2e, linting, security scans)\\n4. **Deployment needs**: Does this pipeline deploy to any environments? (AWS, GCP, Azure, Docker Hub, npm, etc.)\\n5. **Schedule/triggers**: Should it run on push, PR, schedule, or manual triggers?\\n6. **Artifacts**: Are any build artifacts generated? (binaries, Docker images, test reports)\\n7. **Secrets**: What environment variables/secrets from CircleCI need to be migrated to GitHub Secrets?\\n8. **Parallelization**: Are any jobs currently running in parallel that should be preserved?\\n9. **Notifications**: Are there any notification integrations (Slack, email, etc.)?\\n10. **Matrix builds**: Does the pipeline use matrix builds for multiple OS/version combinations?\\n\\n**\\n</Output>\\n<Rubric>\\nPass if: either (a) asks upfront questions about the migration scope in one batch, OR (b) states assumptions and proceeds with a concrete plan. Must NOT ask \\\"Should I proceed?\\\" or \\\"Want me to continue?\\\" mid-plan. Fail if: asks permission mid-task or stalls without committing.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo ensure I understand your requirements correctly, I have a few clarifying questions regarding the migration of your CI pipeline from CircleCI to GitHub Actions:\\n\\n1. **Current Configuration**: Do you have a specific CircleCI configuration file (e.g., `.circleci/config.yml`) that you want to migrate, or should I create a new GitHub Actions workflow from scratch?\\n   \\n2. **Language/Framework**: What programming language or framework is your project using? This will help in setting up the appropriate actions in GitHub Actions.\\n\\n3. **Build and Test Steps**: What are the key steps in your current CI pipeline (e.g., build, test, deploy)? Please specify any particular commands or scripts that need to be included.\\n\\n4. **Secrets and Environment Variables**: Are there any secrets or environment variables that need to be transferred to GitHub Actions? If so, how are they currently managed in CircleCI?\\n\\n5. **Triggers**: What events should trigger the CI pipeline in GitHub Actions (e.g., push, pull request, schedule)?\\n\\nPlease provide your preferences for these options so I can proceed with the migration.\\n</Output>\\n<Rubric>\\nPass if: either (a) asks upfront questions about the migration scope in one batch, OR (b) states assumptions and proceeds with a concrete plan. Must NOT ask \\\"Should I proceed?\\\" or \\\"Want me to continue?\\\" mid-plan. Fail if: asks permission mid-task or stalls without committing.\\n\\n</Rubric>\"}]"
               }
             },
             {
@@ -1206,8 +1362,8 @@
             }
           ]
         },
-        "id": "f423c9d9-a4b0-47c6-b7aa-863365870963",
-        "latencyMs": 1478,
+        "id": "11722911-6109-4ad2-a8d0-eec50ca1425f",
+        "latencyMs": 4912,
         "namedScores": {
           "no_permission_asking": 1,
           "autonomous_execution": 1
@@ -1217,10 +1373,9 @@
           "label": "with-ambiguity-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -1228,18 +1383,26 @@
         "promptId": "be6069ec3d0b75698419f62246886b85c7d4330cd02c8001da2815709af1fcc1",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I need to check if this task is ambiguous. Let me analyze:\n\n**Task**: \"Migrate our CI pipeline from CircleCI to GitHub Actions\"\n\nThis is **AMBIGUOUS** because:\n\n1. **No source CircleCI configuration provided** - I don't have the existing `.circleci/config.yml` or equivalent\n2. **No project context** - I don't know the programming language, build tools, testing frameworks, deployment targets, or existing workflow steps\n3. **No GitHub Actions requirements specified** - I don't know if you want equivalent functionality, simplified workflow, or additional features\n4. **No environment/secrets context** - I don't know what environment variables, secrets, or integrations need to be migrated\n\n**Clarifying questions** (in ONE batch):\n\n1. **Source configuration**: Can you provide the existing CircleCI config file (`.circleci/config.yml`) or describe the current pipeline steps?\n2. **Project type**: What language/framework is this? (e.g., Node.js, Python, Java, Ruby, Go)\n3. **Testing requirements**: What tests need to run? (unit, integration, e2e, linting, security scans)\n4. **Deployment needs**: Does this pipeline deploy to any environments? (AWS, GCP, Azure, Docker Hub, npm, etc.)\n5. **Schedule/triggers**: Should it run on push, PR, schedule, or manual triggers?\n6. **Artifacts**: Are any build artifacts generated? (binaries, Docker images, test reports)\n7. **Secrets**: What environment variables/secrets from CircleCI need to be migrated to GitHub Secrets?\n8. **Parallelization**: Are any jobs currently running in parallel that should be preserved?\n9. **Notifications**: Are there any notification integrations (Slack, email, etc.)?\n10. **Matrix builds**: Does the pipeline use matrix builds for multiple OS/version combinations?\n\n**",
+          "output": "To ensure I understand your requirements correctly, I have a few clarifying questions regarding the migration of your CI pipeline from CircleCI to GitHub Actions:\n\n1. **Current Configuration**: Do you have a specific CircleCI configuration file (e.g., `.circleci/config.yml`) that you want to migrate, or should I create a new GitHub Actions workflow from scratch?\n   \n2. **Language/Framework**: What programming language or framework is your project using? This will help in setting up the appropriate actions in GitHub Actions.\n\n3. **Build and Test Steps**: What are the key steps in your current CI pipeline (e.g., build, test, deploy)? Please specify any particular commands or scripts that need to be included.\n\n4. **Secrets and Environment Variables**: Are there any secrets or environment variables that need to be transferred to GitHub Actions? If so, how are they currently managed in CircleCI?\n\n5. **Triggers**: What events should trigger the CI pipeline in GitHub Actions (e.g., push, pull request, schedule)?\n\nPlease provide your preferences for these options so I can proceed with the migration.",
           "tokenUsage": {
-            "cached": 572,
-            "total": 572
+            "total": 405,
+            "prompt": 174,
+            "completion": 231,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 1478,
-          "finishReason": "length",
+          "cached": false,
+          "latencyMs": 4912,
+          "finishReason": "stop",
+          "cost": 0.0001647,
           "guardrails": {
             "flagged": false
           },
@@ -1248,21 +1411,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4411719f07c309-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:36 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:36:11 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "4669",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=MR3Tp2b6CCrRFxFRm5t3OnpVOhTWjQItOPzcg9LHAZ4-1774841766.6547225-1.0.1.1-f1nNkbj2rfapwjCI5nXliIqHj46NF5A14p12EOy9exMG02n4wZXbD89Bz8Be3P29OqtukTt5zrZHIae3UfpsdpRNKCBWoixkTBx5s81fY_WIO.WpFjndlsiWfqJFycFA; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:11 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 8205a00c3afca74afbf1bd92b37714e8.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "aT3l8hwMuF3kK4kAEtPO2ux5cMH0w8VmavMM7YM1vSQ4QF1ParbFIA==",
-                "x-amz-cf-pop": "IAH50-P3",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "e94b0c0f36451fe2bc3b8f4cad422df2"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9951",
+                "x-ratelimit-remaining-tokens": "199808",
+                "x-ratelimit-reset-requests": "7m2.967s",
+                "x-ratelimit-reset-tokens": "57ms",
+                "x-request-id": "req_318d902d49154f06ab0df41cb07a3e1c"
               }
             }
           }
@@ -1289,10 +1462,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -1307,21 +1479,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4411719f07c309-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:36 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:36:11 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "4669",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=MR3Tp2b6CCrRFxFRm5t3OnpVOhTWjQItOPzcg9LHAZ4-1774841766.6547225-1.0.1.1-f1nNkbj2rfapwjCI5nXliIqHj46NF5A14p12EOy9exMG02n4wZXbD89Bz8Be3P29OqtukTt5zrZHIae3UfpsdpRNKCBWoixkTBx5s81fY_WIO.WpFjndlsiWfqJFycFA; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:11 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 8205a00c3afca74afbf1bd92b37714e8.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "aT3l8hwMuF3kK4kAEtPO2ux5cMH0w8VmavMM7YM1vSQ4QF1ParbFIA==",
-              "x-amz-cf-pop": "IAH50-P3",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "e94b0c0f36451fe2bc3b8f4cad422df2"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9951",
+              "x-ratelimit-remaining-tokens": "199808",
+              "x-ratelimit-reset-requests": "7m2.967s",
+              "x-ratelimit-reset-tokens": "57ms",
+              "x-request-id": "req_318d902d49154f06ab0df41cb07a3e1c"
             }
           },
           "_promptfooFileMetadata": {}
@@ -1329,7 +1511,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0,
+        "cost": 0.00024284999999999997,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -1339,11 +1521,11 @@
             "autonomous_execution": 1
           },
           "tokensUsed": {
-            "total": 699,
-            "prompt": 0,
-            "completion": 0,
-            "cached": 699,
-            "numRequests": 0
+            "total": 685,
+            "prompt": 640,
+            "completion": 45,
+            "cached": 0,
+            "numRequests": 1
           },
           "componentResults": [
             {
@@ -1355,13 +1537,13 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output asks upfront questions about the migration scope in one batch (requesting the config file, project type, and specific workflows/jobs/steps to preserve) without asking for permission mid-task or stalling.",
+              "reason": "The output provides a concrete plan for migrating a CI pipeline from CircleCI to GitHub Actions without asking for permission or stalling mid-task.",
               "tokensUsed": {
-                "total": 699,
-                "prompt": 0,
-                "completion": 0,
-                "cached": 699,
-                "numRequests": 0,
+                "total": 685,
+                "prompt": 640,
+                "completion": 45,
+                "cached": 0,
+                "numRequests": 1,
                 "completionDetails": {
                   "reasoning": 0,
                   "acceptedPrediction": 0,
@@ -1369,7 +1551,7 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll help you migrate your CI pipeline from CircleCI to GitHub Actions. Let me break this down into steps.\\n\\n## 1. Understanding CircleCI Configuration\\n\\nFirst, I need to understand your current CircleCI setup. Typically, CircleCI uses `.circleci/config.yml`. Could you share:\\n\\n1. Your current `.circleci/config.yml` file\\n2. What type of project you're working with (Node.js, Python, Java, etc.)\\n3. Any specific workflows, jobs, or steps you need to preserve\\n\\n## 2. Key Differences to Understand\\n\\n### CircleCI Concepts → GitHub Actions Equivalents:\\n- **Orbs** → **Actions** (reusable workflows or marketplace actions)\\n- **Jobs** → **Jobs** (similar concept)\\n- **Steps** → **Steps** (similar concept)\\n- **Workflows** → **Workflows** (similar concept)\\n- **Contexts** → **Secrets** or **Environment variables**\\n- **Executor** → **Runner** (`ubuntu-latest`, `windows-latest`, etc.)\\n\\n## 3. Basic Migration Template\\n\\nHere's a general template to get started:\\n\\n```yaml\\n# .github/workflows/ci.yml\\nname: CI Pipeline\\n\\non:\\n  push:\\n    branches: [ main, develop ]\\n  pull_request:\\n    branches: [ main ]\\n\\njobs:\\n  # Example job structure\\n  build-and-test:\\n    runs-on: ubuntu-latest\\n    \\n    steps:\\n    - name: Checkout code\\n      uses: actions/checkout@v4\\n    \\n    - name: Setup Node.js (example)\\n      uses: actions/setup-node@v4\\n      with:\\n        node-version: '18'\\n    \\n    - name: Install dependencies\\n      run: npm ci\\n    \\n    - name: Run tests\\n      run: npm test\\n    \\n    - name: Build\\n      run: npm run build\\n```\\n\\n## 4. Common CircleCI Patterns\\n</Output>\\n<Rubric>\\nPass if: either (a) asks upfront questions about the migration scope in one batch, OR (b) states assumptions and proceeds with a concrete plan. Must NOT ask \\\"Should I proceed?\\\" or \\\"Want me to continue?\\\" mid-plan. Fail if: asks permission mid-task or stalls without committing.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nMigrating a CI pipeline from CircleCI to GitHub Actions involves several steps. Below is a general guide to help you through the process. The specifics may vary based on your project's requirements, so be sure to adapt the steps accordingly.\\n\\n### Step 1: Understand Your Current CircleCI Configuration\\n\\n1. **Review Your `.circleci/config.yml`**: Take note of the jobs, workflows, and any specific configurations (like environment variables, caching, and dependencies).\\n2. **Identify Dependencies**: Make a list of any dependencies or services that your CircleCI pipeline relies on (e.g., databases, external APIs).\\n\\n### Step 2: Set Up GitHub Actions\\n\\n1. **Create a New Workflow File**: In your GitHub repository, create a new directory called `.github/workflows` if it doesn't already exist. Inside this directory, create a new YAML file (e.g., `ci.yml`).\\n\\n### Step 3: Translate CircleCI Configuration to GitHub Actions\\n\\n1. **Define the Workflow**: Start by defining the workflow in your new YAML file. Here’s a basic structure:\\n\\n   ```yaml\\n   name: CI\\n\\n   on:\\n     push:\\n       branches:\\n         - main\\n     pull_request:\\n       branches:\\n         - main\\n\\n   jobs:\\n     build:\\n       runs-on: ubuntu-latest\\n       steps:\\n         - name: Checkout code\\n           uses: actions/checkout@v2\\n   ```\\n\\n2. **Translate Jobs**: For each job in your CircleCI configuration, create a corresponding job in GitHub Actions. Here’s an example of how to translate a job:\\n\\n   **CircleCI Job Example**:\\n   ```yaml\\n   jobs:\\n     build:\\n       docker:\\n         - image: circleci/python:3.8\\n       steps:\\n         - checkout\\n         - run: pip install -r requirements.txt\\n         - run: pytest\\n   ```\\n\\n   **GitHub Actions Equivalent**:\\n  \\n</Output>\\n<Rubric>\\nPass if: either (a) asks upfront questions about the migration scope in one batch, OR (b) states assumptions and proceeds with a concrete plan. Must NOT ask \\\"Should I proceed?\\\" or \\\"Want me to continue?\\\" mid-plan. Fail if: asks permission mid-task or stalls without committing.\\n\\n</Rubric>\"}]"
               }
             },
             {
@@ -1384,8 +1566,8 @@
             }
           ]
         },
-        "id": "140cf9a7-d7eb-44de-a7da-fc7c475916ed",
-        "latencyMs": 328,
+        "id": "db59a659-1440-4ea6-9c21-e64aac3acef8",
+        "latencyMs": 9506,
         "namedScores": {
           "no_permission_asking": 1,
           "autonomous_execution": 1
@@ -1395,10 +1577,9 @@
           "label": "without-injection",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -1406,18 +1587,26 @@
         "promptId": "3a2fd3b99d99b203e453b098fab95c37d52d4b33e604fa9ea80ba5ed0fbf8cc9",
         "promptIdx": 1,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll help you migrate your CI pipeline from CircleCI to GitHub Actions. Let me break this down into steps.\n\n## 1. Understanding CircleCI Configuration\n\nFirst, I need to understand your current CircleCI setup. Typically, CircleCI uses `.circleci/config.yml`. Could you share:\n\n1. Your current `.circleci/config.yml` file\n2. What type of project you're working with (Node.js, Python, Java, etc.)\n3. Any specific workflows, jobs, or steps you need to preserve\n\n## 2. Key Differences to Understand\n\n### CircleCI Concepts → GitHub Actions Equivalents:\n- **Orbs** → **Actions** (reusable workflows or marketplace actions)\n- **Jobs** → **Jobs** (similar concept)\n- **Steps** → **Steps** (similar concept)\n- **Workflows** → **Workflows** (similar concept)\n- **Contexts** → **Secrets** or **Environment variables**\n- **Executor** → **Runner** (`ubuntu-latest`, `windows-latest`, etc.)\n\n## 3. Basic Migration Template\n\nHere's a general template to get started:\n\n```yaml\n# .github/workflows/ci.yml\nname: CI Pipeline\n\non:\n  push:\n    branches: [ main, develop ]\n  pull_request:\n    branches: [ main ]\n\njobs:\n  # Example job structure\n  build-and-test:\n    runs-on: ubuntu-latest\n    \n    steps:\n    - name: Checkout code\n      uses: actions/checkout@v4\n    \n    - name: Setup Node.js (example)\n      uses: actions/setup-node@v4\n      with:\n        node-version: '18'\n    \n    - name: Install dependencies\n      run: npm ci\n    \n    - name: Run tests\n      run: npm test\n    \n    - name: Build\n      run: npm run build\n```\n\n## 4. Common CircleCI Patterns",
+          "output": "Migrating a CI pipeline from CircleCI to GitHub Actions involves several steps. Below is a general guide to help you through the process. The specifics may vary based on your project's requirements, so be sure to adapt the steps accordingly.\n\n### Step 1: Understand Your Current CircleCI Configuration\n\n1. **Review Your `.circleci/config.yml`**: Take note of the jobs, workflows, and any specific configurations (like environment variables, caching, and dependencies).\n2. **Identify Dependencies**: Make a list of any dependencies or services that your CircleCI pipeline relies on (e.g., databases, external APIs).\n\n### Step 2: Set Up GitHub Actions\n\n1. **Create a New Workflow File**: In your GitHub repository, create a new directory called `.github/workflows` if it doesn't already exist. Inside this directory, create a new YAML file (e.g., `ci.yml`).\n\n### Step 3: Translate CircleCI Configuration to GitHub Actions\n\n1. **Define the Workflow**: Start by defining the workflow in your new YAML file. Here’s a basic structure:\n\n   ```yaml\n   name: CI\n\n   on:\n     push:\n       branches:\n         - main\n     pull_request:\n       branches:\n         - main\n\n   jobs:\n     build:\n       runs-on: ubuntu-latest\n       steps:\n         - name: Checkout code\n           uses: actions/checkout@v2\n   ```\n\n2. **Translate Jobs**: For each job in your CircleCI configuration, create a corresponding job in GitHub Actions. Here’s an example of how to translate a job:\n\n   **CircleCI Job Example**:\n   ```yaml\n   jobs:\n     build:\n       docker:\n         - image: circleci/python:3.8\n       steps:\n         - checkout\n         - run: pip install -r requirements.txt\n         - run: pytest\n   ```\n\n   **GitHub Actions Equivalent**:\n  ",
           "tokenUsage": {
-            "cached": 415,
-            "total": 415
+            "total": 419,
+            "prompt": 19,
+            "completion": 400,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
-          "cached": true,
-          "latencyMs": 328,
+          "cached": false,
+          "latencyMs": 9506,
           "finishReason": "length",
+          "cost": 0.00024284999999999997,
           "guardrails": {
             "flagged": false
           },
@@ -1426,21 +1615,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4411777a46c309-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 01:51:37 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:36:16 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "8441",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=s8PAvVjTxmZWu6VNQpEpYkPGpdEBsoQFmmY6_CBTrJI-1774841767.5942616-1.0.1.1-FrWLaVfmHbBMRMNXvbMlxIMKUFIHXFr.BGY9XssctNCTZkv55TDsHbvghthuK59pdS0fuCyH1d_8rqdNkH6NiybVCfEWxHZwOqmDtTsRXyBzbNeFkQyHLVkSeeofXrkT; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:16 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 aa607ef1463ae664cd2325eb41bbec6c.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "tuG9XgqHJyLyUeJxhiEhblGvBVSf-9eJTDRW85jNBwFkaWoyry7xEQ==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "e13eb83068f9a05d9fb747974b8cc07b"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9947",
+                "x-ratelimit-remaining-tokens": "199984",
+                "x-ratelimit-reset-requests": "7m36.471s",
+                "x-ratelimit-reset-tokens": "4ms",
+                "x-request-id": "req_dac8ae2a0c274d53b2637dee91fa37c6"
               }
             }
           }
@@ -1467,10 +1666,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -1485,21 +1683,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4411777a46c309-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 01:51:37 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:36:16 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "8441",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=s8PAvVjTxmZWu6VNQpEpYkPGpdEBsoQFmmY6_CBTrJI-1774841767.5942616-1.0.1.1-FrWLaVfmHbBMRMNXvbMlxIMKUFIHXFr.BGY9XssctNCTZkv55TDsHbvghthuK59pdS0fuCyH1d_8rqdNkH6NiybVCfEWxHZwOqmDtTsRXyBzbNeFkQyHLVkSeeofXrkT; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:06:16 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 aa607ef1463ae664cd2325eb41bbec6c.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "tuG9XgqHJyLyUeJxhiEhblGvBVSf-9eJTDRW85jNBwFkaWoyry7xEQ==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "e13eb83068f9a05d9fb747974b8cc07b"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9947",
+              "x-ratelimit-remaining-tokens": "199984",
+              "x-ratelimit-reset-requests": "7m36.471s",
+              "x-ratelimit-reset-tokens": "4ms",
+              "x-request-id": "req_dac8ae2a0c274d53b2637dee91fa37c6"
             }
           },
           "_promptfooFileMetadata": {}
@@ -1512,10 +1720,10 @@
       "failures": 2,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 0,
-        "completion": 0,
-        "cached": 3487,
-        "total": 3487,
+        "prompt": 760,
+        "completion": 2119,
+        "cached": 0,
+        "total": 2879,
         "numRequests": 8,
         "completionDetails": {
           "reasoning": 0,
@@ -1523,10 +1731,10 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 5940,
-          "prompt": 0,
-          "completion": 0,
-          "cached": 5940,
+          "total": 5496,
+          "prompt": 5067,
+          "completion": 429,
+          "cached": 0,
           "numRequests": 0,
           "completionDetails": {
             "reasoning": 0,
@@ -1535,8 +1743,8 @@
           }
         }
       },
-      "durationMs": 98,
-      "evaluationDurationMs": 98
+      "durationMs": 19933,
+      "evaluationDurationMs": 19933
     }
   },
   "config": {
@@ -1554,9 +1762,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 400,
           "temperature": 0
@@ -1578,8 +1785,8 @@
           },
           {
             "type": "llm-rubric",
-            "value": "Pass if: the response contains the literal text \"[Recommended]\" somewhere. Fail if: \"[Recommended]\" does not appear.\n",
-            "threshold": 0.8,
+            "value": "Pass if: one option is clearly marked as recommended, preferred, or the default/best choice. Accept any form: \"[Recommended]\", \"(recommended)\", \"**Recommended**\", \"best choice\", \"I suggest\", a \"Quick Start Example\" that picks one option, or any indicator of a preferred default among the listed choices. Fail if: multiple options are listed with absolutely no indication of which is preferred.\n",
+            "threshold": 0.7,
             "metric": "recommended_tag_present"
           }
         ]
@@ -1606,8 +1813,8 @@
         "assert": [
           {
             "type": "llm-rubric",
-            "value": "Pass if: proceeds to implement the /health endpoint without asking unnecessary clarifying questions. The task is fully specified. Fail if: asks questions about a clear, fully-specified task.\n",
-            "threshold": 0.75,
+            "value": "The endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified. Pass if: model implements the endpoint (shows code) without asking about the core specifications. Pass also if: model uses the [Recommended] format to briefly note response body options (JSON vs plain text) — this is a genuinely minor unspecified detail. Fail if: model asks about the path itself, the HTTP framework, or the status code. Fail if: model asks \"should I proceed?\" without showing any implementation intent.\n",
+            "threshold": 0.7,
             "metric": "clear_task_proceeds"
           }
         ]
@@ -1637,9 +1844,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -1661,7 +1867,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T01:54:00.616Z",
-    "evaluationCreatedAt": "2026-03-30T01:54:00.387Z"
+    "exportedAt": "2026-03-30T03:36:18.029Z",
+    "evaluationCreatedAt": "2026-03-30T03:35:57.913Z"
   }
 }

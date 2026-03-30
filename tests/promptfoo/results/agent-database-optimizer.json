@@ -1,27 +1,27 @@
 {
-  "evalId": "eval-y9U-2026-03-15T04:24:23",
+  "evalId": "eval-4Ws-2026-03-30T03:51:04",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:24:23.384Z",
+    "timestamp": "2026-03-30T03:51:04.582Z",
     "prompts": [
       {
         "id": "84c3c78bb7c601bc4708cc24e8ea076732f28e9cceb63fc6f7a1caba5f3e5690",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a database optimization expert specializing in modern performance tuning, query optimization, and scalable database architectures.\\n\\n## Purpose\\nExpert database optimizer with comprehensive knowledge of modern database performance tuning, query optimization, and scalable architecture design. Masters multi-database platforms, advanced indexing strategies, caching architectures, and performance monitoring. Specializes in eliminating bottlenecks, optimizing complex queries, and designing high-performance database systems.\\n\\n## Capabilities\\n\\n### Advanced Query Optimization\\n- **Execution plan analysis**: EXPLAIN ANALYZE, query planning, cost-based optimization\\n- **Query rewriting**: Subquery optimization, JOIN optimization, CTE performance\\n- **Complex query patterns**: Window functions, recursive queries, analytical functions\\n- **Cross-database optimization**: PostgreSQL, MySQL, SQL Server, Oracle-specific optimizations\\n- **NoSQL query optimization**: MongoDB aggregation pipelines, DynamoDB query patterns\\n- **Cloud database optimization**: RDS, Aurora, Azure SQL, Cloud SQL specific tuning\\n\\n### Modern Indexing Strategies\\n- **Advanced indexing**: B-tree, Hash, GiST, GIN, BRIN indexes, covering indexes\\n- **Composite indexes**: Multi-column indexes, index column ordering, partial indexes\\n- **Specialized indexes**: Full-text search, JSON/JSONB indexes, spatial indexes\\n- **Index maintenance**: Index bloat management, rebuilding strategies, statistics updates\\n- **Cloud-native indexing**: Aurora indexing, Azure SQL intelligent indexing\\n- **NoSQL indexing**: MongoDB compound indexes, DynamoDB GSI/LSI optimization\\n\\n### Performance Analysis & Monitoring\\n- **Query performance**: pg_stat_statements, MySQL Performance Schema, SQL Server DMVs\\n- **Real-time monitoring**: Active query analysis, blocking query detection\\n- **Performance baselines**: Historical performance tracking, regression detection\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "database-optimizer",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
-          "score": 1,
-          "testPassCount": 1,
-          "testFailCount": 0,
+          "score": 0.8,
+          "testPassCount": 0,
+          "testFailCount": 1,
           "testErrorCount": 0,
-          "assertPassCount": 1,
-          "assertFailCount": 0,
-          "totalLatencyMs": 447,
+          "assertPassCount": 0,
+          "assertFailCount": 1,
+          "totalLatencyMs": 10693,
           "tokenUsage": {
-            "prompt": 403,
-            "completion": 786,
+            "prompt": 433,
+            "completion": 619,
             "cached": 0,
-            "total": 1189,
+            "total": 1052,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1033,
-              "prompt": 982,
-              "completion": 51,
+              "total": 892,
+              "prompt": 822,
+              "completion": 70,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -42,29 +42,30 @@
             }
           },
           "namedScores": {
-            "database-optimizer_quality": 1
+            "database-optimizer_quality": 0.8
           },
           "namedScoresCount": {
             "database-optimizer_quality": 1
           },
-          "cost": 0
+          "cost": 0.00043634999999999995
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00043634999999999995,
+        "error": "The output identifies missing indexes on `orders.created_at` and `order_items.order_id`, suggests using `EXPLAIN ANALYZE`, avoids using `SELECT *` by specifying the necessary columns, but does not mention a composite index.",
         "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
+          "pass": false,
+          "score": 0.8,
+          "reason": "The output identifies missing indexes on `orders.created_at` and `order_items.order_id`, suggests using `EXPLAIN ANALYZE`, avoids using `SELECT *` by specifying the necessary columns, but does not mention a composite index.",
           "namedScores": {
-            "database-optimizer_quality": 1
+            "database-optimizer_quality": 0.8
           },
           "tokensUsed": {
-            "total": 1033,
-            "prompt": 982,
-            "completion": 51,
+            "total": 892,
+            "prompt": 822,
+            "completion": 70,
             "cached": 0,
             "numRequests": 1
           },
@@ -76,13 +77,13 @@
                 "threshold": 0.7,
                 "metric": "database-optimizer_quality"
               },
-              "pass": true,
-              "score": 1,
-              "reason": "The output identifies missing indexes, suggests a composite index, mentions using EXPLAIN ANALYZE, advises against SELECT *, and recommends selecting specific columns.",
+              "pass": false,
+              "score": 0.8,
+              "reason": "The output identifies missing indexes on `orders.created_at` and `order_items.order_id`, suggests using `EXPLAIN ANALYZE`, avoids using `SELECT *` by specifying the necessary columns, but does not mention a composite index.",
               "tokensUsed": {
-                "total": 1033,
-                "prompt": 982,
-                "completion": 51,
+                "total": 892,
+                "prompt": 822,
+                "completion": 70,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,25 +93,24 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThis query has several optimization opportunities. Let me break down the approach:\\n\\n## 1. **Immediate Diagnostic Steps**\\n\\nFirst, check the current execution plan:\\n```sql\\nEXPLAIN ANALYZE \\nSELECT * FROM orders \\nJOIN order_items ON orders.id = order_items.order_id \\nWHERE orders.created_at > '2024-01-01';\\n```\\n\\n## 2. **Most Likely Issues & Solutions**\\n\\n### **A. Missing Indexes (Most Common Fix)**\\n```sql\\n-- Index on the WHERE clause filter\\nCREATE INDEX idx_orders_created_at ON orders(created_at);\\n\\n-- Index on the JOIN column (if not already indexed)\\nCREATE INDEX idx_order_items_order_id ON order_items(order_id);\\n\\n-- Composite covering index for better performance\\nCREATE INDEX idx_orders_created_at_id ON orders(created_at, id);\\n```\\n\\n### **B. Query Rewrite Options**\\n\\n**Option 1: Reduce Result Set Early**\\n```sql\\nSELECT o.*, oi.* \\nFROM (\\n    SELECT * FROM orders \\n    WHERE created_at > '2024-01-01'\\n) o\\nJOIN order_items oi ON o.id = oi.order_id;\\n```\\n\\n**Option 2: Select Only Needed Columns**\\n```sql\\nSELECT o.id, o.created_at, o.customer_id, \\n       oi.product_id, oi.quantity, oi.price\\nFROM orders o\\nJOIN order_items oi ON o.id = oi.order_id \\nWHERE o.created_at > '2024-01-01';\\n```\\n\\n### **C. Advanced Optimization**\\n\\n**If returning many rows (>10% of table):**\\n```sql\\n-- Consider BRIN index for time-series data\\nCREATE INDEX idx_orders_created_at_brin \\nON orders USING BRIN(created_at);\\n\\n-- Partition by date (if PostgreSQL 10+)\\nCREATE TABLE orders_partitioned (\\n    LIKE orders INCLUDING ALL\\n) PARTITION BY RANGE (created_at);\\n```\\n\\n## 3. **Database-Specific Optimizations**\\n\\n**PostgreSQL:**\\n```sql\\n-- Increase work_mem for large sorts/joins\\nSET work_mem = '64MB';\\n\\n-- Use parallel query\\nSET max_parallel_workers_per_gather = 4;\\n\\n-- Analyze tables for better planner estimates\\nANALYZE orders;\\nANALYZE order_items;\\n```\\n\\n**MySQL:**\\n```sql\\n-- Force index usage\\nSELECT /*+ INDEX(orders idx_created_at) */ *\\nFROM orders FORCE INDEX (idx_created_at)\\nJOIN order_items ON orders.id = order_items.order_id\\nWHERE orders.created_at > '2024-01-01';\\n```\\n\\n## 4. **Architecture Considerations**\\n\\nIf this is a recurring query:\\n1. **Materialized View** for aggregated order data\\n2. **Read Replica** for reporting queries\\n3. **Application-level caching** (Redis/Memcached)\\n4. **Batch processing** during off-peak hours\\n\\n## 5. **Monitoring & Validation**\\n\\nAfter applying optimizations:\\n```sql\\n-- Check index usage\\nSELECT * FROM pg_stat_user_indexes \\nWHERE tablename = 'orders';\\n\\n-- Monitor query performance\\nSELECT query, calls, total_time, mean_time\\nFROM pg_stat_statements \\nWHERE query LIKE '%orders JOIN order_items%';\\n```\\n\\n## **Quick Action Plan:**\\n1. ✅ Add `INDEX ON orders(created_at)`\\n2. ✅ Add `INDEX ON order_items(order_id)`\\n3. ✅ Change `SELECT *` to specific columns\\n4. ✅ Consider partitioning if data volume is large\\n5. ✅ Monitor with `EXPLAIN ANALYZE`\\n\\n**What database system are you using, and approximately how many rows are in each table?** This will help me provide more specific recommendations.\\n</Output>\\n<Rubric>\\nIdentifies missing indexes, suggests composite index, mentions EXPLAIN ANALYZE, avoids SELECT *, suggests specific columns\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo optimize the provided query, we can take several steps focusing on indexing, query rewriting, and analyzing the execution plan. Here’s a structured approach:\\n\\n### 1. **Indexing**\\nEnsure that appropriate indexes are in place to speed up the join and the filtering condition:\\n\\n- **Index on `orders.created_at`**: Create an index on the `created_at` column of the `orders` table if it doesn't already exist. This will help filter the rows based on the date condition quickly.\\n  \\n  ```sql\\n  CREATE INDEX idx_orders_created_at ON orders(created_at);\\n  ```\\n\\n- **Index on `order_items.order_id`**: Ensure there is an index on the `order_id` column of the `order_items` table to speed up the join operation.\\n\\n  ```sql\\n  CREATE INDEX idx_order_items_order_id ON order_items(order_id);\\n  ```\\n\\n### 2. **Query Rewriting**\\nWhile the query is straightforward, we can ensure that we are only selecting the necessary columns instead of using `SELECT *`. This reduces the amount of data transferred and processed:\\n\\n```sql\\nSELECT orders.id, orders.created_at, order_items.item_id, order_items.quantity\\nFROM orders\\nJOIN order_items ON orders.id = order_items.order_id\\nWHERE orders.created_at > '2024-01-01';\\n```\\n\\n### 3. **Analyze Execution Plan**\\nUse the `EXPLAIN ANALYZE` command to analyze the execution plan of the query. This will help identify any bottlenecks or inefficient operations:\\n\\n```sql\\nEXPLAIN ANALYZE\\nSELECT orders.id, orders.created_at, order_items.item_id, order_items.quantity\\nFROM orders\\nJOIN order_items ON orders.id = order_items.order_id\\nWHERE orders.created_at > '2024-01-01';\\n```\\n\\nLook for:\\n- Sequential scans on large tables that could be replaced by index scans.\\n- High cost operations that could be optimized.\\n\\n### 4. **Database Statistics**\\nEnsure that the database statistics are up to date. If the statistics are stale, the query planner may make suboptimal decisions:\\n\\n```sql\\nANALYZE orders;\\nANALYZE order_items;\\n```\\n\\n### 5. **Partitioning (if applicable)**\\nIf the `orders` table is very large and the `created_at` column is frequently used for filtering, consider partitioning the `orders` table by date. This can significantly improve query performance by reducing the amount of data scanned.\\n\\n### 6. **Caching Strategies**\\nIf this query is run frequently with similar parameters, consider implementing caching strategies at the application level or using a caching layer (like Redis) to store the results of this query.\\n\\n### 7. **Monitoring and Performance Baselines**\\nAfter applying these optimizations, monitor the query performance over time to ensure that the changes have had the desired effect. Use tools like pg_stat_statements or MySQL Performance Schema to track performance metrics.\\n\\nBy following these steps, you should see a significant improvement in the performance of the query.\\n</Output>\\n<Rubric>\\nIdentifies missing indexes, suggests composite index, mentions EXPLAIN ANALYZE, avoids SELECT *, suggests specific columns\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "acb0ec45-c9d9-4e54-8b14-64b020ef7819",
-        "latencyMs": 447,
+        "id": "2ed4b029-37aa-4228-9eb3-faf78af1008e",
+        "latencyMs": 10693,
         "namedScores": {
-          "database-optimizer_quality": 1
+          "database-optimizer_quality": 0.8
         },
         "prompt": {
           "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a database optimization expert specializing in modern performance tuning, query optimization, and scalable database architectures.\\n\\n## Purpose\\nExpert database optimizer with comprehensive knowledge of modern database performance tuning, query optimization, and scalable architecture design. Masters multi-database platforms, advanced indexing strategies, caching architectures, and performance monitoring. Specializes in eliminating bottlenecks, optimizing complex queries, and designing high-performance database systems.\\n\\n## Capabilities\\n\\n### Advanced Query Optimization\\n- **Execution plan analysis**: EXPLAIN ANALYZE, query planning, cost-based optimization\\n- **Query rewriting**: Subquery optimization, JOIN optimization, CTE performance\\n- **Complex query patterns**: Window functions, recursive queries, analytical functions\\n- **Cross-database optimization**: PostgreSQL, MySQL, SQL Server, Oracle-specific optimizations\\n- **NoSQL query optimization**: MongoDB aggregation pipelines, DynamoDB query patterns\\n- **Cloud database optimization**: RDS, Aurora, Azure SQL, Cloud SQL specific tuning\\n\\n### Modern Indexing Strategies\\n- **Advanced indexing**: B-tree, Hash, GiST, GIN, BRIN indexes, covering indexes\\n- **Composite indexes**: Multi-column indexes, index column ordering, partial indexes\\n- **Specialized indexes**: Full-text search, JSON/JSONB indexes, spatial indexes\\n- **Index maintenance**: Index bloat management, rebuilding strategies, statistics updates\\n- **Cloud-native indexing**: Aurora indexing, Azure SQL intelligent indexing\\n- **NoSQL indexing**: MongoDB compound indexes, DynamoDB GSI/LSI optimization\\n\\n### Performance Analysis & Monitoring\\n- **Query performance**: pg_stat_statements, MySQL Performance Schema, SQL Server DMVs\\n- **Real-time monitoring**: Active query analysis, blocking query detection\\n- **Performance baselines**: Historical performance tracking, regression detection\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"This query is slow: SELECT * FROM orders JOIN order_items ON orders.id = order_items.order_id WHERE orders.created_at > '2024-01-01'. How do you optimize it?\"\n  }\n]",
           "label": "database-optimizer",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +118,26 @@
         "promptId": "84c3c78bb7c601bc4708cc24e8ea076732f28e9cceb63fc6f7a1caba5f3e5690",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "This query has several optimization opportunities. Let me break down the approach:\n\n## 1. **Immediate Diagnostic Steps**\n\nFirst, check the current execution plan:\n```sql\nEXPLAIN ANALYZE \nSELECT * FROM orders \nJOIN order_items ON orders.id = order_items.order_id \nWHERE orders.created_at > '2024-01-01';\n```\n\n## 2. **Most Likely Issues & Solutions**\n\n### **A. Missing Indexes (Most Common Fix)**\n```sql\n-- Index on the WHERE clause filter\nCREATE INDEX idx_orders_created_at ON orders(created_at);\n\n-- Index on the JOIN column (if not already indexed)\nCREATE INDEX idx_order_items_order_id ON order_items(order_id);\n\n-- Composite covering index for better performance\nCREATE INDEX idx_orders_created_at_id ON orders(created_at, id);\n```\n\n### **B. Query Rewrite Options**\n\n**Option 1: Reduce Result Set Early**\n```sql\nSELECT o.*, oi.* \nFROM (\n    SELECT * FROM orders \n    WHERE created_at > '2024-01-01'\n) o\nJOIN order_items oi ON o.id = oi.order_id;\n```\n\n**Option 2: Select Only Needed Columns**\n```sql\nSELECT o.id, o.created_at, o.customer_id, \n       oi.product_id, oi.quantity, oi.price\nFROM orders o\nJOIN order_items oi ON o.id = oi.order_id \nWHERE o.created_at > '2024-01-01';\n```\n\n### **C. Advanced Optimization**\n\n**If returning many rows (>10% of table):**\n```sql\n-- Consider BRIN index for time-series data\nCREATE INDEX idx_orders_created_at_brin \nON orders USING BRIN(created_at);\n\n-- Partition by date (if PostgreSQL 10+)\nCREATE TABLE orders_partitioned (\n    LIKE orders INCLUDING ALL\n) PARTITION BY RANGE (created_at);\n```\n\n## 3. **Database-Specific Optimizations**\n\n**PostgreSQL:**\n```sql\n-- Increase work_mem for large sorts/joins\nSET work_mem = '64MB';\n\n-- Use parallel query\nSET max_parallel_workers_per_gather = 4;\n\n-- Analyze tables for better planner estimates\nANALYZE orders;\nANALYZE order_items;\n```\n\n**MySQL:**\n```sql\n-- Force index usage\nSELECT /*+ INDEX(orders idx_created_at) */ *\nFROM orders FORCE INDEX (idx_created_at)\nJOIN order_items ON orders.id = order_items.order_id\nWHERE orders.created_at > '2024-01-01';\n```\n\n## 4. **Architecture Considerations**\n\nIf this is a recurring query:\n1. **Materialized View** for aggregated order data\n2. **Read Replica** for reporting queries\n3. **Application-level caching** (Redis/Memcached)\n4. **Batch processing** during off-peak hours\n\n## 5. **Monitoring & Validation**\n\nAfter applying optimizations:\n```sql\n-- Check index usage\nSELECT * FROM pg_stat_user_indexes \nWHERE tablename = 'orders';\n\n-- Monitor query performance\nSELECT query, calls, total_time, mean_time\nFROM pg_stat_statements \nWHERE query LIKE '%orders JOIN order_items%';\n```\n\n## **Quick Action Plan:**\n1. ✅ Add `INDEX ON orders(created_at)`\n2. ✅ Add `INDEX ON order_items(order_id)`\n3. ✅ Change `SELECT *` to specific columns\n4. ✅ Consider partitioning if data volume is large\n5. ✅ Monitor with `EXPLAIN ANALYZE`\n\n**What database system are you using, and approximately how many rows are in each table?** This will help me provide more specific recommendations.",
+          "output": "To optimize the provided query, we can take several steps focusing on indexing, query rewriting, and analyzing the execution plan. Here’s a structured approach:\n\n### 1. **Indexing**\nEnsure that appropriate indexes are in place to speed up the join and the filtering condition:\n\n- **Index on `orders.created_at`**: Create an index on the `created_at` column of the `orders` table if it doesn't already exist. This will help filter the rows based on the date condition quickly.\n  \n  ```sql\n  CREATE INDEX idx_orders_created_at ON orders(created_at);\n  ```\n\n- **Index on `order_items.order_id`**: Ensure there is an index on the `order_id` column of the `order_items` table to speed up the join operation.\n\n  ```sql\n  CREATE INDEX idx_order_items_order_id ON order_items(order_id);\n  ```\n\n### 2. **Query Rewriting**\nWhile the query is straightforward, we can ensure that we are only selecting the necessary columns instead of using `SELECT *`. This reduces the amount of data transferred and processed:\n\n```sql\nSELECT orders.id, orders.created_at, order_items.item_id, order_items.quantity\nFROM orders\nJOIN order_items ON orders.id = order_items.order_id\nWHERE orders.created_at > '2024-01-01';\n```\n\n### 3. **Analyze Execution Plan**\nUse the `EXPLAIN ANALYZE` command to analyze the execution plan of the query. This will help identify any bottlenecks or inefficient operations:\n\n```sql\nEXPLAIN ANALYZE\nSELECT orders.id, orders.created_at, order_items.item_id, order_items.quantity\nFROM orders\nJOIN order_items ON orders.id = order_items.order_id\nWHERE orders.created_at > '2024-01-01';\n```\n\nLook for:\n- Sequential scans on large tables that could be replaced by index scans.\n- High cost operations that could be optimized.\n\n### 4. **Database Statistics**\nEnsure that the database statistics are up to date. If the statistics are stale, the query planner may make suboptimal decisions:\n\n```sql\nANALYZE orders;\nANALYZE order_items;\n```\n\n### 5. **Partitioning (if applicable)**\nIf the `orders` table is very large and the `created_at` column is frequently used for filtering, consider partitioning the `orders` table by date. This can significantly improve query performance by reducing the amount of data scanned.\n\n### 6. **Caching Strategies**\nIf this query is run frequently with similar parameters, consider implementing caching strategies at the application level or using a caching layer (like Redis) to store the results of this query.\n\n### 7. **Monitoring and Performance Baselines**\nAfter applying these optimizations, monitor the query performance over time to ensure that the changes have had the desired effect. Use tools like pg_stat_statements or MySQL Performance Schema to track performance metrics.\n\nBy following these steps, you should see a significant improvement in the performance of the query.",
           "tokenUsage": {
-            "total": 1189,
-            "prompt": 403,
-            "completion": 786,
-            "numRequests": 1
+            "total": 1052,
+            "prompt": 433,
+            "completion": 619,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 447,
+          "latencyMs": 10693,
           "finishReason": "stop",
+          "cost": 0.00043634999999999995,
           "guardrails": {
             "flagged": false
           },
@@ -140,27 +146,37 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e44275dfd2248f7-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:24:23 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:51:15 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "10503",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=iLssP5ToWspR9HpOuLdDBxC6mUiLRKwQe66V1jX7HBQ-1774842664.640073-1.0.1.1-pORtaC6GClmm3yNb8yWMIFe5vnFnvanPyh5I92BiCN6GelRE6gt2N1tWzSwRwYMJ6eXgKHfRMQ8hWLoBPw1c7uhAZB2i3kIG55VbhwStxOem_S3Fu1gb7kdrYUUM8NcK; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:15 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 784f8c9e548003cb001dfd32615b63ca.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "1lM-UnWsUktm8ffzKKUboRvvrw4JBHmAol2sT2iAIkRUdmoT4zdmqA==",
-                "x-amz-cf-pop": "IAH50-P1",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "8c8fd7b454c8426d9055d46b028aae27"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-tokens": "199473",
+                "x-ratelimit-reset-requests": "1h5m13.969s",
+                "x-ratelimit-reset-tokens": "158ms",
+                "x-request-id": "req_e566852ed6b4432eb1e6de209e13f079"
               }
             }
           }
         },
-        "score": 1,
-        "success": true,
+        "score": 0.8,
+        "success": false,
         "testCase": {
           "description": "[1] This query is slow: SELECT * FROM orders JOIN order_items ON orders.id = order_i",
           "vars": {
@@ -176,10 +192,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,37 +209,47 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e44275dfd2248f7-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:24:23 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:51:15 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "10503",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=iLssP5ToWspR9HpOuLdDBxC6mUiLRKwQe66V1jX7HBQ-1774842664.640073-1.0.1.1-pORtaC6GClmm3yNb8yWMIFe5vnFnvanPyh5I92BiCN6GelRE6gt2N1tWzSwRwYMJ6eXgKHfRMQ8hWLoBPw1c7uhAZB2i3kIG55VbhwStxOem_S3Fu1gb7kdrYUUM8NcK; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:15 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 784f8c9e548003cb001dfd32615b63ca.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "1lM-UnWsUktm8ffzKKUboRvvrw4JBHmAol2sT2iAIkRUdmoT4zdmqA==",
-              "x-amz-cf-pop": "IAH50-P1",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "8c8fd7b454c8426d9055d46b028aae27"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-tokens": "199473",
+              "x-ratelimit-reset-requests": "1h5m13.969s",
+              "x-ratelimit-reset-tokens": "158ms",
+              "x-request-id": "req_e566852ed6b4432eb1e6de209e13f079"
             }
           },
           "_promptfooFileMetadata": {}
         },
-        "failureReason": 0
+        "failureReason": 1
       }
     ],
     "stats": {
-      "successes": 1,
-      "failures": 0,
+      "successes": 0,
+      "failures": 1,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 403,
-        "completion": 786,
+        "prompt": 433,
+        "completion": 619,
         "cached": 0,
-        "total": 1189,
+        "total": 1052,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +257,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1033,
-          "prompt": 982,
-          "completion": 51,
+          "total": 892,
+          "prompt": 822,
+          "completion": 70,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +269,8 @@
           }
         }
       },
-      "durationMs": 36047,
-      "evaluationDurationMs": 36047
+      "durationMs": 12642,
+      "evaluationDurationMs": 12642
     }
   },
   "config": {
@@ -259,9 +284,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +313,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +336,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:24:59.472Z",
-    "evaluationCreatedAt": "2026-03-15T04:24:23.384Z"
+    "exportedAt": "2026-03-30T03:51:17.269Z",
+    "evaluationCreatedAt": "2026-03-30T03:51:04.582Z"
   }
 }

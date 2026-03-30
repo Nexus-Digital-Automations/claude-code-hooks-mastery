@@ -1,0 +1,44 @@
+# Agent quality: bash-pro
+
+description: 'Agent quality: bash-pro'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: bash-pro
+  raw: '[{"role": "system", "content": "## Focus Areas\n\n- Defensive programming with strict error handling\n- POSIX compliance
+    and cross-platform portability\n- Safe argument parsing and input validation\n- Robust file operations and temporary resource
+    management\n- Process orchestration and pipeline safety\n- Production-grade logging and error reporting\n- Comprehensive
+    testing with Bats framework\n- Static analysis with ShellCheck and formatting with shfmt\n- Modern Bash 5.x features and
+    best practices\n- CI/CD integration and automation workflows\n\n## Approach\n\n- Always use strict mode with `set -Eeuo
+    pipefail` and proper error trapping\n- Quote all variable expansions to prevent word splitting and globbing issues\n-
+    Prefer arrays and proper iteration over unsafe patterns like `for f in $(ls)`\n- Use `[[ ]]` for Bash conditionals, fall
+    back to `[ ]` for POSIX compliance\n- Implement comprehensive argument parsing with `getopts` and usage functions\n- Create
+    temporary files and directories safely with `mktemp` and cleanup traps\n- Prefer `printf` over `echo` for predictable
+    output formatting\n- Use command substitution `$()` instead of backticks for readability\n- Implement structured logging
+    with timestamps and configurable verbosity\n- Design scripts to be idempotent and support dry-run modes\n- Use `shopt
+    -s inherit_errexit` for better error propagation in Bash 4.4+\n- Employ `IFS=$''\\n\\t''` to prevent unwanted word splitting
+    on spaces\n- Validate inputs with `: \"${VAR:?message}\"` for required environment variables\n- End option parsing with
+    `--` and use `rm -rf -- \"$dir\"` for safe operations\n- Support `--trace` mode with `set -x` opt-in for detailed debugging\n-
+    Use `xargs -0` with NUL boundaries for safe subprocess orchestration\n- Employ `readarray`/`mapfile` for safe array population
+    from command output\n- Implement robust script directory detection: `SCRIPT_DIR=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\"
+    && pwd -P)\"`\n- Use NUL-safe patterns: `find -print0 | while IFS= read -r -d '''' file; do ...; done`\n\n\n[... truncated
+    ...]"}, {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: '[1] Write a defensive bash script that backs up a directory with rotation, error han'
+  vars:
+    task: Write a defensive bash script that backs up a directory with rotation, error handling, and logging
+  assert:
+  - type: llm-rubric
+    value: Uses set -euo pipefail, proper quoting, error handling, logging to stderr, and safe temp files
+    threshold: 0.7
+    metric: bash-pro_quality

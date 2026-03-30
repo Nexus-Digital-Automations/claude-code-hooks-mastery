@@ -2,20 +2,18 @@ description: "CLAUDE.md behavioral eval — tests whether the system prompt driv
 
 # Use DeepSeek as both response model and grader
 providers:
-  - id: openai:chat:deepseek-chat
+  - id: openai:chat:gpt-4o-mini
     config:
-      apiBaseUrl: https://api.deepseek.com
-      apiKeyEnvar: DEEPSEEK_API_KEY
+      apiKeyEnvar: OPENAI_API_KEY
       max_tokens: 600
       temperature: 0.0
 
 defaultTest:
   options:
     provider:
-      id: openai:chat:deepseek-chat
+      id: openai:chat:gpt-4o-mini
       config:
-        apiBaseUrl: https://api.deepseek.com
-        apiKeyEnvar: DEEPSEEK_API_KEY
+        apiKeyEnvar: OPENAI_API_KEY
 
 prompts:
   - file://prompts/claude-md-system.txt

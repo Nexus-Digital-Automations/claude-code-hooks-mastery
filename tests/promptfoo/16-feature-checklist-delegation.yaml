@@ -1,27 +1,23 @@
-description: "Feature Checklist extraction — CLAUDE.md delegation protocol requires enumerating every feature before calling DeepSeek"
+description: "Implementation Plan generation — CLAUDE.md delegation protocol requires writing a plan before calling DeepSeek"
 
-# Tests that the updated CLAUDE.md delegation protocol correctly:
-# 1. Extracts an explicit numbered Feature Checklist from the user's request
+# Tests that the CLAUDE.md delegation protocol correctly:
+# 1. Writes an Implementation Plan before delegating (not just a feature list)
 # 2. Expands vague terms ("deck management") into individual CRUD operations
-# 3. Includes the checklist in the task description sent to DeepSeek
-# 4. Verifies each checklist item after DeepSeek completes (not just "looks done")
-#
-# Uses openai:chat:deepseek-chat directly (not deepseek_review_provider.py)
-# because we're testing Claude/LLM behavior under CLAUDE.md instructions, not the verifier.
+# 3. Includes architecture, contracts, and constraints — not just features
+# 4. Embeds the plan in the task description sent to DeepSeek
+# 5. Verifies each feature against the plan after agent completes
 
 providers:
-  - id: openai:chat:deepseek-chat
+  - id: openai:chat:gpt-4o-mini
     config:
-      apiBaseUrl: https://api.deepseek.com
-      apiKeyEnvar: DEEPSEEK_API_KEY
+      apiKeyEnvar: OPENAI_API_KEY
 
 defaultTest:
   options:
     provider:
-      id: openai:chat:deepseek-chat
+      id: openai:chat:gpt-4o-mini
       config:
-        apiBaseUrl: https://api.deepseek.com
-        apiKeyEnvar: DEEPSEEK_API_KEY
+        apiKeyEnvar: OPENAI_API_KEY
 
 prompts:
   - label: "claude-md-delegation"
@@ -31,33 +27,40 @@ prompts:
       --- BEGIN CLAUDE.md (excerpt) ---
       ## DELEGATION PROTOCOL (MANDATORY)
 
-      You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+      You are in **deepseek mode**. DeepSeek builds code but is not as strong a coder as you — expect mistakes. You own planning, testing, validation, and frontend.
 
       ### Division of Labor
       | Role | Owner | Scope |
       |------|-------|-------|
+      | **Planning** | Claude Code (you) | Write the Implementation Plan before every delegation — features, architecture, contracts, constraints |
       | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools |
       | **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E. Run them yourself |
       | **Validation** | Claude Code (you) | ALL linting, type checking, build verification |
 
-      ### Workflow: Build then Test then Ship
+      ### Workflow: Plan then Delegate then Verify
 
-      **Before delegating**, extract a Feature Checklist from the user's request.
+      **Before delegating**, write an Implementation Plan scaled to the task.
 
-      1. Extract a numbered **Feature Checklist** — list EVERY distinct button, form, CRUD
-         operation (add/edit/delete), modal, mode, filter, timer, counter, export/import feature
-         requested. If the user said "deck management" list: create deck, edit deck, delete deck.
-         Include this checklist in the task description sent to DeepSeek.
-      2. Call `mcp__deepseek-agent__run` with task that **includes the Feature Checklist** as:
-         `REQUIRED FEATURES — ALL must be implemented and tested:\n1. ...\n2. ...`
+      1. Write an **Implementation Plan** with:
+         - **Features**: numbered list of EVERY distinct operation (expand "management" into
+           individual CRUD ops: create, edit, delete). If the user said "deck management" list:
+           create deck, edit deck, delete deck.
+         - **Architecture**: file structure, patterns, tech choices. Where new files go,
+           which existing files change.
+         - **Contracts**: key function signatures, API endpoints, data shapes.
+         - **Constraints**: what NOT to change, existing code/tests/files to preserve.
+         - **Error handling**: expected failure modes and how to handle them.
+         - **Verification criteria**: how you will validate each feature after delivery.
+         Include this plan in the task description sent to DeepSeek.
+      2. Call `mcp__deepseek-agent__run` with the **Implementation Plan as the task description**
       3. Monitor with `mcp__deepseek-agent__poll`
-      4. **Read every file DeepSeek touched** — line by line
-      5. **Verify Feature Checklist item by item**:
+      4. **Read every file the agent modified** — line by line
+      5. **Verify each feature against the plan**:
          - Find each feature's implementation in the code
          - Confirm it is wired to the UI (not dead code, not a stub)
          - alert()/confirm() substituted for a requested modal = incomplete → follow-up task
          - TODO/empty handler where logic should be = incomplete → follow-up task
-      6. **Run ALL tests yourself**: unit, integration, E2E, linting, type checks, build. Never trust DeepSeek's claims.
+      6. **Run ALL tests yourself**: unit, integration, E2E, linting, type checks, build. Independent verification is mandatory.
       7. Rate: "high confidence" / "needs fixes" / "redo"
       8. Fix issues or send targeted follow-up. Do NOT approve incomplete work.
 
@@ -66,12 +69,12 @@ prompts:
 
       User request: {{user_request}}
 
-      Show your Feature Checklist extraction, then describe what you would send to DeepSeek.
+      Show your Implementation Plan, then describe what you would send to DeepSeek.
 
 tests:
-  # ── GROUP 1: Feature Checklist extraction ─────────────────────────────────────────
+  # ── GROUP 1: Implementation Plan generation ─────────────────────────────────────────
 
-  - description: "Flashcard app with multiple feature groups → checklist enumerates EACH CRUD op individually"
+  - description: "Flashcard app with multiple feature groups → plan enumerates EACH CRUD op with architecture"
     vars:
       user_request: >
         Build a flashcard quiz app with deck management (create, edit, delete decks),
@@ -81,20 +84,22 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response shows an explicit numbered Feature Checklist that individually
+          Pass if: the response shows an explicit Implementation Plan that individually
           lists each CRUD operation rather than grouping them. Must include ALL of:
           (1) create deck, (2) edit deck, (3) delete deck — not just "deck management" as one item.
           (4) add card, (5) edit card, (6) delete card — not just "card management" as one item.
           (7) quiz mode with flip, (8) Got It button, (9) Keep Studying button OR quiz navigation,
           (10) quiz summary modal — listed as a separate item, not bundled with quiz mode.
-          The response must show the checklist BEFORE describing what to send to DeepSeek.
+          The plan should also include architecture details (file structure or patterns) or
+          contracts (function signatures or data shapes) beyond just a feature list.
+          The response must show the plan BEFORE describing what to send to DeepSeek.
           Fail if: groups CRUD operations into single items ("deck management = 1 item"),
-          lists fewer than 8 distinct features, or skips the checklist extraction step entirely
-          and just calls mcp__deepseek-agent__run without showing the numbered list.
+          lists fewer than 8 distinct features, or skips the plan and just calls
+          mcp__deepseek-agent__run without showing the Implementation Plan.
         threshold: 0.75
-        metric: "checklist_expands_crud_operations"
+        metric: "plan_expands_crud_with_architecture"
 
-  - description: "Simple feature request → checklist still extracted, even for small tasks"
+  - description: "Simple feature request → plan still generated, even for small tasks"
     vars:
       user_request: >
         Build a password strength checker with a text input, a strength indicator bar
@@ -102,17 +107,17 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response extracts a Feature Checklist with at least 3 distinct items:
+          Pass if: the response generates an Implementation Plan with at least 3 distinct feature items:
           (1) text input for password, (2) strength indicator / strength bar showing weak/medium/strong
-          levels, (3) show/hide password toggle button. The checklist must be shown explicitly
+          levels, (3) show/hide password toggle button. The plan must be shown explicitly
           before the DeepSeek delegation call. The list must reflect the ACTUAL requested features
           (strength levels, toggle button) not generic items.
-          Fail if: skips the checklist extraction and directly calls mcp__deepseek-agent__run
+          Fail if: skips the plan and directly calls mcp__deepseek-agent__run
           with only a prose description, or lists only 1-2 items instead of the distinct features.
         threshold: 0.75
-        metric: "checklist_extracted_for_small_task"
+        metric: "plan_generated_for_small_task"
 
-  - description: "Vague 'management' terms expanded to individual CRUD operations in checklist"
+  - description: "Vague 'management' terms expanded to individual CRUD operations in plan"
     vars:
       user_request: >
         Build a contact book app with contact management (full CRUD), tag management
@@ -123,14 +128,14 @@ tests:
           Pass if: the response expands "contact management (full CRUD)" into individual items:
           create contact, edit/update contact, delete contact, view/list contacts.
           Also expands "tag management" into: add tag to contact, remove tag from contact.
-          AND lists search, filter, and CSV export as separate checklist items.
-          The checklist should have 8+ distinct items rather than 4 vague group headers.
-          Fail if: keeps "contact management" as a single checklist item instead of expanding it,
+          AND lists search, filter, and CSV export as separate items in the plan.
+          The plan should have 8+ distinct items rather than 4 vague group headers.
+          Fail if: keeps "contact management" as a single item instead of expanding it,
           or fails to separately list add tag and remove tag as distinct operations.
         threshold: 0.70
-        metric: "checklist_expands_vague_management_terms"
+        metric: "plan_expands_vague_terms"
 
-  - description: "DeepSeek task description includes REQUIRED FEATURES section with the full checklist"
+  - description: "DeepSeek task description IS the Implementation Plan, not just a feature list"
     vars:
       user_request: >
         Build a habit tracker app with: add habit (name + frequency), mark habit complete
@@ -139,18 +144,19 @@ tests:
       - type: llm-rubric
         value: >
           Pass if: the response shows the task description that would be sent to DeepSeek,
-          and that description includes a "REQUIRED FEATURES — ALL must be implemented and tested:"
-          section (or equivalent label) with a numbered list. The list must include at minimum:
-          add habit, mark complete, streak counter/count, delete habit, weekly summary view.
-          The REQUIRED FEATURES section should appear in the task body, not just as a comment.
-          Fail if: the DeepSeek task description is plain prose with no explicit feature list,
-          or the feature list is present but not clearly labeled as required/mandatory features.
+          and that description is structured as an Implementation Plan — not just prose or
+          a bare feature list. It should include a features section with a numbered list
+          (add habit, mark complete, streak counter/count, delete habit, weekly summary view)
+          AND at least one of: architecture details, contracts/signatures, or constraints.
+          The plan should appear in the task body sent to DeepSeek.
+          Fail if: the DeepSeek task description is plain prose with no structured plan,
+          or the plan has features only with no architecture/contracts/constraints.
         threshold: 0.70
-        metric: "task_includes_required_features_section"
+        metric: "task_description_is_implementation_plan"
 
   # ── GROUP 2: Post-completion verification behavior ─────────────────────────────────
 
-  - description: "After DeepSeek returns — verification must check EACH checklist item, not just 'looks done'"
+  - description: "After agent returns — verification must check EACH plan item, not just 'looks done'"
     vars:
       user_request: >
         DeepSeek just completed building a todo app I delegated. It claims to have
@@ -164,11 +170,12 @@ tests:
           (a) Checks EACH of the 4 features individually in the code (not just "looks done"),
           (b) Mentions looking for actual implementation (event handlers wired to UI, not dead code),
           (c) Mentions running the code / testing it, not just reading it,
-          (d) Does NOT trust DeepSeek's claim that "all features implemented" — skeptical review required.
+          (d) Does NOT trust the agent's claim that "all features implemented" — independent
+          verification is required regardless of what the agent reports.
           Must explicitly say it will verify add, edit, delete, and mark-complete separately.
-          Fail if: response says "DeepSeek confirmed it's done so we're good" or just runs
+          Fail if: response says "the agent confirmed it's done so we're good" or just runs
           one general test without per-feature verification. CLAUDE.md requires item-by-item
-          verification, not blanket trust of DeepSeek's summary.
+          verification against the plan.
         threshold: 0.70
         metric: "verifies_each_feature_individually"
 
@@ -193,9 +200,9 @@ tests:
         threshold: 0.75
         metric: "flags_alert_as_incomplete_not_modal"
 
-  # ── GROUP 3: Post-DeepSeek testing ownership ─────────────────────────────────
+  # ── GROUP 3: Post-agent testing ownership ─────────────────────────────────
 
-  - description: "After DeepSeek completes → Claude Code describes running ALL tests itself"
+  - description: "After agent completes → Claude Code describes running ALL tests itself"
     vars:
       user_request: >
         DeepSeek just finished building the habit tracker. It wrote 4 files.
@@ -203,13 +210,19 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: describes running tests (unit, integration, E2E), linting, type checks,
-          and build verification YOURSELF — not delegating testing back to DeepSeek.
-          Must mention reading every file DeepSeek touched and running tests independently.
-          The Division of Labor says Claude Code owns ALL testing and validation.
-          Fail if: suggests delegating testing to DeepSeek, trusting agent output
-          without independent verification, or skipping the review/testing step.
-        threshold: 0.75
-        metric: "claude_runs_tests_after_deepseek"
+          Pass if: the response includes ALL of these verification steps that YOU (Claude Code)
+          must perform yourself:
+          (a) Read every file the agent modified — line by line review
+          (b) Run tests yourself — unit, integration, or E2E
+          (c) Run linting or type checks yourself
+          (d) Run the build or start the app yourself
+          The response may also include other steps like creating a verification plan,
+          but the core requirement is that testing and validation are described as YOUR
+          responsibility, not delegated back to the agent.
+          Fail if: the response delegates testing or validation back to DeepSeek,
+          or says to trust the agent's output without independent verification,
+          or omits the file review and testing steps entirely.
+        threshold: 0.70
+        metric: "claude_runs_tests_after_agent"
 
 outputPath: tests/promptfoo/results/16-feature-checklist-delegation.json

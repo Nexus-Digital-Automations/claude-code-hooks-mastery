@@ -836,7 +836,7 @@ THESE ARE NOT VALID REASONS TO SKIP:
 ✗ "This task seems clear to me" — that is a rationalization
 ✗ "I understand the intent" — you haven't confirmed it
 ✗ "Let me just start and ask if they want changes" — you will build the wrong thing
-✗ Starting to read files or explore before asking — work has started before clarification
+✗ "Let me explore the codebase to figure out what to do" — exploration without knowing what you're looking for is not clarification
 
 STEP 2 — CREATE A SPEC (after getting answers, before any code):
 • Write specs/<descriptive-name>.md with what the user wants in their words
@@ -988,6 +988,25 @@ def main():
 
         # Record task start time (authoritative timestamp for transcript filtering)
         task_id, prompt_id, is_followup = _record_task_start(session_id, prompt, cwd)
+
+        # Append to reviewer request log (full prompt history for GPT-5 Mini reviewer)
+        try:
+            _req_file = Path.home() / f".claude/data/user_requests_{session_id}.json"
+            _req_file.parent.mkdir(parents=True, exist_ok=True)
+            _requests = []
+            if _req_file.exists():
+                try:
+                    _requests = json.loads(_req_file.read_text())
+                except Exception:
+                    _requests = []
+            _requests.append({
+                "prompt": prompt[:2000],
+                "timestamp": datetime.now().isoformat(),
+                "prompt_id": prompt_id,
+            })
+            _req_file.write_text(json.dumps(_requests, indent=2))
+        except Exception:
+            pass  # Never block prompt submission
 
         # Reset verification state for new task (per-prompt isolation)
         # Skips reset if this is a follow-up prompt with existing check progress.

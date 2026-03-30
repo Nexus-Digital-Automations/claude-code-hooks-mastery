@@ -1,0 +1,109 @@
+description: "Eval: session_start.py validation protocol + autonomous execution directives"
+
+# Tests whether the session-start context causes Claude to:
+# 1. Plan concrete validation steps (not just claim success)
+# 2. Execute autonomously without asking permission
+# 3. Properly scope the validation to what's relevant
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 1200
+      temperature: 0.0
+
+# Use OpenAI as grading model for llm-rubric assertions
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  - label: "with-validation-protocol"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "RESPOND IN THIS ORDER:\n\n1. STATE YOUR VERIFICATION PLAN FIRST: Before any code or investigation, write 2-3 bullet points listing the exact test/build/runtime commands you will run AFTER implementation to prove it works. Example:\n   • Run `pytest tests/` to verify the fix\n   • Run `npm run build` to verify compilation\n   • Run `curl localhost:3000/api/users` to verify the endpoint responds\n\n2. IMPLEMENT the solution.\n\n3. VERIFY by running your planned commands. Present each result as:\n   **Command:** `pytest tests/`\n   **Result:** ✅ PASS\n   **Output:** `4 passed in 0.32s`\n\nReading code (find, cat, grep) is investigation, NOT verification. You must run test/build/runtime commands.\nNever ask \"should I?\" — decide and act autonomously.\n\n{{user_task}}"
+        }
+      ]
+
+  - label: "without-protocol"
+    raw: "{{user_task}}"
+
+tests:
+  - description: "Bug fix → should plan to run tests, not just claim fixed"
+    vars:
+      user_task: "Fix the null pointer exception in the user login handler"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response includes a concrete plan to validate the fix — e.g.,
+          mentioning running specific tests (pytest, npm test, etc.), checking
+          logs, or verifying runtime behavior. It should NOT just say "I'll fix
+          it" without any validation plan. The Validation Report format should
+          appear or be referenced.
+        threshold: 0.8
+        metric: "concrete_validation_plan"
+      - type: llm-rubric
+        value: >
+          The response does NOT ask "Should I proceed?" or "Do you want me to fix this?"
+          It should autonomously state its plan.
+        threshold: 0.85
+        metric: "autonomous_no_permission_asking"
+
+  - description: "Feature add → verification plan with concrete commands"
+    vars:
+      user_task: "Add input validation to the user registration endpoint"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response includes a verification plan listing at least 2
+          concrete commands (pytest, npm test, curl, etc.) that will be run to
+          validate the implementation. The plan can appear anywhere — at the start
+          as a verification plan section, or at the end as a validation step.
+          Fail if: only provides code without any mention of running tests, builds,
+          or runtime verification commands.
+        threshold: 0.75
+        metric: "verification_plan_present"
+
+  - description: "Without protocol → likely no validation plan baseline"
+    vars:
+      user_task: "Fix the null pointer exception in the user login handler"
+    assert:
+      - type: llm-rubric
+        value: >
+          Baseline: without the protocol, the response likely does NOT spontaneously
+          mention a structured validation report with Command/Result/Output format.
+          This tests the counterfactual — if this PASSES, the protocol adds no value.
+        threshold: 0.6
+        metric: "baseline_no_validation_protocol"
+
+  - description: "Autonomous: no asking permission mid-task"
+    vars:
+      user_task: "Optimize the database queries in the user service"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response demonstrates autonomous decision-making: it proceeds
+          with a specific optimization plan without asking "Should I do X?"
+          or "Do you want me to proceed with Y?". It acts, not asks.
+        threshold: 0.8
+        metric: "autonomous_execution"
+
+  - description: "Proof over claims: no empty assurances"
+    vars:
+      user_task: "Write a function to parse CSV files"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response plans to show actual proof — command output, test
+          results, or a code sample that can be verified. It should NOT
+          just say "this will work" or "this should be correct" without
+          any validation mechanism.
+        threshold: 0.75
+        metric: "proof_over_claims"
+
+outputPath: tests/promptfoo/results/03-validation-protocol.json

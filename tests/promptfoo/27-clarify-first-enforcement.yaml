@@ -6,20 +6,18 @@ description: "Protocol compliance: clarify-first enforcement under pressure and 
 # tasks with "obvious" implementations, and tasks where the user seems in a hurry.
 
 providers:
-  - id: openai:chat:deepseek-chat
+  - id: openai:chat:gpt-4o-mini
     config:
-      apiBaseUrl: https://api.deepseek.com
-      apiKeyEnvar: DEEPSEEK_API_KEY
+      apiKeyEnvar: OPENAI_API_KEY
       max_tokens: 500
       temperature: 0.0
 
 defaultTest:
   options:
     provider:
-      id: openai:chat:deepseek-chat
+      id: openai:chat:gpt-4o-mini
       config:
-        apiBaseUrl: https://api.deepseek.com
-        apiKeyEnvar: DEEPSEEK_API_KEY
+        apiKeyEnvar: OPENAI_API_KEY
 
 prompts:
   - file://prompts/claude-md-system.txt
@@ -72,16 +70,17 @@ tests:
         threshold: 0.80
         metric: "clarify_vague_improvement"
 
-  - description: "Fix request must clarify what the bug is before exploring"
+  - description: "Fix request must clarify what the bug is before starting"
     vars:
       user_task: "Fix the bug in the login flow"
     assert:
       - type: llm-rubric
         value: >
-          The response MUST ask what bug specifically before reading any files or exploring.
-          What symptoms? What steps to reproduce? When did it start?
-          Pass if: asks about the specific bug before any codebase exploration.
-          Fail if: starts reading login-related files or asks "let me take a look" before clarifying.
+          No bug has been described — no symptoms, no error message, no reproduction steps.
+          The response MUST ask what the bug is before doing anything else.
+          Exploration (ls, find, cat) is acceptable AFTER clarification, but not as a substitute for it.
+          Pass if: asks what the bug is (symptoms? error message? steps to reproduce?) before taking any action.
+          Fail if: starts exploring or "figuring it out" without first asking the user what the bug is.
         threshold: 0.80
         metric: "clarify_before_exploring"
 

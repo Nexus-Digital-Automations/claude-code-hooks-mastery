@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-dnL-2026-03-15T04:55:58",
+  "evalId": "eval-RYx-2026-03-30T03:59:57",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:55:58.248Z",
+    "timestamp": "2026-03-30T03:59:57.511Z",
     "prompts": [
       {
         "id": "e1a653b166c0ca0a0af29b05a7c7cf1c315f9ba5322e116bde265e0f484182c3",
         "raw": "[{\"role\": \"system\", \"content\": \"# Architecture Patterns\\n\\nMaster proven backend architecture patterns including Clean Architecture, Hexagonal Architecture, and Domain-Driven Design to build maintainable, testable, and scalable systems.\\n\\n## When to Use This Skill\\n\\n- Designing new backend systems from scratch\\n- Refactoring monolithic applications for better maintainability\\n- Establishing architecture standards for your team\\n- Migrating from tightly coupled to loosely coupled architectures\\n- Implementing domain-driven design principles\\n- Creating testable and mockable codebases\\n- Planning microservices decomposition\\n\\n## Core Concepts\\n\\n### 1. Clean Architecture (Uncle Bob)\\n\\n**Layers (dependency flows inward):**\\n- **Entities**: Core business models\\n- **Use Cases**: Application business rules\\n- **Interface Adapters**: Controllers, presenters, gateways\\n- **Frameworks & Drivers**: UI, database, external services\\n\\n**Key Principles:**\\n- Dependencies point inward\\n- Inner layers know nothing about outer layers\\n- Business logic independent of frameworks\\n- Testable without UI, database, or external services\\n\\n### 2. Hexagonal Architecture (Ports and Adapters)\\n\\n**Components:**\\n- **Domain Core**: Business logic\\n- **Ports**: Interfaces defining interactions\\n- **Adapters**: Implementations of ports (database, REST, message queue)\\n\\n**Benefits:**\\n- Swap implementations easily (mock for testing)\\n- Technology-agnostic core\\n- Clear separation of concerns\\n\\n### 3. Domain-Driven Design (DDD)\\n\\n**Strategic Patterns:**\\n- **Bounded Contexts**: Separate models for different domains\\n- **Context Mapping**: How contexts relate\\n- **Ubiquitous Language**: Shared terminology\\n\\n**Tactical Patterns:**\\n- **Entities**: Objects with identity\\n- **Value Objects**: Immutable objects defined by attributes\\n- **Aggregates**: Consistency boundaries\\n- **Repositories**: Data access abstraction\\n- **Domain Events**: Things that happened\\n\\n## Clean Architecture Pattern\\n\\n### Directory Structure\\n```\\napp/\\n├── domain/           # Entities & business rules\\n│   ├── entities/\\n│   │   ├── user.py\\n│   │   └── order.py\\n│   ├── value_objects/\\n│   │   ├── email.py\\n│   │   └── money.py\\n│   └── interfaces/   # Abstract interfaces\\n│       ├── user_repository.py\\n│       └── payment_gateway.py\\n├── use_cases/        # Application business rules\\n│   ├── create_user.py\\n│   ├── process_order.py\\n│   └── send_notification.py\\n├── adapters/         # Interface implementations\\n│   ├── repositories/\\n│   │   ├── postgres_user_repository.py\\n│   │   └── redis_cache_repository.py\\n│   ├── controllers/\\n│   │   └── user_controller.py\\n│   └── gateways/\\n│       ├── stripe_payment_gateway.py\\n│       └── sendgrid_email_gateway.py\\n└── infrastructure/   # Framework & external concerns\\n    ├── database.py\\n    ├── config.py\\n    └── logging.py\\n```\\n\\n### Implementation Example\\n\\n```python\\n# domain/entities/user.py\\nfrom dataclasses import dataclass\\nfrom datetime import datetime\\nfrom typing import Optional\\n\\n@dataclass\\nclass User:\\n    \\\"\\\"\\\"Core user entity - no framework dependencies.\\\"\\\"\\\"\\n    id: str\\n    email: str\\n    name: str\\n    created_at: datetime\\n    is_active: bool = True\\n\\n    def deactivate(self):\\n        \\\"\\\"\\\"Business rule: deactivating user.\\\"\\\"\\\"\\n        self.is_active = False\\n\\n    def can_place_order(self) -> bool:\\n        \\\"\\\"\\\"Business rule: active users can order.\\\"\\\"\\\"\\n        return self.is_active\\n\\n# domain/interfaces/user_repository.py\\nfrom abc import ABC, abstractmethod\\nfrom typing import Optional, List\\nfrom domain.entities.user import User\\n\\nclass IUserRepository(ABC):\\n    \\\"\\\"\\\"Port: defines contract, no implementation.\\\"\\\"\\\"\\n\\n    @abstractmethod\\n    async def find_by_id(self, user_id: str) -> Optional[User]:\\n        pass\\n\\n    @abstractmethod\\n    async def find_by_email(self, email: str) -> Optional[User]:\\n        pass\\n\\n    @abstractmethod\\n    async def save(self, user: User) -> User:\\n        pass\\n\\n    @abstractmethod\\n    async def delete(self, user_id: str) -> bool:\\n        pass\\n\\n# use_cases/create_user.py\\nfrom domain.entities.user import User\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "architecture-patterns",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 437,
+          "totalLatencyMs": 15508,
           "tokenUsage": {
-            "prompt": 979,
-            "completion": 1144,
+            "prompt": 976,
+            "completion": 601,
             "cached": 0,
-            "total": 2123,
+            "total": 1577,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1413,
-              "prompt": 1337,
-              "completion": 76,
+              "total": 849,
+              "prompt": 799,
+              "completion": 50,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "skill_architecture-patterns_quality": 1
           },
-          "cost": 0
+          "cost": 0.000507
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.000507,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "skill_architecture-patterns_quality": 1
           },
           "tokensUsed": {
-            "total": 1413,
-            "prompt": 1337,
-            "completion": 76,
+            "total": 849,
+            "prompt": 799,
+            "completion": 50,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides specific decision criteria through scenarios, a decision matrix, and a checklist, clearly outlining pros/cons and when CQRS adds value versus overhead, such as in high read/write ratios or complex queries, while warning against over-engineering for simple cases.",
+              "reason": "The output provides detailed decision criteria for when to use CQRS versus a simple CRUD approach, including specific scenarios and considerations that highlight the pros and cons of each method.",
               "tokensUsed": {
-                "total": 1413,
-                "prompt": 1337,
-                "completion": 76,
+                "total": 849,
+                "prompt": 799,
+                "completion": 50,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nExcellent question! This is a key architectural decision. Here's a clear decision framework:\\n\\n## **Use Simple CRUD When:**\\n\\n### ✅ **Good Scenarios:**\\n1. **Simple data models** with basic create/read/update/delete operations\\n2. **Low to moderate read/write ratio** (e.g., 80% reads, 20% writes)\\n3. **Single data source** with straightforward queries\\n4. **No complex business logic** in reads\\n5. **Team size is small** and you need to move fast\\n6. **No need for real-time analytics** or complex reporting\\n7. **Consistency requirements** are simple (eventual consistency is fine)\\n\\n### 📊 **Example Use Cases:**\\n- User profile management\\n- Basic content management (blogs, articles)\\n- Simple inventory tracking\\n- Admin dashboards with basic reporting\\n- Internal tools with modest scale\\n\\n## **Use CQRS When:**\\n\\n### ✅ **Good Scenarios:**\\n1. **High read/write ratio** (e.g., 1000:1 reads to writes)\\n2. **Different data models** needed for reads vs writes\\n3. **Complex query requirements** that don't match write model\\n4. **Performance optimization** needed for reads\\n5. **Event sourcing** is being used\\n6. **Multiple read models** needed (different views of same data)\\n7. **Real-time analytics** or reporting requirements\\n8. **Team can handle complexity** (separate teams for read/write sides)\\n\\n### 📊 **Example Use Cases:**\\n- **E-commerce platforms**: \\n  - Write: Order processing (complex validation)\\n  - Read: Product catalog (denormalized, optimized for search)\\n- **Social media feeds**:\\n  - Write: Post creation\\n  - Read: Timeline generation (complex joins, personalization)\\n- **Financial systems**:\\n  - Write: Transaction processing (ACID compliance)\\n  - Read: Portfolio views, analytics dashboards\\n- **Gaming platforms**:\\n  - Write: Game state updates\\n  - Read: Leaderboards, player stats\\n\\n## **Decision Matrix**\\n\\n| Factor | Favor CRUD | Favor CQRS |\\n|--------|------------|------------|\\n| **Read/Write Ratio** | < 100:1 | > 1000:1 |\\n| **Query Complexity** | Simple queries | Complex joins, aggregations |\\n| **Performance Needs** | Moderate | High (sub-millisecond reads) |\\n| **Data Consistency** | Strong consistency needed | Eventual consistency acceptable |\\n| **Team Experience** | Junior/mid-level | Senior/experienced with patterns |\\n| **Time to Market** | Fast delivery needed | Can invest in architecture |\\n| **Scalability** | Vertical scaling sufficient | Need horizontal scaling |\\n\\n## **Practical Implementation Advice**\\n\\n### **Start with CRUD, Evolve to CQRS**\\n```python\\n# Phase 1: Simple CRUD\\nclass UserService:\\n    def create_user(self, data): ...\\n    def get_user(self, id): ...\\n    def update_user(self, id, data): ...\\n    \\n# Phase 2: Separate concerns but same model\\nclass UserCommandService:\\n    def create_user(self, data): ...\\n    \\nclass UserQueryService:\\n    def get_user(self, id): ...\\n    \\n# Phase 3: Full CQRS with separate models\\nclass UserWriteModel:\\n    # Normalized, transactional\\n    def create(self, data): ...\\n    \\nclass UserReadModel:\\n    # Denormalized, optimized for queries\\n    def get_user_profile(self, id): ...\\n    def search_users(self, criteria): ...\\n```\\n\\n### **When to Consider Hybrid Approach**\\n```python\\n# 80% of operations use CRUD\\nclass UserService:\\n    # CRUD for simple operations\\n    def update_profile(self, user_id, data): ...\\n    \\n    # CQRS for specific complex scenarios\\n    def generate_monthly_report(self, user_id):\\n        # Uses separate read model\\n        return ReportReadModel.get_monthly(user_id)\\n```\\n\\n## **Red Flags for CQRS Over-Engineering**\\n\\n🚨 **Don't use CQRS if:**\\n1. You're building a simple CRUD app that won't scale\\n2. Your team hasn't worked with eventual consistency before\\n3. You can't justify the operational complexity\\n4. Your read and write models are identical\\n5. You don't have performance issues with reads\\n\\n## **Migration Path**\\n\\n```\\nSimple CRUD → Separated Services → CQRS Lite → Full CQRS\\n     ↓              ↓                ↓            ↓\\nMonolithic   Command/Query      Separate DB   Event Sourcing\\n             separation         for reads     + Read Models\\n```\\n\\n## **Quick Checklist**\\n\\n**Ask these questions:**\\n1. Are read and write performance requirements different? ✅ CQRS\\n2. Do reads need different data shapes than writes? ✅ CQRS  \\n3. Is eventual consistency acceptable for reads? ✅ CQRS\\n4. Can you handle data synchronization complexity? ✅ CQRS\\n5. Do you need real-time analytics? ✅ CQRS\\n6. Is this a simple admin interface? ✅ CRUD\\n7. Do you need strong consistency? ✅ CRUD\\n8. Is this a prototype/MVP? ✅ CRUD\\n\\n**Bottom line:** Start with the simplest thing that works. Only introduce CQRS when you have measurable problems that it solves. The operational overhead is significant, but the benefits for the right use cases are transformative.\\n</Output>\\n<Rubric>\\nGives specific decision criteria with pros/cons, mentions when CQRS adds value vs overhead\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nChoosing between the Command Query Responsibility Segregation (CQRS) pattern and a simple CRUD (Create, Read, Update, Delete) approach depends on several factors related to the complexity, scalability, and specific requirements of your application. Here are some considerations to help you decide:\\n\\n### When to Use CQRS\\n\\n1. **Complex Business Logic**: If your application has complex business rules that require different handling for commands (writes) and queries (reads), CQRS can help separate these concerns, making the system easier to manage.\\n\\n2. **High Read/Write Load**: In scenarios where the read and write operations have significantly different load characteristics, CQRS allows you to optimize each side independently. For example, you can scale the read side to handle more queries without affecting the write side.\\n\\n3. **Different Data Models**: If your read and write operations require different data models (e.g., a normalized model for writes and a denormalized model for reads), CQRS allows you to maintain separate models tailored to each operation.\\n\\n4. **Event Sourcing**: If you plan to implement event sourcing (storing the state of an entity as a sequence of events), CQRS is often a natural fit, as it allows you to reconstruct the state of an entity from its events.\\n\\n5. **Microservices Architecture**: In a microservices environment, CQRS can help manage the complexity of interactions between services, especially when different services are responsible for different aspects of the domain.\\n\\n6. **Audit and History**: If you need to maintain a detailed audit trail of changes or support complex querying capabilities, CQRS can facilitate this by separating the command and query responsibilities.\\n\\n### When to Use Simple CRUD\\n\\n1. **Simplicity**: If your application is relatively simple, with straightforward CRUD operations and minimal business logic, a simple CRUD approach is often sufficient and easier to implement.\\n\\n2. **Low Complexity**: For applications with low complexity and where the read and write operations are similar, using CRUD can reduce overhead and speed up development.\\n\\n3. **Rapid Prototyping**: If you are in the early stages of development or prototyping, a CRUD approach allows for faster iteration and testing of ideas without the added complexity of CQRS.\\n\\n4. **Limited Scale**: If you do not anticipate high traffic or complex interactions, a CRUD approach can be more than adequate for your needs.\\n\\n5. **Team Experience**: If your team is more familiar with CRUD operations and lacks experience with CQRS, it may be more efficient to start with CRUD and consider refactoring to CQRS later if needed.\\n\\n### Summary\\n\\nIn summary, use CQRS when you have complex business requirements, high scalability needs, or when you want to separate concerns for better maintainability. Opt for a simple CRUD approach when your application is straightforward, has low complexity, and you want to prioritize speed and simplicity in development. Always consider the specific context and requirements of your application when making this decision.\\n</Output>\\n<Rubric>\\nGives specific decision criteria with pros/cons, mentions when CQRS adds value vs overhead\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "3aa72049-959f-4eb7-833d-c06e6e6cb190",
-        "latencyMs": 437,
+        "id": "90247204-9a9d-4eed-962f-904eb7c4b486",
+        "latencyMs": 15508,
         "namedScores": {
           "skill_architecture-patterns_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "architecture-patterns",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "e1a653b166c0ca0a0af29b05a7c7cf1c315f9ba5322e116bde265e0f484182c3",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "Excellent question! This is a key architectural decision. Here's a clear decision framework:\n\n## **Use Simple CRUD When:**\n\n### ✅ **Good Scenarios:**\n1. **Simple data models** with basic create/read/update/delete operations\n2. **Low to moderate read/write ratio** (e.g., 80% reads, 20% writes)\n3. **Single data source** with straightforward queries\n4. **No complex business logic** in reads\n5. **Team size is small** and you need to move fast\n6. **No need for real-time analytics** or complex reporting\n7. **Consistency requirements** are simple (eventual consistency is fine)\n\n### 📊 **Example Use Cases:**\n- User profile management\n- Basic content management (blogs, articles)\n- Simple inventory tracking\n- Admin dashboards with basic reporting\n- Internal tools with modest scale\n\n## **Use CQRS When:**\n\n### ✅ **Good Scenarios:**\n1. **High read/write ratio** (e.g., 1000:1 reads to writes)\n2. **Different data models** needed for reads vs writes\n3. **Complex query requirements** that don't match write model\n4. **Performance optimization** needed for reads\n5. **Event sourcing** is being used\n6. **Multiple read models** needed (different views of same data)\n7. **Real-time analytics** or reporting requirements\n8. **Team can handle complexity** (separate teams for read/write sides)\n\n### 📊 **Example Use Cases:**\n- **E-commerce platforms**: \n  - Write: Order processing (complex validation)\n  - Read: Product catalog (denormalized, optimized for search)\n- **Social media feeds**:\n  - Write: Post creation\n  - Read: Timeline generation (complex joins, personalization)\n- **Financial systems**:\n  - Write: Transaction processing (ACID compliance)\n  - Read: Portfolio views, analytics dashboards\n- **Gaming platforms**:\n  - Write: Game state updates\n  - Read: Leaderboards, player stats\n\n## **Decision Matrix**\n\n| Factor | Favor CRUD | Favor CQRS |\n|--------|------------|------------|\n| **Read/Write Ratio** | < 100:1 | > 1000:1 |\n| **Query Complexity** | Simple queries | Complex joins, aggregations |\n| **Performance Needs** | Moderate | High (sub-millisecond reads) |\n| **Data Consistency** | Strong consistency needed | Eventual consistency acceptable |\n| **Team Experience** | Junior/mid-level | Senior/experienced with patterns |\n| **Time to Market** | Fast delivery needed | Can invest in architecture |\n| **Scalability** | Vertical scaling sufficient | Need horizontal scaling |\n\n## **Practical Implementation Advice**\n\n### **Start with CRUD, Evolve to CQRS**\n```python\n# Phase 1: Simple CRUD\nclass UserService:\n    def create_user(self, data): ...\n    def get_user(self, id): ...\n    def update_user(self, id, data): ...\n    \n# Phase 2: Separate concerns but same model\nclass UserCommandService:\n    def create_user(self, data): ...\n    \nclass UserQueryService:\n    def get_user(self, id): ...\n    \n# Phase 3: Full CQRS with separate models\nclass UserWriteModel:\n    # Normalized, transactional\n    def create(self, data): ...\n    \nclass UserReadModel:\n    # Denormalized, optimized for queries\n    def get_user_profile(self, id): ...\n    def search_users(self, criteria): ...\n```\n\n### **When to Consider Hybrid Approach**\n```python\n# 80% of operations use CRUD\nclass UserService:\n    # CRUD for simple operations\n    def update_profile(self, user_id, data): ...\n    \n    # CQRS for specific complex scenarios\n    def generate_monthly_report(self, user_id):\n        # Uses separate read model\n        return ReportReadModel.get_monthly(user_id)\n```\n\n## **Red Flags for CQRS Over-Engineering**\n\n🚨 **Don't use CQRS if:**\n1. You're building a simple CRUD app that won't scale\n2. Your team hasn't worked with eventual consistency before\n3. You can't justify the operational complexity\n4. Your read and write models are identical\n5. You don't have performance issues with reads\n\n## **Migration Path**\n\n```\nSimple CRUD → Separated Services → CQRS Lite → Full CQRS\n     ↓              ↓                ↓            ↓\nMonolithic   Command/Query      Separate DB   Event Sourcing\n             separation         for reads     + Read Models\n```\n\n## **Quick Checklist**\n\n**Ask these questions:**\n1. Are read and write performance requirements different? ✅ CQRS\n2. Do reads need different data shapes than writes? ✅ CQRS  \n3. Is eventual consistency acceptable for reads? ✅ CQRS\n4. Can you handle data synchronization complexity? ✅ CQRS\n5. Do you need real-time analytics? ✅ CQRS\n6. Is this a simple admin interface? ✅ CRUD\n7. Do you need strong consistency? ✅ CRUD\n8. Is this a prototype/MVP? ✅ CRUD\n\n**Bottom line:** Start with the simplest thing that works. Only introduce CQRS when you have measurable problems that it solves. The operational overhead is significant, but the benefits for the right use cases are transformative.",
+          "output": "Choosing between the Command Query Responsibility Segregation (CQRS) pattern and a simple CRUD (Create, Read, Update, Delete) approach depends on several factors related to the complexity, scalability, and specific requirements of your application. Here are some considerations to help you decide:\n\n### When to Use CQRS\n\n1. **Complex Business Logic**: If your application has complex business rules that require different handling for commands (writes) and queries (reads), CQRS can help separate these concerns, making the system easier to manage.\n\n2. **High Read/Write Load**: In scenarios where the read and write operations have significantly different load characteristics, CQRS allows you to optimize each side independently. For example, you can scale the read side to handle more queries without affecting the write side.\n\n3. **Different Data Models**: If your read and write operations require different data models (e.g., a normalized model for writes and a denormalized model for reads), CQRS allows you to maintain separate models tailored to each operation.\n\n4. **Event Sourcing**: If you plan to implement event sourcing (storing the state of an entity as a sequence of events), CQRS is often a natural fit, as it allows you to reconstruct the state of an entity from its events.\n\n5. **Microservices Architecture**: In a microservices environment, CQRS can help manage the complexity of interactions between services, especially when different services are responsible for different aspects of the domain.\n\n6. **Audit and History**: If you need to maintain a detailed audit trail of changes or support complex querying capabilities, CQRS can facilitate this by separating the command and query responsibilities.\n\n### When to Use Simple CRUD\n\n1. **Simplicity**: If your application is relatively simple, with straightforward CRUD operations and minimal business logic, a simple CRUD approach is often sufficient and easier to implement.\n\n2. **Low Complexity**: For applications with low complexity and where the read and write operations are similar, using CRUD can reduce overhead and speed up development.\n\n3. **Rapid Prototyping**: If you are in the early stages of development or prototyping, a CRUD approach allows for faster iteration and testing of ideas without the added complexity of CQRS.\n\n4. **Limited Scale**: If you do not anticipate high traffic or complex interactions, a CRUD approach can be more than adequate for your needs.\n\n5. **Team Experience**: If your team is more familiar with CRUD operations and lacks experience with CQRS, it may be more efficient to start with CRUD and consider refactoring to CQRS later if needed.\n\n### Summary\n\nIn summary, use CQRS when you have complex business requirements, high scalability needs, or when you want to separate concerns for better maintainability. Opt for a simple CRUD approach when your application is straightforward, has low complexity, and you want to prioritize speed and simplicity in development. Always consider the specific context and requirements of your application when making this decision.",
           "tokenUsage": {
-            "total": 2123,
-            "prompt": 979,
-            "completion": 1144,
-            "numRequests": 1
+            "total": 1577,
+            "prompt": 976,
+            "completion": 601,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 437,
+          "latencyMs": 15508,
           "finishReason": "stop",
+          "cost": 0.000507,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e443460f9a43915-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:55:58 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 04:00:13 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "15275",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=N0fEkcfHTVQeN101bw0Na7RwJXPwspuCLu6jGOMoook-1774843197.6005766-1.0.1.1-y6lnZZPU1PVGxyAYQVLNAD2WHlGaR41h..x9W1iziOWJO4.ejuuh6wYOKyKoYNIx6QujzdhnvW5KsTEPFCi6_zdOgYyeiPtDn9e7.NTkR01AngUb76lffeSMyFT8Q8RM; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:30:13 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 e9560116508023b1150b869325390bb6.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "5kfLN_54gN3hqozN8HNQs-ooaSKJGtliCvj6H1Qjli0oGCFOc54KDA==",
-                "x-amz-cf-pop": "IAH50-P5",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "a61000e2e3f4a14523b62feadb5c1fd9"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9538",
+                "x-ratelimit-remaining-tokens": "198923",
+                "x-ratelimit-reset-requests": "1h6m25.795s",
+                "x-ratelimit-reset-tokens": "323ms",
+                "x-request-id": "req_aeed0e25b6e94eeb8910a8b1e53e8dda"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e443460f9a43915-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:55:58 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 04:00:13 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "15275",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=N0fEkcfHTVQeN101bw0Na7RwJXPwspuCLu6jGOMoook-1774843197.6005766-1.0.1.1-y6lnZZPU1PVGxyAYQVLNAD2WHlGaR41h..x9W1iziOWJO4.ejuuh6wYOKyKoYNIx6QujzdhnvW5KsTEPFCi6_zdOgYyeiPtDn9e7.NTkR01AngUb76lffeSMyFT8Q8RM; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:30:13 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 e9560116508023b1150b869325390bb6.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "5kfLN_54gN3hqozN8HNQs-ooaSKJGtliCvj6H1Qjli0oGCFOc54KDA==",
-              "x-amz-cf-pop": "IAH50-P5",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "a61000e2e3f4a14523b62feadb5c1fd9"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9538",
+              "x-ratelimit-remaining-tokens": "198923",
+              "x-ratelimit-reset-requests": "1h6m25.795s",
+              "x-ratelimit-reset-tokens": "323ms",
+              "x-request-id": "req_aeed0e25b6e94eeb8910a8b1e53e8dda"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 979,
-        "completion": 1144,
+        "prompt": 976,
+        "completion": 601,
         "cached": 0,
-        "total": 2123,
+        "total": 1577,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1413,
-          "prompt": 1337,
-          "completion": 76,
+          "total": 849,
+          "prompt": 799,
+          "completion": 50,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 57793,
-      "evaluationDurationMs": 57793
+      "durationMs": 16887,
+      "evaluationDurationMs": 16887
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:56:56.078Z",
-    "evaluationCreatedAt": "2026-03-15T04:55:58.248Z"
+    "exportedAt": "2026-03-30T04:00:14.426Z",
+    "evaluationCreatedAt": "2026-03-30T03:59:57.511Z"
   }
 }

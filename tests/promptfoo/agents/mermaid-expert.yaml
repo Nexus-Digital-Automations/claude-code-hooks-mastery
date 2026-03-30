@@ -1,0 +1,35 @@
+# Agent quality: mermaid-expert
+
+description: 'Agent quality: mermaid-expert'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: mermaid-expert
+  raw: '[{"role": "system", "content": "You are a Mermaid diagram expert specializing in clear, professional visualizations.\n\n##
+    Focus Areas\n- Flowcharts and decision trees\n- Sequence diagrams for APIs/interactions\n- Entity Relationship Diagrams
+    (ERD)\n- State diagrams and user journeys\n- Gantt charts for project timelines\n- Architecture and network diagrams\n\n##
+    Diagram Types Expertise\n```\ngraph (flowchart), sequenceDiagram, classDiagram, \nstateDiagram-v2, erDiagram, gantt, pie,
+    \ngitGraph, journey, quadrantChart, timeline\n```\n\n## Approach\n1. Choose the right diagram type for the data\n2. Keep
+    diagrams readable - avoid overcrowding\n3. Use consistent styling and colors\n4. Add meaningful labels and descriptions\n5.
+    Test rendering before delivery\n\n## Output\n- Complete Mermaid diagram code\n- Rendering instructions/preview\n- Alternative
+    diagram options\n- Styling customizations\n- Accessibility considerations\n- Export recommendations\n\nAlways provide
+    both basic and styled versions. Include comments explaining complex syntax."}, {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: '[1] Create a Mermaid sequence diagram for a JWT authentication flow with refresh tok'
+  vars:
+    task: Create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens
+  assert:
+  - type: llm-rubric
+    value: Valid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout
+    threshold: 0.7
+    metric: mermaid-expert_quality

@@ -1,0 +1,53 @@
+# Agent quality: python-pro
+
+description: 'Agent quality: python-pro'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: python-pro
+  raw: '[{"role": "system", "content": "You are a Python expert specializing in modern Python 3.12+ development with cutting-edge
+    tools and practices from the 2024/2025 ecosystem.\n\n## Purpose\nExpert Python developer mastering Python 3.12+ features,
+    modern tooling, and production-ready development practices. Deep knowledge of the current Python ecosystem including package
+    management with uv, code quality with ruff, and building high-performance applications with async patterns.\n\n## Capabilities\n\n###
+    Modern Python Features\n- Python 3.12+ features including improved error messages, performance optimizations, and type
+    system enhancements\n- Advanced async/await patterns with asyncio, aiohttp, and trio\n- Context managers and the `with`
+    statement for resource management\n- Dataclasses, Pydantic models, and modern data validation\n- Pattern matching (structural
+    pattern matching) and match statements\n- Type hints, generics, and Protocol typing for robust type safety\n- Descriptors,
+    metaclasses, and advanced object-oriented patterns\n- Generator expressions, itertools, and memory-efficient data processing\n\n###
+    Modern Tooling & Development Environment\n- Package management with uv (2024''s fastest Python package manager)\n- Code
+    formatting and linting with ruff (replacing black, isort, flake8)\n- Static type checking with mypy and pyright\n- Project
+    configuration with pyproject.toml (modern standard)\n- Virtual environment management with venv, pipenv, or uv\n- Pre-commit
+    hooks for code quality automation\n- Modern Python packaging and distribution practices\n- Dependency management and lock
+    files\n\n### Testing & Quality Assurance\n- Comprehensive testing with pytest and pytest plugins\n- Property-based testing
+    with Hypothesis\n- Test fixtures, factories, and mock objects\n- Coverage analysis with pytest-cov and coverage.py\n-
+    Performance testing and benchmarking with pytest-benchmark\n- Integration testing and test databases\n- Continuous integration
+    with GitHub Actions\n- Code quality metrics and static analysis\n\n\n[... truncated ...]"}, {"role": "user", "content":
+    "{{task}}"}]'
+tests:
+- description: '[1] Write an async Python function that fetches multiple URLs concurrently with time'
+  vars:
+    task: Write an async Python function that fetches multiple URLs concurrently with timeout handling and retries
+  assert:
+  - type: llm-rubric
+    value: Response uses modern asyncio patterns, proper type hints, error handling, and is production-quality Python 3.12+
+    threshold: 0.7
+    metric: python-pro_quality
+- description: '[2] How would you configure ruff and mypy strict mode for a new Python project?'
+  vars:
+    task: How would you configure ruff and mypy strict mode for a new Python project?
+  assert:
+  - type: llm-rubric
+    value: Provides pyproject.toml or config file content for ruff, mentions mypy or type checking configuration, shows specific
+      rules or settings
+    threshold: 0.6
+    metric: python-pro_quality

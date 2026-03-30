@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-kGU-2026-03-15T04:56:58",
+  "evalId": "eval-I8n-2026-03-30T04:00:16",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:56:58.229Z",
+    "timestamp": "2026-03-30T04:00:16.165Z",
     "prompts": [
       {
         "id": "95fb5c1116f5965abb5fc4df055e558f768c6b7a52efc17606f22170822f66b6",
         "raw": "[{\"role\": \"system\", \"content\": \"# Code Review Excellence\\n\\nTransform code reviews from gatekeeping to knowledge sharing through constructive feedback, systematic analysis, and collaborative improvement.\\n\\n## When to Use This Skill\\n\\n- Reviewing pull requests and code changes\\n- Establishing code review standards for teams\\n- Mentoring junior developers through reviews\\n- Conducting architecture reviews\\n- Creating review checklists and guidelines\\n- Improving team collaboration\\n- Reducing code review cycle time\\n- Maintaining code quality standards\\n\\n## Core Principles\\n\\n### 1. The Review Mindset\\n\\n**Goals of Code Review:**\\n- Catch bugs and edge cases\\n- Ensure code maintainability\\n- Share knowledge across team\\n- Enforce coding standards\\n- Improve design and architecture\\n- Build team culture\\n\\n**Not the Goals:**\\n- Show off knowledge\\n- Nitpick formatting (use linters)\\n- Block progress unnecessarily\\n- Rewrite to your preference\\n\\n### 2. Effective Feedback\\n\\n**Good Feedback is:**\\n- Specific and actionable\\n- Educational, not judgmental\\n- Focused on the code, not the person\\n- Balanced (praise good work too)\\n- Prioritized (critical vs nice-to-have)\\n\\n```markdown\\n❌ Bad: \\\"This is wrong.\\\"\\n✅ Good: \\\"This could cause a race condition when multiple users\\n         access simultaneously. Consider using a mutex here.\\\"\\n\\n❌ Bad: \\\"Why didn't you use X pattern?\\\"\\n✅ Good: \\\"Have you considered the Repository pattern? It would\\n         make this easier to test. Here's an example: [link]\\\"\\n\\n❌ Bad: \\\"Rename this variable.\\\"\\n✅ Good: \\\"[nit] Consider `userCount` instead of `uc` for\\n         clarity. Not blocking if you prefer to keep it.\\\"\\n```\\n\\n### 3. Review Scope\\n\\n**What to Review:**\\n- Logic correctness and edge cases\\n- Security vulnerabilities\\n- Performance implications\\n- Test coverage and quality\\n- Error handling\\n- Documentation and comments\\n- API design and naming\\n- Architectural fit\\n\\n**What Not to Review Manually:**\\n- Code formatting (use Prettier, Black, etc.)\\n- Import organization\\n- Linting violations\\n- Simple typos\\n\\n## Review Process\\n\\n### Phase 1: Context Gathering (2-3 minutes)\\n\\n```markdown\\nBefore diving into code, understand:\\n\\n1. Read PR description and linked issue\\n2. Check PR size (>400 lines? Ask to split)\\n3. Review CI/CD status (tests passing?)\\n4. Understand the business requirement\\n5. Note any relevant architectural decisions\\n```\\n\\n### Phase 2: High-Level Review (5-10 minutes)\\n\\n```markdown\\n1. **Architecture & Design**\\n   - Does the solution fit the problem?\\n   - Are there simpler approaches?\\n   - Is it consistent with existing patterns?\\n   - Will it scale?\\n\\n2. **File Organization**\\n   - Are new files in the right places?\\n   - Is code grouped logically?\\n   - Are there duplicate files?\\n\\n3. **Testing Strategy**\\n   - Are there tests?\\n   - Do tests cover edge cases?\\n   - Are tests readable?\\n```\\n\\n### Phase 3: Line-by-Line Review (10-20 minutes)\\n\\n```markdown\\nFor each file:\\n\\n1. **Logic & Correctness**\\n   - Edge cases handled?\\n   - Off-by-one errors?\\n   - Null/undefined checks?\\n   - Race conditions?\\n\\n2. **Security**\\n   - Input validation?\\n   - SQL injection risks?\\n   - XSS vulnerabilities?\\n   - Sensitive data exposure?\\n\\n3. **Performance**\\n   - N+1 queries?\\n   - Unnecessary loops?\\n   - Memory leaks?\\n   - Blocking operations?\\n\\n4. **Maintainability**\\n   - Clear variable names?\\n   - Functions doing one thing?\\n   - Complex code commented?\\n   - Magic numbers extracted?\\n```\\n\\n### Phase 4: Summary & Decision (2-3 minutes)\\n\\n```markdown\\n1. Summarize key concerns\\n2. Highlight what you liked\\n3. Make clear decision:\\n   - ✅ Approve\\n   - 💬 Comment (minor suggestions)\\n   - 🔄 Request Changes (must address)\\n4. Offer to pair if complex\\n```\\n\\n## Review Techniques\\n\\n### Technique 1: The Checklist Method\\n\\n```markdown\\n## Security Checklist\\n- [ ] User input validated and sanitized\\n- [ ] SQL queries use parameterization\\n- [ ] Authentication/authorization checked\\n- [ ] Secrets not hardcoded\\n- [ ] Error messages don't leak info\\n\\n## Performance Checklist\\n- [ ] No N+1 queries\\n- [ ] Database queries indexed\\n- [ ] Large lists paginated\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "code-review-excellence",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 463,
+          "totalLatencyMs": 21004,
           "tokenUsage": {
-            "prompt": 973,
-            "completion": 1500,
+            "prompt": 969,
+            "completion": 651,
             "cached": 0,
-            "total": 2473,
+            "total": 1620,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1790,
-              "prompt": 1695,
-              "completion": 95,
+              "total": 902,
+              "prompt": 852,
+              "completion": 50,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "skill_code-review-excellence_quality": 1
           },
-          "cost": 0
+          "cost": 0.00053595
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00053595,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "skill_code-review-excellence_quality": 1
           },
           "tokensUsed": {
-            "total": 1790,
-            "prompt": 1695,
-            "completion": 95,
+            "total": 902,
+            "prompt": 852,
+            "completion": 50,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The checklist includes specific items for security (authentication, input validation, data protection), error handling (meaningful error messages, structured error responses, validation errors), tests (unit tests, integration tests, test cases), documentation (OpenAPI specs, endpoint documentation, code comments), and performance (database queries, response size, caching headers), covering all five mentioned categories.",
+              "reason": "The output includes specific checklist items for security, error handling, tests, documentation, and performance, covering more than three of the specified categories.",
               "tokensUsed": {
-                "total": 1790,
-                "prompt": 1695,
-                "completion": 95,
+                "total": 902,
+                "prompt": 852,
+                "completion": 50,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n# REST API Endpoint Code Review Checklist\\n\\n## 📋 Quick Reference\\n**Review Time:** 15-25 minutes  \\n**PR Size Limit:** <300 lines for endpoint changes  \\n**Priority Order:** Security → Correctness → Design → Polish\\n\\n---\\n\\n## 🔐 **SECURITY (CRITICAL)**\\n\\n### Authentication & Authorization\\n- [ ] **Authentication required** for endpoint (unless explicitly public)\\n- [ ] **Authorization checks** match user permissions to operation\\n- [ ] **Role-based access control** implemented correctly\\n- [ ] **Resource ownership** verified (users can't access others' data)\\n- [ ] **Admin-only endpoints** clearly marked and protected\\n\\n### Input Validation\\n- [ ] **Request validation** using framework tools (Joi, class-validator, etc.)\\n- [ ] **Type checking** for all parameters (query, body, params)\\n- [ ] **Business rule validation** (e.g., \\\"end date > start date\\\")\\n- [ ] **Input sanitization** for strings (XSS prevention)\\n- [ ] **File uploads** validated (type, size, malware scan if applicable)\\n\\n### Data Protection\\n- [ ] **Sensitive data** not exposed in responses (SSN, passwords, tokens)\\n- [ ] **PII handling** complies with regulations (GDPR, CCPA)\\n- [ ] **Rate limiting** implemented for public endpoints\\n- [ ] **SQL injection** prevented (parameterized queries/ORM)\\n- [ ] **No secrets** in logs or error messages\\n\\n---\\n\\n## ✅ **CORRECTNESS & RELIABILITY**\\n\\n### Business Logic\\n- [ ] **Edge cases** handled (empty lists, null values, duplicates)\\n- [ ] **Error scenarios** covered (network failures, DB errors)\\n- [ ] **Idempotency** considered for POST/PUT operations\\n- [ ] **Race conditions** prevented (optimistic locking, transactions)\\n- [ ] **Data consistency** maintained (ACID properties)\\n\\n### HTTP Standards\\n- [ ] **Correct HTTP method** used (GET/POST/PUT/DELETE/PATCH)\\n- [ ] **Appropriate status codes** returned:\\n  - 200/201 for success\\n  - 400 for client errors\\n  - 401/403 for auth issues\\n  - 404 for not found\\n  - 500 for server errors (with logging)\\n- [ ] **Response format** consistent with API conventions\\n- [ ] **Pagination** implemented for list endpoints (>50 items)\\n\\n### Error Handling\\n- [ ] **Meaningful error messages** (user-friendly but not info-leaking)\\n- [ ] **Structured error responses** (consistent format)\\n- [ ] **Validation errors** return field-specific messages\\n- [ ] **Unhandled exceptions** caught and logged\\n- [ ] **Circuit breakers** for external service calls\\n\\n---\\n\\n## 🏗️ **DESIGN & ARCHITECTURE**\\n\\n### API Design\\n- [ ] **RESTful conventions** followed:\\n  - Resource naming (plural nouns: `/users` not `/getUsers`)\\n  - Nested resources (`/users/{id}/posts`)\\n  - Query parameters for filtering/sorting\\n- [ ] **Endpoint purpose** is clear and single-responsibility\\n- [ ] **Versioning** considered if breaking changes\\n- [ ] **Backward compatibility** maintained if needed\\n\\n### Code Structure\\n- [ ] **Separation of concerns**:\\n  - Controller (HTTP layer)\\n  - Service (business logic)\\n  - Repository (data access)\\n- [ ] **Dependency injection** used (not hardcoded dependencies)\\n- [ ] **No business logic** in controllers\\n- [ ] **DTOs/View Models** used for request/response\\n- [ ] **Mapping logic** not duplicated\\n\\n### Database/Data Layer\\n- [ ] **Efficient queries** (N+1 problems avoided)\\n- [ ] **Indexes** considered for new query patterns\\n- [ ] **Transactions** used for multi-step operations\\n- [ ] **Caching strategy** considered for frequently accessed data\\n- [ ] **Data migrations** included if schema changes\\n\\n---\\n\\n## 🧪 **TESTING**\\n\\n### Test Coverage\\n- [ ] **Unit tests** for service layer logic\\n- [ ] **Integration tests** for HTTP layer\\n- [ ] **Test cases** include:\\n  - Happy path\\n  - Validation failures\\n  - Authentication/authorization failures\\n  - Edge cases\\n- [ ] **Mock external services** appropriately\\n\\n### Test Quality\\n- [ ] **Tests are readable** and well-named\\n- [ ] **No test interdependencies** (tests run independently)\\n- [ ] **Test data** is isolated (not sharing DB state)\\n- [ ] **Assertions** check both success and failure states\\n- [ ] **Performance tests** for high-traffic endpoints\\n\\n---\\n\\n## 📚 **DOCUMENTATION**\\n\\n### API Documentation\\n- [ ] **OpenAPI/Swagger** specs updated\\n- [ ] **Endpoint documented** with:\\n  - Description\\n  - Parameters (required/optional, types, examples)\\n  - Request body schema\\n  - Response examples (success/error)\\n  - Authentication requirements\\n- [ ] **Example requests** provided (cURL, Postman)\\n- [ ] **Changelog** updated if public API\\n\\n### Code Documentation\\n- [ ] **Complex logic** commented\\n- [ ] **Public methods** documented (JSDoc/TSDoc)\\n- [ ] **TODOs/FIXMEs** documented with tickets\\n- [ ] **Architecture decisions** recorded if non-obvious\\n\\n---\\n\\n## ⚡ **PERFORMANCE**\\n\\n### Response Time\\n- [ ] **Database queries** optimized (EXPLAIN plan checked)\\n- [ ] **N+1 query problems** avoided\\n- [ ] **Response size** reasonable (pagination, field selection)\\n- [ ] **Heavy operations** async or background jobs\\n- [ ] **Caching headers** set appropriately\\n\\n### Scalability\\n- [ ] **Stateless design** (no server-side session storage)\\n- [ ] **Database locks** minimized\\n- [ ] **Bottlenecks** identified and addressed\\n- [ ] **Monitoring metrics** added (response time, error rate)\\n\\n---\\n\\n## 🔄 **MAINTAINABILITY**\\n\\n### Code Quality\\n- [ ] **Consistent naming** with existing codebase\\n- [ ] **No code duplication** (DRY principle)\\n- [ ] **Functions/methods** small and single-purpose\\n- [ ] **Configuration** externalized (not hardcoded)\\n- [ ] **Environment-specific** code avoided\\n\\n### Observability\\n- [ ] **Logging** at appropriate levels (INFO, ERROR, DEBUG)\\n- [ ] **Structured logging** (JSON format, correlation IDs)\\n- [ ] **Metrics exposed** for monitoring\\n- [ ] **Health checks** updated if new dependencies\\n\\n---\\n\\n## 🚀 **DEPLOYMENT & OPERATIONS**\\n\\n### Deployment Safety\\n- [ ] **Database migrations** are backward compatible\\n- [ ] **Feature flags** used for gradual rollout\\n- [ ] **Breaking changes** communicated to consumers\\n- [ ] **Rollback plan** considered\\n\\n### Monitoring\\n- [ ]\\n</Output>\\n<Rubric>\\nProvides specific checklist items covering at least 3 of: security, error handling, tests, documentation, performance\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nWhen reviewing a pull request (PR) that adds a new REST API endpoint, it's essential to ensure that the implementation adheres to best practices for security, performance, maintainability, and overall design. Below is a checklist tailored for reviewing a new REST API endpoint:\\n\\n### REST API Endpoint Review Checklist\\n\\n#### 1. **Functionality**\\n- [ ] Does the endpoint fulfill the specified requirements?\\n- [ ] Are the HTTP methods (GET, POST, PUT, DELETE, etc.) used appropriately?\\n- [ ] Is the endpoint URL structured according to RESTful conventions?\\n- [ ] Are the expected request and response formats (JSON, XML, etc.) clearly defined?\\n\\n#### 2. **Input Validation**\\n- [ ] Are all input parameters validated (e.g., required fields, data types)?\\n- [ ] Are there checks for SQL injection, XSS, and other common vulnerabilities?\\n- [ ] Are error messages generic enough to avoid leaking sensitive information?\\n\\n#### 3. **Authentication and Authorization**\\n- [ ] Is the endpoint secured with appropriate authentication (e.g., OAuth, JWT)?\\n- [ ] Are authorization checks in place to ensure users have permission to access the resource?\\n\\n#### 4. **Error Handling**\\n- [ ] Are errors handled gracefully, returning appropriate HTTP status codes (e.g., 400, 404, 500)?\\n- [ ] Is there a consistent error response format for clients to understand issues?\\n\\n#### 5. **Performance**\\n- [ ] Are there any potential performance bottlenecks (e.g., N+1 queries)?\\n- [ ] Is pagination implemented for endpoints returning large datasets?\\n- [ ] Are caching strategies considered where applicable?\\n\\n#### 6. **Testing**\\n- [ ] Are unit tests provided for the new endpoint?\\n- [ ] Do tests cover edge cases and error scenarios?\\n- [ ] Is there integration testing to ensure the endpoint works with other components?\\n\\n#### 7. **Documentation**\\n- [ ] Is the endpoint documented in the API documentation (e.g., Swagger/OpenAPI)?\\n- [ ] Are examples of requests and responses included in the documentation?\\n- [ ] Is there a clear description of the endpoint's purpose and usage?\\n\\n#### 8. **Code Quality**\\n- [ ] Is the code clean, readable, and well-organized?\\n- [ ] Are functions and methods appropriately named to reflect their purpose?\\n- [ ] Are there comments explaining complex logic or decisions?\\n- [ ] Is there adherence to coding standards and style guides?\\n\\n#### 9. **Versioning**\\n- [ ] Is there a versioning strategy in place for the API (e.g., /v1/resource)?\\n- [ ] Are backward compatibility considerations addressed?\\n\\n#### 10. **Security**\\n- [ ] Are sensitive data and secrets (e.g., API keys) not hardcoded?\\n- [ ] Is HTTPS enforced for secure communication?\\n- [ ] Are rate limiting and throttling mechanisms in place to prevent abuse?\\n\\n### Summary\\nAfter going through the checklist, summarize your findings, highlight any critical issues, and provide constructive feedback. Make sure to acknowledge any good practices observed in the implementation as well. This approach not only helps maintain code quality but also fosters a culture of learning and improvement within the team.\\n</Output>\\n<Rubric>\\nProvides specific checklist items covering at least 3 of: security, error handling, tests, documentation, performance\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "c9b857ec-a711-429c-b00a-796b20afb9ab",
-        "latencyMs": 463,
+        "id": "bcb006f3-c264-41f0-a570-673515d58a7f",
+        "latencyMs": 21004,
         "namedScores": {
           "skill_code-review-excellence_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "code-review-excellence",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "95fb5c1116f5965abb5fc4df055e558f768c6b7a52efc17606f22170822f66b6",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "# REST API Endpoint Code Review Checklist\n\n## 📋 Quick Reference\n**Review Time:** 15-25 minutes  \n**PR Size Limit:** <300 lines for endpoint changes  \n**Priority Order:** Security → Correctness → Design → Polish\n\n---\n\n## 🔐 **SECURITY (CRITICAL)**\n\n### Authentication & Authorization\n- [ ] **Authentication required** for endpoint (unless explicitly public)\n- [ ] **Authorization checks** match user permissions to operation\n- [ ] **Role-based access control** implemented correctly\n- [ ] **Resource ownership** verified (users can't access others' data)\n- [ ] **Admin-only endpoints** clearly marked and protected\n\n### Input Validation\n- [ ] **Request validation** using framework tools (Joi, class-validator, etc.)\n- [ ] **Type checking** for all parameters (query, body, params)\n- [ ] **Business rule validation** (e.g., \"end date > start date\")\n- [ ] **Input sanitization** for strings (XSS prevention)\n- [ ] **File uploads** validated (type, size, malware scan if applicable)\n\n### Data Protection\n- [ ] **Sensitive data** not exposed in responses (SSN, passwords, tokens)\n- [ ] **PII handling** complies with regulations (GDPR, CCPA)\n- [ ] **Rate limiting** implemented for public endpoints\n- [ ] **SQL injection** prevented (parameterized queries/ORM)\n- [ ] **No secrets** in logs or error messages\n\n---\n\n## ✅ **CORRECTNESS & RELIABILITY**\n\n### Business Logic\n- [ ] **Edge cases** handled (empty lists, null values, duplicates)\n- [ ] **Error scenarios** covered (network failures, DB errors)\n- [ ] **Idempotency** considered for POST/PUT operations\n- [ ] **Race conditions** prevented (optimistic locking, transactions)\n- [ ] **Data consistency** maintained (ACID properties)\n\n### HTTP Standards\n- [ ] **Correct HTTP method** used (GET/POST/PUT/DELETE/PATCH)\n- [ ] **Appropriate status codes** returned:\n  - 200/201 for success\n  - 400 for client errors\n  - 401/403 for auth issues\n  - 404 for not found\n  - 500 for server errors (with logging)\n- [ ] **Response format** consistent with API conventions\n- [ ] **Pagination** implemented for list endpoints (>50 items)\n\n### Error Handling\n- [ ] **Meaningful error messages** (user-friendly but not info-leaking)\n- [ ] **Structured error responses** (consistent format)\n- [ ] **Validation errors** return field-specific messages\n- [ ] **Unhandled exceptions** caught and logged\n- [ ] **Circuit breakers** for external service calls\n\n---\n\n## 🏗️ **DESIGN & ARCHITECTURE**\n\n### API Design\n- [ ] **RESTful conventions** followed:\n  - Resource naming (plural nouns: `/users` not `/getUsers`)\n  - Nested resources (`/users/{id}/posts`)\n  - Query parameters for filtering/sorting\n- [ ] **Endpoint purpose** is clear and single-responsibility\n- [ ] **Versioning** considered if breaking changes\n- [ ] **Backward compatibility** maintained if needed\n\n### Code Structure\n- [ ] **Separation of concerns**:\n  - Controller (HTTP layer)\n  - Service (business logic)\n  - Repository (data access)\n- [ ] **Dependency injection** used (not hardcoded dependencies)\n- [ ] **No business logic** in controllers\n- [ ] **DTOs/View Models** used for request/response\n- [ ] **Mapping logic** not duplicated\n\n### Database/Data Layer\n- [ ] **Efficient queries** (N+1 problems avoided)\n- [ ] **Indexes** considered for new query patterns\n- [ ] **Transactions** used for multi-step operations\n- [ ] **Caching strategy** considered for frequently accessed data\n- [ ] **Data migrations** included if schema changes\n\n---\n\n## 🧪 **TESTING**\n\n### Test Coverage\n- [ ] **Unit tests** for service layer logic\n- [ ] **Integration tests** for HTTP layer\n- [ ] **Test cases** include:\n  - Happy path\n  - Validation failures\n  - Authentication/authorization failures\n  - Edge cases\n- [ ] **Mock external services** appropriately\n\n### Test Quality\n- [ ] **Tests are readable** and well-named\n- [ ] **No test interdependencies** (tests run independently)\n- [ ] **Test data** is isolated (not sharing DB state)\n- [ ] **Assertions** check both success and failure states\n- [ ] **Performance tests** for high-traffic endpoints\n\n---\n\n## 📚 **DOCUMENTATION**\n\n### API Documentation\n- [ ] **OpenAPI/Swagger** specs updated\n- [ ] **Endpoint documented** with:\n  - Description\n  - Parameters (required/optional, types, examples)\n  - Request body schema\n  - Response examples (success/error)\n  - Authentication requirements\n- [ ] **Example requests** provided (cURL, Postman)\n- [ ] **Changelog** updated if public API\n\n### Code Documentation\n- [ ] **Complex logic** commented\n- [ ] **Public methods** documented (JSDoc/TSDoc)\n- [ ] **TODOs/FIXMEs** documented with tickets\n- [ ] **Architecture decisions** recorded if non-obvious\n\n---\n\n## ⚡ **PERFORMANCE**\n\n### Response Time\n- [ ] **Database queries** optimized (EXPLAIN plan checked)\n- [ ] **N+1 query problems** avoided\n- [ ] **Response size** reasonable (pagination, field selection)\n- [ ] **Heavy operations** async or background jobs\n- [ ] **Caching headers** set appropriately\n\n### Scalability\n- [ ] **Stateless design** (no server-side session storage)\n- [ ] **Database locks** minimized\n- [ ] **Bottlenecks** identified and addressed\n- [ ] **Monitoring metrics** added (response time, error rate)\n\n---\n\n## 🔄 **MAINTAINABILITY**\n\n### Code Quality\n- [ ] **Consistent naming** with existing codebase\n- [ ] **No code duplication** (DRY principle)\n- [ ] **Functions/methods** small and single-purpose\n- [ ] **Configuration** externalized (not hardcoded)\n- [ ] **Environment-specific** code avoided\n\n### Observability\n- [ ] **Logging** at appropriate levels (INFO, ERROR, DEBUG)\n- [ ] **Structured logging** (JSON format, correlation IDs)\n- [ ] **Metrics exposed** for monitoring\n- [ ] **Health checks** updated if new dependencies\n\n---\n\n## 🚀 **DEPLOYMENT & OPERATIONS**\n\n### Deployment Safety\n- [ ] **Database migrations** are backward compatible\n- [ ] **Feature flags** used for gradual rollout\n- [ ] **Breaking changes** communicated to consumers\n- [ ] **Rollback plan** considered\n\n### Monitoring\n- [ ]",
+          "output": "When reviewing a pull request (PR) that adds a new REST API endpoint, it's essential to ensure that the implementation adheres to best practices for security, performance, maintainability, and overall design. Below is a checklist tailored for reviewing a new REST API endpoint:\n\n### REST API Endpoint Review Checklist\n\n#### 1. **Functionality**\n- [ ] Does the endpoint fulfill the specified requirements?\n- [ ] Are the HTTP methods (GET, POST, PUT, DELETE, etc.) used appropriately?\n- [ ] Is the endpoint URL structured according to RESTful conventions?\n- [ ] Are the expected request and response formats (JSON, XML, etc.) clearly defined?\n\n#### 2. **Input Validation**\n- [ ] Are all input parameters validated (e.g., required fields, data types)?\n- [ ] Are there checks for SQL injection, XSS, and other common vulnerabilities?\n- [ ] Are error messages generic enough to avoid leaking sensitive information?\n\n#### 3. **Authentication and Authorization**\n- [ ] Is the endpoint secured with appropriate authentication (e.g., OAuth, JWT)?\n- [ ] Are authorization checks in place to ensure users have permission to access the resource?\n\n#### 4. **Error Handling**\n- [ ] Are errors handled gracefully, returning appropriate HTTP status codes (e.g., 400, 404, 500)?\n- [ ] Is there a consistent error response format for clients to understand issues?\n\n#### 5. **Performance**\n- [ ] Are there any potential performance bottlenecks (e.g., N+1 queries)?\n- [ ] Is pagination implemented for endpoints returning large datasets?\n- [ ] Are caching strategies considered where applicable?\n\n#### 6. **Testing**\n- [ ] Are unit tests provided for the new endpoint?\n- [ ] Do tests cover edge cases and error scenarios?\n- [ ] Is there integration testing to ensure the endpoint works with other components?\n\n#### 7. **Documentation**\n- [ ] Is the endpoint documented in the API documentation (e.g., Swagger/OpenAPI)?\n- [ ] Are examples of requests and responses included in the documentation?\n- [ ] Is there a clear description of the endpoint's purpose and usage?\n\n#### 8. **Code Quality**\n- [ ] Is the code clean, readable, and well-organized?\n- [ ] Are functions and methods appropriately named to reflect their purpose?\n- [ ] Are there comments explaining complex logic or decisions?\n- [ ] Is there adherence to coding standards and style guides?\n\n#### 9. **Versioning**\n- [ ] Is there a versioning strategy in place for the API (e.g., /v1/resource)?\n- [ ] Are backward compatibility considerations addressed?\n\n#### 10. **Security**\n- [ ] Are sensitive data and secrets (e.g., API keys) not hardcoded?\n- [ ] Is HTTPS enforced for secure communication?\n- [ ] Are rate limiting and throttling mechanisms in place to prevent abuse?\n\n### Summary\nAfter going through the checklist, summarize your findings, highlight any critical issues, and provide constructive feedback. Make sure to acknowledge any good practices observed in the implementation as well. This approach not only helps maintain code quality but also fosters a culture of learning and improvement within the team.",
           "tokenUsage": {
-            "total": 2473,
-            "prompt": 973,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1620,
+            "prompt": 969,
+            "completion": 651,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 463,
-          "finishReason": "length",
+          "latencyMs": 21004,
+          "finishReason": "stop",
+          "cost": 0.00053595,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4434d56b3dfe0e-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:56:58 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 04:00:37 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "20790",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=qWos5w38BSI8iu7DJ0miJZKNBsbWr4LifcNQkFESvUU-1774843216.2259865-1.0.1.1-j.OfLhvQvczDYB29s9.m_YVI9psUTxt1nPUp.XkiPDFoGEZcmD8kUESyDSxKZnDPfn2tXUvh5MJaUDdtRPtAgDSb7RjLdi6VyVjxb2PwoKa.72qC5ux3beINxffWWniy; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:30:37 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 c394b304f0944b3e9f46b58b7e0d2e66.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "bi2yydAC_i1Hduh0anJWHnXpotiFW4BtbdAgbLYalMGbkwWJq9ACyA==",
-                "x-amz-cf-pop": "IAH50-P5",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "6e6918247685d1053ac017b5fce34124"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9538",
+                "x-ratelimit-remaining-tokens": "198968",
+                "x-ratelimit-reset-requests": "1h6m24.624s",
+                "x-ratelimit-reset-tokens": "309ms",
+                "x-request-id": "req_71d8b052b1d54c9193cec4af2e830d88"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4434d56b3dfe0e-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:56:58 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 04:00:37 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "20790",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=qWos5w38BSI8iu7DJ0miJZKNBsbWr4LifcNQkFESvUU-1774843216.2259865-1.0.1.1-j.OfLhvQvczDYB29s9.m_YVI9psUTxt1nPUp.XkiPDFoGEZcmD8kUESyDSxKZnDPfn2tXUvh5MJaUDdtRPtAgDSb7RjLdi6VyVjxb2PwoKa.72qC5ux3beINxffWWniy; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:30:37 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 c394b304f0944b3e9f46b58b7e0d2e66.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "bi2yydAC_i1Hduh0anJWHnXpotiFW4BtbdAgbLYalMGbkwWJq9ACyA==",
-              "x-amz-cf-pop": "IAH50-P5",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "6e6918247685d1053ac017b5fce34124"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9538",
+              "x-ratelimit-remaining-tokens": "198968",
+              "x-ratelimit-reset-requests": "1h6m24.624s",
+              "x-ratelimit-reset-tokens": "309ms",
+              "x-request-id": "req_71d8b052b1d54c9193cec4af2e830d88"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 973,
-        "completion": 1500,
+        "prompt": 969,
+        "completion": 651,
         "cached": 0,
-        "total": 2473,
+        "total": 1620,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1790,
-          "prompt": 1695,
-          "completion": 95,
+          "total": 902,
+          "prompt": 852,
+          "completion": 50,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 72054,
-      "evaluationDurationMs": 72054
+      "durationMs": 22682,
+      "evaluationDurationMs": 22682
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:58:10.326Z",
-    "evaluationCreatedAt": "2026-03-15T04:56:58.229Z"
+    "exportedAt": "2026-03-30T04:00:38.900Z",
+    "evaluationCreatedAt": "2026-03-30T04:00:16.165Z"
   }
 }

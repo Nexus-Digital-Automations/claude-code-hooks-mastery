@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-QNq-2026-03-15T04:39:03",
+  "evalId": "eval-m5t-2026-03-30T03:55:09",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:39:03.495Z",
+    "timestamp": "2026-03-30T03:55:09.324Z",
     "prompts": [
       {
         "id": "844ccd54b8c2007d7559da17a65467044d777295b58d5679c177a3f283f9b454",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a Mermaid diagram expert specializing in clear, professional visualizations.\\n\\n## Focus Areas\\n- Flowcharts and decision trees\\n- Sequence diagrams for APIs/interactions\\n- Entity Relationship Diagrams (ERD)\\n- State diagrams and user journeys\\n- Gantt charts for project timelines\\n- Architecture and network diagrams\\n\\n## Diagram Types Expertise\\n```\\ngraph (flowchart), sequenceDiagram, classDiagram, \\nstateDiagram-v2, erDiagram, gantt, pie, \\ngitGraph, journey, quadrantChart, timeline\\n```\\n\\n## Approach\\n1. Choose the right diagram type for the data\\n2. Keep diagrams readable - avoid overcrowding\\n3. Use consistent styling and colors\\n4. Add meaningful labels and descriptions\\n5. Test rendering before delivery\\n\\n## Output\\n- Complete Mermaid diagram code\\n- Rendering instructions/preview\\n- Alternative diagram options\\n- Styling customizations\\n- Accessibility considerations\\n- Export recommendations\\n\\nAlways provide both basic and styled versions. Include comments explaining complex syntax.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "mermaid-expert",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 629,
+          "totalLatencyMs": 12220,
           "tokenUsage": {
-            "prompt": 225,
-            "completion": 1500,
+            "prompt": 226,
+            "completion": 603,
             "cached": 0,
-            "total": 1725,
+            "total": 829,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1764,
-              "prompt": 1696,
-              "completion": 68,
+              "total": 856,
+              "prompt": 803,
+              "completion": 53,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "mermaid-expert_quality": 1
           },
-          "cost": 0
+          "cost": 0.00039569999999999997
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00039569999999999997,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "mermaid-expert_quality": 1
           },
           "tokensUsed": {
-            "total": 1764,
-            "prompt": 1696,
-            "completion": 68,
+            "total": 856,
+            "prompt": 803,
+            "completion": 53,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output contains multiple Mermaid diagrams with valid syntax that collectively cover login, token issuance, API request with bearer token, refresh flow, and logout. The sequence diagrams explicitly show these steps, and the alternative diagrams reinforce the coverage.",
+              "reason": "The output contains valid Mermaid syntax and covers the entire JWT authentication flow including login, token issuance, API requests with bearer tokens, refresh flow, and mentions logout indirectly through token expiration.",
               "tokensUsed": {
-                "total": 1764,
-                "prompt": 1696,
-                "completion": 68,
+                "total": 856,
+                "prompt": 803,
+                "completion": 53,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive Mermaid sequence diagram for a JWT authentication flow with refresh tokens, including both basic and styled versions.\\n\\n## JWT Authentication Flow with Refresh Tokens\\n\\n### Basic Version (Clean and Simple)\\n\\n```mermaid\\nsequenceDiagram\\n    participant U as User/Client\\n    participant A as Auth Server\\n    participant R as Resource Server/API\\n    participant DB as Database\\n\\n    Note over U,A: Initial Authentication\\n    U->>A: POST /login (credentials)\\n    A->>DB: Validate credentials\\n    DB-->>A: User data\\n    A->>A: Generate Access Token (short-lived)\\n    A->>A: Generate Refresh Token (long-lived)\\n    A->>DB: Store refresh token hash\\n    A-->>U: Return {access_token, refresh_token, expires_in}\\n    \\n    Note over U,R: Access Protected Resource\\n    U->>R: GET /protected (with access_token)\\n    R->>R: Validate access_token signature & expiry\\n    R-->>U: Return protected data\\n    \\n    Note over U,R: Access Token Expired\\n    U->>R: GET /protected (with expired access_token)\\n    R-->>U: 401 Unauthorized (token expired)\\n    \\n    Note over U,A: Refresh Token Flow\\n    U->>A: POST /refresh (with refresh_token)\\n    A->>DB: Validate refresh_token (check hash & expiry)\\n    DB-->>A: Valid token\\n    A->>A: Generate new access_token\\n    A->>DB: Invalidate old refresh_token (optional)\\n    A->>DB: Store new refresh_token hash (optional rotation)\\n    A-->>U: Return new {access_token, refresh_token, expires_in}\\n    \\n    Note over U,R: Retry with New Token\\n    U->>R: GET /protected (with new access_token)\\n    R->>R: Validate new access_token\\n    R-->>U: Return protected data\\n    \\n    Note over U,A: Logout/Token Revocation\\n    U->>A: POST /logout (with refresh_token)\\n    A->>DB: Delete/invalidate refresh_token\\n    A-->>U: 200 OK (logged out)\\n```\\n\\n### Styled Version (Enhanced Readability)\\n\\n```mermaid\\nsequenceDiagram\\n    box rgba(240, 248, 255, 0.8) Client Side\\n    participant U as User/Client\\n    end\\n    box rgba(255, 245, 245, 0.8) Authentication\\n    participant A as Auth Server\\n    participant DB as Token Database\\n    end\\n    box rgba(245, 255, 245, 0.8) Resources\\n    participant R as Resource Server\\n    end\\n\\n    %% Initial Authentication\\n    rect rgb(240, 248, 255)\\n        Note over U,A: 1. Initial Authentication\\n        U->>A: POST /login<br/>username & password\\n        A->>DB: Query: Validate user credentials\\n        DB-->>A: ✓ User authenticated\\n        A->>A: Generate JWT (access_token: 15min)\\n        A->>A: Generate refresh_token (7 days)\\n        A->>DB: Store refresh_token hash<br/>(user_id, token_hash, expires_at)\\n        A-->>U: Response:<br/>{<br/>  \\\"access_token\\\": \\\"jwt.xyz...\\\",<br/>  \\\"refresh_token\\\": \\\"rt_abc...\\\",<br/>  \\\"expires_in\\\": 900<br/>}\\n    end\\n\\n    %% Access Protected Resource\\n    rect rgb(245, 255, 245)\\n        Note over U,R: 2. Access Protected Resource\\n        U->>R: GET /api/protected<br/>Header: Authorization: Bearer {access_token}\\n        R->>R: Verify:<br/>- Signature valid<br/>- Not expired<br/>- Claims match\\n        R-->>U: 200 OK<br/>{ \\\"data\\\": \\\"protected content\\\" }\\n    end\\n\\n    %% Token Expiration\\n    rect rgb(255, 250, 240)\\n        Note over U,R: 3. Access Token Expired\\n        U->>R: GET /api/protected<br/>(with expired token)\\n        R->>R: Token expired!\\n        R-->>U: 401 Unauthorized<br/>{ \\\"error\\\": \\\"token_expired\\\" }\\n    end\\n\\n    %% Refresh Token Flow\\n    rect rgb(255, 245, 245)\\n        Note over U,A: 4. Refresh Token Flow\\n        U->>A: POST /api/refresh<br/>{ \\\"refresh_token\\\": \\\"rt_abc...\\\" }\\n        A->>DB: Validate refresh_token:<br/>- Find by hash<br/>- Check expiry<br/>- Check revocation\\n        DB-->>A: ✓ Token valid\\n        A->>A: Generate new access_token\\n        A->>DB: Optional: Rotate refresh_token<br/>(invalidate old, store new)\\n        A-->>U: 200 OK<br/>{<br/>  \\\"access_token\\\": \\\"jwt.new...\\\",<br/>  \\\"refresh_token\\\": \\\"rt_new...\\\",<br/>  \\\"expires_in\\\": 900<br/>}\\n    end\\n\\n    %% Retry with New Token\\n    rect rgb(230, 255, 250)\\n        Note over U,R: 5. Retry with New Token\\n        U->>R: GET /api/protected<br/>(with new access_token)\\n        R->>R: ✓ Token valid\\n        R-->>U: 200 OK<br/>{ \\\"data\\\": \\\"protected content\\\" }\\n    end\\n\\n    %% Logout\\n    rect rgb(255, 240, 240)\\n        Note over U,A: 6. Logout / Token Revocation\\n        U->>A: POST /api/logout<br/>{ \\\"refresh_token\\\": \\\"rt_abc...\\\" }\\n        A->>DB: Delete/invalidate refresh_token\\n        A-->>U: 200 OK<br/>{ \\\"message\\\": \\\"Logged out successfully\\\" }\\n    end\\n```\\n\\n## Alternative Diagram Options\\n\\n### 1. **State Diagram Version** (Shows token lifecycle)\\n```mermaid\\nstateDiagram-v2\\n    [*] --> Unauthenticated\\n    \\n    Unauthenticated --> Authenticated : Login successful\\n    Authenticated --> TokenValid : Access protected resource\\n    TokenValid --> [*] : Return data\\n    \\n    Authenticated --> TokenExpired : Token expiry (15min)\\n    TokenExpired --> Refreshing : Request new token\\n    Refreshing --> Authenticated : Refresh successful\\n    Refreshing --> Unauthenticated : Refresh failed\\n    \\n    Authenticated --> [*] : Logout/Revoke\\n```\\n\\n### 2. **Simplified Flowchart**\\n```mermaid\\ngraph TD\\n    A[User Login] --> B{Valid Credentials?}\\n    B -->|Yes| C[Generate Tokens]\\n    C --> D[Store Refresh Token]\\n    D\\n</Output>\\n<Rubric>\\nValid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens, we will outline the interactions between the user, the client application, the authentication server, and the resource server. \\n\\n### Basic Sequence Diagram Code\\n\\n```mermaid\\nsequenceDiagram\\n    participant User\\n    participant Client\\n    participant AuthServer\\n    participant ResourceServer\\n\\n    User->>Client: Enter credentials (username, password)\\n    Client->>AuthServer: POST /login (credentials)\\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n    \\n    Note over Client: Access token expires after a short time\\n    Client->>AuthServer: POST /refresh (refreshToken)\\n    AuthServer-->>Client: 200 OK (newAccessToken)\\n    Client->>ResourceServer: GET /protected (newAccessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n```\\n\\n### Rendering Instructions\\nTo render this diagram, you can use any Markdown editor that supports Mermaid syntax, such as:\\n- GitHub\\n- GitLab\\n- Markdown Preview Enhanced in Visual Studio Code\\n\\n### Alternative Diagram Options\\n1. **Flowchart**: If you prefer a flowchart representation of the same process.\\n2. **State Diagram**: To show the states of the tokens (valid, expired, refreshed).\\n\\n### Styling Customizations\\nYou can customize the appearance of the diagram by adding styles. Here’s an example of how to add styles:\\n\\n```mermaid\\n%%{init: {'theme': 'default', 'themeVariables': {'sequenceDiagramWidth': '800px'}}}%%\\nsequenceDiagram\\n    participant User\\n    participant Client\\n    participant AuthServer\\n    participant ResourceServer\\n\\n    User->>Client: Enter credentials (username, password)\\n    Client->>AuthServer: POST /login (credentials)\\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n    \\n    Note over Client: Access token expires after a short time\\n    Client->>AuthServer: POST /refresh (refreshToken)\\n    AuthServer-->>Client: 200 OK (newAccessToken)\\n    Client->>ResourceServer: GET /protected (newAccessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n```\\n\\n### Accessibility Considerations\\n- Ensure that the text is legible with sufficient contrast.\\n- Use clear and concise labels for actions and responses.\\n\\n### Export Recommendations\\n- Export the diagram as an SVG or PNG for use in presentations or documentation.\\n- Use tools like Mermaid Live Editor for easy export options.\\n\\nThis sequence diagram effectively illustrates the JWT authentication flow with refresh tokens, showing the interactions clearly and concisely.\\n</Output>\\n<Rubric>\\nValid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "f9f933d1-30f7-4122-a2f2-1b3f2995ebaa",
-        "latencyMs": 629,
+        "id": "de2640d5-fcb2-4131-a9c3-eb05ca2905af",
+        "latencyMs": 12220,
         "namedScores": {
           "mermaid-expert_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "mermaid-expert",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "844ccd54b8c2007d7559da17a65467044d777295b58d5679c177a3f283f9b454",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll create a comprehensive Mermaid sequence diagram for a JWT authentication flow with refresh tokens, including both basic and styled versions.\n\n## JWT Authentication Flow with Refresh Tokens\n\n### Basic Version (Clean and Simple)\n\n```mermaid\nsequenceDiagram\n    participant U as User/Client\n    participant A as Auth Server\n    participant R as Resource Server/API\n    participant DB as Database\n\n    Note over U,A: Initial Authentication\n    U->>A: POST /login (credentials)\n    A->>DB: Validate credentials\n    DB-->>A: User data\n    A->>A: Generate Access Token (short-lived)\n    A->>A: Generate Refresh Token (long-lived)\n    A->>DB: Store refresh token hash\n    A-->>U: Return {access_token, refresh_token, expires_in}\n    \n    Note over U,R: Access Protected Resource\n    U->>R: GET /protected (with access_token)\n    R->>R: Validate access_token signature & expiry\n    R-->>U: Return protected data\n    \n    Note over U,R: Access Token Expired\n    U->>R: GET /protected (with expired access_token)\n    R-->>U: 401 Unauthorized (token expired)\n    \n    Note over U,A: Refresh Token Flow\n    U->>A: POST /refresh (with refresh_token)\n    A->>DB: Validate refresh_token (check hash & expiry)\n    DB-->>A: Valid token\n    A->>A: Generate new access_token\n    A->>DB: Invalidate old refresh_token (optional)\n    A->>DB: Store new refresh_token hash (optional rotation)\n    A-->>U: Return new {access_token, refresh_token, expires_in}\n    \n    Note over U,R: Retry with New Token\n    U->>R: GET /protected (with new access_token)\n    R->>R: Validate new access_token\n    R-->>U: Return protected data\n    \n    Note over U,A: Logout/Token Revocation\n    U->>A: POST /logout (with refresh_token)\n    A->>DB: Delete/invalidate refresh_token\n    A-->>U: 200 OK (logged out)\n```\n\n### Styled Version (Enhanced Readability)\n\n```mermaid\nsequenceDiagram\n    box rgba(240, 248, 255, 0.8) Client Side\n    participant U as User/Client\n    end\n    box rgba(255, 245, 245, 0.8) Authentication\n    participant A as Auth Server\n    participant DB as Token Database\n    end\n    box rgba(245, 255, 245, 0.8) Resources\n    participant R as Resource Server\n    end\n\n    %% Initial Authentication\n    rect rgb(240, 248, 255)\n        Note over U,A: 1. Initial Authentication\n        U->>A: POST /login<br/>username & password\n        A->>DB: Query: Validate user credentials\n        DB-->>A: ✓ User authenticated\n        A->>A: Generate JWT (access_token: 15min)\n        A->>A: Generate refresh_token (7 days)\n        A->>DB: Store refresh_token hash<br/>(user_id, token_hash, expires_at)\n        A-->>U: Response:<br/>{<br/>  \"access_token\": \"jwt.xyz...\",<br/>  \"refresh_token\": \"rt_abc...\",<br/>  \"expires_in\": 900<br/>}\n    end\n\n    %% Access Protected Resource\n    rect rgb(245, 255, 245)\n        Note over U,R: 2. Access Protected Resource\n        U->>R: GET /api/protected<br/>Header: Authorization: Bearer {access_token}\n        R->>R: Verify:<br/>- Signature valid<br/>- Not expired<br/>- Claims match\n        R-->>U: 200 OK<br/>{ \"data\": \"protected content\" }\n    end\n\n    %% Token Expiration\n    rect rgb(255, 250, 240)\n        Note over U,R: 3. Access Token Expired\n        U->>R: GET /api/protected<br/>(with expired token)\n        R->>R: Token expired!\n        R-->>U: 401 Unauthorized<br/>{ \"error\": \"token_expired\" }\n    end\n\n    %% Refresh Token Flow\n    rect rgb(255, 245, 245)\n        Note over U,A: 4. Refresh Token Flow\n        U->>A: POST /api/refresh<br/>{ \"refresh_token\": \"rt_abc...\" }\n        A->>DB: Validate refresh_token:<br/>- Find by hash<br/>- Check expiry<br/>- Check revocation\n        DB-->>A: ✓ Token valid\n        A->>A: Generate new access_token\n        A->>DB: Optional: Rotate refresh_token<br/>(invalidate old, store new)\n        A-->>U: 200 OK<br/>{<br/>  \"access_token\": \"jwt.new...\",<br/>  \"refresh_token\": \"rt_new...\",<br/>  \"expires_in\": 900<br/>}\n    end\n\n    %% Retry with New Token\n    rect rgb(230, 255, 250)\n        Note over U,R: 5. Retry with New Token\n        U->>R: GET /api/protected<br/>(with new access_token)\n        R->>R: ✓ Token valid\n        R-->>U: 200 OK<br/>{ \"data\": \"protected content\" }\n    end\n\n    %% Logout\n    rect rgb(255, 240, 240)\n        Note over U,A: 6. Logout / Token Revocation\n        U->>A: POST /api/logout<br/>{ \"refresh_token\": \"rt_abc...\" }\n        A->>DB: Delete/invalidate refresh_token\n        A-->>U: 200 OK<br/>{ \"message\": \"Logged out successfully\" }\n    end\n```\n\n## Alternative Diagram Options\n\n### 1. **State Diagram Version** (Shows token lifecycle)\n```mermaid\nstateDiagram-v2\n    [*] --> Unauthenticated\n    \n    Unauthenticated --> Authenticated : Login successful\n    Authenticated --> TokenValid : Access protected resource\n    TokenValid --> [*] : Return data\n    \n    Authenticated --> TokenExpired : Token expiry (15min)\n    TokenExpired --> Refreshing : Request new token\n    Refreshing --> Authenticated : Refresh successful\n    Refreshing --> Unauthenticated : Refresh failed\n    \n    Authenticated --> [*] : Logout/Revoke\n```\n\n### 2. **Simplified Flowchart**\n```mermaid\ngraph TD\n    A[User Login] --> B{Valid Credentials?}\n    B -->|Yes| C[Generate Tokens]\n    C --> D[Store Refresh Token]\n    D",
+          "output": "To create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens, we will outline the interactions between the user, the client application, the authentication server, and the resource server. \n\n### Basic Sequence Diagram Code\n\n```mermaid\nsequenceDiagram\n    participant User\n    participant Client\n    participant AuthServer\n    participant ResourceServer\n\n    User->>Client: Enter credentials (username, password)\n    Client->>AuthServer: POST /login (credentials)\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n    \n    Note over Client: Access token expires after a short time\n    Client->>AuthServer: POST /refresh (refreshToken)\n    AuthServer-->>Client: 200 OK (newAccessToken)\n    Client->>ResourceServer: GET /protected (newAccessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n```\n\n### Rendering Instructions\nTo render this diagram, you can use any Markdown editor that supports Mermaid syntax, such as:\n- GitHub\n- GitLab\n- Markdown Preview Enhanced in Visual Studio Code\n\n### Alternative Diagram Options\n1. **Flowchart**: If you prefer a flowchart representation of the same process.\n2. **State Diagram**: To show the states of the tokens (valid, expired, refreshed).\n\n### Styling Customizations\nYou can customize the appearance of the diagram by adding styles. Here’s an example of how to add styles:\n\n```mermaid\n%%{init: {'theme': 'default', 'themeVariables': {'sequenceDiagramWidth': '800px'}}}%%\nsequenceDiagram\n    participant User\n    participant Client\n    participant AuthServer\n    participant ResourceServer\n\n    User->>Client: Enter credentials (username, password)\n    Client->>AuthServer: POST /login (credentials)\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n    \n    Note over Client: Access token expires after a short time\n    Client->>AuthServer: POST /refresh (refreshToken)\n    AuthServer-->>Client: 200 OK (newAccessToken)\n    Client->>ResourceServer: GET /protected (newAccessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n```\n\n### Accessibility Considerations\n- Ensure that the text is legible with sufficient contrast.\n- Use clear and concise labels for actions and responses.\n\n### Export Recommendations\n- Export the diagram as an SVG or PNG for use in presentations or documentation.\n- Use tools like Mermaid Live Editor for easy export options.\n\nThis sequence diagram effectively illustrates the JWT authentication flow with refresh tokens, showing the interactions clearly and concisely.",
           "tokenUsage": {
-            "total": 1725,
-            "prompt": 225,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 829,
+            "prompt": 226,
+            "completion": 603,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 629,
-          "finishReason": "length",
+          "latencyMs": 12220,
+          "finishReason": "stop",
+          "cost": 0.00039569999999999997,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e442d57ae9c9381-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:39:04 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:55:21 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "11802",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=0OZxVsoAUDyBkARAn1rWfnkFzCpql0Bz.K6H0bWM_fY-1774842909.3875942-1.0.1.1-.3T2jjiK7_IYAe26hpdCok4wtPt9Fwa.YtFlzOGVZCsjuv5Wxp0UMa9975.IWCHi6JHoRMApGLjrJ4UdL1pMopTfnGXPotaWwOLQCOALVqVntkaKnqlhBZKwE4HUbaWC; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:25:21 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 b1f0bd2dd051dd6f157994a7f220f470.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "U40V2ydW0pc0CVUXgxYtMRZtFx-yiIymKGo_v6ZxIlREliobmOhB0w==",
-                "x-amz-cf-pop": "IAH50-P3",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "08c649a088f5f31009356f3a084c0a57"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-tokens": "199729",
+                "x-ratelimit-reset-requests": "1h5m10.901s",
+                "x-ratelimit-reset-tokens": "81ms",
+                "x-request-id": "req_44ab0a89dfdd92c2ad949d26097803b3"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e442d57ae9c9381-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:39:04 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:55:21 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "11802",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=0OZxVsoAUDyBkARAn1rWfnkFzCpql0Bz.K6H0bWM_fY-1774842909.3875942-1.0.1.1-.3T2jjiK7_IYAe26hpdCok4wtPt9Fwa.YtFlzOGVZCsjuv5Wxp0UMa9975.IWCHi6JHoRMApGLjrJ4UdL1pMopTfnGXPotaWwOLQCOALVqVntkaKnqlhBZKwE4HUbaWC; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:25:21 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 b1f0bd2dd051dd6f157994a7f220f470.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "U40V2ydW0pc0CVUXgxYtMRZtFx-yiIymKGo_v6ZxIlREliobmOhB0w==",
-              "x-amz-cf-pop": "IAH50-P3",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "08c649a088f5f31009356f3a084c0a57"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-tokens": "199729",
+              "x-ratelimit-reset-requests": "1h5m10.901s",
+              "x-ratelimit-reset-tokens": "81ms",
+              "x-request-id": "req_44ab0a89dfdd92c2ad949d26097803b3"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 225,
-        "completion": 1500,
+        "prompt": 226,
+        "completion": 603,
         "cached": 0,
-        "total": 1725,
+        "total": 829,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1764,
-          "prompt": 1696,
-          "completion": 68,
+          "total": 856,
+          "prompt": 803,
+          "completion": 53,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 70584,
-      "evaluationDurationMs": 70584
+      "durationMs": 13589,
+      "evaluationDurationMs": 13589
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:40:14.116Z",
-    "evaluationCreatedAt": "2026-03-15T04:39:03.495Z"
+    "exportedAt": "2026-03-30T03:55:22.959Z",
+    "evaluationCreatedAt": "2026-03-30T03:55:09.324Z"
   }
 }

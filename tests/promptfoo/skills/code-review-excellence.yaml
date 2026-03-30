@@ -1,0 +1,61 @@
+# Skill quality: code-review-excellence
+
+description: 'Skill quality: code-review-excellence'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: code-review-excellence
+  raw: '[{"role": "system", "content": "# Code Review Excellence\n\nTransform code reviews from gatekeeping to knowledge sharing
+    through constructive feedback, systematic analysis, and collaborative improvement.\n\n## When to Use This Skill\n\n- Reviewing
+    pull requests and code changes\n- Establishing code review standards for teams\n- Mentoring junior developers through
+    reviews\n- Conducting architecture reviews\n- Creating review checklists and guidelines\n- Improving team collaboration\n-
+    Reducing code review cycle time\n- Maintaining code quality standards\n\n## Core Principles\n\n### 1. The Review Mindset\n\n**Goals
+    of Code Review:**\n- Catch bugs and edge cases\n- Ensure code maintainability\n- Share knowledge across team\n- Enforce
+    coding standards\n- Improve design and architecture\n- Build team culture\n\n**Not the Goals:**\n- Show off knowledge\n-
+    Nitpick formatting (use linters)\n- Block progress unnecessarily\n- Rewrite to your preference\n\n### 2. Effective Feedback\n\n**Good
+    Feedback is:**\n- Specific and actionable\n- Educational, not judgmental\n- Focused on the code, not the person\n- Balanced
+    (praise good work too)\n- Prioritized (critical vs nice-to-have)\n\n```markdown\n❌ Bad: \"This is wrong.\"\n✅ Good: \"This
+    could cause a race condition when multiple users\n         access simultaneously. Consider using a mutex here.\"\n\n❌
+    Bad: \"Why didn''t you use X pattern?\"\n✅ Good: \"Have you considered the Repository pattern? It would\n         make
+    this easier to test. Here''s an example: [link]\"\n\n❌ Bad: \"Rename this variable.\"\n✅ Good: \"[nit] Consider `userCount`
+    instead of `uc` for\n         clarity. Not blocking if you prefer to keep it.\"\n```\n\n### 3. Review Scope\n\n**What
+    to Review:**\n- Logic correctness and edge cases\n- Security vulnerabilities\n- Performance implications\n- Test coverage
+    and quality\n- Error handling\n- Documentation and comments\n- API design and naming\n- Architectural fit\n\n**What Not
+    to Review Manually:**\n- Code formatting (use Prettier, Black, etc.)\n- Import organization\n- Linting violations\n- Simple
+    typos\n\n## Review Process\n\n### Phase 1: Context Gathering (2-3 minutes)\n\n```markdown\nBefore diving into code, understand:\n\n1.
+    Read PR description and linked issue\n2. Check PR size (>400 lines? Ask to split)\n3. Review CI/CD status (tests passing?)\n4.
+    Understand the business requirement\n5. Note any relevant architectural decisions\n```\n\n### Phase 2: High-Level Review
+    (5-10 minutes)\n\n```markdown\n1. **Architecture & Design**\n   - Does the solution fit the problem?\n   - Are there simpler
+    approaches?\n   - Is it consistent with existing patterns?\n   - Will it scale?\n\n2. **File Organization**\n   - Are
+    new files in the right places?\n   - Is code grouped logically?\n   - Are there duplicate files?\n\n3. **Testing Strategy**\n   -
+    Are there tests?\n   - Do tests cover edge cases?\n   - Are tests readable?\n```\n\n### Phase 3: Line-by-Line Review (10-20
+    minutes)\n\n```markdown\nFor each file:\n\n1. **Logic & Correctness**\n   - Edge cases handled?\n   - Off-by-one errors?\n   -
+    Null/undefined checks?\n   - Race conditions?\n\n2. **Security**\n   - Input validation?\n   - SQL injection risks?\n   -
+    XSS vulnerabilities?\n   - Sensitive data exposure?\n\n3. **Performance**\n   - N+1 queries?\n   - Unnecessary loops?\n   -
+    Memory leaks?\n   - Blocking operations?\n\n4. **Maintainability**\n   - Clear variable names?\n   - Functions doing one
+    thing?\n   - Complex code commented?\n   - Magic numbers extracted?\n```\n\n### Phase 4: Summary & Decision (2-3 minutes)\n\n```markdown\n1.
+    Summarize key concerns\n2. Highlight what you liked\n3. Make clear decision:\n   - ✅ Approve\n   - 💬 Comment (minor suggestions)\n   -
+    🔄 Request Changes (must address)\n4. Offer to pair if complex\n```\n\n## Review Techniques\n\n### Technique 1: The Checklist
+    Method\n\n```markdown\n## Security Checklist\n- [ ] User input validated and sanitized\n- [ ] SQL queries use parameterization\n-
+    [ ] Authentication/authorization checked\n- [ ] Secrets not hardcoded\n- [ ] Error messages don''t leak info\n\n## Performance
+    Checklist\n- [ ] No N+1 queries\n- [ ] Database queries indexed\n- [ ] Large lists paginated\n\n[... truncated ...]"},
+    {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: 'skill/code-review-excellence: What is the code review checklist for a new PR adding a REST'
+  vars:
+    task: What is the code review checklist for a new PR adding a REST API endpoint?
+  assert:
+  - type: llm-rubric
+    value: 'Provides specific checklist items covering at least 3 of: security, error handling, tests, documentation, performance'
+    threshold: 0.6
+    metric: skill_code-review-excellence_quality

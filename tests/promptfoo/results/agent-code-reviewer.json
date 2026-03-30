@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-QHh-2026-03-15T04:19:56",
+  "evalId": "eval-hJw-2026-03-30T03:49:59",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:19:56.397Z",
+    "timestamp": "2026-03-30T03:49:59.915Z",
     "prompts": [
       {
         "id": "e08ba693bb6ad36a0cfc77cb678d2e638e4013f69c1e55a4d81768cd7d4d6a56",
         "raw": "[{\"role\": \"system\", \"content\": \"You are an elite code review expert specializing in modern code analysis techniques, AI-powered review tools, and production-grade quality assurance.\\n\\n## Expert Purpose\\nMaster code reviewer focused on ensuring code quality, security, performance, and maintainability using cutting-edge analysis tools and techniques. Combines deep technical expertise with modern AI-assisted review processes, static analysis tools, and production reliability practices to deliver comprehensive code assessments that prevent bugs, security vulnerabilities, and production incidents.\\n\\n## Capabilities\\n\\n### AI-Powered Code Analysis\\n- Integration with modern AI review tools (Trag, Bito, Codiga, GitHub Copilot)\\n- Natural language pattern definition for custom review rules\\n- Context-aware code analysis using LLMs and machine learning\\n- Automated pull request analysis and comment generation\\n- Real-time feedback integration with CLI tools and IDEs\\n- Custom rule-based reviews with team-specific patterns\\n- Multi-language AI code analysis and suggestion generation\\n\\n### Modern Static Analysis Tools\\n- SonarQube, CodeQL, and Semgrep for comprehensive code scanning\\n- Security-focused analysis with Snyk, Bandit, and OWASP tools\\n- Performance analysis with profilers and complexity analyzers\\n- Dependency vulnerability scanning with npm audit, pip-audit\\n- License compliance checking and open source risk assessment\\n- Code quality metrics with cyclomatic complexity analysis\\n- Technical debt assessment and code smell detection\\n\\n### Security Code Review\\n- OWASP Top 10 vulnerability detection and prevention\\n- Input validation and sanitization review\\n- Authentication and authorization implementation analysis\\n- Cryptographic implementation and key management review\\n- SQL injection, XSS, and CSRF prevention verification\\n- Secrets and credential management assessment\\n- API security patterns and rate limiting implementation\\n- Container and infrastructure security code review\\n\\n### Performance & Scalability Analysis\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "code-reviewer",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 392,
+          "totalLatencyMs": 10567,
           "tokenUsage": {
-            "prompt": 405,
-            "completion": 1158,
+            "prompt": 411,
+            "completion": 529,
             "cached": 0,
-            "total": 1563,
+            "total": 940,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1414,
-              "prompt": 1349,
-              "completion": 65,
+              "total": 780,
+              "prompt": 726,
+              "completion": 54,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "code-reviewer_quality": 1
           },
-          "cost": 0
+          "cost": 0.00037904999999999997
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00037904999999999997,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "code-reviewer_quality": 1
           },
           "tokensUsed": {
-            "total": 1414,
-            "prompt": 1349,
-            "completion": 65,
+            "total": 780,
+            "prompt": 726,
+            "completion": 54,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output identifies the misuse of list comprehension for side effects, suggests cleaner alternatives including standard list comprehension and explicit loops, discusses performance implications, and checks for edge cases such as empty input and non-iterable data.",
+              "reason": "The output identifies the misuse of list comprehension, suggests cleaner alternatives, discusses performance improvements, and mentions the need for input validation, which aligns with the rubric requirements.",
               "tokensUsed": {
-                "total": 1414,
-                "prompt": 1349,
-                "completion": 65,
+                "total": 780,
+                "prompt": 726,
+                "completion": 54,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n## 🔍 **Code Review Analysis**\\n\\n### **Immediate Issues Identified**\\n\\n1. **Misuse of List Comprehension** - You're using a list comprehension for side effects (`.append()`), which is an anti-pattern\\n2. **Unnecessary Intermediate List** - The comprehension creates a temporary list of `None` values that's immediately discarded\\n3. **Poor Readability** - The one-liner approach sacrifices clarity\\n\\n### **Current Code Problems**\\n\\n```python\\ndef process(data):\\n    result = []  # ✅ Clear variable name\\n    [result.append(x*2) for x in data if x > 0]  # ❌ Anti-pattern\\n    return result\\n```\\n\\n**Issues:**\\n- **Memory Inefficiency**: Creates a list of `None` values equal to filtered data length\\n- **Confusing Intent**: List comprehensions should return values, not cause side effects\\n- **Performance Impact**: Python must allocate and discard the temporary list\\n\\n### **✅ Recommended Solutions**\\n\\n#### **Option 1: Standard List Comprehension (Most Pythonic)**\\n```python\\ndef process(data):\\n    \\\"\\\"\\\"Return doubled values for positive numbers in data.\\\"\\\"\\\"\\n    return [x * 2 for x in data if x > 0]\\n```\\n\\n#### **Option 2: Generator Expression (Memory Efficient)**\\n```python\\ndef process(data):\\n    \\\"\\\"\\\"Return doubled values for positive numbers in data.\\\"\\\"\\\"\\n    return list(x * 2 for x in data if x > 0)\\n```\\n\\n#### **Option 3: Explicit Loop (Most Readable for Complex Logic)**\\n```python\\ndef process(data):\\n    \\\"\\\"\\\"Return doubled values for positive numbers in data.\\\"\\\"\\\"\\n    result = []\\n    for x in data:\\n        if x > 0:\\n            result.append(x * 2)\\n    return result\\n```\\n\\n### **📊 Performance Comparison**\\n\\n```python\\nimport timeit\\n\\n# Original (anti-pattern)\\nsetup1 = \\\"\\\"\\\"\\ndef process(data):\\n    result = []\\n    [result.append(x*2) for x in data if x > 0]\\n    return result\\n\\\"\\\"\\\"\\n\\n# Recommended (list comprehension)\\nsetup2 = \\\"\\\"\\\"\\ndef process(data):\\n    return [x * 2 for x in data if x > 0]\\n\\\"\\\"\\\"\\n\\ndata = list(range(-1000, 1000))\\n\\nprint(\\\"Original:\\\", timeit.timeit(\\\"process(data)\\\", setup1, globals={'data': data}, number=10000))\\nprint(\\\"Improved: \\\", timeit.timeit(\\\"process(data)\\\", setup2, globals={'data': data}, number=10000))\\n```\\n\\n**Expected Results:**\\n- **Original**: ~30-40% slower due to unnecessary list allocation\\n- **Improved**: Faster and more memory efficient\\n\\n### **🔧 Additional Improvements**\\n\\n#### **Add Type Hints (Python 3.5+)**\\n```python\\nfrom typing import List, Union\\n\\ndef process(data: List[Union[int, float]]) -> List[Union[int, float]]:\\n    \\\"\\\"\\\"Return doubled values for positive numbers in data.\\\"\\\"\\\"\\n    return [x * 2 for x in data if x > 0]\\n```\\n\\n#### **Handle Edge Cases**\\n```python\\ndef process(data):\\n    \\\"\\\"\\\"Return doubled values for positive numbers in data.\\\"\\\"\\\"\\n    if not data:\\n        return []\\n    \\n    # Handle non-iterable input\\n    try:\\n        return [x * 2 for x in data if x > 0]\\n    except TypeError:\\n        raise TypeError(\\\"Input must be iterable\\\")\\n```\\n\\n### **📈 Code Quality Metrics**\\n\\n| Metric | Original | Improved |\\n|--------|----------|----------|\\n| **Lines of Code** | 3 | 1-3 |\\n| **Cyclomatic Complexity** | 2 | 1 |\\n| **Memory Usage** | High | Low |\\n| **Readability** | Poor | Excellent |\\n| **Pythonic** | No | Yes |\\n\\n### **🎯 Key Takeaways**\\n\\n1. **List comprehensions should return values, not cause side effects**\\n2. **Avoid creating unnecessary intermediate data structures**\\n3. **Choose clarity over cleverness** - Option 3 (explicit loop) is often best for team projects\\n4. **Consider using type hints** for better IDE support and documentation\\n\\n### **🚀 Production Recommendation**\\n\\n```python\\nfrom typing import Iterable, List, Union\\n\\ndef filter_and_double(\\n    data: Iterable[Union[int, float]], \\n    multiplier: int = 2\\n) -> List[Union[int, float]]:\\n    \\\"\\\"\\\"\\n    Filter positive numbers and apply multiplication.\\n    \\n    Args:\\n        data: Iterable of numbers\\n        multiplier: Value to multiply by (default: 2)\\n    \\n    Returns:\\n        List of multiplied positive numbers\\n    \\n    Example:\\n        >>> filter_and_double([-1, 0, 1, 2])\\n        [2, 4]\\n    \\\"\\\"\\\"\\n    return [x * multiplier for x in data if x > 0]\\n```\\n\\n**Why this is better:**\\n- Clear, descriptive function name\\n- Type hints for better tooling support\\n- Configurable multiplier parameter\\n- Comprehensive docstring with example\\n- Proper error handling through type hints\\n\\n**Static Analysis Tools Would Flag:**\\n- ✅ **SonarQube**: \\\"List comprehensions should not be used for side effects\\\"\\n- ✅ **Pylint**: \\\"Expression is assigned to nothing (W0106)\\\"\\n- ✅ **Flake8**: \\\"Do not use list comprehension for side effects\\\"\\n\\n**Final Verdict**: **Refactor Required** - The current implementation uses an anti-pattern that reduces performance and readability. Use a standard list comprehension instead.\\n</Output>\\n<Rubric>\\nIdentifies list comprehension misuse, suggests cleaner alternatives, mentions performance, checks for edge cases\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nLet's review the provided Python function `process(data)` for code quality, readability, performance, and maintainability.\\n\\n### Code Review\\n\\n1. **Functionality**:\\n   - The function takes a list `data` and returns a new list containing the elements of `data` that are greater than 0, each multiplied by 2.\\n\\n2. **Readability**:\\n   - The use of a list comprehension with a side effect (appending to `result`) is not idiomatic in Python. List comprehensions are generally used to create new lists, not to modify existing ones.\\n   - The function lacks a docstring, which would help explain its purpose and usage.\\n\\n3. **Performance**:\\n   - The current implementation creates an unnecessary intermediate list. Using a list comprehension directly to create the result would be more efficient.\\n\\n4. **Maintainability**:\\n   - The code could be clearer and more maintainable with a more explicit approach. Using a standard loop would enhance readability.\\n\\n5. **Pythonic Practices**:\\n   - The use of a list comprehension for side effects is discouraged in Python. Instead, a generator expression or a simple loop would be more appropriate.\\n\\n### Suggested Improvements\\n\\nHere’s a revised version of the function that addresses the above points:\\n\\n```python\\ndef process(data):\\n    \\\"\\\"\\\"Process the input list, returning a new list with each positive element doubled.\\\"\\\"\\\"\\n    return [x * 2 for x in data if x > 0]\\n```\\n\\n### Key Changes Made:\\n- **List Comprehension**: The function now uses a list comprehension directly to create the result list, which is more efficient and idiomatic.\\n- **Docstring**: Added a docstring to explain the function's purpose and behavior.\\n- **Removed Unnecessary Variable**: The intermediate `result` list is no longer needed, simplifying the code.\\n\\n### Additional Considerations\\n- **Type Annotations**: Consider adding type annotations for better clarity and to assist with static type checking:\\n  \\n  ```python\\n  from typing import List, Union\\n\\n  def process(data: List[Union[int, float]]) -> List[Union[int, float]]:\\n      \\\"\\\"\\\"Process the input list, returning a new list with each positive element doubled.\\\"\\\"\\\"\\n      return [x * 2 for x in data if x > 0]\\n  ```\\n\\n- **Input Validation**: Depending on the expected input, you might want to add input validation to ensure that `data` is indeed a list of numbers.\\n\\nBy implementing these changes, the function will be more efficient, readable, and maintainable, adhering to Python's best practices.\\n</Output>\\n<Rubric>\\nIdentifies list comprehension misuse, suggests cleaner alternatives, mentions performance, checks for edge cases\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "5bbf35db-7c62-4a85-856f-206244429a4a",
-        "latencyMs": 392,
+        "id": "b5780ea7-5f74-420d-9d1a-14e96f4a5084",
+        "latencyMs": 10567,
         "namedScores": {
           "code-reviewer_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "code-reviewer",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "e08ba693bb6ad36a0cfc77cb678d2e638e4013f69c1e55a4d81768cd7d4d6a56",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "## 🔍 **Code Review Analysis**\n\n### **Immediate Issues Identified**\n\n1. **Misuse of List Comprehension** - You're using a list comprehension for side effects (`.append()`), which is an anti-pattern\n2. **Unnecessary Intermediate List** - The comprehension creates a temporary list of `None` values that's immediately discarded\n3. **Poor Readability** - The one-liner approach sacrifices clarity\n\n### **Current Code Problems**\n\n```python\ndef process(data):\n    result = []  # ✅ Clear variable name\n    [result.append(x*2) for x in data if x > 0]  # ❌ Anti-pattern\n    return result\n```\n\n**Issues:**\n- **Memory Inefficiency**: Creates a list of `None` values equal to filtered data length\n- **Confusing Intent**: List comprehensions should return values, not cause side effects\n- **Performance Impact**: Python must allocate and discard the temporary list\n\n### **✅ Recommended Solutions**\n\n#### **Option 1: Standard List Comprehension (Most Pythonic)**\n```python\ndef process(data):\n    \"\"\"Return doubled values for positive numbers in data.\"\"\"\n    return [x * 2 for x in data if x > 0]\n```\n\n#### **Option 2: Generator Expression (Memory Efficient)**\n```python\ndef process(data):\n    \"\"\"Return doubled values for positive numbers in data.\"\"\"\n    return list(x * 2 for x in data if x > 0)\n```\n\n#### **Option 3: Explicit Loop (Most Readable for Complex Logic)**\n```python\ndef process(data):\n    \"\"\"Return doubled values for positive numbers in data.\"\"\"\n    result = []\n    for x in data:\n        if x > 0:\n            result.append(x * 2)\n    return result\n```\n\n### **📊 Performance Comparison**\n\n```python\nimport timeit\n\n# Original (anti-pattern)\nsetup1 = \"\"\"\ndef process(data):\n    result = []\n    [result.append(x*2) for x in data if x > 0]\n    return result\n\"\"\"\n\n# Recommended (list comprehension)\nsetup2 = \"\"\"\ndef process(data):\n    return [x * 2 for x in data if x > 0]\n\"\"\"\n\ndata = list(range(-1000, 1000))\n\nprint(\"Original:\", timeit.timeit(\"process(data)\", setup1, globals={'data': data}, number=10000))\nprint(\"Improved: \", timeit.timeit(\"process(data)\", setup2, globals={'data': data}, number=10000))\n```\n\n**Expected Results:**\n- **Original**: ~30-40% slower due to unnecessary list allocation\n- **Improved**: Faster and more memory efficient\n\n### **🔧 Additional Improvements**\n\n#### **Add Type Hints (Python 3.5+)**\n```python\nfrom typing import List, Union\n\ndef process(data: List[Union[int, float]]) -> List[Union[int, float]]:\n    \"\"\"Return doubled values for positive numbers in data.\"\"\"\n    return [x * 2 for x in data if x > 0]\n```\n\n#### **Handle Edge Cases**\n```python\ndef process(data):\n    \"\"\"Return doubled values for positive numbers in data.\"\"\"\n    if not data:\n        return []\n    \n    # Handle non-iterable input\n    try:\n        return [x * 2 for x in data if x > 0]\n    except TypeError:\n        raise TypeError(\"Input must be iterable\")\n```\n\n### **📈 Code Quality Metrics**\n\n| Metric | Original | Improved |\n|--------|----------|----------|\n| **Lines of Code** | 3 | 1-3 |\n| **Cyclomatic Complexity** | 2 | 1 |\n| **Memory Usage** | High | Low |\n| **Readability** | Poor | Excellent |\n| **Pythonic** | No | Yes |\n\n### **🎯 Key Takeaways**\n\n1. **List comprehensions should return values, not cause side effects**\n2. **Avoid creating unnecessary intermediate data structures**\n3. **Choose clarity over cleverness** - Option 3 (explicit loop) is often best for team projects\n4. **Consider using type hints** for better IDE support and documentation\n\n### **🚀 Production Recommendation**\n\n```python\nfrom typing import Iterable, List, Union\n\ndef filter_and_double(\n    data: Iterable[Union[int, float]], \n    multiplier: int = 2\n) -> List[Union[int, float]]:\n    \"\"\"\n    Filter positive numbers and apply multiplication.\n    \n    Args:\n        data: Iterable of numbers\n        multiplier: Value to multiply by (default: 2)\n    \n    Returns:\n        List of multiplied positive numbers\n    \n    Example:\n        >>> filter_and_double([-1, 0, 1, 2])\n        [2, 4]\n    \"\"\"\n    return [x * multiplier for x in data if x > 0]\n```\n\n**Why this is better:**\n- Clear, descriptive function name\n- Type hints for better tooling support\n- Configurable multiplier parameter\n- Comprehensive docstring with example\n- Proper error handling through type hints\n\n**Static Analysis Tools Would Flag:**\n- ✅ **SonarQube**: \"List comprehensions should not be used for side effects\"\n- ✅ **Pylint**: \"Expression is assigned to nothing (W0106)\"\n- ✅ **Flake8**: \"Do not use list comprehension for side effects\"\n\n**Final Verdict**: **Refactor Required** - The current implementation uses an anti-pattern that reduces performance and readability. Use a standard list comprehension instead.",
+          "output": "Let's review the provided Python function `process(data)` for code quality, readability, performance, and maintainability.\n\n### Code Review\n\n1. **Functionality**:\n   - The function takes a list `data` and returns a new list containing the elements of `data` that are greater than 0, each multiplied by 2.\n\n2. **Readability**:\n   - The use of a list comprehension with a side effect (appending to `result`) is not idiomatic in Python. List comprehensions are generally used to create new lists, not to modify existing ones.\n   - The function lacks a docstring, which would help explain its purpose and usage.\n\n3. **Performance**:\n   - The current implementation creates an unnecessary intermediate list. Using a list comprehension directly to create the result would be more efficient.\n\n4. **Maintainability**:\n   - The code could be clearer and more maintainable with a more explicit approach. Using a standard loop would enhance readability.\n\n5. **Pythonic Practices**:\n   - The use of a list comprehension for side effects is discouraged in Python. Instead, a generator expression or a simple loop would be more appropriate.\n\n### Suggested Improvements\n\nHere’s a revised version of the function that addresses the above points:\n\n```python\ndef process(data):\n    \"\"\"Process the input list, returning a new list with each positive element doubled.\"\"\"\n    return [x * 2 for x in data if x > 0]\n```\n\n### Key Changes Made:\n- **List Comprehension**: The function now uses a list comprehension directly to create the result list, which is more efficient and idiomatic.\n- **Docstring**: Added a docstring to explain the function's purpose and behavior.\n- **Removed Unnecessary Variable**: The intermediate `result` list is no longer needed, simplifying the code.\n\n### Additional Considerations\n- **Type Annotations**: Consider adding type annotations for better clarity and to assist with static type checking:\n  \n  ```python\n  from typing import List, Union\n\n  def process(data: List[Union[int, float]]) -> List[Union[int, float]]:\n      \"\"\"Process the input list, returning a new list with each positive element doubled.\"\"\"\n      return [x * 2 for x in data if x > 0]\n  ```\n\n- **Input Validation**: Depending on the expected input, you might want to add input validation to ensure that `data` is indeed a list of numbers.\n\nBy implementing these changes, the function will be more efficient, readable, and maintainable, adhering to Python's best practices.",
           "tokenUsage": {
-            "total": 1563,
-            "prompt": 405,
-            "completion": 1158,
-            "numRequests": 1
+            "total": 940,
+            "prompt": 411,
+            "completion": 529,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 392,
+          "latencyMs": 10567,
           "finishReason": "stop",
+          "cost": 0.00037904999999999997,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4425c9de663cfd-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:19:56 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:50:10 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "10385",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=Pg9Gp2HCU4H2Oh6W41CENh2xbkaEjb_baeYZFADwAf0-1774842599.9720697-1.0.1.1-LOISiAs6WzuUTUWjR8n0akeUoTRRvGyYKO0dw8FNxh9cidbSVA1uwDi8fD7F1ExquAK5truQiM7d9Pyc6WHjl1hB5GpOaPjnCon_zUqU_9CjIYCQ_9jY0JavcDtkwaV2; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:20:10 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 e56379a810bd08882d9968e443bb1848.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "cFCqMiOXhuGzHEBpIQULiNr93KLeIVuaFKD5jRDQG0-juN6Oz-9cng==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "ad842e374a91bc4cc700ecdcee96690d"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-tokens": "199462",
+                "x-ratelimit-reset-requests": "1h5m9.518s",
+                "x-ratelimit-reset-tokens": "161ms",
+                "x-request-id": "req_c2370e1431ad4c14a1e6937d42b7dec6"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4425c9de663cfd-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:19:56 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:50:10 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "10385",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=Pg9Gp2HCU4H2Oh6W41CENh2xbkaEjb_baeYZFADwAf0-1774842599.9720697-1.0.1.1-LOISiAs6WzuUTUWjR8n0akeUoTRRvGyYKO0dw8FNxh9cidbSVA1uwDi8fD7F1ExquAK5truQiM7d9Pyc6WHjl1hB5GpOaPjnCon_zUqU_9CjIYCQ_9jY0JavcDtkwaV2; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:20:10 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 e56379a810bd08882d9968e443bb1848.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "cFCqMiOXhuGzHEBpIQULiNr93KLeIVuaFKD5jRDQG0-juN6Oz-9cng==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "ad842e374a91bc4cc700ecdcee96690d"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-tokens": "199462",
+              "x-ratelimit-reset-requests": "1h5m9.518s",
+              "x-ratelimit-reset-tokens": "161ms",
+              "x-request-id": "req_c2370e1431ad4c14a1e6937d42b7dec6"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 405,
-        "completion": 1158,
+        "prompt": 411,
+        "completion": 529,
         "cached": 0,
-        "total": 1563,
+        "total": 940,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1414,
-          "prompt": 1349,
-          "completion": 65,
+          "total": 780,
+          "prompt": 726,
+          "completion": 54,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 57478,
-      "evaluationDurationMs": 57478
+      "durationMs": 12051,
+      "evaluationDurationMs": 12051
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:20:53.913Z",
-    "evaluationCreatedAt": "2026-03-15T04:19:56.397Z"
+    "exportedAt": "2026-03-30T03:50:12.008Z",
+    "evaluationCreatedAt": "2026-03-30T03:49:59.915Z"
   }
 }

@@ -1,0 +1,47 @@
+# Agent quality: typescript-pro
+
+description: 'Agent quality: typescript-pro'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: typescript-pro
+  raw: '[{"role": "system", "content": "You are a TypeScript expert specializing in advanced typing and enterprise-grade development.\n\n##
+    Focus Areas\n- Advanced type systems (generics, conditional types, mapped types)\n- Strict TypeScript configuration and
+    compiler options\n- Type inference optimization and utility types\n- Decorators and metadata programming\n- Module systems
+    and namespace organization\n- Integration with modern frameworks (React, Node.js, Express)\n\n## Approach\n1. Leverage
+    strict type checking with appropriate compiler flags\n2. Use generics and utility types for maximum type safety\n3. Prefer
+    type inference over explicit annotations when clear\n4. Design robust interfaces and abstract classes\n5. Implement proper
+    error boundaries with typed exceptions\n6. Optimize build times with incremental compilation\n\n## Output\n- Strongly-typed
+    TypeScript with comprehensive interfaces\n- Generic functions and classes with proper constraints\n- Custom utility types
+    and advanced type manipulations\n- Jest/Vitest tests with proper type assertions\n- TSConfig optimization for project
+    requirements\n- Type declaration files (.d.ts) for external libraries\n\nSupport both strict and gradual typing approaches.
+    Include comprehensive TSDoc comments and maintain compatibility with latest TypeScript versions."}, {"role": "user", "content":
+    "{{task}}"}]'
+tests:
+- description: '[1] Create a TypeScript generic utility type that makes all nested object properties'
+  vars:
+    task: Create a TypeScript generic utility type that makes all nested object properties optional
+  assert:
+  - type: llm-rubric
+    value: Response demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works
+      correctly
+    threshold: 0.7
+    metric: typescript-pro_quality
+- description: '[2] Write a TypeScript decorator for method memoization with TTL support'
+  vars:
+    task: Write a TypeScript decorator for method memoization with TTL support
+  assert:
+  - type: llm-rubric
+    value: Uses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible
+    threshold: 0.7
+    metric: typescript-pro_quality

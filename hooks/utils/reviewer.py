@@ -217,6 +217,7 @@ class ReviewPacket:
     agent_mode: str = "claude"
     root_clean: bool = True
     root_violations: list[str] = field(default_factory=list)
+    last_assistant_message: str = ""
     timestamp: str = ""
 
 
@@ -243,7 +244,10 @@ def _resolve_session_id(session_id: str) -> str:
     return session_id
 
 
-def build_review_packet(session_id: str) -> ReviewPacket:
+def build_review_packet(
+    session_id: str,
+    last_assistant_message: str = "",
+) -> ReviewPacket:
     """Gather all context needed for a protocol review.
 
     Reads user requests, specs, project config, runs sandbox checks,
@@ -252,6 +256,7 @@ def build_review_packet(session_id: str) -> ReviewPacket:
     session_id = _resolve_session_id(session_id)
     packet = ReviewPacket(
         session_id=session_id,
+        last_assistant_message=last_assistant_message[:3000] if last_assistant_message else "",
         timestamp=datetime.now().isoformat(),
     )
 
@@ -357,8 +362,15 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
     """Convert ReviewPacket into structured text for the LLM prompt."""
     sections = []
 
+    # Last assistant message (for Execute-Don't-Recommend check)
+    sections.append("## LAST ASSISTANT MESSAGE")
+    if packet.last_assistant_message:
+        sections.append(packet.last_assistant_message)
+    else:
+        sections.append("(Not captured)")
+
     # User requests
-    sections.append("## USER REQUESTS")
+    sections.append("\n## USER REQUESTS")
     if packet.user_requests:
         for i, req in enumerate(packet.user_requests, 1):
             ts = req.get("timestamp", "?")
@@ -611,7 +623,10 @@ class ReviewResult:
     error: str = ""
 
 
-def run_review(session_id: str) -> ReviewResult:
+def run_review(
+    session_id: str,
+    last_assistant_message: str = "",
+) -> ReviewResult:
     """Execute a single review round.
 
     1. Build review packet (including sandbox checks)
@@ -647,7 +662,7 @@ def run_review(session_id: str) -> ReviewResult:
         )
 
     # Build review packet
-    packet = build_review_packet(session_id)
+    packet = build_review_packet(session_id, last_assistant_message=last_assistant_message)
     packet_text = format_packet_for_prompt(packet)
 
     # Load conversation history

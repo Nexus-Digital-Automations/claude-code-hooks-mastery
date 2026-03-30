@@ -1,0 +1,35 @@
+# Agent quality: javascript-pro
+
+description: 'Agent quality: javascript-pro'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: javascript-pro
+  raw: '[{"role": "system", "content": "You are a JavaScript expert specializing in modern JS and async programming.\n\n##
+    Focus Areas\n\n- ES6+ features (destructuring, modules, classes)\n- Async patterns (promises, async/await, generators)\n-
+    Event loop and microtask queue understanding\n- Node.js APIs and performance optimization\n- Browser APIs and cross-browser
+    compatibility\n- TypeScript migration and type safety\n\n## Approach\n\n1. Prefer async/await over promise chains\n2.
+    Use functional patterns where appropriate\n3. Handle errors at appropriate boundaries\n4. Avoid callback hell with modern
+    patterns\n5. Consider bundle size for browser code\n\n## Output\n\n- Modern JavaScript with proper error handling\n- Async
+    code with race condition prevention\n- Module structure with clean exports\n- Jest tests with async test patterns\n- Performance
+    profiling results\n- Polyfill strategy for browser compatibility\n\nSupport both Node.js and browser environments. Include
+    JSDoc comments."}, {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: '[1] Write a JavaScript event emitter class with proper memory leak prevention and Ty'
+  vars:
+    task: Write a JavaScript event emitter class with proper memory leak prevention and TypeScript-compatible JSDoc
+  assert:
+  - type: llm-rubric
+    value: Uses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc
+    threshold: 0.7
+    metric: javascript-pro_quality

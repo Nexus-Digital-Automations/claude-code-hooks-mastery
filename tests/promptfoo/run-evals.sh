@@ -5,20 +5,16 @@
 set -e
 cd /Users/jeremyparker/.claude
 
-# Load DeepSeek API key from ~/.claude/.env if not already set
-if [ -z "$DEEPSEEK_API_KEY" ] && [ -f ~/.claude/.env ]; then
-  export DEEPSEEK_API_KEY=$(grep '^DEEPSEEK_API_KEY=' ~/.claude/.env | cut -d= -f2- | tr -d '"'"'" | head -1) # nosec
+# Load OpenAI API key from ~/.claude/.env if not already set
+if [ -z "$OPENAI_API_KEY" ] && [ -f ~/.claude/.env ]; then
+  export OPENAI_API_KEY=$(grep '^OPENAI_API_KEY=' ~/.claude/.env | cut -d= -f2- | tr -d '"'"'" | head -1) # nosec
 fi
 
-if [ -z "$DEEPSEEK_API_KEY" ]; then
-  echo "ERROR: DEEPSEEK_API_KEY not set."
-  echo "Add it to ~/.claude/.env:  DEEPSEEK_API_KEY=sk-..."
+if [ -z "$OPENAI_API_KEY" ]; then
+  echo "ERROR: OPENAI_API_KEY not set."
+  echo "Add it to ~/.claude/.env:  OPENAI_API_KEY=sk-..."
   exit 1
 fi
-
-# Point promptfoo's built-in llm-rubric grader at DeepSeek (OpenAI-compatible)
-export OPENAI_API_KEY=$DEEPSEEK_API_KEY  # nosec — forwards env var, not a hardcoded secret
-export OPENAI_BASE_URL="https://api.deepseek.com"
 
 PROMPTFOO="./node_modules/.bin/promptfoo"
 RESULTS_DIR="tests/promptfoo/results"
@@ -100,6 +96,7 @@ case "$SUITE" in
   24) run_eval "24" "deepseek-skills-effectiveness" ;;
   25) run_eval "25" "deepseek-prompt-ab" ;;
   26) run_eval "26" "deepseek-planning-ab" ;;
+  27) run_eval "27" "clarify-first-enforcement" ;;
   ab)
     run_eval "18" "routing-v2-ab"
     run_eval "19" "ambiguity-v2-ab"
@@ -159,6 +156,7 @@ case "$SUITE" in
     run_eval "24" "deepseek-skills-effectiveness"
     run_eval "25" "deepseek-prompt-ab"
     run_eval "26" "deepseek-planning-ab"
+    run_eval "27" "clarify-first-enforcement"
     for yaml_file in "${AGENTS_DIR}"/*.yaml; do
       agent_name=$(basename "$yaml_file" .yaml)
       run_agent_eval "$agent_name"
@@ -169,7 +167,7 @@ case "$SUITE" in
     done
     ;;
   *)
-    echo "Usage: $0 [01-05|11|13-26|ab|deepseek|deepseek-ab|hooks|per-agent|all]"
+    echo "Usage: $0 [01-05|11|13-27|ab|deepseek|deepseek-ab|hooks|per-agent|all]"
     exit 1
     ;;
 esac

@@ -1,0 +1,120 @@
+description: "Eval: agent routing directive from user_prompt_submit.py"
+
+# Tests whether the routing directive causes Claude to:
+# 1. Dispatch the RIGHT agent for domain-specialist tasks
+# 2. NOT dispatch agents for trivial tasks / questions
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 300
+      temperature: 0.0
+
+# Use OpenAI as grading model for llm-rubric assertions
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  - label: "with-routing-directive"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "BEFORE ANSWERING: Does this task need a specialist agent?\n\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\n• Security audit or hardening of a codebase\n• ML model training, evaluation, or deployment\n• Infrastructure, cloud, or DevOps setup\n• Database design, migration, or optimization\n\nIf routing: State \"Routing to <agent-name> for <reason>.\" BEFORE any code.\n\nDO NOT ROUTE — answer directly for:\n• Questions and explanations (\"What is X?\", \"How does X work?\", \"Explain X\")\n• One-line fixes and typos\n• Git operations and quick edits\n• Conceptual advice without implementation\n\nAGENTS:\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\n[DATABASE] database-architect, database-optimizer, sql-pro\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\n[OPS] incident-responder, devops-troubleshooter, debugger\n[DOCS] docs-architect, mermaid-expert\n\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\n\n{{user_task}}"
+        }
+      ]
+
+  - label: "without-routing-directive"
+    raw: "{{user_task}}"
+
+tests:
+  # --- Tasks that SHOULD trigger agent routing ---
+
+  - description: "FastAPI + JWT auth → should mention fastapi-pro or backend-security-coder"
+    vars:
+      user_task: "Build a FastAPI application with JWT authentication and refresh token rotation"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response explicitly mentions routing to or using a specific agent
+          such as fastapi-pro, backend-architect, or backend-security-coder.
+          It should NOT just dive into writing code without any routing mention.
+        threshold: 0.8
+        metric: "correct_agent_dispatch"
+
+  - description: "Rust TCP server → should route to rust-pro"
+    vars:
+      user_task: "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response explicitly mentions routing to rust-pro or a relevant
+          Rust specialist. It should not attempt to write all the Rust code
+          directly without mentioning agent delegation.
+        threshold: 0.7
+        metric: "correct_agent_dispatch"
+
+  - description: "K8s GitOps → should route to kubernetes-architect"
+    vars:
+      user_task: "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response mentions routing to kubernetes-architect, deployment-engineer,
+          or a related infrastructure agent. Not just generic advice.
+        threshold: 0.7
+        metric: "correct_agent_dispatch"
+
+  - description: "OWASP audit → should route to security agent"
+    vars:
+      user_task: "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response mentions routing to owasp-guardian-sonnet, security-auditor,
+          or sast-orchestrator-sonnet. Should clearly identify security specialization.
+        threshold: 0.8
+        metric: "correct_agent_dispatch"
+
+  # --- Tasks that should NOT trigger routing ---
+
+  - description: "Simple question → no agent dispatch needed"
+    vars:
+      user_task: "What does the SOLID principle stand for?"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response directly answers the question about SOLID principles.
+          It does NOT claim to be routing to an agent — that would be overkill
+          for a simple knowledge question.
+        threshold: 0.8
+        metric: "avoids_unnecessary_dispatch"
+
+  - description: "One-line fix → no agent dispatch needed"
+    vars:
+      user_task: "Fix this: print('hello world')"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response addresses the trivial print statement directly.
+          It should NOT route to a specialized agent for such a simple request.
+        threshold: 0.8
+        metric: "avoids_unnecessary_dispatch"
+
+  - description: "Explanation request → no agent dispatch needed"
+    vars:
+      user_task: "Explain how async/await works in Python"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response explains async/await directly without routing to python-pro
+          or any other agent. An explanation question doesn't require agent delegation.
+        threshold: 0.75
+        metric: "avoids_unnecessary_dispatch"
+
+outputPath: tests/promptfoo/results/01-agent-routing.json

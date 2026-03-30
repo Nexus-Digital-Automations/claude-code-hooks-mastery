@@ -1,0 +1,61 @@
+# Skill quality: python-testing-patterns
+
+description: 'Skill quality: python-testing-patterns'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: python-testing-patterns
+  raw: '[{"role": "system", "content": "# Python Testing Patterns\n\nComprehensive guide to implementing robust testing strategies
+    in Python using pytest, fixtures, mocking, parameterization, and test-driven development practices.\n\n## When to Use
+    This Skill\n\n- Writing unit tests for Python code\n- Setting up test suites and test infrastructure\n- Implementing test-driven
+    development (TDD)\n- Creating integration tests for APIs and services\n- Mocking external dependencies and services\n-
+    Testing async code and concurrent operations\n- Setting up continuous testing in CI/CD\n- Implementing property-based
+    testing\n- Testing database operations\n- Debugging failing tests\n\n## Core Concepts\n\n### 1. Test Types\n- **Unit Tests**:
+    Test individual functions/classes in isolation\n- **Integration Tests**: Test interaction between components\n- **Functional
+    Tests**: Test complete features end-to-end\n- **Performance Tests**: Measure speed and resource usage\n\n### 2. Test Structure
+    (AAA Pattern)\n- **Arrange**: Set up test data and preconditions\n- **Act**: Execute the code under test\n- **Assert**:
+    Verify the results\n\n### 3. Test Coverage\n- Measure what code is exercised by tests\n- Identify untested code paths\n-
+    Aim for meaningful coverage, not just high percentages\n\n### 4. Test Isolation\n- Tests should be independent\n- No shared
+    state between tests\n- Each test should clean up after itself\n\n## Quick Start\n\n```python\n# test_example.py\ndef add(a,
+    b):\n    return a + b\n\ndef test_add():\n    \"\"\"Basic test example.\"\"\"\n    result = add(2, 3)\n    assert result
+    == 5\n\ndef test_add_negative():\n    \"\"\"Test with negative numbers.\"\"\"\n    assert add(-1, 1) == 0\n\n# Run with:
+    pytest test_example.py\n```\n\n## Fundamental Patterns\n\n### Pattern 1: Basic pytest Tests\n\n```python\n# test_calculator.py\nimport
+    pytest\n\nclass Calculator:\n    \"\"\"Simple calculator for testing.\"\"\"\n\n    def add(self, a: float, b: float) ->
+    float:\n        return a + b\n\n    def subtract(self, a: float, b: float) -> float:\n        return a - b\n\n    def
+    multiply(self, a: float, b: float) -> float:\n        return a * b\n\n    def divide(self, a: float, b: float) -> float:\n        if
+    b == 0:\n            raise ValueError(\"Cannot divide by zero\")\n        return a / b\n\n\ndef test_addition():\n    \"\"\"Test
+    addition.\"\"\"\n    calc = Calculator()\n    assert calc.add(2, 3) == 5\n    assert calc.add(-1, 1) == 0\n    assert
+    calc.add(0, 0) == 0\n\n\ndef test_subtraction():\n    \"\"\"Test subtraction.\"\"\"\n    calc = Calculator()\n    assert
+    calc.subtract(5, 3) == 2\n    assert calc.subtract(0, 5) == -5\n\n\ndef test_multiplication():\n    \"\"\"Test multiplication.\"\"\"\n    calc
+    = Calculator()\n    assert calc.multiply(3, 4) == 12\n    assert calc.multiply(0, 5) == 0\n\n\ndef test_division():\n    \"\"\"Test
+    division.\"\"\"\n    calc = Calculator()\n    assert calc.divide(6, 3) == 2\n    assert calc.divide(5, 2) == 2.5\n\n\ndef
+    test_division_by_zero():\n    \"\"\"Test division by zero raises error.\"\"\"\n    calc = Calculator()\n    with pytest.raises(ValueError,
+    match=\"Cannot divide by zero\"):\n        calc.divide(5, 0)\n```\n\n### Pattern 2: Fixtures for Setup and Teardown\n\n```python\n#
+    test_database.py\nimport pytest\nfrom typing import Generator\n\nclass Database:\n    \"\"\"Simple database class.\"\"\"\n\n    def
+    __init__(self, connection_string: str):\n        self.connection_string = connection_string\n        self.connected =
+    False\n\n    def connect(self):\n        \"\"\"Connect to database.\"\"\"\n        self.connected = True\n\n    def disconnect(self):\n        \"\"\"Disconnect
+    from database.\"\"\"\n        self.connected = False\n\n    def query(self, sql: str) -> list:\n        \"\"\"Execute
+    query.\"\"\"\n        if not self.connected:\n            raise RuntimeError(\"Not connected\")\n        return [{\"id\":
+    1, \"name\": \"Test\"}]\n\n\n@pytest.fixture\ndef db() -> Generator[Database, None, None]:\n    \"\"\"Fixture that provides
+    connected database.\"\"\"\n    # Setup\n    database = Database(\"sqlite:///:memory:\")\n    database.connect()\n\n    #
+    Provide to test\n    yield database\n\n    # Teardown\n    database.disconnect()\n\n\ndef test_database_query(db):\n\n[...
+    truncated ...]"}, {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: 'skill/python-testing-patterns: Show me how to write parameterized pytest tests with fixture'
+  vars:
+    task: Show me how to write parameterized pytest tests with fixtures for a database model
+  assert:
+  - type: llm-rubric
+    value: Demonstrates pytest.mark.parametrize usage, defines at least one fixture, shows actual test code with assertions
+    threshold: 0.6
+    metric: skill_python-testing-patterns_quality

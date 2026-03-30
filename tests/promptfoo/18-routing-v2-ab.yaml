@@ -1,0 +1,165 @@
+description: "A/B: Agent routing directive v1 (current) vs v2 (optimized)"
+
+# Tests whether the routing directive causes the model to:
+# 1. Acknowledge routing BEFORE providing code for specialist tasks
+# 2. NOT route for trivial tasks
+# Compares current prompt (v1) against optimized version (v2)
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 400
+      temperature: 0.0
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  # ── v1: Current prompt (from user_prompt_submit.py) ──
+  - label: "v1-routing-current"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "BEFORE ANSWERING: Check if this task falls into a specialist domain:\n• Implementing features in a specific language or framework (Rust, Go, Python, FastAPI, React, etc.)\n• Security analysis, audit, or hardening\n• ML/AI model training, evaluation, or deployment\n• Infrastructure, cloud, or DevOps setup\n• Database design, migration, or optimization\n• Code review, test suite creation, or performance profiling\n\nIf YES → dispatch: Task(subagent_type=\"<agent>\", prompt=\"<full task>\")\n          then announce: \"Routing to <agent> for <reason>.\"\nIf NO  → answer directly (questions, explanations, quick edits, clarifications).\n\nAVAILABLE AGENTS (subagent_type: <name> in Task tool):\n[CODE]     python-pro, typescript-pro, javascript-pro, rust-pro, golang-pro, java-pro, scala-pro, csharp-pro, ruby-pro, elixir-pro, bash-pro, cpp-pro, c-pro\n[BACKEND]  backend-architect, fastapi-pro, django-pro, graphql-architect, api-designer-sonnet\n[FRONTEND] frontend-developer, ui-ux-designer, mobile-developer, flutter-expert, ios-developer\n[SECURITY] security-auditor, threat-modeling-expert, backend-security-coder, frontend-security-coder, owasp-guardian-sonnet\n[ML/DATA]  data-scientist, ml-engineer, mlops-engineer, data-engineer, ai-engineer, prompt-engineer\n[DATABASE] database-architect, database-optimizer, sql-pro, database-admin\n[INFRA]    kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer, cicd-engineer-sonnet\n[TESTING]  test-automator, tdd-orchestrator, architect-review, code-reviewer, performance-engineer\n[OPS]      incident-responder, devops-troubleshooter, observability-engineer, error-detective, debugger\n[DOCS]     docs-architect, tutorial-engineer, mermaid-expert, c4-code, c4-component, c4-container, c4-context\n[OTHER]    legacy-modernizer, dx-optimizer, quant-analyst, payment-integration, blockchain-developer\n\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\n\n{{user_task}}"
+        }
+      ]
+
+  # ── v2: Optimized prompt (v3 iteration — fixes over-routing) ──
+  - label: "v2-routing-optimized"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "BEFORE ANSWERING: Does this task need a specialist agent?\n\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\n• Security audit or hardening of a codebase\n• ML model training, evaluation, or deployment\n• Infrastructure, cloud, or DevOps setup\n• Database design, migration, or optimization\n\nIf routing: State \"Routing to <agent-name> for <reason>.\" BEFORE any code.\n\nDO NOT ROUTE — answer directly for:\n• Questions and explanations (\"What is X?\", \"How does X work?\", \"Explain X\")\n• One-line fixes and typos\n• Git operations and quick edits\n• Conceptual advice without implementation\n\nAGENTS:\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\n[ML/DATA] data-scientist, ml-engineer, ai-engineer\n[DATABASE] database-architect, database-optimizer, sql-pro\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\n[OPS] incident-responder, devops-troubleshooter, debugger\n[DOCS] docs-architect, mermaid-expert\n\n{{user_task}}"
+        }
+      ]
+
+tests:
+  # ── Tasks that SHOULD trigger routing ──
+
+  - description: "FastAPI + JWT auth → should mention routing to fastapi-pro or backend agent"
+    vars:
+      user_task: "Build a FastAPI application with JWT authentication and refresh token rotation"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response mentions routing to a specific agent (fastapi-pro,
+          backend-architect, or backend-security-coder) BEFORE diving into code.
+          The routing statement should appear near the start of the response.
+          Acceptable: "Routing to fastapi-pro for..." or "I'd route this to fastapi-pro".
+          Fail if: the response starts with code or implementation details without
+          any mention of routing to a specific agent name from the list.
+        threshold: 0.75
+        metric: "correct_agent_dispatch"
+
+  - description: "Rust TCP server → should route to rust-pro"
+    vars:
+      user_task: "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response mentions routing to rust-pro (or a Rust specialist)
+          before providing implementation details. The agent name must appear.
+          Fail if: jumps directly to Rust code without mentioning any routing or agent.
+        threshold: 0.75
+        metric: "correct_agent_dispatch"
+
+  - description: "K8s GitOps → should route to kubernetes-architect or deployment-engineer"
+    vars:
+      user_task: "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions routing to kubernetes-architect, deployment-engineer,
+          or cloud-architect before providing setup instructions.
+          Fail if: provides GitOps setup guidance without naming a specific agent.
+        threshold: 0.75
+        metric: "correct_agent_dispatch"
+
+  - description: "OWASP audit → should route to security agent"
+    vars:
+      user_task: "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions routing to owasp-guardian-sonnet, security-auditor,
+          or backend-security-coder before starting the review.
+          Fail if: starts a security review without naming any agent.
+        threshold: 0.75
+        metric: "correct_agent_dispatch"
+
+  - description: "ML pipeline → should route to ml-engineer or data-scientist"
+    vars:
+      user_task: "Build a training pipeline for a transformer model with distributed training on 4 GPUs"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions routing to ml-engineer, data-scientist, or ai-engineer.
+          Fail if: jumps to implementation without naming an agent.
+        threshold: 0.75
+        metric: "correct_agent_dispatch"
+
+  - description: "Database optimization → should route to database-optimizer or sql-pro"
+    vars:
+      user_task: "Optimize the slow queries in our PostgreSQL database — the dashboard page takes 12 seconds"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions routing to database-optimizer, sql-pro, or database-architect.
+          Fail if: starts writing SQL optimization advice without naming an agent.
+        threshold: 0.75
+        metric: "correct_agent_dispatch"
+
+  # ── Tasks that should NOT trigger routing ──
+
+  - description: "Simple question → no agent dispatch needed"
+    vars:
+      user_task: "What does the SOLID principle stand for?"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: directly answers the question without mentioning any routing or agents.
+          Fail if: mentions routing to an agent for a simple knowledge question.
+        threshold: 0.80
+        metric: "avoids_unnecessary_dispatch"
+
+  - description: "One-line fix → no agent dispatch"
+    vars:
+      user_task: "Fix this typo: pritn('hello world')"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: directly fixes the typo (print) without routing to any agent.
+          Fail if: routes to python-pro or any agent for a trivial fix.
+        threshold: 0.80
+        metric: "avoids_unnecessary_dispatch"
+
+  - description: "Explanation request → no agent dispatch"
+    vars:
+      user_task: "Explain how async/await works in Python"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: explains async/await directly without routing.
+          Fail if: routes to python-pro for an explanation question.
+        threshold: 0.80
+        metric: "avoids_unnecessary_dispatch"
+
+  - description: "Git question → no agent dispatch"
+    vars:
+      user_task: "How do I revert the last commit?"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: answers the git question directly.
+          Fail if: routes to any agent for a simple git question.
+        threshold: 0.80
+        metric: "avoids_unnecessary_dispatch"
+
+outputPath: tests/promptfoo/results/18-routing-v2-ab.json

@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-hch-2026-03-15T04:18:40",
+  "evalId": "eval-bfh-2026-03-30T03:49:44",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:18:40.870Z",
+    "timestamp": "2026-03-30T03:49:44.392Z",
     "prompts": [
       {
         "id": "eef53e81d845570dd3cc3c9ab8266cc74e5c5f5a67dda8cf7f199c70cc27a60f",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a cloud architect specializing in scalable, cost-effective, and secure multi-cloud infrastructure design.\\n\\n## Purpose\\nExpert cloud architect with deep knowledge of AWS, Azure, GCP, and emerging cloud technologies. Masters Infrastructure as Code, FinOps practices, and modern architectural patterns including serverless, microservices, and event-driven architectures. Specializes in cost optimization, security best practices, and building resilient, scalable systems.\\n\\n## Capabilities\\n\\n### Cloud Platform Expertise\\n- **AWS**: EC2, Lambda, EKS, RDS, S3, VPC, IAM, CloudFormation, CDK, Well-Architected Framework\\n- **Azure**: Virtual Machines, Functions, AKS, SQL Database, Blob Storage, Virtual Network, ARM templates, Bicep\\n- **Google Cloud**: Compute Engine, Cloud Functions, GKE, Cloud SQL, Cloud Storage, VPC, Cloud Deployment Manager\\n- **Multi-cloud strategies**: Cross-cloud networking, data replication, disaster recovery, vendor lock-in mitigation\\n- **Edge computing**: CloudFlare, AWS CloudFront, Azure CDN, edge functions, IoT architectures\\n\\n### Infrastructure as Code Mastery\\n- **Terraform/OpenTofu**: Advanced module design, state management, workspaces, provider configurations\\n- **Native IaC**: CloudFormation (AWS), ARM/Bicep (Azure), Cloud Deployment Manager (GCP)\\n- **Modern IaC**: AWS CDK, Azure CDK, Pulumi with TypeScript/Python/Go\\n- **GitOps**: Infrastructure automation with ArgoCD, Flux, GitHub Actions, GitLab CI/CD\\n- **Policy as Code**: Open Policy Agent (OPA), AWS Config, Azure Policy, GCP Organization Policy\\n\\n### Cost Optimization & FinOps\\n- **Cost monitoring**: CloudWatch, Azure Cost Management, GCP Cost Management, third-party tools (CloudHealth, Cloudability)\\n- **Resource optimization**: Right-sizing recommendations, reserved instances, spot instances, committed use discounts\\n- **Cost allocation**: Tagging strategies, chargeback models, showback reporting\\n- **FinOps practices**: Cost anomaly detection, budget alerts, optimization automation\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "cloud-architect",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 383,
+          "totalLatencyMs": 11456,
           "tokenUsage": {
-            "prompt": 472,
-            "completion": 1500,
+            "prompt": 483,
+            "completion": 694,
             "cached": 0,
-            "total": 1972,
+            "total": 1177,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1825,
-              "prompt": 1704,
-              "completion": 121,
+              "total": 954,
+              "prompt": 902,
+              "completion": 52,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "cloud-architect_quality": 1
           },
-          "cost": 0
+          "cost": 0.00048885
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00048885,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "cloud-architect_quality": 1
           },
           "tokensUsed": {
-            "total": 1825,
-            "prompt": 1704,
-            "completion": 121,
+            "total": 954,
+            "prompt": 902,
+            "completion": 52,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output covers Route53 routing (latency-based routing with health checks), CloudFront/CDN (edge caching and global distribution), multi-region data replication (Aurora Global DB, DynamoDB Global Tables, S3 cross-region replication), latency optimization (Global Accelerator, latency-based routing, edge caching), and high availability design (active-active regions, auto-scaling, health checks, failover). This exceeds the requirement of covering at least 3 of the specified topics.",
+              "reason": "The output covers Route 53 routing, CloudFront as a CDN, and multi-region data replication through Amazon Aurora Global Database or DynamoDB Global Tables.",
               "tokensUsed": {
-                "total": 1825,
-                "prompt": 1704,
-                "completion": 121,
+                "total": 954,
+                "prompt": 902,
+                "completion": 52,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll design a multi-region active-active architecture for a web application on AWS with <100ms latency. This architecture ensures high availability, low latency, and global scalability.\\n\\n## **Multi-Region Active-Active Architecture Design**\\n\\n### **Architecture Overview**\\n```\\n┌─────────────────────────────────────────────────────────────────────────┐\\n│                           GLOBAL ARCHITECTURE                           │\\n├─────────────────────────────────────────────────────────────────────────┤\\n│                                                                         │\\n│  Region: us-east-1 (Virginia)        Region: eu-west-1 (Ireland)       │\\n│  ┌────────────────────────────┐     ┌────────────────────────────┐     │\\n│  │   Application Tier         │     │   Application Tier         │     │\\n│  │  ┌────────────────────┐    │     │  ┌────────────────────┐    │     │\\n│  │  │   ALB              │    │     │  │   ALB              │    │     │\\n│  │  └─────────┬──────────┘    │     │  └─────────┬──────────┘    │     │\\n│  │            │                │     │            │                │     │\\n│  │  ┌─────────▼──────────┐    │     │  ┌─────────▼──────────┐    │     │\\n│  │  │   ECS Fargate      │    │     │  │   ECS Fargate      │    │     │\\n│  │  │   (Auto Scaling)   │◄───┼─────┼──│   (Auto Scaling)   │    │     │\\n│  │  └─────────┬──────────┘    │     │  └─────────┬──────────┘    │     │\\n│  │            │                │     │            │                │     │\\n│  │  ┌─────────▼──────────┐    │     │  ┌─────────▼──────────┐    │     │\\n│  │  │   Aurora Global DB │◄────┼─────┼──► Aurora Global DB │    │     │\\n│  │  │   (Writer)         │     │     │  │   (Reader)        │    │     │\\n│  │  └────────────────────┘     │     │  └────────────────────┘    │     │\\n│  └──────────────────────────────┘     └────────────────────────────┘     │\\n│                                                                         │\\n│  ┌─────────────────────────────────────────────────────────────────────┐│\\n│  │                    GLOBAL SERVICES                                  ││\\n│  │  ┌─────────────────────────────────────────────────────────────┐   ││\\n│  │  │  Amazon Route 53 + Global Accelerator                        │   ││\\n│  │  │  • Latency-based routing                                     │   ││\\n│  │  │  • Health checks                                             │   ││\\n│  │  │  • Anycast IP                                                │   ││\\n│  │  └─────────────────────────────────────────────────────────────┘   ││\\n│  │                                                                     ││\\n│  │  ┌─────────────────────────────────────────────────────────────┐   ││\\n│  │  │  Amazon CloudFront + WAF                                    │   ││\\n│  │  │  • Edge caching                                             │   ││\\n│  │  │  • DDoS protection                                          │   ││\\n│  │  │  • Global distribution                                      │   ││\\n│  │  └─────────────────────────────────────────────────────────────┘   ││\\n│  │                                                                     ││\\n│  │  ┌─────────────────────────────────────────────────────────────┐   ││\\n│  │  │  Global Data Layer                                          │   ││\\n│  │  │  • DynamoDB Global Tables                                   │   ││\\n│  │  │  • ElastiCache Global Datastore                             │   ││\\n│  │  │  • S3 Cross-Region Replication                              │   ││\\n│  │  └─────────────────────────────────────────────────────────────┘   ││\\n│  └─────────────────────────────────────────────────────────────────────┘│\\n└─────────────────────────────────────────────────────────────────────────┘\\n```\\n\\n---\\n\\n## **Core Components & Implementation**\\n\\n### **1. Global Traffic Management**\\n```yaml\\n# Route 53 Configuration\\nLatency-Based Routing Policy:\\n  - Primary Endpoint: us-east-1 ALB\\n  - Secondary Endpoint: eu-west-1 ALB\\n  - Health Checks: Every 30 seconds\\n  - Failover Threshold: 3 consecutive failures\\n\\n# AWS Global Accelerator\\nAccelerator Configuration:\\n  - Anycast IP addresses (2 static IPs)\\n  - TCP/UDP optimization\\n  - Health checks from multiple edge locations\\n  - Automatic failover (<1 minute)\\n```\\n\\n### **2. Compute Layer (Active-Active)**\\n```terraform\\n# ECS Fargate Configuration (Both Regions)\\nmodule \\\"ecs_cluster\\\" {\\n  source = \\\"terraform-aws-modules/ecs/aws\\\"\\n  \\n  cluster_name = \\\"webapp-${var.region}\\\"\\n  \\n  fargate_capacity_providers = {\\n    FARGATE = {\\n      default_capacity_provider_strategy = {\\n        weight = 100\\n        base   = 1\\n      }\\n    }\\n  }\\n  \\n  services = {\\n    webapp = {\\n      cpu    = 1024\\n      memory = 2048\\n      \\n      # Auto-scaling based on CPU/Memory\\n      autoscaling = {\\n        min_capacity = 2\\n        max_capacity = 10\\n        target_cpu_utilization = 70\\n        target_memory_utilization = 70\\n      }\\n      \\n      # Health checks\\n      health_check = {\\n        command     = [\\\"CMD-SHELL\\\", \\\"curl -f http://localhost/health || exit 1\\\"]\\n        interval    = 30\\n        timeout     = 5\\n        retries     = 3\\n        start_period = 60\\n      }\\n    }\\n  }\\n}\\n```\\n\\n### **3. Global Database Layer**\\n```terraform\\n# Aurora Global Database\\nresource \\\"aws_rds_global_cluster\\\" \\\"webapp\\\" {\\n  global_cluster_identifier = \\\"webapp-global-db\\\"\\n  engine                    = \\\"aurora-postgresql\\\"\\n  engine_version           = \\\"13.7\\\"\\n  database_name            = \\\"webappdb\\\"\\n}\\n\\n# Primary Region (us-east-1)\\nresource \\\"aws_rds_cluster\\\" \\\"primary\\\" {\\n  cluster_identifier      = \\\"webapp-primary\\\"\\n  engine                 = \\\"aurora-postgresql\\\"\\n  engine_version         = \\\"13.7\\\"\\n  global_cluster_identifier = aws_rds_global_cluster.webapp.id\\n  \\n  # Multi-AZ for high availability\\n  availability_zones     = [\\\"us-east-1a\\\", \\\"us-east-1b\\\", \\\"us-east-1c\\n</Output>\\n<Rubric>\\nCovers at least 3 of: Route53 routing, CloudFront/CDN, multi-region data replication, latency optimization, high availability design\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a multi-region active-active architecture on AWS for a web application with a latency requirement of less than 100ms involves several key components and considerations. Below is a high-level architecture design that meets these requirements.\\n\\n### Architecture Overview\\n\\n1. **Regions**: Choose at least two AWS regions that are geographically close to each other to minimize latency. For example, you could use `us-east-1` (N. Virginia) and `us-east-2` (Ohio).\\n\\n2. **Load Balancing**: Use Amazon Route 53 for DNS-based load balancing with health checks. This will route traffic to the nearest healthy region based on latency.\\n\\n3. **Web Application Layer**:\\n   - Deploy the web application on Amazon Elastic Container Service (ECS) or Amazon Elastic Kubernetes Service (EKS) in both regions.\\n   - Use Application Load Balancers (ALB) in each region to distribute traffic among the application instances.\\n\\n4. **Database Layer**:\\n   - Use Amazon Aurora Global Database or Amazon DynamoDB Global Tables for a multi-region database setup. This allows for low-latency reads and writes across regions.\\n   - Ensure that the database is configured for cross-region replication to maintain data consistency.\\n\\n5. **Caching Layer**:\\n   - Implement Amazon ElastiCache (Redis or Memcached) in each region to cache frequently accessed data and reduce database load.\\n   - Use a global cache strategy to ensure that cache invalidation is handled properly across regions.\\n\\n6. **Storage Layer**:\\n   - Use Amazon S3 for object storage, with cross-region replication enabled to keep data synchronized across regions.\\n   - For static assets, consider using Amazon CloudFront as a Content Delivery Network (CDN) to cache content at edge locations closer to users.\\n\\n7. **Monitoring and Logging**:\\n   - Use Amazon CloudWatch for monitoring application performance and health across regions.\\n   - Implement centralized logging using Amazon CloudWatch Logs or AWS OpenSearch Service to aggregate logs from both regions.\\n\\n8. **Security**:\\n   - Use AWS Identity and Access Management (IAM) for access control.\\n   - Implement AWS WAF (Web Application Firewall) to protect against common web exploits.\\n   - Ensure that all data in transit is encrypted using TLS.\\n\\n9. **Disaster Recovery**:\\n   - Implement automated failover mechanisms using Route 53 health checks to redirect traffic to the healthy region in case of a failure.\\n   - Regularly test the failover process to ensure that it meets recovery time objectives (RTO) and recovery point objectives (RPO).\\n\\n### Latency Considerations\\n\\n- **Geographic Proximity**: Choose regions that are within a close geographic distance to minimize latency.\\n- **Network Optimization**: Use AWS Global Accelerator to optimize the path to your application, improving performance and reducing latency.\\n- **Edge Locations**: Leverage AWS CloudFront to cache content at edge locations, reducing latency for static assets.\\n\\n### Cost Considerations\\n\\n- **Resource Optimization**: Use auto-scaling to adjust the number of instances based on traffic patterns, ensuring cost efficiency.\\n- **Reserved Instances**: Consider using reserved instances or savings plans for predictable workloads to reduce costs.\\n\\n### Conclusion\\n\\nThis multi-region active-active architecture on AWS is designed to provide high availability, low latency, and resilience for your web application. By leveraging AWS services effectively, you can ensure that your application meets the performance requirements while remaining cost-effective and secure.\\n</Output>\\n<Rubric>\\nCovers at least 3 of: Route53 routing, CloudFront/CDN, multi-region data replication, latency optimization, high availability design\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "5468a6c3-a94b-4aba-b09f-b18fc15091e0",
-        "latencyMs": 383,
+        "id": "5af7883c-9a88-48e8-9b13-a3f131e4768c",
+        "latencyMs": 11456,
         "namedScores": {
           "cloud-architect_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "cloud-architect",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "eef53e81d845570dd3cc3c9ab8266cc74e5c5f5a67dda8cf7f199c70cc27a60f",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll design a multi-region active-active architecture for a web application on AWS with <100ms latency. This architecture ensures high availability, low latency, and global scalability.\n\n## **Multi-Region Active-Active Architecture Design**\n\n### **Architecture Overview**\n```\n┌─────────────────────────────────────────────────────────────────────────┐\n│                           GLOBAL ARCHITECTURE                           │\n├─────────────────────────────────────────────────────────────────────────┤\n│                                                                         │\n│  Region: us-east-1 (Virginia)        Region: eu-west-1 (Ireland)       │\n│  ┌────────────────────────────┐     ┌────────────────────────────┐     │\n│  │   Application Tier         │     │   Application Tier         │     │\n│  │  ┌────────────────────┐    │     │  ┌────────────────────┐    │     │\n│  │  │   ALB              │    │     │  │   ALB              │    │     │\n│  │  └─────────┬──────────┘    │     │  └─────────┬──────────┘    │     │\n│  │            │                │     │            │                │     │\n│  │  ┌─────────▼──────────┐    │     │  ┌─────────▼──────────┐    │     │\n│  │  │   ECS Fargate      │    │     │  │   ECS Fargate      │    │     │\n│  │  │   (Auto Scaling)   │◄───┼─────┼──│   (Auto Scaling)   │    │     │\n│  │  └─────────┬──────────┘    │     │  └─────────┬──────────┘    │     │\n│  │            │                │     │            │                │     │\n│  │  ┌─────────▼──────────┐    │     │  ┌─────────▼──────────┐    │     │\n│  │  │   Aurora Global DB │◄────┼─────┼──► Aurora Global DB │    │     │\n│  │  │   (Writer)         │     │     │  │   (Reader)        │    │     │\n│  │  └────────────────────┘     │     │  └────────────────────┘    │     │\n│  └──────────────────────────────┘     └────────────────────────────┘     │\n│                                                                         │\n│  ┌─────────────────────────────────────────────────────────────────────┐│\n│  │                    GLOBAL SERVICES                                  ││\n│  │  ┌─────────────────────────────────────────────────────────────┐   ││\n│  │  │  Amazon Route 53 + Global Accelerator                        │   ││\n│  │  │  • Latency-based routing                                     │   ││\n│  │  │  • Health checks                                             │   ││\n│  │  │  • Anycast IP                                                │   ││\n│  │  └─────────────────────────────────────────────────────────────┘   ││\n│  │                                                                     ││\n│  │  ┌─────────────────────────────────────────────────────────────┐   ││\n│  │  │  Amazon CloudFront + WAF                                    │   ││\n│  │  │  • Edge caching                                             │   ││\n│  │  │  • DDoS protection                                          │   ││\n│  │  │  • Global distribution                                      │   ││\n│  │  └─────────────────────────────────────────────────────────────┘   ││\n│  │                                                                     ││\n│  │  ┌─────────────────────────────────────────────────────────────┐   ││\n│  │  │  Global Data Layer                                          │   ││\n│  │  │  • DynamoDB Global Tables                                   │   ││\n│  │  │  • ElastiCache Global Datastore                             │   ││\n│  │  │  • S3 Cross-Region Replication                              │   ││\n│  │  └─────────────────────────────────────────────────────────────┘   ││\n│  └─────────────────────────────────────────────────────────────────────┘│\n└─────────────────────────────────────────────────────────────────────────┘\n```\n\n---\n\n## **Core Components & Implementation**\n\n### **1. Global Traffic Management**\n```yaml\n# Route 53 Configuration\nLatency-Based Routing Policy:\n  - Primary Endpoint: us-east-1 ALB\n  - Secondary Endpoint: eu-west-1 ALB\n  - Health Checks: Every 30 seconds\n  - Failover Threshold: 3 consecutive failures\n\n# AWS Global Accelerator\nAccelerator Configuration:\n  - Anycast IP addresses (2 static IPs)\n  - TCP/UDP optimization\n  - Health checks from multiple edge locations\n  - Automatic failover (<1 minute)\n```\n\n### **2. Compute Layer (Active-Active)**\n```terraform\n# ECS Fargate Configuration (Both Regions)\nmodule \"ecs_cluster\" {\n  source = \"terraform-aws-modules/ecs/aws\"\n  \n  cluster_name = \"webapp-${var.region}\"\n  \n  fargate_capacity_providers = {\n    FARGATE = {\n      default_capacity_provider_strategy = {\n        weight = 100\n        base   = 1\n      }\n    }\n  }\n  \n  services = {\n    webapp = {\n      cpu    = 1024\n      memory = 2048\n      \n      # Auto-scaling based on CPU/Memory\n      autoscaling = {\n        min_capacity = 2\n        max_capacity = 10\n        target_cpu_utilization = 70\n        target_memory_utilization = 70\n      }\n      \n      # Health checks\n      health_check = {\n        command     = [\"CMD-SHELL\", \"curl -f http://localhost/health || exit 1\"]\n        interval    = 30\n        timeout     = 5\n        retries     = 3\n        start_period = 60\n      }\n    }\n  }\n}\n```\n\n### **3. Global Database Layer**\n```terraform\n# Aurora Global Database\nresource \"aws_rds_global_cluster\" \"webapp\" {\n  global_cluster_identifier = \"webapp-global-db\"\n  engine                    = \"aurora-postgresql\"\n  engine_version           = \"13.7\"\n  database_name            = \"webappdb\"\n}\n\n# Primary Region (us-east-1)\nresource \"aws_rds_cluster\" \"primary\" {\n  cluster_identifier      = \"webapp-primary\"\n  engine                 = \"aurora-postgresql\"\n  engine_version         = \"13.7\"\n  global_cluster_identifier = aws_rds_global_cluster.webapp.id\n  \n  # Multi-AZ for high availability\n  availability_zones     = [\"us-east-1a\", \"us-east-1b\", \"us-east-1c",
+          "output": "Designing a multi-region active-active architecture on AWS for a web application with a latency requirement of less than 100ms involves several key components and considerations. Below is a high-level architecture design that meets these requirements.\n\n### Architecture Overview\n\n1. **Regions**: Choose at least two AWS regions that are geographically close to each other to minimize latency. For example, you could use `us-east-1` (N. Virginia) and `us-east-2` (Ohio).\n\n2. **Load Balancing**: Use Amazon Route 53 for DNS-based load balancing with health checks. This will route traffic to the nearest healthy region based on latency.\n\n3. **Web Application Layer**:\n   - Deploy the web application on Amazon Elastic Container Service (ECS) or Amazon Elastic Kubernetes Service (EKS) in both regions.\n   - Use Application Load Balancers (ALB) in each region to distribute traffic among the application instances.\n\n4. **Database Layer**:\n   - Use Amazon Aurora Global Database or Amazon DynamoDB Global Tables for a multi-region database setup. This allows for low-latency reads and writes across regions.\n   - Ensure that the database is configured for cross-region replication to maintain data consistency.\n\n5. **Caching Layer**:\n   - Implement Amazon ElastiCache (Redis or Memcached) in each region to cache frequently accessed data and reduce database load.\n   - Use a global cache strategy to ensure that cache invalidation is handled properly across regions.\n\n6. **Storage Layer**:\n   - Use Amazon S3 for object storage, with cross-region replication enabled to keep data synchronized across regions.\n   - For static assets, consider using Amazon CloudFront as a Content Delivery Network (CDN) to cache content at edge locations closer to users.\n\n7. **Monitoring and Logging**:\n   - Use Amazon CloudWatch for monitoring application performance and health across regions.\n   - Implement centralized logging using Amazon CloudWatch Logs or AWS OpenSearch Service to aggregate logs from both regions.\n\n8. **Security**:\n   - Use AWS Identity and Access Management (IAM) for access control.\n   - Implement AWS WAF (Web Application Firewall) to protect against common web exploits.\n   - Ensure that all data in transit is encrypted using TLS.\n\n9. **Disaster Recovery**:\n   - Implement automated failover mechanisms using Route 53 health checks to redirect traffic to the healthy region in case of a failure.\n   - Regularly test the failover process to ensure that it meets recovery time objectives (RTO) and recovery point objectives (RPO).\n\n### Latency Considerations\n\n- **Geographic Proximity**: Choose regions that are within a close geographic distance to minimize latency.\n- **Network Optimization**: Use AWS Global Accelerator to optimize the path to your application, improving performance and reducing latency.\n- **Edge Locations**: Leverage AWS CloudFront to cache content at edge locations, reducing latency for static assets.\n\n### Cost Considerations\n\n- **Resource Optimization**: Use auto-scaling to adjust the number of instances based on traffic patterns, ensuring cost efficiency.\n- **Reserved Instances**: Consider using reserved instances or savings plans for predictable workloads to reduce costs.\n\n### Conclusion\n\nThis multi-region active-active architecture on AWS is designed to provide high availability, low latency, and resilience for your web application. By leveraging AWS services effectively, you can ensure that your application meets the performance requirements while remaining cost-effective and secure.",
           "tokenUsage": {
-            "total": 1972,
-            "prompt": 472,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1177,
+            "prompt": 483,
+            "completion": 694,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 383,
-          "finishReason": "length",
+          "latencyMs": 11456,
+          "finishReason": "stop",
+          "cost": 0.00048885,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4425690a3616b2-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:18:41 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:49:55 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "11211",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=V265Y6.CD5gHReOLYA2Wb6OejwR6T.zvV_J9Wt45S5Y-1774842584.488292-1.0.1.1-1PMzC3MgWome33zy1l6cAV9ba3hU.iCLuLFyOHk6iF3hvJhf23uuKT81kjm6039powAVTJqzQjT4IM0LuWSGXWZYGX05UATqUMGWwcqM7Re3d.OJNKVav1OzCkkWuaQ4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:19:55 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 22fa6751aa43c58102eb69ce699317cc.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "Lz2fnQXsV3_DAWk2Ere_I6ens8gx3mPqQoXigmqcE_mCcXgvaBNOlw==",
-                "x-amz-cf-pop": "IAH50-P2",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "6b908547d0764d681f52b3fa697e90d4"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-tokens": "199470",
+                "x-ratelimit-reset-requests": "1h5m7.701s",
+                "x-ratelimit-reset-tokens": "159ms",
+                "x-request-id": "req_5171f478f1ec4a4a92c6fd507761eaf9"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4425690a3616b2-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:18:41 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:49:55 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "11211",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=V265Y6.CD5gHReOLYA2Wb6OejwR6T.zvV_J9Wt45S5Y-1774842584.488292-1.0.1.1-1PMzC3MgWome33zy1l6cAV9ba3hU.iCLuLFyOHk6iF3hvJhf23uuKT81kjm6039powAVTJqzQjT4IM0LuWSGXWZYGX05UATqUMGWwcqM7Re3d.OJNKVav1OzCkkWuaQ4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:19:55 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 22fa6751aa43c58102eb69ce699317cc.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "Lz2fnQXsV3_DAWk2Ere_I6ens8gx3mPqQoXigmqcE_mCcXgvaBNOlw==",
-              "x-amz-cf-pop": "IAH50-P2",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "6b908547d0764d681f52b3fa697e90d4"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-tokens": "199470",
+              "x-ratelimit-reset-requests": "1h5m7.701s",
+              "x-ratelimit-reset-tokens": "159ms",
+              "x-request-id": "req_5171f478f1ec4a4a92c6fd507761eaf9"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 472,
-        "completion": 1500,
+        "prompt": 483,
+        "completion": 694,
         "cached": 0,
-        "total": 1972,
+        "total": 1177,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1825,
-          "prompt": 1704,
-          "completion": 121,
+          "total": 954,
+          "prompt": 902,
+          "completion": 52,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 73018,
-      "evaluationDurationMs": 73018
+      "durationMs": 13332,
+      "evaluationDurationMs": 13332
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:19:53.936Z",
-    "evaluationCreatedAt": "2026-03-15T04:18:40.870Z"
+    "exportedAt": "2026-03-30T03:49:57.767Z",
+    "evaluationCreatedAt": "2026-03-30T03:49:44.392Z"
   }
 }

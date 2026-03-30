@@ -1,0 +1,187 @@
+description: "DeepSeek delegation edge cases — boundary conditions for routing decisions"
+
+# Tests the DeepSeek delegation protocol handles edge cases:
+# 1. Small tasks (~2 files) → Claude handles directly, no delegation
+# 2. Security tasks → Claude handles, never delegate
+# 3. Frontend UI → Claude handles, never delegate
+# 4. Full-stack → split correctly (backend → DeepSeek, frontend → Claude)
+# 5. Vague requests → requirements gathering, not immediate delegation
+# 6. Large backend tasks → must delegate
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 500
+      temperature: 0.0
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  - label: "deepseek-delegation-protocol"
+    raw: |
+      You are Claude Code. You are in deepseek delegation mode.
+
+      --- DELEGATION RULES ---
+      DIVISION OF LABOR:
+      - You (Claude Code): planning, testing, validation, frontend UI, security, review
+      - DeepSeek Agent (via mcp__deepseek-agent__run): backend code building
+
+      DELEGATION THRESHOLD:
+      - Tasks touching 5+ backend files → MUST delegate to DeepSeek
+      - Tasks touching 1-4 files → implement directly yourself
+      - ALL frontend UI work → you handle directly (never delegate)
+      - ALL security work → you handle directly (never delegate)
+      - Full-stack tasks → split: delegate backend, you do frontend
+
+      REQUIREMENTS GATHERING:
+      - Vague requests ("build an app", "make a website") → ask for spec first, don't code
+      - Ask: frontend framework? backend stack? features as numbered list? database? auth?
+
+      BEFORE DELEGATING:
+      - Write an Implementation Plan (features, architecture, contracts, constraints)
+      - Include plan in the task description sent to mcp__deepseek-agent__run
+      - Use profile="default-delegation" for budget controls
+      --- END RULES ---
+
+      User request: {{user_task}}
+
+      Describe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.
+
+tests:
+  # ── Small tasks: handle directly ──
+
+  - description: "Fix typo in one file → handle directly, no delegation"
+    vars:
+      user_task: "Fix the typo in src/utils/helpers.ts — 'recieve' should be 'receive'"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: states it will handle this directly (too small to delegate).
+          Should NOT mention mcp__deepseek-agent__run or delegation.
+          A one-file typo fix is clearly below the 5-file threshold.
+          Fail if: delegates this to DeepSeek or writes an Implementation Plan.
+        threshold: 0.80
+        metric: "small_task_direct_handling"
+      - type: not-contains
+        value: "mcp__deepseek-agent__run"
+        metric: "no_delegation_call"
+
+  - description: "Add one env var to config → handle directly"
+    vars:
+      user_task: "Add REDIS_URL to the config.ts and .env.example files"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles directly — 2 files is below delegation threshold.
+          Fail if: delegates to DeepSeek for a 2-file change.
+        threshold: 0.80
+        metric: "small_task_direct_handling"
+
+  # ── Security tasks: never delegate ──
+
+  - description: "Security audit → Claude handles, never delegate"
+    vars:
+      user_task: "Run a security audit on our authentication system — check for OWASP Top 10 vulnerabilities"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: states it will handle the security audit itself (security work
+          is never delegated to DeepSeek). Should mention doing the audit directly.
+          Fail if: delegates security audit to DeepSeek. The rules explicitly say
+          "ALL security work → you handle directly (never delegate)".
+        threshold: 0.80
+        metric: "security_kept_by_claude"
+
+  - description: "Secrets scanning → Claude handles, never delegate"
+    vars:
+      user_task: "Scan the codebase for hardcoded secrets, API keys, and credentials"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: handles secrets scanning directly — security work stays with Claude.
+          Fail if: delegates to DeepSeek.
+        threshold: 0.80
+        metric: "security_kept_by_claude"
+
+  # ── Frontend UI: never delegate ──
+
+  - description: "React component → Claude handles, never delegate"
+    vars:
+      user_task: "Build a responsive dashboard with a sidebar navigation, header, and a grid of metric cards"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: states it will build the frontend UI itself (UI work is never
+          delegated). Should mention handling it directly.
+          Fail if: delegates React/UI work to DeepSeek. Rules say "ALL frontend
+          UI work → you handle directly (never delegate)".
+        threshold: 0.80
+        metric: "frontend_kept_by_claude"
+
+  # ── Full-stack: split correctly ──
+
+  - description: "Full-stack feature → split: backend to DeepSeek, frontend to Claude"
+    vars:
+      user_task: "Add a user profile page: API endpoint GET /api/profile that returns user data, and a React component that displays the profile with an edit form"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: describes a split approach — delegates the backend API endpoint
+          to DeepSeek, handles the React frontend component itself. The split should
+          be explicit: "delegate backend" and "handle frontend directly".
+          Fail if: delegates the entire task (including frontend) to DeepSeek,
+          OR handles the entire task (including 5+ file backend) directly.
+        threshold: 0.70
+        metric: "fullstack_split_correctly"
+
+  # ── Large backend: must delegate ──
+
+  - description: "New API service (10+ files) → must delegate to DeepSeek"
+    vars:
+      user_task: "Build a complete REST API for an e-commerce system: products CRUD, categories CRUD, cart management, order placement, payment webhook handler, and admin endpoints"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: writes an Implementation Plan and delegates to DeepSeek via
+          mcp__deepseek-agent__run. This is clearly a 10+ file backend task that
+          exceeds the delegation threshold. The plan should enumerate the features.
+          Fail if: attempts to implement directly without delegating, OR delegates
+          without writing a plan first.
+        threshold: 0.75
+        metric: "large_backend_delegated"
+
+  # ── Vague request: requirements gathering ──
+
+  - description: "Vague 'build an app' → gather requirements, don't code"
+    vars:
+      user_task: "Build me a social media app"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks clarifying questions about requirements — frontend framework,
+          backend stack, features list, database, auth needs. Does NOT start coding
+          or delegating without a spec.
+          Fail if: starts delegating to DeepSeek or writing code without first
+          gathering requirements for this vague request.
+        threshold: 0.80
+        metric: "vague_request_gathers_requirements"
+
+  - description: "Vague 'make a dashboard' → gather requirements"
+    vars:
+      user_task: "Create a dashboard for our team"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks what the dashboard should show, what framework to use,
+          what data sources, etc. Requirements gathering before implementation.
+          Fail if: starts building without asking what "dashboard for our team" means.
+        threshold: 0.80
+        metric: "vague_request_gathers_requirements"
+
+outputPath: tests/promptfoo/results/21-delegation-edge-cases.json

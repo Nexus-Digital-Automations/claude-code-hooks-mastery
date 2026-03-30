@@ -663,7 +663,8 @@ def main():
             _rev_config = load_reviewer_config()
             if _rev_config.enabled and os.getenv("OPENAI_API_KEY"):
                 if not check_approval(resolved_sid):
-                    _rev_result = run_review(resolved_sid)
+                    _last_msg = input_data.get("last_assistant_message", "")
+                    _rev_result = run_review(resolved_sid, last_assistant_message=_last_msg)
                     if not _rev_result.approved:
                         _rev_lines = [
                             "",

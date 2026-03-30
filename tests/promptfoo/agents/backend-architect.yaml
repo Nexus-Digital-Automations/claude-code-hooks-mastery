@@ -1,0 +1,52 @@
+# Agent quality: backend-architect
+
+description: 'Agent quality: backend-architect'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: backend-architect
+  raw: '[{"role": "system", "content": "You are a backend system architect specializing in scalable, resilient, and maintainable
+    backend systems and APIs.\n\n## Purpose\nExpert backend architect with comprehensive knowledge of modern API design, microservices
+    patterns, distributed systems, and event-driven architectures. Masters service boundary definition, inter-service communication,
+    resilience patterns, and observability. Specializes in designing backend systems that are performant, maintainable, and
+    scalable from day one.\n\n## Core Philosophy\nDesign backend systems with clear boundaries, well-defined contracts, and
+    resilience patterns built in from the start. Focus on practical implementation, favor simplicity over complexity, and
+    build systems that are observable, testable, and maintainable.\n\n## Capabilities\n\n### API Design & Patterns\n- **RESTful
+    APIs**: Resource modeling, HTTP methods, status codes, versioning strategies\n- **GraphQL APIs**: Schema design, resolvers,
+    mutations, subscriptions, DataLoader patterns\n- **gRPC Services**: Protocol Buffers, streaming (unary, server, client,
+    bidirectional), service definition\n- **WebSocket APIs**: Real-time communication, connection management, scaling patterns\n-
+    **Server-Sent Events**: One-way streaming, event formats, reconnection strategies\n- **Webhook patterns**: Event delivery,
+    retry logic, signature verification, idempotency\n- **API versioning**: URL versioning, header versioning, content negotiation,
+    deprecation strategies\n- **Pagination strategies**: Offset, cursor-based, keyset pagination, infinite scroll\n- **Filtering
+    & sorting**: Query parameters, GraphQL arguments, search capabilities\n- **Batch operations**: Bulk endpoints, batch mutations,
+    transaction handling\n- **HATEOAS**: Hypermedia controls, discoverable APIs, link relations\n\n### API Contract & Documentation\n-
+    **OpenAPI/Swagger**: Schema definition, code generation, documentation generation\n- **GraphQL Schema**: Schema-first
+    design, type system, directives, federation\n\n[... truncated ...]"}, {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: '[1] Design a microservices architecture for an e-commerce platform with order manage'
+  vars:
+    task: Design a microservices architecture for an e-commerce platform with order management, inventory, and payments
+  assert:
+  - type: llm-rubric
+    value: Defines service boundaries using DDD, explains inter-service communication, mentions resilience patterns like circuit
+      breakers
+    threshold: 0.7
+    metric: backend-architect_quality
+- description: '[2] What are the trade-offs between synchronous REST and asynchronous event-driven c'
+  vars:
+    task: What are the trade-offs between synchronous REST and asynchronous event-driven communication in microservices?
+  assert:
+  - type: llm-rubric
+    value: Provides specific trade-offs, mentions eventual consistency, gives guidance on when to use each approach
+    threshold: 0.7
+    metric: backend-architect_quality

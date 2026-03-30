@@ -1,0 +1,172 @@
+description: "A/B: Validation protocol v1 (current ~300 words) vs v2 (optimized ~80 words)"
+
+# Tests whether the validation protocol causes the model to:
+# 1. Plan concrete validation steps (run tests, build, etc.)
+# 2. Use the Validation Report format (Command/Result/Output)
+# 3. NOT just claim "this will work" without evidence
+# 4. Execute autonomously without asking permission
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 1200
+      temperature: 0.0
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  # ── v1: Current prompt (~300 words) ──
+  - label: "v1-validation-current"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "--- MANDATORY VALIDATION PROTOCOL ---\nBEFORE completing ANY task, you MUST validate your work using one or more of these methods:\n\nTESTING METHODS:\n- Unit tests: `npm test`, `pytest`, `cargo test`, `go test`, `jest`, `mocha`\n- Integration tests: Run API tests, database tests\n- E2E tests: Puppeteer, Playwright, Cypress, Selenium\n- Type checking: `tsc --noEmit`, `mypy`, `pyright`\n\nBUILD VERIFICATION:\n- Compile/build: `npm run build`, `tsc`, `cargo build`, `go build`\n- Lint check: `eslint`, `flake8`, `pylint`, `clippy`\n- No errors in build output\n\nRUNTIME VERIFICATION:\n- Add console.log/print statements to verify code paths execute\n- Run the application and check it starts without errors\n- Make API calls and verify responses\n- Check browser console for errors\n\nPROOF OF FUNCTIONALITY:\n- Show command output proving tests pass\n- Display log entries proving code executed\n- Capture API responses showing correct behavior\n- Screenshot showing expected UI state\n\nVALIDATION REPORT REQUIRED:\nBefore stopping, you MUST present a report like this:\n\n## Validation Report\n**Command:** `[what you ran]`\n**Result:** ✅ PASS or ❌ FAIL\n**Output:** [actual output snippet]\n\nShow proof. The user is a critical thinker - not empty claims.\n\nYOU ARE NOT ALLOWED TO STOP until you have:\n1. Executed at least one validation method\n2. Confirmed the validation passed\n3. Fixed any failures found\n4. Presented a validation report with proof\n\n--- AUTONOMOUS EXECUTION ---\nDO NOT ASK: \"Should I fix this?\" / \"Should I continue?\" / \"Want me to proceed?\"\nJust fix it. Just continue. Just proceed.\nErrors = fix immediately and continue.\nAmbiguity = resolve UPFRONT ONLY, not mid-task.\nKEEP WORKING until ALL requested features are complete.\n\n{{user_task}}"
+        }
+      ]
+
+  # ── v2: Optimized prompt (v4 — forces upfront verification plan) ──
+  - label: "v2-validation-optimized"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "RESPOND IN THIS ORDER:\n\n1. STATE YOUR VERIFICATION PLAN FIRST: Before any code or investigation, write 2-3 bullet points listing the exact test/build/runtime commands you will run AFTER implementation to prove it works. Example:\n   • Run `pytest tests/` to verify the fix\n   • Run `npm run build` to verify compilation\n   • Run `curl localhost:3000/api/users` to verify the endpoint responds\n\n2. IMPLEMENT the solution.\n\n3. VERIFY by running your planned commands. Present each result as:\n   **Command:** `pytest tests/`\n   **Result:** ✅ PASS\n   **Output:** `4 passed in 0.32s`\n\nReading code (find, cat, grep) is investigation, NOT verification. You must run test/build/runtime commands.\nNever ask \"should I?\" — decide and act autonomously.\n\n{{user_task}}"
+        }
+      ]
+
+tests:
+  # ── Validation planning for implementation tasks ──
+
+  - description: "Bug fix → should plan to run tests AND show output"
+    vars:
+      user_task: "Fix the null pointer exception in the user login handler"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response includes a plan to validate the fix — mentions
+          running specific tests (pytest, npm test, jest, etc.) AND mentions
+          showing actual command output as proof. Should not just say "I'll fix it"
+          without a validation step.
+          Fail if: provides a fix without any mention of running tests or showing
+          command output. Pure code-only responses fail.
+        threshold: 0.75
+        metric: "plans_test_execution"
+      - type: llm-rubric
+        value: >
+          Pass if: does NOT ask "Should I proceed?" or "Do you want me to fix this?"
+          — it autonomously states its plan and acts.
+          Fail if: asks permission before proceeding.
+        threshold: 0.85
+        metric: "autonomous_no_permission"
+
+  - description: "Feature add → validation/verification steps mentioned"
+    vars:
+      user_task: "Add input validation to the user registration endpoint"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: the response includes a verification plan that references running
+          at least 2 of: tests (pytest, jest, etc.), lint, build, or runtime check
+          (curl, start app, etc.). The plan can appear anywhere in the response —
+          at the start, middle, or end. Bonus if it uses the Command/Result/Output format.
+          Fail if: only provides code without mentioning any verification steps.
+        threshold: 0.70
+        metric: "validation_steps_planned"
+
+  - description: "Refactor task → should plan build + test verification"
+    vars:
+      user_task: "Refactor the authentication middleware to use async/await instead of callbacks"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: plans to verify the refactor works — mentions running tests AND
+          build/compile check after making changes. Refactoring without verification
+          is dangerous.
+          Fail if: just shows refactored code without any verification plan.
+        threshold: 0.75
+        metric: "refactor_verification_planned"
+
+  - description: "API endpoint → should plan runtime verification (curl, start app)"
+    vars:
+      user_task: "Create a REST endpoint POST /api/users that accepts name and email"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: plans to verify the endpoint works at runtime — mentions
+          starting the server and testing with curl, httpie, or similar tool,
+          OR mentions running integration tests that hit the endpoint.
+          Fail if: only writes the code without any runtime verification plan.
+        threshold: 0.70
+        metric: "runtime_verification_planned"
+
+  # ── Proof format compliance ──
+
+  - description: "CSV parser → should plan to show proof, not just claim correctness"
+    vars:
+      user_task: "Write a function to parse CSV files with headers and return a list of dictionaries"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: mentions showing actual proof — running the code with sample
+          input, showing test output, or demonstrating the function works with
+          real data. Should NOT just say "this works" or "this is correct"
+          without any mechanism to verify.
+          Fail if: only provides the function code and says "this should work"
+          without any proof or verification plan.
+        threshold: 0.70
+        metric: "proof_over_claims"
+
+  - description: "Database migration → should plan multiple verification steps"
+    vars:
+      user_task: "Add a 'last_login' timestamp column to the users table"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: plans at least 2 verification steps — e.g., running the migration
+          AND checking the schema, OR running tests AND verifying the column exists.
+          Migration changes are risky — single verification is insufficient.
+          Fail if: runs the migration without any verification, or only does one check.
+        threshold: 0.70
+        metric: "multiple_verification_steps"
+
+  # ── Autonomy checks ──
+
+  - description: "DB optimization → autonomous plan, no permission asking"
+    vars:
+      user_task: "Optimize the database queries in the user service — the main page loads in 8 seconds"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: proceeds with a specific optimization plan without asking
+          "Should I do X?" or "Do you want me to proceed?". Acts decisively.
+          Fail if: asks for permission before starting work.
+        threshold: 0.80
+        metric: "autonomous_execution"
+      - type: not-contains
+        value: "Should I proceed"
+        metric: "no_should_i_proceed"
+
+  # ── Baseline (no protocol) ──
+
+  - description: "Baseline: without protocol, model likely skips validation plan"
+    vars:
+      user_task: "Fix the null pointer exception in the user login handler"
+    assert:
+      - type: llm-rubric
+        value: >
+          Baseline test: this response (without the validation protocol) likely
+          does NOT include structured validation with Command/Result/Output format.
+          Pass if: the response lacks structured validation (proving the protocol
+          adds value). Fail if: it spontaneously includes structured validation
+          (meaning the protocol is unnecessary).
+        threshold: 0.60
+        metric: "baseline_no_validation"
+
+outputPath: tests/promptfoo/results/20-validation-v2-ab.json

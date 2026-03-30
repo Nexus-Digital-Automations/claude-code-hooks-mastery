@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-yjK-2026-03-15T04:54:45",
+  "evalId": "eval-6Ff-2026-03-30T03:59:39",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:54:45.520Z",
+    "timestamp": "2026-03-30T03:59:39.648Z",
     "prompts": [
       {
         "id": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a TypeScript expert specializing in advanced typing and enterprise-grade development.\\n\\n## Focus Areas\\n- Advanced type systems (generics, conditional types, mapped types)\\n- Strict TypeScript configuration and compiler options\\n- Type inference optimization and utility types\\n- Decorators and metadata programming\\n- Module systems and namespace organization\\n- Integration with modern frameworks (React, Node.js, Express)\\n\\n## Approach\\n1. Leverage strict type checking with appropriate compiler flags\\n2. Use generics and utility types for maximum type safety\\n3. Prefer type inference over explicit annotations when clear\\n4. Design robust interfaces and abstract classes\\n5. Implement proper error boundaries with typed exceptions\\n6. Optimize build times with incremental compilation\\n\\n## Output\\n- Strongly-typed TypeScript with comprehensive interfaces\\n- Generic functions and classes with proper constraints\\n- Custom utility types and advanced type manipulations\\n- Jest/Vitest tests with proper type assertions\\n- TSConfig optimization for project requirements\\n- Type declaration files (.d.ts) for external libraries\\n\\nSupport both strict and gradual typing approaches. Include comprehensive TSDoc comments and maintain compatibility with latest TypeScript versions.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "typescript-pro",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 2,
           "testPassCount": 2,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 2,
           "assertFailCount": 0,
-          "totalLatencyMs": 1120,
+          "totalLatencyMs": 21733,
           "tokenUsage": {
-            "prompt": 500,
-            "completion": 3000,
+            "prompt": 508,
+            "completion": 1186,
             "cached": 0,
-            "total": 3500,
+            "total": 1694,
             "numRequests": 2,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 3511,
-              "prompt": 3388,
-              "completion": 123,
+              "total": 1692,
+              "prompt": 1582,
+              "completion": 110,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "typescript-pro_quality": 2
           },
-          "cost": 0
+          "cost": 0.0007878
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00026264999999999996,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "typescript-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1756,
-            "prompt": 1694,
-            "completion": 62,
+            "total": 629,
+            "prompt": 573,
+            "completion": 56,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The response includes multiple sophisticated DeepPartial implementations with proper generic constraints, handles edge cases like arrays and built-in types, provides comprehensive examples, and demonstrates advanced TypeScript knowledge through utility functions and type guards.",
+              "reason": "The output provides a detailed explanation of a TypeScript utility type that makes all properties of an object optional, including nested properties, demonstrating a strong understanding of TypeScript's type system and generics.",
               "tokensUsed": {
-                "total": 1756,
-                "prompt": 1694,
-                "completion": 62,
+                "total": 629,
+                "prompt": 573,
+                "completion": 56,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's a comprehensive TypeScript generic utility type that makes all nested object properties optional:\\n\\n```typescript\\n/**\\n * Recursively makes all properties of an object (including nested objects) optional\\n * @typeParam T - The type to transform\\n * @example\\n * ```typescript\\n * type User = {\\n *   id: number;\\n *   name: string;\\n *   address: {\\n *     street: string;\\n *     city: string;\\n *     country: {\\n *       code: string;\\n *       name: string;\\n *     };\\n *   };\\n *   preferences: {\\n *     theme: 'light' | 'dark';\\n *     notifications: boolean;\\n *   };\\n * };\\n * \\n * type PartialUser = DeepPartial<User>;\\n * // Equivalent to:\\n * // {\\n * //   id?: number;\\n * //   name?: string;\\n * //   address?: {\\n * //     street?: string;\\n * //     city?: string;\\n * //     country?: {\\n * //       code?: string;\\n * //       name?: string;\\n * //     };\\n * //   };\\n * //   preferences?: {\\n * //     theme?: 'light' | 'dark';\\n * //     notifications?: boolean;\\n * //   };\\n * // }\\n * ```\\n */\\nexport type DeepPartial<T> = T extends object\\n  ? {\\n      [P in keyof T]?: T[P] extends Array<infer U>\\n        ? Array<DeepPartial<U>>\\n        : T[P] extends ReadonlyArray<infer U>\\n        ? ReadonlyArray<DeepPartial<U>>\\n        : DeepPartial<T[P]>;\\n    }\\n  : T;\\n\\n/**\\n * Alternative implementation with better handling for built-in types\\n * This version preserves Date, RegExp, Map, Set, and other built-in types\\n */\\nexport type DeepPartialPreserveBuiltins<T> = T extends\\n  | Date\\n  | RegExp\\n  | Function\\n  | Map<any, any>\\n  | Set<any>\\n  | WeakMap<any, any>\\n  | WeakSet<any>\\n  | Promise<any>\\n  ? T\\n  : T extends Array<infer U>\\n  ? Array<DeepPartialPreserveBuiltins<U>>\\n  : T extends ReadonlyArray<infer U>\\n  ? ReadonlyArray<DeepPartialPreserveBuiltins<U>>\\n  : T extends object\\n  ? {\\n      [P in keyof T]?: DeepPartialPreserveBuiltins<T[P]>;\\n    }\\n  : T;\\n\\n/**\\n * Strict version that only works with plain objects and arrays\\n * This is useful when you want to ensure you're only dealing with serializable data\\n */\\nexport type DeepPartialStrict<T> = T extends\\n  | string\\n  | number\\n  | boolean\\n  | symbol\\n  | bigint\\n  | null\\n  | undefined\\n  ? T\\n  : T extends Array<infer U>\\n  ? Array<DeepPartialStrict<U>>\\n  : T extends ReadonlyArray<infer U>\\n  ? ReadonlyArray<DeepPartialStrict<U>>\\n  : T extends object\\n  ? {\\n      [P in keyof T]?: DeepPartialStrict<T[P]>;\\n    }\\n  : never;\\n\\n/**\\n * Utility type that makes properties optional but preserves required properties for specific keys\\n * @typeParam T - The base type\\n * @typeParam K - Keys that should remain required\\n */\\nexport type DeepPartialExcept<T, K extends keyof T> = DeepPartial<T> &\\n  Pick<T, K>;\\n\\n/**\\n * Example usage and tests\\n */\\n\\n// Example types\\ninterface Address {\\n  street: string;\\n  city: string;\\n  country: {\\n    code: string;\\n    name: string;\\n  };\\n  coordinates: [number, number];\\n}\\n\\ninterface User {\\n  id: number;\\n  name: string;\\n  email: string;\\n  address: Address;\\n  tags: string[];\\n  metadata: Record<string, any>;\\n  createdAt: Date;\\n  updatedAt: Date;\\n}\\n\\n// Test the DeepPartial type\\ntype PartialUser = DeepPartial<User>;\\n\\n// Valid assignments\\nconst validPartialUser: PartialUser = {\\n  name: 'John', // Optional property\\n  address: {\\n    city: 'New York', // Nested optional property\\n    country: {\\n      code: 'US', // Deep nested optional property\\n    },\\n  },\\n  tags: ['developer'], // Array with optional elements\\n  createdAt: new Date(), // Date preserved as is\\n};\\n\\n// Test with arrays containing objects\\ninterface Task {\\n  id: number;\\n  title: string;\\n  subtasks: Array<{\\n    id: number;\\n    description: string;\\n  }>;\\n}\\n\\ntype PartialTask = DeepPartial<Task>;\\n\\nconst partialTask: PartialTask = {\\n  title: 'Work',\\n  subtasks: [\\n    { id: 1 }, // description is optional\\n    { description: 'Meeting' }, // id is optional\\n  ],\\n};\\n\\n// Test with built-in types preservation\\ntype UserWithBuiltins = DeepPartialPreserveBuiltins<User>;\\n\\nconst userWithBuiltins: UserWithBuiltins = {\\n  name: 'Alice',\\n  createdAt: new Date(), // Date is preserved, not made optional internally\\n  address: {\\n    city: 'London',\\n  },\\n};\\n\\n// Test the DeepPartialExcept utility\\ntype UserProfileUpdate = DeepPartialExcept<User, 'id'>;\\n\\nconst userUpdate: UserProfileUpdate = {\\n  id: 123, // Required\\n  name: 'Updated Name', // Optional\\n  // email is optional\\n  address: {\\n    city: 'Updated City', // Optional\\n    // street is optional\\n  },\\n};\\n\\n// Type guard to check if an object is a valid partial update\\nfunction isValidPartialUpdate<T extends object>(\\n  obj: unknown,\\n  requiredKeys: Array<keyof T>\\n): obj is DeepPartial<T> {\\n  if (typeof obj !== 'object' || obj === null) {\\n    return false;\\n  }\\n\\n  // Check that all required keys are present\\n  for (const key of requiredKeys) {\\n    if (!(key in obj)) {\\n      return false;\\n    }\\n  }\\n\\n  return true;\\n}\\n\\n// Utility function to merge partial updates\\nfunction mergePartialUpdate<T extends object>(\\n  base: T,\\n  update: DeepPartial<T>\\n): T {\\n  const result = { ...base };\\n\\n  for (const key in update) {\\n    if (update[key] !== undefined) {\\n      const baseValue = base[key];\\n      const updateValue = update[key];\\n\\n      if (\\n        typeof baseValue === 'object' &&\\n        baseValue !== null &&\\n        typeof updateValue === 'object' &&\\n        updateValue !== null &&\\n        !(baseValue instanceof Date) &&\\n        !(updateValue instanceof Date)\\n      ) {\\n        // Recursively merge nested objects\\n        result[key as keyof T] = mergePartialUpdate(\\n          baseValue as any,\\n          updateValue as any\\n        ) as any;\\n      } else {\\n        result[key as keyof T] = updateValue as any;\\n      }\\n    }\\n  }\\n\\n  return result;\\n}\\n\\n// Example usage of merge function\\nconst baseUser: User\\n</Output>\\n<Rubric>\\nResponse demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create a TypeScript generic utility type that makes all nested object properties optional, you can use a recursive mapped type. This utility type will traverse through each property of the object and apply the optional modifier (`?`) to each property, including nested objects.\\n\\nHere's how you can implement this:\\n\\n```typescript\\n/**\\n * A utility type that makes all properties of an object optional, including nested properties.\\n * \\n * @template T - The object type to make properties optional.\\n */\\ntype DeepPartial<T> = {\\n    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];\\n};\\n\\n// Example usage:\\n\\ninterface User {\\n    id: number;\\n    name: string;\\n    address: {\\n        street: string;\\n        city: string;\\n        country: string;\\n    };\\n    hobbies: string[];\\n}\\n\\n// Using DeepPartial to create a type where all properties are optional\\ntype PartialUser = DeepPartial<User>;\\n\\nconst user: PartialUser = {\\n    // All properties are optional\\n    name: \\\"John Doe\\\",\\n    address: {\\n        city: \\\"New York\\\"\\n    }\\n};\\n```\\n\\n### Explanation:\\n1. **Mapped Type**: The `DeepPartial` type uses a mapped type to iterate over each key `K` in the object type `T`.\\n2. **Conditional Type**: The conditional type checks if the property type `T[K]` is an object. If it is, it recursively applies `DeepPartial` to that property. If not, it simply retains the original type.\\n3. **Optional Modifier**: The `?` makes each property optional.\\n\\n### Usage:\\nYou can use the `DeepPartial` type to create a new type where all properties of the original type are optional, which is particularly useful for scenarios like form handling or API responses where not all data may be present.\\n</Output>\\n<Rubric>\\nResponse demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "5eb1ee66-4f7a-48f8-976a-e77546992ba9",
-        "latencyMs": 560,
+        "id": "db730f18-560c-4a77-acaa-93140279e529",
+        "latencyMs": 6820,
         "namedScores": {
           "typescript-pro_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "typescript-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "Here's a comprehensive TypeScript generic utility type that makes all nested object properties optional:\n\n```typescript\n/**\n * Recursively makes all properties of an object (including nested objects) optional\n * @typeParam T - The type to transform\n * @example\n * ```typescript\n * type User = {\n *   id: number;\n *   name: string;\n *   address: {\n *     street: string;\n *     city: string;\n *     country: {\n *       code: string;\n *       name: string;\n *     };\n *   };\n *   preferences: {\n *     theme: 'light' | 'dark';\n *     notifications: boolean;\n *   };\n * };\n * \n * type PartialUser = DeepPartial<User>;\n * // Equivalent to:\n * // {\n * //   id?: number;\n * //   name?: string;\n * //   address?: {\n * //     street?: string;\n * //     city?: string;\n * //     country?: {\n * //       code?: string;\n * //       name?: string;\n * //     };\n * //   };\n * //   preferences?: {\n * //     theme?: 'light' | 'dark';\n * //     notifications?: boolean;\n * //   };\n * // }\n * ```\n */\nexport type DeepPartial<T> = T extends object\n  ? {\n      [P in keyof T]?: T[P] extends Array<infer U>\n        ? Array<DeepPartial<U>>\n        : T[P] extends ReadonlyArray<infer U>\n        ? ReadonlyArray<DeepPartial<U>>\n        : DeepPartial<T[P]>;\n    }\n  : T;\n\n/**\n * Alternative implementation with better handling for built-in types\n * This version preserves Date, RegExp, Map, Set, and other built-in types\n */\nexport type DeepPartialPreserveBuiltins<T> = T extends\n  | Date\n  | RegExp\n  | Function\n  | Map<any, any>\n  | Set<any>\n  | WeakMap<any, any>\n  | WeakSet<any>\n  | Promise<any>\n  ? T\n  : T extends Array<infer U>\n  ? Array<DeepPartialPreserveBuiltins<U>>\n  : T extends ReadonlyArray<infer U>\n  ? ReadonlyArray<DeepPartialPreserveBuiltins<U>>\n  : T extends object\n  ? {\n      [P in keyof T]?: DeepPartialPreserveBuiltins<T[P]>;\n    }\n  : T;\n\n/**\n * Strict version that only works with plain objects and arrays\n * This is useful when you want to ensure you're only dealing with serializable data\n */\nexport type DeepPartialStrict<T> = T extends\n  | string\n  | number\n  | boolean\n  | symbol\n  | bigint\n  | null\n  | undefined\n  ? T\n  : T extends Array<infer U>\n  ? Array<DeepPartialStrict<U>>\n  : T extends ReadonlyArray<infer U>\n  ? ReadonlyArray<DeepPartialStrict<U>>\n  : T extends object\n  ? {\n      [P in keyof T]?: DeepPartialStrict<T[P]>;\n    }\n  : never;\n\n/**\n * Utility type that makes properties optional but preserves required properties for specific keys\n * @typeParam T - The base type\n * @typeParam K - Keys that should remain required\n */\nexport type DeepPartialExcept<T, K extends keyof T> = DeepPartial<T> &\n  Pick<T, K>;\n\n/**\n * Example usage and tests\n */\n\n// Example types\ninterface Address {\n  street: string;\n  city: string;\n  country: {\n    code: string;\n    name: string;\n  };\n  coordinates: [number, number];\n}\n\ninterface User {\n  id: number;\n  name: string;\n  email: string;\n  address: Address;\n  tags: string[];\n  metadata: Record<string, any>;\n  createdAt: Date;\n  updatedAt: Date;\n}\n\n// Test the DeepPartial type\ntype PartialUser = DeepPartial<User>;\n\n// Valid assignments\nconst validPartialUser: PartialUser = {\n  name: 'John', // Optional property\n  address: {\n    city: 'New York', // Nested optional property\n    country: {\n      code: 'US', // Deep nested optional property\n    },\n  },\n  tags: ['developer'], // Array with optional elements\n  createdAt: new Date(), // Date preserved as is\n};\n\n// Test with arrays containing objects\ninterface Task {\n  id: number;\n  title: string;\n  subtasks: Array<{\n    id: number;\n    description: string;\n  }>;\n}\n\ntype PartialTask = DeepPartial<Task>;\n\nconst partialTask: PartialTask = {\n  title: 'Work',\n  subtasks: [\n    { id: 1 }, // description is optional\n    { description: 'Meeting' }, // id is optional\n  ],\n};\n\n// Test with built-in types preservation\ntype UserWithBuiltins = DeepPartialPreserveBuiltins<User>;\n\nconst userWithBuiltins: UserWithBuiltins = {\n  name: 'Alice',\n  createdAt: new Date(), // Date is preserved, not made optional internally\n  address: {\n    city: 'London',\n  },\n};\n\n// Test the DeepPartialExcept utility\ntype UserProfileUpdate = DeepPartialExcept<User, 'id'>;\n\nconst userUpdate: UserProfileUpdate = {\n  id: 123, // Required\n  name: 'Updated Name', // Optional\n  // email is optional\n  address: {\n    city: 'Updated City', // Optional\n    // street is optional\n  },\n};\n\n// Type guard to check if an object is a valid partial update\nfunction isValidPartialUpdate<T extends object>(\n  obj: unknown,\n  requiredKeys: Array<keyof T>\n): obj is DeepPartial<T> {\n  if (typeof obj !== 'object' || obj === null) {\n    return false;\n  }\n\n  // Check that all required keys are present\n  for (const key of requiredKeys) {\n    if (!(key in obj)) {\n      return false;\n    }\n  }\n\n  return true;\n}\n\n// Utility function to merge partial updates\nfunction mergePartialUpdate<T extends object>(\n  base: T,\n  update: DeepPartial<T>\n): T {\n  const result = { ...base };\n\n  for (const key in update) {\n    if (update[key] !== undefined) {\n      const baseValue = base[key];\n      const updateValue = update[key];\n\n      if (\n        typeof baseValue === 'object' &&\n        baseValue !== null &&\n        typeof updateValue === 'object' &&\n        updateValue !== null &&\n        !(baseValue instanceof Date) &&\n        !(updateValue instanceof Date)\n      ) {\n        // Recursively merge nested objects\n        result[key as keyof T] = mergePartialUpdate(\n          baseValue as any,\n          updateValue as any\n        ) as any;\n      } else {\n        result[key as keyof T] = updateValue as any;\n      }\n    }\n  }\n\n  return result;\n}\n\n// Example usage of merge function\nconst baseUser: User",
+          "output": "To create a TypeScript generic utility type that makes all nested object properties optional, you can use a recursive mapped type. This utility type will traverse through each property of the object and apply the optional modifier (`?`) to each property, including nested objects.\n\nHere's how you can implement this:\n\n```typescript\n/**\n * A utility type that makes all properties of an object optional, including nested properties.\n * \n * @template T - The object type to make properties optional.\n */\ntype DeepPartial<T> = {\n    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];\n};\n\n// Example usage:\n\ninterface User {\n    id: number;\n    name: string;\n    address: {\n        street: string;\n        city: string;\n        country: string;\n    };\n    hobbies: string[];\n}\n\n// Using DeepPartial to create a type where all properties are optional\ntype PartialUser = DeepPartial<User>;\n\nconst user: PartialUser = {\n    // All properties are optional\n    name: \"John Doe\",\n    address: {\n        city: \"New York\"\n    }\n};\n```\n\n### Explanation:\n1. **Mapped Type**: The `DeepPartial` type uses a mapped type to iterate over each key `K` in the object type `T`.\n2. **Conditional Type**: The conditional type checks if the property type `T[K]` is an object. If it is, it recursively applies `DeepPartial` to that property. If not, it simply retains the original type.\n3. **Optional Modifier**: The `?` makes each property optional.\n\n### Usage:\nYou can use the `DeepPartial` type to create a new type where all properties of the original type are optional, which is particularly useful for scenarios like form handling or API responses where not all data may be present.",
           "tokenUsage": {
-            "total": 1750,
-            "prompt": 250,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 629,
+            "prompt": 255,
+            "completion": 374,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 560,
-          "finishReason": "length",
+          "latencyMs": 6820,
+          "finishReason": "stop",
+          "cost": 0.00026264999999999996,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4433f158d08c80-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:54:45 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:59:46 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "6492",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=btfRXwuqbIYzks559E0y.1r26gvPuP4xbt_sGvodG20-1774843179.73395-1.0.1.1-0qaplR12NNQTYnQ_eVrYBx2GRCQOmNKAyKlp76R9wIVIG4f8MG1QShtSudEe0WzRKKHpTY5YvUMUiPDGPzq3McqbU8Nsl_DTVjA6258kP_QBpAdMooxRhJSHtvMMO6rP; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:46 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 4922693003ba820cda0974a02523e512.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "IocsWmgaVznFzpRWW5mg656CbecSHGpTcn2T7pUFWsxWDlu8tiTSZA==",
-                "x-amz-cf-pop": "IAH50-P1",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "1d6cd77257cb904404dc7620b547f95d"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9540",
+                "x-ratelimit-remaining-tokens": "199658",
+                "x-ratelimit-reset-requests": "1h6m9.045s",
+                "x-ratelimit-reset-tokens": "102ms",
+                "x-request-id": "req_776e2c65907d4b539a681cc4f1711cc7"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4433f158d08c80-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:54:45 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:59:46 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "6492",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=btfRXwuqbIYzks559E0y.1r26gvPuP4xbt_sGvodG20-1774843179.73395-1.0.1.1-0qaplR12NNQTYnQ_eVrYBx2GRCQOmNKAyKlp76R9wIVIG4f8MG1QShtSudEe0WzRKKHpTY5YvUMUiPDGPzq3McqbU8Nsl_DTVjA6258kP_QBpAdMooxRhJSHtvMMO6rP; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:46 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 4922693003ba820cda0974a02523e512.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "IocsWmgaVznFzpRWW5mg656CbecSHGpTcn2T7pUFWsxWDlu8tiTSZA==",
-              "x-amz-cf-pop": "IAH50-P1",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "1d6cd77257cb904404dc7620b547f95d"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9540",
+              "x-ratelimit-remaining-tokens": "199658",
+              "x-ratelimit-reset-requests": "1h6m9.045s",
+              "x-ratelimit-reset-tokens": "102ms",
+              "x-request-id": "req_776e2c65907d4b539a681cc4f1711cc7"
             }
           },
           "_promptfooFileMetadata": {}
@@ -216,7 +240,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0,
+        "cost": 0.0005251499999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -225,9 +249,9 @@
             "typescript-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1755,
-            "prompt": 1694,
-            "completion": 61,
+            "total": 1063,
+            "prompt": 1009,
+            "completion": 54,
             "cached": 0,
             "numRequests": 1
           },
@@ -241,11 +265,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The decorator uses proper TypeScript decorator syntax with typed MethodDecorator return, correctly accesses descriptor.value, and maintains type safety with generics, making it compatible with TypeScript strict mode.",
+              "reason": "The output correctly implements a TypeScript decorator using proper syntax, handles method metadata through the descriptor, and is compatible with TypeScript strict mode by using type annotations.",
               "tokensUsed": {
-                "total": 1755,
-                "prompt": 1694,
-                "completion": 61,
+                "total": 1063,
+                "prompt": 1009,
+                "completion": 54,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -255,13 +279,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive TypeScript decorator for method memoization with TTL (Time To Live) support, featuring advanced typing and enterprise-grade patterns.\\n\\n```typescript\\n// memoization.decorator.ts\\n\\n/**\\n * Memoization configuration options\\n */\\nexport interface MemoizationOptions<TArgs extends any[] = any[], TReturn = any> {\\n  /**\\n   * Time To Live in milliseconds\\n   * @default Infinity (no expiration)\\n   */\\n  ttl?: number;\\n  \\n  /**\\n   * Custom cache key generator\\n   * @param args - Method arguments\\n   * @returns Cache key string\\n   */\\n  keyResolver?: (...args: TArgs) => string;\\n  \\n  /**\\n   * Custom cache implementation\\n   * @default new Map()\\n   */\\n  cache?: Map<string, CacheEntry<TReturn>>;\\n  \\n  /**\\n   * Whether to use WeakMap for cache (prevents memory leaks)\\n   * @default false\\n   */\\n  useWeakMap?: boolean;\\n}\\n\\n/**\\n * Cache entry with expiration timestamp\\n */\\ninterface CacheEntry<T> {\\n  value: T;\\n  expiresAt: number | null;\\n}\\n\\n/**\\n * Memoization decorator factory with TTL support\\n * @param options - Memoization configuration\\n * @returns Method decorator\\n */\\nexport function memoize<TArgs extends any[], TReturn>(\\n  options: MemoizationOptions<TArgs, TReturn> = {}\\n): MethodDecorator {\\n  const {\\n    ttl = Infinity,\\n    keyResolver = defaultKeyResolver,\\n    cache: externalCache,\\n    useWeakMap = false,\\n  } = options;\\n\\n  return function <T>(\\n    target: Object,\\n    propertyKey: string | symbol,\\n    descriptor: TypedPropertyDescriptor<(...args: TArgs) => TReturn>\\n  ): TypedPropertyDescriptor<(...args: TArgs) => TReturn> | void {\\n    if (!descriptor.value) {\\n      return descriptor;\\n    }\\n\\n    const originalMethod = descriptor.value;\\n    const methodName = String(propertyKey);\\n\\n    // Create appropriate cache based on configuration\\n    let cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>;\\n    \\n    if (useWeakMap) {\\n      cache = new WeakMap<object, CacheEntry<TReturn>>();\\n    } else {\\n      cache = externalCache || new Map<string, CacheEntry<TReturn>>();\\n    }\\n\\n    descriptor.value = function (...args: TArgs): TReturn {\\n      const cacheKey = useWeakMap \\n        ? this \\n        : keyResolver(...args);\\n\\n      // Check cache\\n      const cachedEntry = (cache as any).get(cacheKey);\\n      \\n      if (cachedEntry) {\\n        const now = Date.now();\\n        \\n        // Check if entry is still valid\\n        if (cachedEntry.expiresAt === null || cachedEntry.expiresAt > now) {\\n          console.debug(`[Memoize] Cache hit for ${methodName}`);\\n          return cachedEntry.value;\\n        }\\n        \\n        // Entry expired, remove it\\n        console.debug(`[Memoize] Cache expired for ${methodName}`);\\n        (cache as any).delete(cacheKey);\\n      }\\n\\n      // Cache miss or expired, execute original method\\n      console.debug(`[Memoize] Cache miss for ${methodName}`);\\n      const result = originalMethod.apply(this, args);\\n      \\n      // Calculate expiration time\\n      const expiresAt = ttl === Infinity ? null : Date.now() + ttl;\\n      \\n      // Store in cache\\n      const entry: CacheEntry<TReturn> = { value: result, expiresAt };\\n      (cache as any).set(cacheKey, entry);\\n\\n      return result;\\n    };\\n\\n    // Add cache management methods to the instance\\n    addCacheManagementMethods(target, propertyKey, cache, useWeakMap);\\n\\n    return descriptor;\\n  };\\n}\\n\\n/**\\n * Default cache key resolver using JSON.stringify\\n * Handles circular references and special cases\\n */\\nfunction defaultKeyResolver<TArgs extends any[]>(...args: TArgs): string {\\n  try {\\n    return JSON.stringify(args, (key, value) => {\\n      // Handle special cases\\n      if (typeof value === 'function') {\\n        return `[Function: ${value.name || 'anonymous'}]`;\\n      }\\n      if (value instanceof RegExp) {\\n        return value.toString();\\n      }\\n      if (value instanceof Date) {\\n        return value.toISOString();\\n      }\\n      if (value instanceof Map) {\\n        return `[Map ${JSON.stringify(Array.from(value.entries()))}]`;\\n      }\\n      if (value instanceof Set) {\\n        return `[Set ${JSON.stringify(Array.from(value))}]`;\\n      }\\n      return value;\\n    });\\n  } catch (error) {\\n    // Fallback for circular references or unserializable objects\\n    return args.map(arg => {\\n      if (arg === null) return 'null';\\n      if (arg === undefined) return 'undefined';\\n      if (typeof arg === 'object') {\\n        return `[Object ${Object.prototype.toString.call(arg)}]`;\\n      }\\n      return String(arg);\\n    }).join('|');\\n  }\\n}\\n\\n/**\\n * Add cache management methods to the class instance\\n */\\nfunction addCacheManagementMethods<TArgs extends any[], TReturn>(\\n  target: Object,\\n  propertyKey: string | symbol,\\n  cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>,\\n  useWeakMap: boolean\\n): void {\\n  const methodName = String(propertyKey);\\n  const cacheKey = `__memoize_cache_${methodName}`;\\n  \\n  // Store cache reference on the prototype\\n  Object.defineProperty(target, cacheKey, {\\n    value: cache,\\n    writable: false,\\n    enumerable: false,\\n    configurable: true,\\n  });\\n\\n  // Add clearCache method\\n  const clearMethodName = `clear${methodName.charAt(0).toUpperCase() + methodName.slice(1)}Cache`;\\n  Object.defineProperty(target, clearMethodName, {\\n    value: function() {\\n      const instanceCache = (this as any)[cacheKey];\\n      if (instanceCache) {\\n        if (useWeakMap) {\\n          // WeakMap doesn't have clear() in all environments\\n          // We'll create a new one\\n          (this as any)[cacheKey] = new WeakMap<object, CacheEntry<TReturn>>();\\n        } else {\\n          (instanceCache as Map<string, CacheEntry<TReturn>>).clear();\\n        }\\n        console.debug(`[Memoize] Cache cleared for ${methodName}`);\\n      }\\n    },\\n    writable: false,\\n    enumerable: false,\\n    configurable: true,\\n  });\\n\\n  // Add getCacheStats method\\n  const statsMethodName = `get${methodName.charAt(0).toUpperCase() + methodName.slice(1)}CacheStats`;\\n  Object.defineProperty(target, statsMethodName, {\\n    value: function() {\\n      const instanceCache = (this as any)[cacheKey];\\n      if (!instanceCache) {\\n        return { size: 0, entries\\n</Output>\\n<Rubric>\\nUses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a TypeScript decorator for method memoization with Time-To-Live (TTL) support involves a few steps. The decorator will cache the results of method calls and invalidate the cache after a specified duration. Below is a complete implementation of such a decorator.\\n\\n### Memoization Decorator with TTL\\n\\n```typescript\\nfunction MemoizeWithTTL(ttl: number) {\\n    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {\\n        const originalMethod = descriptor.value;\\n        const cache: Map<string, { value: any; expiry: number }> = new Map();\\n\\n        descriptor.value = function (...args: any[]) {\\n            const key = JSON.stringify(args); // Create a unique key based on arguments\\n            const now = Date.now();\\n\\n            // Check if the cache has the value and if it is still valid\\n            if (cache.has(key)) {\\n                const cached = cache.get(key)!;\\n                if (now < cached.expiry) {\\n                    return cached.value; // Return cached value if not expired\\n                }\\n                cache.delete(key); // Remove expired cache\\n            }\\n\\n            // Call the original method and cache the result\\n            const result = originalMethod.apply(this, args);\\n            cache.set(key, { value: result, expiry: now + ttl });\\n            return result;\\n        };\\n\\n        return descriptor;\\n    };\\n}\\n\\n// Example usage\\nclass Example {\\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\\n    expensiveCalculation(num: number): number {\\n        console.log('Calculating...');\\n        return num * 2; // Simulate an expensive operation\\n    }\\n}\\n\\n// Testing the decorator\\nconst example = new Example();\\n\\nconsole.log(example.expensiveCalculation(5)); // Calculating... 10\\nconsole.log(example.expensiveCalculation(5)); // 10 (cached result)\\nsetTimeout(() => {\\n    console.log(example.expensiveCalculation(5)); // Calculating... 10 (cache expired)\\n}, 6000);\\n```\\n\\n### Explanation\\n\\n1. **Decorator Function**: The `MemoizeWithTTL` function takes a `ttl` parameter, which specifies the time-to-live for the cached results.\\n\\n2. **Cache Structure**: A `Map` is used to store cached values along with their expiry timestamps. The key is generated by serializing the method arguments.\\n\\n3. **Method Replacement**: The original method is replaced with a new function that checks the cache before executing the original method. If the cached value is still valid (not expired), it returns the cached value. If it has expired, it removes the entry from the cache.\\n\\n4. **Example Class**: An example class `Example` demonstrates how to use the decorator. The `expensiveCalculation` method simulates an expensive operation.\\n\\n5. **Testing**: The testing code shows how the decorator works, including the caching behavior and TTL expiration.\\n\\n### Type Safety and TSDoc Comments\\n\\nYou can enhance the type safety and documentation by adding TSDoc comments to the decorator and the example class:\\n\\n```typescript\\n/**\\n * A method decorator that memoizes the result of a method call with a specified TTL.\\n * \\n * @param ttl - The time-to-live in milliseconds for the cached result.\\n */\\nfunction MemoizeWithTTL(ttl: number) {\\n    // ... (implementation remains the same)\\n}\\n\\n/**\\n * Example class demonstrating the use of the MemoizeWithTTL decorator.\\n */\\nclass Example {\\n    /**\\n     * An expensive calculation that is memoized.\\n     * \\n     * @param num - The number to be processed.\\n     * @returns The result of the calculation.\\n     */\\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\\n    expensiveCalculation(num: number): number {\\n        console.log('Calculating...');\\n        return num * 2; // Simulate an expensive operation\\n    }\\n}\\n```\\n\\nThis implementation provides a robust and type-safe way to memoize method calls with TTL support in TypeScript.\\n</Output>\\n<Rubric>\\nUses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "2bb3cfe9-1d96-4900-872e-57911a89727a",
-        "latencyMs": 560,
+        "id": "ff0f7c7a-dbd3-4556-a6e7-a2578ee4b285",
+        "latencyMs": 14913,
         "namedScores": {
           "typescript-pro_quality": 1
         },
@@ -270,10 +294,9 @@
           "label": "typescript-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -281,20 +304,26 @@
         "promptId": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll create a comprehensive TypeScript decorator for method memoization with TTL (Time To Live) support, featuring advanced typing and enterprise-grade patterns.\n\n```typescript\n// memoization.decorator.ts\n\n/**\n * Memoization configuration options\n */\nexport interface MemoizationOptions<TArgs extends any[] = any[], TReturn = any> {\n  /**\n   * Time To Live in milliseconds\n   * @default Infinity (no expiration)\n   */\n  ttl?: number;\n  \n  /**\n   * Custom cache key generator\n   * @param args - Method arguments\n   * @returns Cache key string\n   */\n  keyResolver?: (...args: TArgs) => string;\n  \n  /**\n   * Custom cache implementation\n   * @default new Map()\n   */\n  cache?: Map<string, CacheEntry<TReturn>>;\n  \n  /**\n   * Whether to use WeakMap for cache (prevents memory leaks)\n   * @default false\n   */\n  useWeakMap?: boolean;\n}\n\n/**\n * Cache entry with expiration timestamp\n */\ninterface CacheEntry<T> {\n  value: T;\n  expiresAt: number | null;\n}\n\n/**\n * Memoization decorator factory with TTL support\n * @param options - Memoization configuration\n * @returns Method decorator\n */\nexport function memoize<TArgs extends any[], TReturn>(\n  options: MemoizationOptions<TArgs, TReturn> = {}\n): MethodDecorator {\n  const {\n    ttl = Infinity,\n    keyResolver = defaultKeyResolver,\n    cache: externalCache,\n    useWeakMap = false,\n  } = options;\n\n  return function <T>(\n    target: Object,\n    propertyKey: string | symbol,\n    descriptor: TypedPropertyDescriptor<(...args: TArgs) => TReturn>\n  ): TypedPropertyDescriptor<(...args: TArgs) => TReturn> | void {\n    if (!descriptor.value) {\n      return descriptor;\n    }\n\n    const originalMethod = descriptor.value;\n    const methodName = String(propertyKey);\n\n    // Create appropriate cache based on configuration\n    let cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>;\n    \n    if (useWeakMap) {\n      cache = new WeakMap<object, CacheEntry<TReturn>>();\n    } else {\n      cache = externalCache || new Map<string, CacheEntry<TReturn>>();\n    }\n\n    descriptor.value = function (...args: TArgs): TReturn {\n      const cacheKey = useWeakMap \n        ? this \n        : keyResolver(...args);\n\n      // Check cache\n      const cachedEntry = (cache as any).get(cacheKey);\n      \n      if (cachedEntry) {\n        const now = Date.now();\n        \n        // Check if entry is still valid\n        if (cachedEntry.expiresAt === null || cachedEntry.expiresAt > now) {\n          console.debug(`[Memoize] Cache hit for ${methodName}`);\n          return cachedEntry.value;\n        }\n        \n        // Entry expired, remove it\n        console.debug(`[Memoize] Cache expired for ${methodName}`);\n        (cache as any).delete(cacheKey);\n      }\n\n      // Cache miss or expired, execute original method\n      console.debug(`[Memoize] Cache miss for ${methodName}`);\n      const result = originalMethod.apply(this, args);\n      \n      // Calculate expiration time\n      const expiresAt = ttl === Infinity ? null : Date.now() + ttl;\n      \n      // Store in cache\n      const entry: CacheEntry<TReturn> = { value: result, expiresAt };\n      (cache as any).set(cacheKey, entry);\n\n      return result;\n    };\n\n    // Add cache management methods to the instance\n    addCacheManagementMethods(target, propertyKey, cache, useWeakMap);\n\n    return descriptor;\n  };\n}\n\n/**\n * Default cache key resolver using JSON.stringify\n * Handles circular references and special cases\n */\nfunction defaultKeyResolver<TArgs extends any[]>(...args: TArgs): string {\n  try {\n    return JSON.stringify(args, (key, value) => {\n      // Handle special cases\n      if (typeof value === 'function') {\n        return `[Function: ${value.name || 'anonymous'}]`;\n      }\n      if (value instanceof RegExp) {\n        return value.toString();\n      }\n      if (value instanceof Date) {\n        return value.toISOString();\n      }\n      if (value instanceof Map) {\n        return `[Map ${JSON.stringify(Array.from(value.entries()))}]`;\n      }\n      if (value instanceof Set) {\n        return `[Set ${JSON.stringify(Array.from(value))}]`;\n      }\n      return value;\n    });\n  } catch (error) {\n    // Fallback for circular references or unserializable objects\n    return args.map(arg => {\n      if (arg === null) return 'null';\n      if (arg === undefined) return 'undefined';\n      if (typeof arg === 'object') {\n        return `[Object ${Object.prototype.toString.call(arg)}]`;\n      }\n      return String(arg);\n    }).join('|');\n  }\n}\n\n/**\n * Add cache management methods to the class instance\n */\nfunction addCacheManagementMethods<TArgs extends any[], TReturn>(\n  target: Object,\n  propertyKey: string | symbol,\n  cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>,\n  useWeakMap: boolean\n): void {\n  const methodName = String(propertyKey);\n  const cacheKey = `__memoize_cache_${methodName}`;\n  \n  // Store cache reference on the prototype\n  Object.defineProperty(target, cacheKey, {\n    value: cache,\n    writable: false,\n    enumerable: false,\n    configurable: true,\n  });\n\n  // Add clearCache method\n  const clearMethodName = `clear${methodName.charAt(0).toUpperCase() + methodName.slice(1)}Cache`;\n  Object.defineProperty(target, clearMethodName, {\n    value: function() {\n      const instanceCache = (this as any)[cacheKey];\n      if (instanceCache) {\n        if (useWeakMap) {\n          // WeakMap doesn't have clear() in all environments\n          // We'll create a new one\n          (this as any)[cacheKey] = new WeakMap<object, CacheEntry<TReturn>>();\n        } else {\n          (instanceCache as Map<string, CacheEntry<TReturn>>).clear();\n        }\n        console.debug(`[Memoize] Cache cleared for ${methodName}`);\n      }\n    },\n    writable: false,\n    enumerable: false,\n    configurable: true,\n  });\n\n  // Add getCacheStats method\n  const statsMethodName = `get${methodName.charAt(0).toUpperCase() + methodName.slice(1)}CacheStats`;\n  Object.defineProperty(target, statsMethodName, {\n    value: function() {\n      const instanceCache = (this as any)[cacheKey];\n      if (!instanceCache) {\n        return { size: 0, entries",
+          "output": "Creating a TypeScript decorator for method memoization with Time-To-Live (TTL) support involves a few steps. The decorator will cache the results of method calls and invalidate the cache after a specified duration. Below is a complete implementation of such a decorator.\n\n### Memoization Decorator with TTL\n\n```typescript\nfunction MemoizeWithTTL(ttl: number) {\n    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {\n        const originalMethod = descriptor.value;\n        const cache: Map<string, { value: any; expiry: number }> = new Map();\n\n        descriptor.value = function (...args: any[]) {\n            const key = JSON.stringify(args); // Create a unique key based on arguments\n            const now = Date.now();\n\n            // Check if the cache has the value and if it is still valid\n            if (cache.has(key)) {\n                const cached = cache.get(key)!;\n                if (now < cached.expiry) {\n                    return cached.value; // Return cached value if not expired\n                }\n                cache.delete(key); // Remove expired cache\n            }\n\n            // Call the original method and cache the result\n            const result = originalMethod.apply(this, args);\n            cache.set(key, { value: result, expiry: now + ttl });\n            return result;\n        };\n\n        return descriptor;\n    };\n}\n\n// Example usage\nclass Example {\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\n    expensiveCalculation(num: number): number {\n        console.log('Calculating...');\n        return num * 2; // Simulate an expensive operation\n    }\n}\n\n// Testing the decorator\nconst example = new Example();\n\nconsole.log(example.expensiveCalculation(5)); // Calculating... 10\nconsole.log(example.expensiveCalculation(5)); // 10 (cached result)\nsetTimeout(() => {\n    console.log(example.expensiveCalculation(5)); // Calculating... 10 (cache expired)\n}, 6000);\n```\n\n### Explanation\n\n1. **Decorator Function**: The `MemoizeWithTTL` function takes a `ttl` parameter, which specifies the time-to-live for the cached results.\n\n2. **Cache Structure**: A `Map` is used to store cached values along with their expiry timestamps. The key is generated by serializing the method arguments.\n\n3. **Method Replacement**: The original method is replaced with a new function that checks the cache before executing the original method. If the cached value is still valid (not expired), it returns the cached value. If it has expired, it removes the entry from the cache.\n\n4. **Example Class**: An example class `Example` demonstrates how to use the decorator. The `expensiveCalculation` method simulates an expensive operation.\n\n5. **Testing**: The testing code shows how the decorator works, including the caching behavior and TTL expiration.\n\n### Type Safety and TSDoc Comments\n\nYou can enhance the type safety and documentation by adding TSDoc comments to the decorator and the example class:\n\n```typescript\n/**\n * A method decorator that memoizes the result of a method call with a specified TTL.\n * \n * @param ttl - The time-to-live in milliseconds for the cached result.\n */\nfunction MemoizeWithTTL(ttl: number) {\n    // ... (implementation remains the same)\n}\n\n/**\n * Example class demonstrating the use of the MemoizeWithTTL decorator.\n */\nclass Example {\n    /**\n     * An expensive calculation that is memoized.\n     * \n     * @param num - The number to be processed.\n     * @returns The result of the calculation.\n     */\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\n    expensiveCalculation(num: number): number {\n        console.log('Calculating...');\n        return num * 2; // Simulate an expensive operation\n    }\n}\n```\n\nThis implementation provides a robust and type-safe way to memoize method calls with TTL support in TypeScript.",
           "tokenUsage": {
-            "total": 1750,
-            "prompt": 250,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1065,
+            "prompt": 253,
+            "completion": 812,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 560,
-          "finishReason": "length",
+          "latencyMs": 14913,
+          "finishReason": "stop",
+          "cost": 0.0005251499999999999,
           "guardrails": {
             "flagged": false
           },
@@ -303,21 +332,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4433f14d51cbf9-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:54:45 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:59:54 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "14711",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=wmVronMwTcRp8UW5I4fJfWm00eSBihvA2PutUaNaHNg-1774843179.7261755-1.0.1.1-qEddb1CWBnQ_.BNG_CN2zVPl6oakYqLStlYhmgQTa.o8aDIAuu.9l7kvX.BSYYDGxDK6otHvu.sWDESK18XmBX.myidoMG_KqSZL0JFK_bgqTNvX1j76lsqTmSUGJZNS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:54 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 4a9bcd4ef1ee36bfc83d37c177a93486.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "q3a4HYxwOc90TEhu84RIF9IKQFbnzQJSSlHZRtUWpgkrysVj6k08Pg==",
-                "x-amz-cf-pop": "IAH50-P3",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "4d98d108d75cd89f760eb3f8a0febb86"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9540",
+                "x-ratelimit-remaining-tokens": "199663",
+                "x-ratelimit-reset-requests": "1h6m9.113s",
+                "x-ratelimit-reset-tokens": "101ms",
+                "x-request-id": "req_a5334b4e60d147b4b1857d63608111b8"
               }
             }
           }
@@ -339,10 +378,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -357,21 +395,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4433f14d51cbf9-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:54:45 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:59:54 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "14711",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=wmVronMwTcRp8UW5I4fJfWm00eSBihvA2PutUaNaHNg-1774843179.7261755-1.0.1.1-qEddb1CWBnQ_.BNG_CN2zVPl6oakYqLStlYhmgQTa.o8aDIAuu.9l7kvX.BSYYDGxDK6otHvu.sWDESK18XmBX.myidoMG_KqSZL0JFK_bgqTNvX1j76lsqTmSUGJZNS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:54 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 4a9bcd4ef1ee36bfc83d37c177a93486.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "q3a4HYxwOc90TEhu84RIF9IKQFbnzQJSSlHZRtUWpgkrysVj6k08Pg==",
-              "x-amz-cf-pop": "IAH50-P3",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "4d98d108d75cd89f760eb3f8a0febb86"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9540",
+              "x-ratelimit-remaining-tokens": "199663",
+              "x-ratelimit-reset-requests": "1h6m9.113s",
+              "x-ratelimit-reset-tokens": "101ms",
+              "x-request-id": "req_a5334b4e60d147b4b1857d63608111b8"
             }
           },
           "_promptfooFileMetadata": {}
@@ -384,10 +432,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 500,
-        "completion": 3000,
+        "prompt": 508,
+        "completion": 1186,
         "cached": 0,
-        "total": 3500,
+        "total": 1694,
         "numRequests": 2,
         "completionDetails": {
           "reasoning": 0,
@@ -395,9 +443,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 3511,
-          "prompt": 3388,
-          "completion": 123,
+          "total": 1692,
+          "prompt": 1582,
+          "completion": 110,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -407,8 +455,8 @@
           }
         }
       },
-      "durationMs": 70714,
-      "evaluationDurationMs": 70714
+      "durationMs": 16361,
+      "evaluationDurationMs": 16361
     }
   },
   "config": {
@@ -422,9 +470,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -466,9 +513,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -490,7 +536,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:55:56.272Z",
-    "evaluationCreatedAt": "2026-03-15T04:54:45.520Z"
+    "exportedAt": "2026-03-30T03:59:56.050Z",
+    "evaluationCreatedAt": "2026-03-30T03:59:39.648Z"
   }
 }

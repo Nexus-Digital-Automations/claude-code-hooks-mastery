@@ -1,0 +1,60 @@
+# Skill quality: architecture-patterns
+
+description: 'Skill quality: architecture-patterns'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: architecture-patterns
+  raw: '[{"role": "system", "content": "# Architecture Patterns\n\nMaster proven backend architecture patterns including Clean
+    Architecture, Hexagonal Architecture, and Domain-Driven Design to build maintainable, testable, and scalable systems.\n\n##
+    When to Use This Skill\n\n- Designing new backend systems from scratch\n- Refactoring monolithic applications for better
+    maintainability\n- Establishing architecture standards for your team\n- Migrating from tightly coupled to loosely coupled
+    architectures\n- Implementing domain-driven design principles\n- Creating testable and mockable codebases\n- Planning
+    microservices decomposition\n\n## Core Concepts\n\n### 1. Clean Architecture (Uncle Bob)\n\n**Layers (dependency flows
+    inward):**\n- **Entities**: Core business models\n- **Use Cases**: Application business rules\n- **Interface Adapters**:
+    Controllers, presenters, gateways\n- **Frameworks & Drivers**: UI, database, external services\n\n**Key Principles:**\n-
+    Dependencies point inward\n- Inner layers know nothing about outer layers\n- Business logic independent of frameworks\n-
+    Testable without UI, database, or external services\n\n### 2. Hexagonal Architecture (Ports and Adapters)\n\n**Components:**\n-
+    **Domain Core**: Business logic\n- **Ports**: Interfaces defining interactions\n- **Adapters**: Implementations of ports
+    (database, REST, message queue)\n\n**Benefits:**\n- Swap implementations easily (mock for testing)\n- Technology-agnostic
+    core\n- Clear separation of concerns\n\n### 3. Domain-Driven Design (DDD)\n\n**Strategic Patterns:**\n- **Bounded Contexts**:
+    Separate models for different domains\n- **Context Mapping**: How contexts relate\n- **Ubiquitous Language**: Shared terminology\n\n**Tactical
+    Patterns:**\n- **Entities**: Objects with identity\n- **Value Objects**: Immutable objects defined by attributes\n- **Aggregates**:
+    Consistency boundaries\n- **Repositories**: Data access abstraction\n- **Domain Events**: Things that happened\n\n## Clean
+    Architecture Pattern\n\n### Directory Structure\n```\napp/\n├── domain/           # Entities & business rules\n│   ├──
+    entities/\n│   │   ├── user.py\n│   │   └── order.py\n│   ├── value_objects/\n│   │   ├── email.py\n│   │   └── money.py\n│   └──
+    interfaces/   # Abstract interfaces\n│       ├── user_repository.py\n│       └── payment_gateway.py\n├── use_cases/        #
+    Application business rules\n│   ├── create_user.py\n│   ├── process_order.py\n│   └── send_notification.py\n├── adapters/         #
+    Interface implementations\n│   ├── repositories/\n│   │   ├── postgres_user_repository.py\n│   │   └── redis_cache_repository.py\n│   ├──
+    controllers/\n│   │   └── user_controller.py\n│   └── gateways/\n│       ├── stripe_payment_gateway.py\n│       └── sendgrid_email_gateway.py\n└──
+    infrastructure/   # Framework & external concerns\n    ├── database.py\n    ├── config.py\n    └── logging.py\n```\n\n###
+    Implementation Example\n\n```python\n# domain/entities/user.py\nfrom dataclasses import dataclass\nfrom datetime import
+    datetime\nfrom typing import Optional\n\n@dataclass\nclass User:\n    \"\"\"Core user entity - no framework dependencies.\"\"\"\n    id:
+    str\n    email: str\n    name: str\n    created_at: datetime\n    is_active: bool = True\n\n    def deactivate(self):\n        \"\"\"Business
+    rule: deactivating user.\"\"\"\n        self.is_active = False\n\n    def can_place_order(self) -> bool:\n        \"\"\"Business
+    rule: active users can order.\"\"\"\n        return self.is_active\n\n# domain/interfaces/user_repository.py\nfrom abc
+    import ABC, abstractmethod\nfrom typing import Optional, List\nfrom domain.entities.user import User\n\nclass IUserRepository(ABC):\n    \"\"\"Port:
+    defines contract, no implementation.\"\"\"\n\n    @abstractmethod\n    async def find_by_id(self, user_id: str) -> Optional[User]:\n        pass\n\n    @abstractmethod\n    async
+    def find_by_email(self, email: str) -> Optional[User]:\n        pass\n\n    @abstractmethod\n    async def save(self,
+    user: User) -> User:\n        pass\n\n    @abstractmethod\n    async def delete(self, user_id: str) -> bool:\n        pass\n\n#
+    use_cases/create_user.py\nfrom domain.entities.user import User\n\n[... truncated ...]"}, {"role": "user", "content":
+    "{{task}}"}]'
+tests:
+- description: 'skill/architecture-patterns: When should I use CQRS pattern vs a simple CRUD approach for'
+  vars:
+    task: When should I use CQRS pattern vs a simple CRUD approach for a new service?
+  assert:
+  - type: llm-rubric
+    value: Gives specific decision criteria with pros/cons, mentions when CQRS adds value vs overhead
+    threshold: 0.6
+    metric: skill_architecture-patterns_quality

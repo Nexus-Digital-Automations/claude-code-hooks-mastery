@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-l3K-2026-03-15T04:26:10",
+  "evalId": "eval-YW6-2026-03-30T03:51:35",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:26:10.499Z",
+    "timestamp": "2026-03-30T03:51:35.953Z",
     "prompts": [
       {
         "id": "9d5ccf6c92ead65a7ff316ba5847de0d5c4b932d78cbc22da549983bd51d42e7",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a DevOps troubleshooter specializing in rapid incident response, advanced debugging, and modern observability practices.\\n\\n## Purpose\\nExpert DevOps troubleshooter with comprehensive knowledge of modern observability tools, debugging methodologies, and incident response practices. Masters log analysis, distributed tracing, performance debugging, and system reliability engineering. Specializes in rapid problem resolution, root cause analysis, and building resilient systems.\\n\\n## Capabilities\\n\\n### Modern Observability & Monitoring\\n- **Logging platforms**: ELK Stack (Elasticsearch, Logstash, Kibana), Loki/Grafana, Fluentd/Fluent Bit\\n- **APM solutions**: DataDog, New Relic, Dynatrace, AppDynamics, Instana, Honeycomb\\n- **Metrics & monitoring**: Prometheus, Grafana, InfluxDB, VictoriaMetrics, Thanos\\n- **Distributed tracing**: Jaeger, Zipkin, AWS X-Ray, OpenTelemetry, custom tracing\\n- **Cloud-native observability**: OpenTelemetry collector, service mesh observability\\n- **Synthetic monitoring**: Pingdom, Datadog Synthetics, custom health checks\\n\\n### Container & Kubernetes Debugging\\n- **kubectl mastery**: Advanced debugging commands, resource inspection, troubleshooting workflows\\n- **Container runtime debugging**: Docker, containerd, CRI-O, runtime-specific issues\\n- **Pod troubleshooting**: Init containers, sidecar issues, resource constraints, networking\\n- **Service mesh debugging**: Istio, Linkerd, Consul Connect traffic and security issues\\n- **Kubernetes networking**: CNI troubleshooting, service discovery, ingress issues\\n- **Storage debugging**: Persistent volume issues, storage class problems, data corruption\\n\\n### Network & DNS Troubleshooting\\n- **Network analysis**: tcpdump, Wireshark, eBPF-based tools, network latency analysis\\n- **DNS debugging**: dig, nslookup, DNS propagation, service discovery issues\\n- **Load balancer issues**: AWS ALB/NLB, Azure Load Balancer, GCP Load Balancer debugging\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "devops-troubleshooter",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 461,
+          "totalLatencyMs": 17849,
           "tokenUsage": {
-            "prompt": 452,
-            "completion": 1500,
+            "prompt": 463,
+            "completion": 891,
             "cached": 0,
-            "total": 1952,
+            "total": 1354,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1803,
-              "prompt": 1702,
-              "completion": 101,
+              "total": 1160,
+              "prompt": 1099,
+              "completion": 61,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "devops-troubleshooter_quality": 1
           },
-          "cost": 0
+          "cost": 0.00060405
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00060405,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "devops-troubleshooter_quality": 1
           },
           "tokensUsed": {
-            "total": 1803,
-            "prompt": 1702,
-            "completion": 101,
+            "total": 1160,
+            "prompt": 1099,
+            "completion": 61,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output outlines a phased debugging process that includes checking metrics, logs, and traces (e.g., Prometheus/Grafana, Loki/ELK, Jaeger/Datadog APM), identifying bottlenecks (e.g., database queries, shared resources), and correlating issues with deployment changes (e.g., overlaying latency graphs with deployment markers). It systematically addresses the rubric's requirements.",
+              "reason": "The output provides a detailed systematic approach that includes checking metrics, logs, and traces, identifying bottlenecks, correlating with deployment changes, and suggests tools like Datadog and Jaeger.",
               "tokensUsed": {
-                "total": 1803,
-                "prompt": 1702,
-                "completion": 101,
+                "total": 1160,
+                "prompt": 1099,
+                "completion": 61,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nExcellent. A sudden 10x+ latency spike post-deployment is a classic high-severity incident. Let's walk through a structured, efficient debugging process. We'll prioritize quick wins and broad indicators before deep diving.\\n\\n### **Phase 1: Immediate Triage & Broad Correlation (First 5-10 minutes)**\\n\\n**Goal:** Confirm the scope, rule out infrastructure, and find the first strong signal.\\n\\n1.  **Scope Assessment:**\\n    *   \\\"Is it all API endpoints or specific ones?\\\" Check your API gateway/dashboard (Kong, APISIX, AWS ALB metrics) for error rates (5xx) and latency by endpoint.\\n    *   \\\"Is it all traffic or specific user patterns?\\\" Check if it's global or isolated to a region, customer, or specific payload.\\n\\n2.  **Infrastructure Health Check (Rule out the obvious):**\\n    *   **Kubernetes/Container Level:** `kubectl top nodes` and `kubectl top pods -l app=<your-api>` – Is CPU/Memory saturated? Any pods stuck in `CrashLoopBackOff`?\\n    *   **Node Level:** Quick check for disk I/O pressure (`kubectl describe node <node-name>` | grep -i pressure).\\n    *   **Database:** Check primary metrics: CPU, connections, replication lag, disk latency. A slow query triggered by new code could back up everything.\\n    *   **External Dependencies:** Status pages for third-party APIs (payment, email, etc.). A downstream timeout can cause cascading latency.\\n\\n3.  **Observability \\\"Time Travel\\\":**\\n    *   **Metrics (Prometheus/Grafana):** Overlay the latency graph with the deployment marker. Correlate with:\\n        *   Request rate (QPS) – Is there a coincident spike?\\n        *   Error rates (5xx, 4xx).\\n        *   Garbage collection cycles (for JVM apps) or memory usage.\\n        *   External dependency latency (database, cache, other services).\\n    *   **Logs (Loki/ELK):** Filter logs from the API service around the deployment time for keywords: `ERROR`, `WARN`, `timeout`, `deadline`, `slow`. Look for stack traces.\\n\\n---\\n\\n### **Phase 2: Targeted Investigation (Based on Phase 1 Signals)**\\n\\n**Scenario A: You found a specific slow endpoint.**\\n*   **Deep Dive with Distributed Tracing (Jaeger, Datadog APM):**\\n    1.  Find a trace for that endpoint with ~2000ms latency.\\n    2.  **The golden question: Where is the time spent?** The trace will visually show you:\\n        *   Is it all in your application code (a single long span)?\\n        *   Is it in a **database query** (e.g., a 1900ms PostgreSQL call)?\\n        *   Is it in a call to **another microservice** or **external API**?\\n        *   Is it **queuing time** before your app even processes it?\\n*   **Action:** The trace points you directly to the culprit. Now debug that component.\\n\\n**Scenario B: The slowness is global across all endpoints.**\\n*   This points to a **shared resource** issue.\\n    1.  **Database Connection Pool Exhaustion:** A common culprit. New code might open connections without closing them or have a misconfigured pool size. Check DB connections graph vs. pool max size.\\n    2.  **Cache Breakdown:** Did a cache key change or flush? Are you now making full-table scans instead of cache hits? Check cache hit ratio.\\n    3.  **Synchronous Bottleneck:** Did you introduce a blocking call (e.g., synchronous logging, filesystem write) on the main request thread?\\n    4.  **Resource Contention:** Check for `CPU Throttling` in Kubernetes (use `kubectl describe pod`). The new deployment might have lower CPU limits.\\n\\n**Scenario C: The slowness is intermittent or affects specific users/payloads.**\\n*   This suggests a **data-dependent issue**.\\n    1.  **\\\"N+1 Query Problem\\\":** Does the new code, when processing a list, make a separate DB call for each item? This explodes with larger payloads.\\n    2.  **Missing Database Index:** A new query might be missing an index. Check slow query logs (PostgreSQL `pg_stat_statements`, MySQL slow query log).\\n    3.  **Large Payload Processing:** Is the new code parsing large JSON/XML payloads synchronously?\\n\\n---\\n\\n### **Phase 3: Deep Debugging & Root Cause Analysis**\\n\\n**Armed with a hypothesis from Phase 2, let's prove it:**\\n\\n*   **For Slow Database Queries:**\\n    *   Connect to the DB and run an `EXPLAIN ANALYZE` on the suspect query from your trace.\\n    *   Look for full table scans (`Seq Scan`), missing indexes, or expensive joins.\\n\\n*   **For Application Code Issues:**\\n    *   **Profile it:** Use a profiler (`pprof` for Go, `py-spy` for Python, `async-profiler` for JVM) on a running pod to see which functions/methods are consuming CPU time.\\n    *   **Check Thread Pools:** (For JVM/Node.js) Are all threads blocked? Use `jstack` or Node.js inspector to dump thread states.\\n\\n*   **For Kubernetes-Specific Issues:**\\n    *   **Exec into a slow pod:** `kubectl exec -it <pod-name> -- /bin/sh`\\n    *   Check basic health: `wget -O- http://localhost:<port>/health` from inside the pod.\\n    *   Check internal logs: `tail -f /proc/1/fd/1` (stdout of PID 1).\\n    *   Use `kubectl debug` to create an ephemeral debug container with troubleshooting tools (`curl`, `dig`, `strace`, `tcpdump`).\\n\\n---\\n\\n### **Immediate Mitigation & Next Steps**\\n\\n1.  **Rollback:** If the impact is severe, **execute a rollback to the previous known-good version immediately**. This is your primary mitigation. Document that RCA will continue post-stabilization.\\n2.  **If rollback isn't possible:** Consider implementing a **circuit breaker** for the failing dependency, or **scaling horizontally** to buy time (if it's a CPU issue).\\n3.  **Communicate:** Update your incident channel with the scope, current findings, and mitigation steps.\\n4.  **Post-Incident:** Once stable, conduct a full **Root Cause Analysis (RCA)**. Key questions:\\n    *   Why didn't our tests catch this? (Load testing? Integration tests?)\\n    *   Why didn't our canary/blue-green deployment catch it? (Traffic percentage too low?)\\n    *   Can we add better observability (e.g., tracing, DB slow query alerts) to detect this faster next time?\\n\\n**Where would you like to start?** Do you have access to metrics dashboards, traces, or\\n</Output>\\n<Rubric>\\nSystematic approach: check metrics, logs, traces; identify bottlenecks; correlate with deployment changes; suggests tools like Jaeger/DataDog\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nWhen faced with a significant increase in API response times after a deployment, a systematic debugging process is essential. Here’s a step-by-step approach to identify and resolve the issue:\\n\\n### Step 1: Verify the Issue\\n1. **Confirm the Symptoms**: \\n   - Use monitoring tools (e.g., Datadog, New Relic) to check the API response times and confirm the increase from 50ms to 2000ms.\\n   - Look for patterns in the response times (e.g., specific endpoints, times of day, or user load).\\n\\n2. **Check Logs**:\\n   - Review application logs for any errors or warnings that may correlate with the deployment.\\n   - Use ELK Stack or Grafana Loki to filter logs by the time of the deployment.\\n\\n### Step 2: Analyze the Deployment\\n1. **Review Deployment Changes**:\\n   - Examine the release notes or commit history for the new version to identify any changes that could impact performance (e.g., new features, dependencies, or configuration changes).\\n\\n2. **Rollback if Necessary**:\\n   - If the issue is critical and immediate resolution is required, consider rolling back to the previous version to restore normal performance while investigating.\\n\\n### Step 3: Performance Profiling\\n1. **Use APM Tools**:\\n   - Utilize Application Performance Monitoring (APM) tools (e.g., Dynatrace, AppDynamics) to trace requests and identify bottlenecks in the code.\\n   - Look for slow database queries, external API calls, or resource-intensive operations.\\n\\n2. **Distributed Tracing**:\\n   - Implement distributed tracing (e.g., Jaeger, Zipkin) to visualize the request flow and pinpoint where delays are occurring in the service architecture.\\n\\n### Step 4: Resource Utilization\\n1. **Check Resource Metrics**:\\n   - Monitor CPU, memory, and I/O usage on the application servers using tools like Prometheus and Grafana.\\n   - Look for resource saturation that could lead to increased response times.\\n\\n2. **Kubernetes Resource Limits**:\\n   - If running in Kubernetes, verify that resource limits and requests are appropriately set for the pods. Check for throttling or OOM (Out of Memory) kills.\\n\\n### Step 5: Database Performance\\n1. **Database Query Analysis**:\\n   - Analyze database performance metrics and logs to identify slow queries or locks that may have been introduced with the new version.\\n   - Use tools like pgAdmin for PostgreSQL or MySQL Workbench for MySQL to profile queries.\\n\\n2. **Connection Pooling**:\\n   - Ensure that the application is correctly managing database connections and that the connection pool is not exhausted.\\n\\n### Step 6: Network and External Dependencies\\n1. **Network Latency**:\\n   - Use tools like tcpdump or Wireshark to analyze network traffic and identify any latency issues.\\n   - Check for any changes in network configuration or routing that could affect performance.\\n\\n2. **External API Calls**:\\n   - If the application relies on external services, monitor their response times and availability. Use synthetic monitoring tools to check their health.\\n\\n### Step 7: Load Testing\\n1. **Simulate Load**:\\n   - Conduct load testing on the new version to replicate the performance issue under controlled conditions. Tools like JMeter or Locust can be used for this purpose.\\n\\n2. **Analyze Results**:\\n   - Compare the performance metrics from the load tests with those from the previous version to identify specific areas of degradation.\\n\\n### Step 8: Implement Fixes and Monitor\\n1. **Apply Fixes**:\\n   - Based on the findings, implement necessary code optimizations, configuration changes, or infrastructure adjustments.\\n\\n2. **Monitor Post-Fix**:\\n   - After deploying fixes, closely monitor the API response times and other relevant metrics to ensure that performance has returned to expected levels.\\n\\n### Step 9: Document Findings\\n1. **Root Cause Analysis**:\\n   - Document the root cause of the performance degradation and the steps taken to resolve it. This will help in future incidents and improve the deployment process.\\n\\n2. **Post-Mortem Review**:\\n   - Conduct a post-mortem review with the team to discuss what went wrong, what was learned, and how to prevent similar issues in the future.\\n\\nBy following this structured approach, you can systematically identify and resolve the performance issues affecting your API after the deployment.\\n</Output>\\n<Rubric>\\nSystematic approach: check metrics, logs, traces; identify bottlenecks; correlate with deployment changes; suggests tools like Jaeger/DataDog\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "710f64fb-2871-424e-aea5-2b53a76c61ef",
-        "latencyMs": 461,
+        "id": "e6138c18-63c4-4ffa-9725-be15e1602a6a",
+        "latencyMs": 17849,
         "namedScores": {
           "devops-troubleshooter_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "devops-troubleshooter",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "9d5ccf6c92ead65a7ff316ba5847de0d5c4b932d78cbc22da549983bd51d42e7",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "Excellent. A sudden 10x+ latency spike post-deployment is a classic high-severity incident. Let's walk through a structured, efficient debugging process. We'll prioritize quick wins and broad indicators before deep diving.\n\n### **Phase 1: Immediate Triage & Broad Correlation (First 5-10 minutes)**\n\n**Goal:** Confirm the scope, rule out infrastructure, and find the first strong signal.\n\n1.  **Scope Assessment:**\n    *   \"Is it all API endpoints or specific ones?\" Check your API gateway/dashboard (Kong, APISIX, AWS ALB metrics) for error rates (5xx) and latency by endpoint.\n    *   \"Is it all traffic or specific user patterns?\" Check if it's global or isolated to a region, customer, or specific payload.\n\n2.  **Infrastructure Health Check (Rule out the obvious):**\n    *   **Kubernetes/Container Level:** `kubectl top nodes` and `kubectl top pods -l app=<your-api>` – Is CPU/Memory saturated? Any pods stuck in `CrashLoopBackOff`?\n    *   **Node Level:** Quick check for disk I/O pressure (`kubectl describe node <node-name>` | grep -i pressure).\n    *   **Database:** Check primary metrics: CPU, connections, replication lag, disk latency. A slow query triggered by new code could back up everything.\n    *   **External Dependencies:** Status pages for third-party APIs (payment, email, etc.). A downstream timeout can cause cascading latency.\n\n3.  **Observability \"Time Travel\":**\n    *   **Metrics (Prometheus/Grafana):** Overlay the latency graph with the deployment marker. Correlate with:\n        *   Request rate (QPS) – Is there a coincident spike?\n        *   Error rates (5xx, 4xx).\n        *   Garbage collection cycles (for JVM apps) or memory usage.\n        *   External dependency latency (database, cache, other services).\n    *   **Logs (Loki/ELK):** Filter logs from the API service around the deployment time for keywords: `ERROR`, `WARN`, `timeout`, `deadline`, `slow`. Look for stack traces.\n\n---\n\n### **Phase 2: Targeted Investigation (Based on Phase 1 Signals)**\n\n**Scenario A: You found a specific slow endpoint.**\n*   **Deep Dive with Distributed Tracing (Jaeger, Datadog APM):**\n    1.  Find a trace for that endpoint with ~2000ms latency.\n    2.  **The golden question: Where is the time spent?** The trace will visually show you:\n        *   Is it all in your application code (a single long span)?\n        *   Is it in a **database query** (e.g., a 1900ms PostgreSQL call)?\n        *   Is it in a call to **another microservice** or **external API**?\n        *   Is it **queuing time** before your app even processes it?\n*   **Action:** The trace points you directly to the culprit. Now debug that component.\n\n**Scenario B: The slowness is global across all endpoints.**\n*   This points to a **shared resource** issue.\n    1.  **Database Connection Pool Exhaustion:** A common culprit. New code might open connections without closing them or have a misconfigured pool size. Check DB connections graph vs. pool max size.\n    2.  **Cache Breakdown:** Did a cache key change or flush? Are you now making full-table scans instead of cache hits? Check cache hit ratio.\n    3.  **Synchronous Bottleneck:** Did you introduce a blocking call (e.g., synchronous logging, filesystem write) on the main request thread?\n    4.  **Resource Contention:** Check for `CPU Throttling` in Kubernetes (use `kubectl describe pod`). The new deployment might have lower CPU limits.\n\n**Scenario C: The slowness is intermittent or affects specific users/payloads.**\n*   This suggests a **data-dependent issue**.\n    1.  **\"N+1 Query Problem\":** Does the new code, when processing a list, make a separate DB call for each item? This explodes with larger payloads.\n    2.  **Missing Database Index:** A new query might be missing an index. Check slow query logs (PostgreSQL `pg_stat_statements`, MySQL slow query log).\n    3.  **Large Payload Processing:** Is the new code parsing large JSON/XML payloads synchronously?\n\n---\n\n### **Phase 3: Deep Debugging & Root Cause Analysis**\n\n**Armed with a hypothesis from Phase 2, let's prove it:**\n\n*   **For Slow Database Queries:**\n    *   Connect to the DB and run an `EXPLAIN ANALYZE` on the suspect query from your trace.\n    *   Look for full table scans (`Seq Scan`), missing indexes, or expensive joins.\n\n*   **For Application Code Issues:**\n    *   **Profile it:** Use a profiler (`pprof` for Go, `py-spy` for Python, `async-profiler` for JVM) on a running pod to see which functions/methods are consuming CPU time.\n    *   **Check Thread Pools:** (For JVM/Node.js) Are all threads blocked? Use `jstack` or Node.js inspector to dump thread states.\n\n*   **For Kubernetes-Specific Issues:**\n    *   **Exec into a slow pod:** `kubectl exec -it <pod-name> -- /bin/sh`\n    *   Check basic health: `wget -O- http://localhost:<port>/health` from inside the pod.\n    *   Check internal logs: `tail -f /proc/1/fd/1` (stdout of PID 1).\n    *   Use `kubectl debug` to create an ephemeral debug container with troubleshooting tools (`curl`, `dig`, `strace`, `tcpdump`).\n\n---\n\n### **Immediate Mitigation & Next Steps**\n\n1.  **Rollback:** If the impact is severe, **execute a rollback to the previous known-good version immediately**. This is your primary mitigation. Document that RCA will continue post-stabilization.\n2.  **If rollback isn't possible:** Consider implementing a **circuit breaker** for the failing dependency, or **scaling horizontally** to buy time (if it's a CPU issue).\n3.  **Communicate:** Update your incident channel with the scope, current findings, and mitigation steps.\n4.  **Post-Incident:** Once stable, conduct a full **Root Cause Analysis (RCA)**. Key questions:\n    *   Why didn't our tests catch this? (Load testing? Integration tests?)\n    *   Why didn't our canary/blue-green deployment catch it? (Traffic percentage too low?)\n    *   Can we add better observability (e.g., tracing, DB slow query alerts) to detect this faster next time?\n\n**Where would you like to start?** Do you have access to metrics dashboards, traces, or",
+          "output": "When faced with a significant increase in API response times after a deployment, a systematic debugging process is essential. Here’s a step-by-step approach to identify and resolve the issue:\n\n### Step 1: Verify the Issue\n1. **Confirm the Symptoms**: \n   - Use monitoring tools (e.g., Datadog, New Relic) to check the API response times and confirm the increase from 50ms to 2000ms.\n   - Look for patterns in the response times (e.g., specific endpoints, times of day, or user load).\n\n2. **Check Logs**:\n   - Review application logs for any errors or warnings that may correlate with the deployment.\n   - Use ELK Stack or Grafana Loki to filter logs by the time of the deployment.\n\n### Step 2: Analyze the Deployment\n1. **Review Deployment Changes**:\n   - Examine the release notes or commit history for the new version to identify any changes that could impact performance (e.g., new features, dependencies, or configuration changes).\n\n2. **Rollback if Necessary**:\n   - If the issue is critical and immediate resolution is required, consider rolling back to the previous version to restore normal performance while investigating.\n\n### Step 3: Performance Profiling\n1. **Use APM Tools**:\n   - Utilize Application Performance Monitoring (APM) tools (e.g., Dynatrace, AppDynamics) to trace requests and identify bottlenecks in the code.\n   - Look for slow database queries, external API calls, or resource-intensive operations.\n\n2. **Distributed Tracing**:\n   - Implement distributed tracing (e.g., Jaeger, Zipkin) to visualize the request flow and pinpoint where delays are occurring in the service architecture.\n\n### Step 4: Resource Utilization\n1. **Check Resource Metrics**:\n   - Monitor CPU, memory, and I/O usage on the application servers using tools like Prometheus and Grafana.\n   - Look for resource saturation that could lead to increased response times.\n\n2. **Kubernetes Resource Limits**:\n   - If running in Kubernetes, verify that resource limits and requests are appropriately set for the pods. Check for throttling or OOM (Out of Memory) kills.\n\n### Step 5: Database Performance\n1. **Database Query Analysis**:\n   - Analyze database performance metrics and logs to identify slow queries or locks that may have been introduced with the new version.\n   - Use tools like pgAdmin for PostgreSQL or MySQL Workbench for MySQL to profile queries.\n\n2. **Connection Pooling**:\n   - Ensure that the application is correctly managing database connections and that the connection pool is not exhausted.\n\n### Step 6: Network and External Dependencies\n1. **Network Latency**:\n   - Use tools like tcpdump or Wireshark to analyze network traffic and identify any latency issues.\n   - Check for any changes in network configuration or routing that could affect performance.\n\n2. **External API Calls**:\n   - If the application relies on external services, monitor their response times and availability. Use synthetic monitoring tools to check their health.\n\n### Step 7: Load Testing\n1. **Simulate Load**:\n   - Conduct load testing on the new version to replicate the performance issue under controlled conditions. Tools like JMeter or Locust can be used for this purpose.\n\n2. **Analyze Results**:\n   - Compare the performance metrics from the load tests with those from the previous version to identify specific areas of degradation.\n\n### Step 8: Implement Fixes and Monitor\n1. **Apply Fixes**:\n   - Based on the findings, implement necessary code optimizations, configuration changes, or infrastructure adjustments.\n\n2. **Monitor Post-Fix**:\n   - After deploying fixes, closely monitor the API response times and other relevant metrics to ensure that performance has returned to expected levels.\n\n### Step 9: Document Findings\n1. **Root Cause Analysis**:\n   - Document the root cause of the performance degradation and the steps taken to resolve it. This will help in future incidents and improve the deployment process.\n\n2. **Post-Mortem Review**:\n   - Conduct a post-mortem review with the team to discuss what went wrong, what was learned, and how to prevent similar issues in the future.\n\nBy following this structured approach, you can systematically identify and resolve the performance issues affecting your API after the deployment.",
           "tokenUsage": {
-            "total": 1952,
-            "prompt": 452,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1354,
+            "prompt": 463,
+            "completion": 891,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 461,
-          "finishReason": "length",
+          "latencyMs": 17849,
+          "finishReason": "stop",
+          "cost": 0.00060405,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e442822183175d5-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:26:10 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:51:53 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "17664",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=Ywifo0F9yO3OQ9sm700OhUhXodwWeBgayDWK8Lm1.yQ-1774842696.0201733-1.0.1.1-aggXTlMaCOXPsEaTXgSVw_BxXOz2hfsoAT9ooPr04P9Dca_2oT_1vA1JH.a_HQ1QicjRKX3J0aY_w5a7RCM0_Jgl07n7VscUgFxSP0J1NAzeerXzyHp.lhqCy_TDNs.Z; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:53 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 36df1f9826c5956f15e4e6c71ad55e0a.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "qlE6KTJCVA-ynia86oEo_XSXC-Q6M5xZVbGjkjVEK2QNepgOaKedXw==",
-                "x-amz-cf-pop": "IAH50-P3",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "f24e108ad00e6f4672cb2bd11c751877"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9552",
+                "x-ratelimit-remaining-tokens": "199479",
+                "x-ratelimit-reset-requests": "1h4m25.323s",
+                "x-ratelimit-reset-tokens": "156ms",
+                "x-request-id": "req_6138236c9fe340a098a86fceb12b1cfb"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e442822183175d5-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:26:10 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:51:53 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "17664",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=Ywifo0F9yO3OQ9sm700OhUhXodwWeBgayDWK8Lm1.yQ-1774842696.0201733-1.0.1.1-aggXTlMaCOXPsEaTXgSVw_BxXOz2hfsoAT9ooPr04P9Dca_2oT_1vA1JH.a_HQ1QicjRKX3J0aY_w5a7RCM0_Jgl07n7VscUgFxSP0J1NAzeerXzyHp.lhqCy_TDNs.Z; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:53 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 36df1f9826c5956f15e4e6c71ad55e0a.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "qlE6KTJCVA-ynia86oEo_XSXC-Q6M5xZVbGjkjVEK2QNepgOaKedXw==",
-              "x-amz-cf-pop": "IAH50-P3",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "f24e108ad00e6f4672cb2bd11c751877"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9552",
+              "x-ratelimit-remaining-tokens": "199479",
+              "x-ratelimit-reset-requests": "1h4m25.323s",
+              "x-ratelimit-reset-tokens": "156ms",
+              "x-request-id": "req_6138236c9fe340a098a86fceb12b1cfb"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 452,
-        "completion": 1500,
+        "prompt": 463,
+        "completion": 891,
         "cached": 0,
-        "total": 1952,
+        "total": 1354,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1803,
-          "prompt": 1702,
-          "completion": 101,
+          "total": 1160,
+          "prompt": 1099,
+          "completion": 61,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 71887,
-      "evaluationDurationMs": 71887
+      "durationMs": 19277,
+      "evaluationDurationMs": 19277
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:27:22.421Z",
-    "evaluationCreatedAt": "2026-03-15T04:26:10.499Z"
+    "exportedAt": "2026-03-30T03:51:55.269Z",
+    "evaluationCreatedAt": "2026-03-30T03:51:35.953Z"
   }
 }

@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-TxV-2026-03-15T04:35:22",
+  "evalId": "eval-idV-2026-03-30T03:54:06",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:35:22.173Z",
+    "timestamp": "2026-03-30T03:54:06.474Z",
     "prompts": [
       {
         "id": "ffca85616afda83002029cabd70a4ad245739d9b76ce4232942d230a4c57c07c",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a JavaScript expert specializing in modern JS and async programming.\\n\\n## Focus Areas\\n\\n- ES6+ features (destructuring, modules, classes)\\n- Async patterns (promises, async/await, generators)\\n- Event loop and microtask queue understanding\\n- Node.js APIs and performance optimization\\n- Browser APIs and cross-browser compatibility\\n- TypeScript migration and type safety\\n\\n## Approach\\n\\n1. Prefer async/await over promise chains\\n2. Use functional patterns where appropriate\\n3. Handle errors at appropriate boundaries\\n4. Avoid callback hell with modern patterns\\n5. Consider bundle size for browser code\\n\\n## Output\\n\\n- Modern JavaScript with proper error handling\\n- Async code with race condition prevention\\n- Module structure with clean exports\\n- Jest tests with async test patterns\\n- Performance profiling results\\n- Polyfill strategy for browser compatibility\\n\\nSupport both Node.js and browser environments. Include JSDoc comments.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "javascript-pro",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 519,
+          "totalLatencyMs": 16745,
           "tokenUsage": {
-            "prompt": 209,
-            "completion": 1500,
+            "prompt": 217,
+            "completion": 793,
             "cached": 0,
-            "total": 1709,
+            "total": 1010,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1755,
-              "prompt": 1697,
-              "completion": 58,
+              "total": 1050,
+              "prompt": 994,
+              "completion": 56,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "javascript-pro_quality": 1
           },
-          "cost": 0
+          "cost": 0.00050835
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00050835,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "javascript-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1755,
-            "prompt": 1697,
-            "completion": 58,
+            "total": 1050,
+            "prompt": 994,
+            "completion": 56,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The code uses ES6+ class syntax with private fields, handles edge cases like abort signals and listener errors, includes cleanup with WeakMap and removeAllListeners, and has comprehensive JSDoc annotations.",
+              "reason": "The output uses modern ES6+ class syntax, handles edge cases with proper cleanup in the 'off' method, and includes useful JSDoc comments for type information.",
               "tokensUsed": {
-                "total": 1755,
-                "prompt": 1697,
-                "completion": 58,
+                "total": 1050,
+                "prompt": 994,
+                "completion": 56,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n```javascript\\n/**\\n * A modern, memory-safe event emitter with TypeScript-compatible JSDoc\\n * @template T - Event map type where keys are event names and values are listener signatures\\n */\\nclass EventEmitter {\\n  /**\\n   * @private\\n   * @type {Map<keyof T, Set<Function>>}\\n   */\\n  #listeners = new Map();\\n\\n  /**\\n   * @private\\n   * @type {Map<Function, { event: keyof T, listener: Function, once: boolean }>}\\n   */\\n  #listenerMetadata = new WeakMap();\\n\\n  /**\\n   * Subscribe to an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {(data: T[K]) => void} listener - Callback function\\n   * @param {Object} [options] - Listener options\\n   * @param {boolean} [options.once=false] - Fire listener only once\\n   * @param {AbortSignal} [options.signal] - AbortSignal to automatically remove listener\\n   * @returns {() => void} Unsubscribe function\\n   */\\n  on(event, listener, options = {}) {\\n    const { once = false, signal } = options;\\n\\n    if (!this.#listeners.has(event)) {\\n      this.#listeners.set(event, new Set());\\n    }\\n\\n    const listenerSet = this.#listeners.get(event);\\n    \\n    // Wrap the listener for once functionality\\n    const wrappedListener = once ? (...args) => {\\n      listener(...args);\\n      this.off(event, wrappedListener);\\n    } : listener;\\n\\n    listenerSet.add(wrappedListener);\\n    \\n    // Store metadata for cleanup\\n    this.#listenerMetadata.set(wrappedListener, { event, listener, once });\\n    \\n    // Handle AbortSignal cleanup\\n    if (signal) {\\n      if (signal.aborted) {\\n        this.off(event, wrappedListener);\\n      } else {\\n        const abortHandler = () => {\\n          this.off(event, wrappedListener);\\n          signal.removeEventListener('abort', abortHandler);\\n        };\\n        signal.addEventListener('abort', abortHandler);\\n      }\\n    }\\n\\n    // Return unsubscribe function\\n    return () => this.off(event, wrappedListener);\\n  }\\n\\n  /**\\n   * Subscribe to an event once\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {(data: T[K]) => void} listener - Callback function\\n   * @returns {() => void} Unsubscribe function\\n   */\\n  once(event, listener) {\\n    return this.on(event, listener, { once: true });\\n  }\\n\\n  /**\\n   * Remove event listener\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {(data: T[K]) => void} listener - Listener to remove\\n   * @returns {boolean} True if listener was removed\\n   */\\n  off(event, listener) {\\n    const listenerSet = this.#listeners.get(event);\\n    if (!listenerSet) return false;\\n\\n    // Find the wrapped listener if it exists\\n    let listenerToRemove = listener;\\n    for (const wrappedListener of listenerSet) {\\n      const metadata = this.#listenerMetadata.get(wrappedListener);\\n      if (metadata && metadata.listener === listener) {\\n        listenerToRemove = wrappedListener;\\n        break;\\n      }\\n    }\\n\\n    const removed = listenerSet.delete(listenerToRemove);\\n    this.#listenerMetadata.delete(listenerToRemove);\\n\\n    // Clean up empty sets\\n    if (listenerSet.size === 0) {\\n      this.#listeners.delete(event);\\n    }\\n\\n    return removed;\\n  }\\n\\n  /**\\n   * Emit an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {T[K]} data - Event data\\n   * @returns {Promise<void[]>} Promise that resolves when all listeners have been called\\n   */\\n  async emit(event, data) {\\n    const listenerSet = this.#listeners.get(event);\\n    if (!listenerSet) return Promise.resolve([]);\\n\\n    // Create a snapshot to prevent issues if listeners are added/removed during emission\\n    const listeners = Array.from(listenerSet);\\n    \\n    // Execute listeners asynchronously but in order\\n    const promises = listeners.map(async (listener) => {\\n      try {\\n        await listener(data);\\n      } catch (error) {\\n        // Emit error event but don't throw from emit()\\n        this.#emitError('listener_error', { event, error, listener });\\n      }\\n    });\\n\\n    return Promise.all(promises);\\n  }\\n\\n  /**\\n   * @private\\n   * Emit error events\\n   * @param {string} event - Error event name\\n   * @param {any} errorData - Error data\\n   */\\n  #emitError(event, errorData) {\\n    // Use setTimeout to avoid recursion issues\\n    setTimeout(() => {\\n      const errorListeners = this.#listeners.get(event);\\n      if (errorListeners) {\\n        errorListeners.forEach(listener => {\\n          try {\\n            listener(errorData);\\n          } catch {\\n            // Prevent infinite error loops\\n          }\\n        });\\n      }\\n    }, 0);\\n  }\\n\\n  /**\\n   * Remove all listeners for an event or all events\\n   * @param {keyof T} [event] - Event name (optional, removes all if not specified)\\n   */\\n  removeAllListeners(event) {\\n    if (event) {\\n      const listenerSet = this.#listeners.get(event);\\n      if (listenerSet) {\\n        listenerSet.forEach(listener => {\\n          this.#listenerMetadata.delete(listener);\\n        });\\n        listenerSet.clear();\\n        this.#listeners.delete(event);\\n      }\\n    } else {\\n      // Clear all listeners\\n      this.#listeners.forEach(listenerSet => {\\n        listenerSet.forEach(listener => {\\n          this.#listenerMetadata.delete(listener);\\n        });\\n        listenerSet.clear();\\n      });\\n      this.#listeners.clear();\\n    }\\n  }\\n\\n  /**\\n   * Get all registered event names\\n   * @returns {Array<keyof T>} Array of event names\\n   */\\n  eventNames() {\\n    return Array.from(this.#listeners.keys());\\n  }\\n\\n  /**\\n   * Get listener count for an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @returns {number} Number of listeners\\n   */\\n  listenerCount(event) {\\n    const listenerSet = this.#listeners.get(event);\\n    return listenerSet ? listenerSet.size : 0;\\n  }\\n\\n  /**\\n   * Get all listeners for an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @returns {Array<Function>} Array of listeners\\n   */\\n  listeners(event) {\\n    const listenerSet = this.#listeners.get(event);\\n    if (!listener\\n</Output>\\n<Rubric>\\nUses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is a JavaScript implementation of an EventEmitter class that includes memory leak prevention and is compatible with TypeScript through JSDoc comments. This implementation uses modern JavaScript features and follows best practices for event handling.\\n\\n```javascript\\n/**\\n * @class EventEmitter\\n * @description A simple event emitter class that allows for registering, emitting, and removing event listeners.\\n */\\nclass EventEmitter {\\n    constructor() {\\n        /** @private @type {Map<string, Set<Function>>} */\\n        this.events = new Map();\\n    }\\n\\n    /**\\n     * Registers an event listener for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @param {Function} listener - The callback function to execute when the event is emitted.\\n     * @returns {this}\\n     */\\n    on(event, listener) {\\n        if (!this.events.has(event)) {\\n            this.events.set(event, new Set());\\n        }\\n        this.events.get(event).add(listener);\\n        return this;\\n    }\\n\\n    /**\\n     * Emits an event, calling all registered listeners with the provided arguments.\\n     * @param {string} event - The name of the event.\\n     * @param {...any} args - The arguments to pass to the event listeners.\\n     * @returns {this}\\n     */\\n    emit(event, ...args) {\\n        if (this.events.has(event)) {\\n            for (const listener of this.events.get(event)) {\\n                listener(...args);\\n            }\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes a specific listener for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @param {Function} listener - The callback function to remove.\\n     * @returns {this}\\n     */\\n    off(event, listener) {\\n        if (this.events.has(event)) {\\n            this.events.get(event).delete(listener);\\n            // Clean up if there are no more listeners for the event\\n            if (this.events.get(event).size === 0) {\\n                this.events.delete(event);\\n            }\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes all listeners for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @returns {this}\\n     */\\n    removeAllListeners(event) {\\n        if (this.events.has(event)) {\\n            this.events.delete(event);\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Returns the number of listeners for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @returns {number}\\n     */\\n    listenerCount(event) {\\n        return this.events.has(event) ? this.events.get(event).size : 0;\\n    }\\n}\\n\\n// Example usage\\nconst emitter = new EventEmitter();\\n\\nconst listener = (data) => {\\n    console.log('Event received:', data);\\n};\\n\\nemitter.on('data', listener);\\nemitter.emit('data', { key: 'value' }); // Event received: { key: 'value' }\\nemitter.off('data', listener);\\nemitter.emit('data', { key: 'value' }); // No output, listener removed\\n```\\n\\n### Key Features:\\n- **Memory Leak Prevention**: The `off` method removes listeners, and if no listeners remain for an event, the event is deleted from the map.\\n- **TypeScript Compatibility**: JSDoc comments provide type information that can be used by TypeScript for type checking.\\n- **Modern JavaScript**: Utilizes ES6+ features such as `Map` and `Set` for efficient storage and management of event listeners.\\n\\n### Usage:\\nYou can use this `EventEmitter` class in both Node.js and browser environments. Just instantiate the class and use the `on`, `emit`, `off`, and `removeAllListeners` methods to manage your events.\\n</Output>\\n<Rubric>\\nUses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "530f43c8-31f9-4697-9519-b28e70e1cd04",
-        "latencyMs": 519,
+        "id": "f0501fa0-aa69-41ce-a6f3-5085f3914686",
+        "latencyMs": 16745,
         "namedScores": {
           "javascript-pro_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "javascript-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "ffca85616afda83002029cabd70a4ad245739d9b76ce4232942d230a4c57c07c",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "```javascript\n/**\n * A modern, memory-safe event emitter with TypeScript-compatible JSDoc\n * @template T - Event map type where keys are event names and values are listener signatures\n */\nclass EventEmitter {\n  /**\n   * @private\n   * @type {Map<keyof T, Set<Function>>}\n   */\n  #listeners = new Map();\n\n  /**\n   * @private\n   * @type {Map<Function, { event: keyof T, listener: Function, once: boolean }>}\n   */\n  #listenerMetadata = new WeakMap();\n\n  /**\n   * Subscribe to an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {(data: T[K]) => void} listener - Callback function\n   * @param {Object} [options] - Listener options\n   * @param {boolean} [options.once=false] - Fire listener only once\n   * @param {AbortSignal} [options.signal] - AbortSignal to automatically remove listener\n   * @returns {() => void} Unsubscribe function\n   */\n  on(event, listener, options = {}) {\n    const { once = false, signal } = options;\n\n    if (!this.#listeners.has(event)) {\n      this.#listeners.set(event, new Set());\n    }\n\n    const listenerSet = this.#listeners.get(event);\n    \n    // Wrap the listener for once functionality\n    const wrappedListener = once ? (...args) => {\n      listener(...args);\n      this.off(event, wrappedListener);\n    } : listener;\n\n    listenerSet.add(wrappedListener);\n    \n    // Store metadata for cleanup\n    this.#listenerMetadata.set(wrappedListener, { event, listener, once });\n    \n    // Handle AbortSignal cleanup\n    if (signal) {\n      if (signal.aborted) {\n        this.off(event, wrappedListener);\n      } else {\n        const abortHandler = () => {\n          this.off(event, wrappedListener);\n          signal.removeEventListener('abort', abortHandler);\n        };\n        signal.addEventListener('abort', abortHandler);\n      }\n    }\n\n    // Return unsubscribe function\n    return () => this.off(event, wrappedListener);\n  }\n\n  /**\n   * Subscribe to an event once\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {(data: T[K]) => void} listener - Callback function\n   * @returns {() => void} Unsubscribe function\n   */\n  once(event, listener) {\n    return this.on(event, listener, { once: true });\n  }\n\n  /**\n   * Remove event listener\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {(data: T[K]) => void} listener - Listener to remove\n   * @returns {boolean} True if listener was removed\n   */\n  off(event, listener) {\n    const listenerSet = this.#listeners.get(event);\n    if (!listenerSet) return false;\n\n    // Find the wrapped listener if it exists\n    let listenerToRemove = listener;\n    for (const wrappedListener of listenerSet) {\n      const metadata = this.#listenerMetadata.get(wrappedListener);\n      if (metadata && metadata.listener === listener) {\n        listenerToRemove = wrappedListener;\n        break;\n      }\n    }\n\n    const removed = listenerSet.delete(listenerToRemove);\n    this.#listenerMetadata.delete(listenerToRemove);\n\n    // Clean up empty sets\n    if (listenerSet.size === 0) {\n      this.#listeners.delete(event);\n    }\n\n    return removed;\n  }\n\n  /**\n   * Emit an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {T[K]} data - Event data\n   * @returns {Promise<void[]>} Promise that resolves when all listeners have been called\n   */\n  async emit(event, data) {\n    const listenerSet = this.#listeners.get(event);\n    if (!listenerSet) return Promise.resolve([]);\n\n    // Create a snapshot to prevent issues if listeners are added/removed during emission\n    const listeners = Array.from(listenerSet);\n    \n    // Execute listeners asynchronously but in order\n    const promises = listeners.map(async (listener) => {\n      try {\n        await listener(data);\n      } catch (error) {\n        // Emit error event but don't throw from emit()\n        this.#emitError('listener_error', { event, error, listener });\n      }\n    });\n\n    return Promise.all(promises);\n  }\n\n  /**\n   * @private\n   * Emit error events\n   * @param {string} event - Error event name\n   * @param {any} errorData - Error data\n   */\n  #emitError(event, errorData) {\n    // Use setTimeout to avoid recursion issues\n    setTimeout(() => {\n      const errorListeners = this.#listeners.get(event);\n      if (errorListeners) {\n        errorListeners.forEach(listener => {\n          try {\n            listener(errorData);\n          } catch {\n            // Prevent infinite error loops\n          }\n        });\n      }\n    }, 0);\n  }\n\n  /**\n   * Remove all listeners for an event or all events\n   * @param {keyof T} [event] - Event name (optional, removes all if not specified)\n   */\n  removeAllListeners(event) {\n    if (event) {\n      const listenerSet = this.#listeners.get(event);\n      if (listenerSet) {\n        listenerSet.forEach(listener => {\n          this.#listenerMetadata.delete(listener);\n        });\n        listenerSet.clear();\n        this.#listeners.delete(event);\n      }\n    } else {\n      // Clear all listeners\n      this.#listeners.forEach(listenerSet => {\n        listenerSet.forEach(listener => {\n          this.#listenerMetadata.delete(listener);\n        });\n        listenerSet.clear();\n      });\n      this.#listeners.clear();\n    }\n  }\n\n  /**\n   * Get all registered event names\n   * @returns {Array<keyof T>} Array of event names\n   */\n  eventNames() {\n    return Array.from(this.#listeners.keys());\n  }\n\n  /**\n   * Get listener count for an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @returns {number} Number of listeners\n   */\n  listenerCount(event) {\n    const listenerSet = this.#listeners.get(event);\n    return listenerSet ? listenerSet.size : 0;\n  }\n\n  /**\n   * Get all listeners for an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @returns {Array<Function>} Array of listeners\n   */\n  listeners(event) {\n    const listenerSet = this.#listeners.get(event);\n    if (!listener",
+          "output": "Certainly! Below is a JavaScript implementation of an EventEmitter class that includes memory leak prevention and is compatible with TypeScript through JSDoc comments. This implementation uses modern JavaScript features and follows best practices for event handling.\n\n```javascript\n/**\n * @class EventEmitter\n * @description A simple event emitter class that allows for registering, emitting, and removing event listeners.\n */\nclass EventEmitter {\n    constructor() {\n        /** @private @type {Map<string, Set<Function>>} */\n        this.events = new Map();\n    }\n\n    /**\n     * Registers an event listener for a specific event.\n     * @param {string} event - The name of the event.\n     * @param {Function} listener - The callback function to execute when the event is emitted.\n     * @returns {this}\n     */\n    on(event, listener) {\n        if (!this.events.has(event)) {\n            this.events.set(event, new Set());\n        }\n        this.events.get(event).add(listener);\n        return this;\n    }\n\n    /**\n     * Emits an event, calling all registered listeners with the provided arguments.\n     * @param {string} event - The name of the event.\n     * @param {...any} args - The arguments to pass to the event listeners.\n     * @returns {this}\n     */\n    emit(event, ...args) {\n        if (this.events.has(event)) {\n            for (const listener of this.events.get(event)) {\n                listener(...args);\n            }\n        }\n        return this;\n    }\n\n    /**\n     * Removes a specific listener for a specific event.\n     * @param {string} event - The name of the event.\n     * @param {Function} listener - The callback function to remove.\n     * @returns {this}\n     */\n    off(event, listener) {\n        if (this.events.has(event)) {\n            this.events.get(event).delete(listener);\n            // Clean up if there are no more listeners for the event\n            if (this.events.get(event).size === 0) {\n                this.events.delete(event);\n            }\n        }\n        return this;\n    }\n\n    /**\n     * Removes all listeners for a specific event.\n     * @param {string} event - The name of the event.\n     * @returns {this}\n     */\n    removeAllListeners(event) {\n        if (this.events.has(event)) {\n            this.events.delete(event);\n        }\n        return this;\n    }\n\n    /**\n     * Returns the number of listeners for a specific event.\n     * @param {string} event - The name of the event.\n     * @returns {number}\n     */\n    listenerCount(event) {\n        return this.events.has(event) ? this.events.get(event).size : 0;\n    }\n}\n\n// Example usage\nconst emitter = new EventEmitter();\n\nconst listener = (data) => {\n    console.log('Event received:', data);\n};\n\nemitter.on('data', listener);\nemitter.emit('data', { key: 'value' }); // Event received: { key: 'value' }\nemitter.off('data', listener);\nemitter.emit('data', { key: 'value' }); // No output, listener removed\n```\n\n### Key Features:\n- **Memory Leak Prevention**: The `off` method removes listeners, and if no listeners remain for an event, the event is deleted from the map.\n- **TypeScript Compatibility**: JSDoc comments provide type information that can be used by TypeScript for type checking.\n- **Modern JavaScript**: Utilizes ES6+ features such as `Map` and `Set` for efficient storage and management of event listeners.\n\n### Usage:\nYou can use this `EventEmitter` class in both Node.js and browser environments. Just instantiate the class and use the `on`, `emit`, `off`, and `removeAllListeners` methods to manage your events.",
           "tokenUsage": {
-            "total": 1709,
-            "prompt": 209,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1010,
+            "prompt": 217,
+            "completion": 793,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 519,
-          "finishReason": "length",
+          "latencyMs": 16745,
+          "finishReason": "stop",
+          "cost": 0.00050835,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e442bced844c9ba-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:35:22 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:54:23 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "16589",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=z9skGzJreeoEcSXkKNuxlrrQuT62jWquHc0W3mNjMNs-1774842846.5327244-1.0.1.1-9gwyl9fyaxPNTtbFc66k4AVHV4sHE3.yT0bZvLbJJKbe2aEahIJmCGFRqDBmCGn9mwn4..TynFM9HX3adnofG39sMGNONnquZMnIX4.wUpdNRcB6O5DuNC7oXS9DUtci; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:23 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 11d825a89ac50a951a8bdfb68424db20.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "iPNqzuQGC0pm8J0lfFkcIvtm8l5oMKXimV18VuRLr4fvbLWy2Ax5wg==",
-                "x-amz-cf-pop": "IAH51-P1",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "493b522a6c482e4691976f5c7efd137c"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-tokens": "199738",
+                "x-ratelimit-reset-requests": "1h5m22.162s",
+                "x-ratelimit-reset-tokens": "78ms",
+                "x-request-id": "req_51339dd96abd4cfe8ff8a7370dd5b6ad"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e442bced844c9ba-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:35:22 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:54:23 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "16589",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=z9skGzJreeoEcSXkKNuxlrrQuT62jWquHc0W3mNjMNs-1774842846.5327244-1.0.1.1-9gwyl9fyaxPNTtbFc66k4AVHV4sHE3.yT0bZvLbJJKbe2aEahIJmCGFRqDBmCGn9mwn4..TynFM9HX3adnofG39sMGNONnquZMnIX4.wUpdNRcB6O5DuNC7oXS9DUtci; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:23 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 11d825a89ac50a951a8bdfb68424db20.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "iPNqzuQGC0pm8J0lfFkcIvtm8l5oMKXimV18VuRLr4fvbLWy2Ax5wg==",
-              "x-amz-cf-pop": "IAH51-P1",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "493b522a6c482e4691976f5c7efd137c"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-tokens": "199738",
+              "x-ratelimit-reset-requests": "1h5m22.162s",
+              "x-ratelimit-reset-tokens": "78ms",
+              "x-request-id": "req_51339dd96abd4cfe8ff8a7370dd5b6ad"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 209,
-        "completion": 1500,
+        "prompt": 217,
+        "completion": 793,
         "cached": 0,
-        "total": 1709,
+        "total": 1010,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1755,
-          "prompt": 1697,
-          "completion": 58,
+          "total": 1050,
+          "prompt": 994,
+          "completion": 56,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 70373,
-      "evaluationDurationMs": 70373
+      "durationMs": 17817,
+      "evaluationDurationMs": 17817
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:36:32.584Z",
-    "evaluationCreatedAt": "2026-03-15T04:35:22.173Z"
+    "exportedAt": "2026-03-30T03:54:24.326Z",
+    "evaluationCreatedAt": "2026-03-30T03:54:06.474Z"
   }
 }

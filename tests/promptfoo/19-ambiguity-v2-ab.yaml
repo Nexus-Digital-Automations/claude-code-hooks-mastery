@@ -1,0 +1,191 @@
+description: "A/B: Ambiguity injection v1 (current) vs v2 (optimized)"
+
+# Tests whether the ambiguity prompt causes the model to:
+# 1. Clarify ambiguous tasks UPFRONT with [Recommended] tags
+# 2. Skip clarification for clear tasks and proceed autonomously
+# 3. Not ask mid-task permission questions
+# 4. Not trigger on trivial acknowledgments
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 500
+      temperature: 0.0
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  # ── v1: Current prompt ──
+  - label: "v1-ambiguity-current"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "STEP 1 — UPFRONT CLARITY: If this task has ≥2 valid interpretations that would lead to\ndifferent implementations, ask ALL clarifying questions in one batch NOW. For each option,\nmark your preferred choice [Recommended]. Then wait for a response before proceeding.\nIf the task is clear, skip to Step 2 immediately.\n\nSTEP 2 — AUTONOMOUS EXECUTION: Once task is clear, proceed fully autonomously.\nNever ask \"should I proceed?\", \"do you want me to X?\", or \"want me to continue?\".\nErrors = fix immediately. Mid-task ambiguity = resolve with best judgment, don't ask.\n\n{{user_task}}"
+        }
+      ]
+
+  # ── v2: Optimized prompt ──
+  - label: "v2-ambiguity-optimized"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "BEFORE STARTING — check if this task is ambiguous:\n\nAMBIGUOUS (≥2 valid interpretations → different implementations):\n→ Ask ALL clarifying questions in ONE batch.\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\n→ Example: \"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\"\n→ Wait for answer before coding.\n\nCLEAR (only one reasonable interpretation):\n→ Skip questions entirely. Start working immediately.\n\nTHEN — execute autonomously:\n• Never ask \"should I proceed?\" or \"want me to continue?\" — just do it.\n• Errors = fix immediately, don't ask.\n• Actions within your capability = execute them, don't say \"I recommend you run X\".\n\n{{user_task}}"
+        }
+      ]
+
+tests:
+  # ── Ambiguous tasks: should clarify with [Recommended] ──
+
+  - description: "Ambiguous DB choice → clarify upfront with [Recommended]"
+    vars:
+      user_task: "Set up a database for my new app"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks clarifying questions about database choice BEFORE implementing.
+          Should present options (PostgreSQL, MongoDB, SQLite, etc.) and mark one
+          with [Recommended] or indicate a recommended choice.
+          Fail if: picks a database and starts implementing without asking, OR
+          asks but doesn't indicate any recommendation.
+        threshold: 0.70
+        metric: "upfront_clarification_with_recommendation"
+      - type: llm-rubric
+        value: >
+          Pass if: the response contains the literal text "[Recommended]" somewhere.
+          Fail if: the text "[Recommended]" does not appear at all.
+        threshold: 0.80
+        metric: "recommended_tag_present"
+
+  - description: "Ambiguous web scraper → clarify target, approach, or language"
+    vars:
+      user_task: "Write a web scraper for this site"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks clarifying questions before implementing. The task is
+          ambiguous (no URL specified, no data fields, no language). The response
+          should ask about at least 2 of: target URL, data to extract, language/tool
+          choice, output format. Bonus if marks an option as [Recommended].
+          Fail if: picks a language and starts writing scraper code without asking
+          any clarifying questions.
+        threshold: 0.70
+        metric: "upfront_clarification_with_recommendation"
+
+  - description: "Ambiguous API design → clarify REST vs GraphQL"
+    vars:
+      user_task: "Build an API for our user management system"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks about API style (REST vs GraphQL), framework choice,
+          or auth requirements. Marks at least one option as [Recommended].
+          Fail if: picks REST/GraphQL and starts building without clarifying.
+        threshold: 0.70
+        metric: "upfront_clarification_with_recommendation"
+
+  - description: "Ambiguous deployment target → clarify where"
+    vars:
+      user_task: "Deploy this application to the cloud"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks about cloud provider (AWS, GCP, Azure), deployment method
+          (containers, serverless, VMs), or budget constraints. Marks a recommendation.
+          Fail if: picks AWS and starts writing Terraform without asking.
+        threshold: 0.70
+        metric: "upfront_clarification_with_recommendation"
+
+  # ── Clear tasks: should NOT ask, should proceed autonomously ──
+
+  - description: "Clear task (health endpoint) → no questions, just do it"
+    vars:
+      user_task: "Add a /health endpoint to my FastAPI app that returns 200 OK with {\"status\": \"healthy\"}"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: proceeds directly to implementation without asking clarifying
+          questions. The task is fully specified — no ambiguity to resolve.
+          May state assumptions briefly but should START implementing, not ask questions.
+          Fail if: asks questions like "what framework?" or "what should the response
+          be?" when the task already specifies FastAPI and the response body.
+        threshold: 0.80
+        metric: "skips_clarification_for_clear_task"
+
+  - description: "Clear task (add button) → no questions, just do it"
+    vars:
+      user_task: "Add a 'Delete All' button to the toolbar that clears all items from the list"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: starts implementing the delete-all button without asking unnecessary
+          questions. The task is clear enough to proceed.
+          Fail if: asks multiple clarifying questions about a straightforward feature.
+        threshold: 0.80
+        metric: "skips_clarification_for_clear_task"
+
+  # ── Autonomy: no mid-task permission asking ──
+
+  - description: "CI migration → autonomous plan, no 'should I proceed?'"
+    vars:
+      user_task: "Migrate our CI pipeline from CircleCI to GitHub Actions"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: either (a) asks upfront questions about the migration scope in one
+          batch, OR (b) states assumptions and provides a concrete migration plan.
+          Must NOT contain phrases like "Should I proceed?", "Want me to continue?",
+          "Do you want me to", "Shall I", "Would you like me to" as mid-task questions.
+          Upfront clarification questions are OK. Permission-seeking is not.
+          Fail if: asks "Should I proceed?" or "Want me to continue?" mid-plan.
+        threshold: 0.80
+        metric: "autonomous_no_permission"
+      - type: not-contains
+        value: "Should I proceed"
+        metric: "no_should_i_proceed"
+      - type: not-contains
+        value: "Want me to continue"
+        metric: "no_want_me_to_continue"
+
+  # ── Trivial input: model gets injection but should still be brief ──
+  # NOTE: In production, the hook skips injection for trivial inputs.
+  # These tests verify the model handles trivial input gracefully even WITH
+  # the injection present (defense in depth). Thresholds are lenient since
+  # the injection primes the model for structured responses.
+
+  - description: "Trivial 'ok' with injection → should still be relatively brief"
+    vars:
+      user_task: "ok"
+    assert:
+      - type: llm-rubric
+        value: >
+          The input is just "ok" — a trivial acknowledgment. The model has been
+          given a clarification framework, but a good model should recognize that
+          "ok" has no ambiguity to resolve and respond briefly.
+          Pass if: the response is relatively short and doesn't ask elaborate
+          clarification questions about "ok". Minor framing is acceptable.
+          Fail if: produces a full-page analysis treating "ok" as a complex task.
+        threshold: 0.60
+        metric: "trivial_input_handled_gracefully"
+
+  - description: "Trivial 'thanks' with injection → should still be brief"
+    vars:
+      user_task: "thanks"
+    assert:
+      - type: llm-rubric
+        value: >
+          The input is just "thanks" — a trivial acknowledgment. Even with the
+          clarification framework injected, the model should respond briefly.
+          Pass if: acknowledges without extensive framework application.
+          Fail if: launches into a multi-section clarification for "thanks".
+        threshold: 0.60
+        metric: "trivial_input_handled_gracefully"
+
+outputPath: tests/promptfoo/results/19-ambiguity-v2-ab.json

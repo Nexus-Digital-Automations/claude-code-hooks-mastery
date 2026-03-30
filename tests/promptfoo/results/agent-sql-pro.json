@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-qpk-2026-03-15T04:49:06",
+  "evalId": "eval-Baz-2026-03-30T03:57:55",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:49:06.481Z",
+    "timestamp": "2026-03-30T03:57:55.122Z",
     "prompts": [
       {
         "id": "0bd839501704289f923c3f782c534ee182cf1828b09190aa01e8e5130195aea6",
         "raw": "[{\"role\": \"system\", \"content\": \"You are an expert SQL specialist mastering modern database systems, performance optimization, and advanced analytical techniques across cloud-native and hybrid OLTP/OLAP environments.\\n\\n## Purpose\\nExpert SQL professional focused on high-performance database systems, advanced query optimization, and modern data architecture. Masters cloud-native databases, hybrid transactional/analytical processing (HTAP), and cutting-edge SQL techniques to deliver scalable and efficient data solutions for enterprise applications.\\n\\n## Capabilities\\n\\n### Modern Database Systems and Platforms\\n- Cloud-native databases: Amazon Aurora, Google Cloud SQL, Azure SQL Database\\n- Data warehouses: Snowflake, Google BigQuery, Amazon Redshift, Databricks\\n- Hybrid OLTP/OLAP systems: CockroachDB, TiDB, MemSQL, VoltDB\\n- NoSQL integration: MongoDB, Cassandra, DynamoDB with SQL interfaces\\n- Time-series databases: InfluxDB, TimescaleDB, Apache Druid\\n- Graph databases: Neo4j, Amazon Neptune with Cypher/Gremlin\\n- Modern PostgreSQL features and extensions\\n\\n### Advanced Query Techniques and Optimization\\n- Complex window functions and analytical queries\\n- Recursive Common Table Expressions (CTEs) for hierarchical data\\n- Advanced JOIN techniques and optimization strategies\\n- Query plan analysis and execution optimization\\n- Parallel query processing and partitioning strategies\\n- Statistical functions and advanced aggregations\\n- JSON/XML data processing and querying\\n\\n### Performance Tuning and Optimization\\n- Comprehensive index strategy design and maintenance\\n- Query execution plan analysis and optimization\\n- Database statistics management and auto-updating\\n- Partitioning strategies for large tables and time-series data\\n- Connection pooling and resource management optimization\\n- Memory configuration and buffer pool tuning\\n- I/O optimization and storage considerations\\n\\n### Cloud Database Architecture\\n- Multi-region database deployment and replication strategies\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "sql-pro",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 554,
+          "totalLatencyMs": 7910,
           "tokenUsage": {
-            "prompt": 395,
-            "completion": 1088,
+            "prompt": 400,
+            "completion": 480,
             "cached": 0,
-            "total": 1483,
+            "total": 880,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1351,
-              "prompt": 1280,
-              "completion": 71,
+              "total": 720,
+              "prompt": 677,
+              "completion": 43,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "sql-pro_quality": 1
           },
-          "cost": 0
+          "cost": 0.000348
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.000348,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "sql-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1351,
-            "prompt": 1280,
-            "completion": 71,
+            "total": 720,
+            "prompt": 677,
+            "completion": 43,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output includes multiple SQL queries that correctly use GROUP BY for aggregation, window functions like ROW_NUMBER() for ranking, date arithmetic with INTERVAL for filtering, proper INNER JOINs between tables, and specific indexing hints for performance optimization.",
+              "reason": "The output correctly uses GROUP BY to aggregate data by customer_id and applies date arithmetic to filter orders from the last 90 days.",
               "tokensUsed": {
-                "total": 1351,
-                "prompt": 1280,
-                "completion": 71,
+                "total": 720,
+                "prompt": 677,
+                "completion": 43,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's an optimized SQL query for finding top 10 customers by revenue in the last 90 days with their order count:\\n\\n```sql\\nWITH customer_revenue AS (\\n    SELECT \\n        c.customer_id,\\n        c.customer_name,\\n        c.email,\\n        COUNT(DISTINCT o.order_id) AS order_count,\\n        SUM(oi.quantity * oi.unit_price) AS total_revenue,\\n        -- Pre-calculate for potential filtering\\n        MAX(o.order_date) AS last_order_date\\n    FROM customers c\\n    INNER JOIN orders o \\n        ON c.customer_id = o.customer_id\\n        AND o.order_date >= CURRENT_DATE - INTERVAL '90 days'\\n        AND o.order_status IN ('completed', 'shipped') -- Filter early\\n    INNER JOIN order_items oi \\n        ON o.order_id = oi.order_id\\n        AND oi.unit_price > 0 -- Avoid negative/zero prices\\n    WHERE c.is_active = TRUE -- Filter inactive customers early\\n    GROUP BY c.customer_id, c.customer_name, c.email\\n    HAVING SUM(oi.quantity * oi.unit_price) > 0 -- Ensure positive revenue\\n)\\nSELECT \\n    customer_id,\\n    customer_name,\\n    email,\\n    order_count,\\n    total_revenue,\\n    last_order_date,\\n    ROUND(total_revenue / NULLIF(order_count, 0), 2) AS avg_order_value\\nFROM customer_revenue\\nORDER BY total_revenue DESC\\nLIMIT 10;\\n```\\n\\n## Key Optimizations Applied:\\n\\n### 1. **Filter Early Strategy**\\n- Date filter applied in JOIN condition to reduce rows early\\n- Status filter excludes incomplete orders before aggregation\\n- Active customer filter in WHERE clause reduces customer base\\n\\n### 2. **Index Recommendations** (for PostgreSQL/MySQL):\\n```sql\\n-- Essential indexes for performance\\nCREATE INDEX idx_orders_customer_date ON orders(customer_id, order_date DESC) \\n    INCLUDE (order_status);\\n    \\nCREATE INDEX idx_order_items_order ON order_items(order_id) \\n    INCLUDE (quantity, unit_price);\\n    \\nCREATE INDEX idx_customers_active ON customers(customer_id) \\n    WHERE is_active = TRUE;\\n```\\n\\n### 3. **Alternative for Large Datasets** (using window functions):\\n```sql\\nSELECT *\\nFROM (\\n    SELECT \\n        c.customer_id,\\n        c.customer_name,\\n        COUNT(DISTINCT o.order_id) AS order_count,\\n        SUM(oi.quantity * oi.unit_price) AS total_revenue,\\n        ROW_NUMBER() OVER (ORDER BY SUM(oi.quantity * oi.unit_price) DESC) AS revenue_rank\\n    FROM customers c\\n    INNER JOIN orders o ON c.customer_id = o.customer_id\\n    INNER JOIN order_items oi ON o.order_id = oi.order_id\\n    WHERE o.order_date >= CURRENT_DATE - INTERVAL '90 days'\\n        AND o.order_status IN ('completed', 'shipped')\\n        AND c.is_active = TRUE\\n    GROUP BY c.customer_id, c.customer_name\\n) ranked_customers\\nWHERE revenue_rank <= 10\\nORDER BY revenue_rank;\\n```\\n\\n### 4. **Cloud-Specific Optimizations**:\\n\\n**Snowflake/BigQuery:**\\n```sql\\n-- Use APPROX_TOP_K for approximate but faster results on huge datasets\\nSELECT \\n    customer_id,\\n    customer_name,\\n    COUNT(DISTINCT order_id) AS order_count,\\n    SUM(quantity * unit_price) AS total_revenue\\nFROM orders\\nWHERE order_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)\\nQUALIFY ROW_NUMBER() OVER (ORDER BY SUM(quantity * unit_price) DESC) <= 10\\nGROUP BY customer_id, customer_name\\nORDER BY total_revenue DESC;\\n```\\n\\n### 5. **Materialized View for Frequent Queries**:\\n```sql\\nCREATE MATERIALIZED VIEW mv_top_customers_90days\\nREFRESH EVERY 1 HOUR\\nAS\\nSELECT \\n    c.customer_id,\\n    c.customer_name,\\n    COUNT(DISTINCT o.order_id) AS order_count,\\n    SUM(oi.quantity * oi.unit_price) AS total_revenue,\\n    MAX(o.order_date) AS last_order_date\\nFROM customers c\\nJOIN orders o ON c.customer_id = o.customer_id\\nJOIN order_items oi ON o.order_id = oi.order_id\\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '90 days'\\n    AND o.order_status IN ('completed', 'shipped')\\n    AND c.is_active = TRUE\\nGROUP BY c.customer_id, c.customer_name;\\n```\\n\\n## Performance Considerations:\\n1. **Partitioning**: Partition `orders` table by `order_date` for time-based queries\\n2. **Statistics**: Ensure statistics are updated for accurate query planning\\n3. **Connection Pooling**: Use prepared statements for repeated execution\\n4. **Monitoring**: Track query performance with `EXPLAIN ANALYZE`\\n\\nThe query assumes standard e-commerce schema with `customers`, `orders`, and `order_items` tables. Adjust table/column names as needed for your specific schema.\\n</Output>\\n<Rubric>\\nUses window functions or GROUP BY correctly, date arithmetic, proper joins, efficient indexing hints\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo write an optimized SQL query that retrieves the top 10 customers by revenue in the last 90 days along with their order count, we need to ensure that we are efficiently aggregating the data and filtering it correctly. Below is an example SQL query that accomplishes this task. This query assumes you have a table named `orders` with relevant columns such as `customer_id`, `order_date`, `order_amount`, and `order_id`.\\n\\n```sql\\nWITH RevenueData AS (\\n    SELECT \\n        customer_id,\\n        SUM(order_amount) AS total_revenue,\\n        COUNT(order_id) AS order_count\\n    FROM \\n        orders\\n    WHERE \\n        order_date >= CURRENT_DATE - INTERVAL '90 days'\\n    GROUP BY \\n        customer_id\\n)\\nSELECT \\n    customer_id,\\n    total_revenue,\\n    order_count\\nFROM \\n    RevenueData\\nORDER BY \\n    total_revenue DESC\\nLIMIT 10;\\n```\\n\\n### Explanation:\\n1. **Common Table Expression (CTE)**: The `WITH RevenueData AS (...)` clause creates a CTE that calculates the total revenue and order count for each customer in the last 90 days.\\n2. **Filtering**: The `WHERE` clause filters the orders to include only those from the last 90 days using `CURRENT_DATE - INTERVAL '90 days'`.\\n3. **Aggregation**: The `SUM(order_amount)` calculates the total revenue, and `COUNT(order_id)` counts the number of orders for each customer.\\n4. **Grouping**: The `GROUP BY customer_id` groups the results by customer.\\n5. **Final Selection**: The outer query selects the customer ID, total revenue, and order count from the CTE.\\n6. **Ordering and Limiting**: The results are ordered by `total_revenue` in descending order, and the `LIMIT 10` clause restricts the output to the top 10 customers.\\n\\n### Performance Considerations:\\n- **Indexing**: Ensure that there are indexes on `order_date`, `customer_id`, and possibly `order_amount` to speed up the filtering and aggregation.\\n- **Statistics**: Keep database statistics up to date to help the query planner optimize the execution plan.\\n- **Partitioning**: If the `orders` table is large, consider partitioning it by date to improve query performance for time-based queries.\\n</Output>\\n<Rubric>\\nUses window functions or GROUP BY correctly, date arithmetic, proper joins, efficient indexing hints\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "8a130454-f18c-429b-bfee-c5d5f9545bd8",
-        "latencyMs": 554,
+        "id": "39b2b401-01ce-409e-ab65-fa0c7266fc92",
+        "latencyMs": 7910,
         "namedScores": {
           "sql-pro_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "sql-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "0bd839501704289f923c3f782c534ee182cf1828b09190aa01e8e5130195aea6",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "Here's an optimized SQL query for finding top 10 customers by revenue in the last 90 days with their order count:\n\n```sql\nWITH customer_revenue AS (\n    SELECT \n        c.customer_id,\n        c.customer_name,\n        c.email,\n        COUNT(DISTINCT o.order_id) AS order_count,\n        SUM(oi.quantity * oi.unit_price) AS total_revenue,\n        -- Pre-calculate for potential filtering\n        MAX(o.order_date) AS last_order_date\n    FROM customers c\n    INNER JOIN orders o \n        ON c.customer_id = o.customer_id\n        AND o.order_date >= CURRENT_DATE - INTERVAL '90 days'\n        AND o.order_status IN ('completed', 'shipped') -- Filter early\n    INNER JOIN order_items oi \n        ON o.order_id = oi.order_id\n        AND oi.unit_price > 0 -- Avoid negative/zero prices\n    WHERE c.is_active = TRUE -- Filter inactive customers early\n    GROUP BY c.customer_id, c.customer_name, c.email\n    HAVING SUM(oi.quantity * oi.unit_price) > 0 -- Ensure positive revenue\n)\nSELECT \n    customer_id,\n    customer_name,\n    email,\n    order_count,\n    total_revenue,\n    last_order_date,\n    ROUND(total_revenue / NULLIF(order_count, 0), 2) AS avg_order_value\nFROM customer_revenue\nORDER BY total_revenue DESC\nLIMIT 10;\n```\n\n## Key Optimizations Applied:\n\n### 1. **Filter Early Strategy**\n- Date filter applied in JOIN condition to reduce rows early\n- Status filter excludes incomplete orders before aggregation\n- Active customer filter in WHERE clause reduces customer base\n\n### 2. **Index Recommendations** (for PostgreSQL/MySQL):\n```sql\n-- Essential indexes for performance\nCREATE INDEX idx_orders_customer_date ON orders(customer_id, order_date DESC) \n    INCLUDE (order_status);\n    \nCREATE INDEX idx_order_items_order ON order_items(order_id) \n    INCLUDE (quantity, unit_price);\n    \nCREATE INDEX idx_customers_active ON customers(customer_id) \n    WHERE is_active = TRUE;\n```\n\n### 3. **Alternative for Large Datasets** (using window functions):\n```sql\nSELECT *\nFROM (\n    SELECT \n        c.customer_id,\n        c.customer_name,\n        COUNT(DISTINCT o.order_id) AS order_count,\n        SUM(oi.quantity * oi.unit_price) AS total_revenue,\n        ROW_NUMBER() OVER (ORDER BY SUM(oi.quantity * oi.unit_price) DESC) AS revenue_rank\n    FROM customers c\n    INNER JOIN orders o ON c.customer_id = o.customer_id\n    INNER JOIN order_items oi ON o.order_id = oi.order_id\n    WHERE o.order_date >= CURRENT_DATE - INTERVAL '90 days'\n        AND o.order_status IN ('completed', 'shipped')\n        AND c.is_active = TRUE\n    GROUP BY c.customer_id, c.customer_name\n) ranked_customers\nWHERE revenue_rank <= 10\nORDER BY revenue_rank;\n```\n\n### 4. **Cloud-Specific Optimizations**:\n\n**Snowflake/BigQuery:**\n```sql\n-- Use APPROX_TOP_K for approximate but faster results on huge datasets\nSELECT \n    customer_id,\n    customer_name,\n    COUNT(DISTINCT order_id) AS order_count,\n    SUM(quantity * unit_price) AS total_revenue\nFROM orders\nWHERE order_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 90 DAY)\nQUALIFY ROW_NUMBER() OVER (ORDER BY SUM(quantity * unit_price) DESC) <= 10\nGROUP BY customer_id, customer_name\nORDER BY total_revenue DESC;\n```\n\n### 5. **Materialized View for Frequent Queries**:\n```sql\nCREATE MATERIALIZED VIEW mv_top_customers_90days\nREFRESH EVERY 1 HOUR\nAS\nSELECT \n    c.customer_id,\n    c.customer_name,\n    COUNT(DISTINCT o.order_id) AS order_count,\n    SUM(oi.quantity * oi.unit_price) AS total_revenue,\n    MAX(o.order_date) AS last_order_date\nFROM customers c\nJOIN orders o ON c.customer_id = o.customer_id\nJOIN order_items oi ON o.order_id = oi.order_id\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '90 days'\n    AND o.order_status IN ('completed', 'shipped')\n    AND c.is_active = TRUE\nGROUP BY c.customer_id, c.customer_name;\n```\n\n## Performance Considerations:\n1. **Partitioning**: Partition `orders` table by `order_date` for time-based queries\n2. **Statistics**: Ensure statistics are updated for accurate query planning\n3. **Connection Pooling**: Use prepared statements for repeated execution\n4. **Monitoring**: Track query performance with `EXPLAIN ANALYZE`\n\nThe query assumes standard e-commerce schema with `customers`, `orders`, and `order_items` tables. Adjust table/column names as needed for your specific schema.",
+          "output": "To write an optimized SQL query that retrieves the top 10 customers by revenue in the last 90 days along with their order count, we need to ensure that we are efficiently aggregating the data and filtering it correctly. Below is an example SQL query that accomplishes this task. This query assumes you have a table named `orders` with relevant columns such as `customer_id`, `order_date`, `order_amount`, and `order_id`.\n\n```sql\nWITH RevenueData AS (\n    SELECT \n        customer_id,\n        SUM(order_amount) AS total_revenue,\n        COUNT(order_id) AS order_count\n    FROM \n        orders\n    WHERE \n        order_date >= CURRENT_DATE - INTERVAL '90 days'\n    GROUP BY \n        customer_id\n)\nSELECT \n    customer_id,\n    total_revenue,\n    order_count\nFROM \n    RevenueData\nORDER BY \n    total_revenue DESC\nLIMIT 10;\n```\n\n### Explanation:\n1. **Common Table Expression (CTE)**: The `WITH RevenueData AS (...)` clause creates a CTE that calculates the total revenue and order count for each customer in the last 90 days.\n2. **Filtering**: The `WHERE` clause filters the orders to include only those from the last 90 days using `CURRENT_DATE - INTERVAL '90 days'`.\n3. **Aggregation**: The `SUM(order_amount)` calculates the total revenue, and `COUNT(order_id)` counts the number of orders for each customer.\n4. **Grouping**: The `GROUP BY customer_id` groups the results by customer.\n5. **Final Selection**: The outer query selects the customer ID, total revenue, and order count from the CTE.\n6. **Ordering and Limiting**: The results are ordered by `total_revenue` in descending order, and the `LIMIT 10` clause restricts the output to the top 10 customers.\n\n### Performance Considerations:\n- **Indexing**: Ensure that there are indexes on `order_date`, `customer_id`, and possibly `order_amount` to speed up the filtering and aggregation.\n- **Statistics**: Keep database statistics up to date to help the query planner optimize the execution plan.\n- **Partitioning**: If the `orders` table is large, consider partitioning it by date to improve query performance for time-based queries.",
           "tokenUsage": {
-            "total": 1483,
-            "prompt": 395,
-            "completion": 1088,
-            "numRequests": 1
+            "total": 880,
+            "prompt": 400,
+            "completion": 480,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 554,
+          "latencyMs": 7910,
           "finishReason": "stop",
+          "cost": 0.000348,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e443163eb878bf0-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:49:06 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:58:03 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "7543",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=9S6Jv2LXpUCM0IxcaX42zldk6ZAAcNTNJiBbQerZXsg-1774843075.1889493-1.0.1.1-sWeaFZmIfRPGuar93IHbc5YMFc19XvF2FykI7L62aRGR.5NYogFxC2gcdkGqlDpnG1aglZL0tK0JlrrT_uTST2sb0HI2hKDqOGLqJpKOjWy0c5Lmu_hORhjdxEVagwQ4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:28:03 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 24f6a977e6e4caa2867374e8f09c9fcc.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "fDpOJL9JoiBqIZ7GW6TZsYV2hRlzyzvU0QTm5EEKyLDKXNTve2-kYw==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "b50995306043288a583603213cf0002f"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9538",
+                "x-ratelimit-remaining-tokens": "199477",
+                "x-ratelimit-reset-requests": "1h6m27.088s",
+                "x-ratelimit-reset-tokens": "156ms",
+                "x-request-id": "req_5c6e9867922d42ee80f35a67c0d2da18"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e443163eb878bf0-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:49:06 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:58:03 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "7543",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=9S6Jv2LXpUCM0IxcaX42zldk6ZAAcNTNJiBbQerZXsg-1774843075.1889493-1.0.1.1-sWeaFZmIfRPGuar93IHbc5YMFc19XvF2FykI7L62aRGR.5NYogFxC2gcdkGqlDpnG1aglZL0tK0JlrrT_uTST2sb0HI2hKDqOGLqJpKOjWy0c5Lmu_hORhjdxEVagwQ4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:28:03 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 24f6a977e6e4caa2867374e8f09c9fcc.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "fDpOJL9JoiBqIZ7GW6TZsYV2hRlzyzvU0QTm5EEKyLDKXNTve2-kYw==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "b50995306043288a583603213cf0002f"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9538",
+              "x-ratelimit-remaining-tokens": "199477",
+              "x-ratelimit-reset-requests": "1h6m27.088s",
+              "x-ratelimit-reset-tokens": "156ms",
+              "x-request-id": "req_5c6e9867922d42ee80f35a67c0d2da18"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 395,
-        "completion": 1088,
+        "prompt": 400,
+        "completion": 480,
         "cached": 0,
-        "total": 1483,
+        "total": 880,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1351,
-          "prompt": 1280,
-          "completion": 71,
+          "total": 720,
+          "prompt": 677,
+          "completion": 43,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 52186,
-      "evaluationDurationMs": 52186
+      "durationMs": 9532,
+      "evaluationDurationMs": 9532
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:49:58.723Z",
-    "evaluationCreatedAt": "2026-03-15T04:49:06.481Z"
+    "exportedAt": "2026-03-30T03:58:04.692Z",
+    "evaluationCreatedAt": "2026-03-30T03:57:55.122Z"
   }
 }

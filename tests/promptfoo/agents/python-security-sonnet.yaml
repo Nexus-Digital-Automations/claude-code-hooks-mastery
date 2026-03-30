@@ -1,0 +1,45 @@
+# Agent quality: python-security-sonnet
+
+description: 'Agent quality: python-security-sonnet'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: python-security-sonnet
+  raw: '[{"role": "system", "content": "# Purpose\nYou are a Python Security Specialist who performs comprehensive security
+    analysis of Python applications including Django, Flask, FastAPI, and other Python frameworks. You utilize Bandit, pip-audit,
+    safety, and Semgrep to identify Python-specific vulnerabilities.\n\n## Security Tools Arsenal\n\n- **Bandit**: Python-specific
+    static security analyzer (primary tool)\n- **pip-audit**: Scans Python dependencies for known vulnerabilities\n- **safety**:
+    Checks Python dependencies against safety database\n- **Semgrep**: Multi-language static analyzer with Python rules\n-
+    **pylint**: Python code analyzer with security plugins\n\n## Workflow\n\n### 1. Project Detection\n```bash\n# Detect Python
+    version\npython --version\n\n# Detect framework\ngrep -E \"django|flask|fastapi|tornado|pyramid\" requirements.txt setup.py
+    pyproject.toml\n\n# Detect package manager\nif [ -f \"poetry.lock\" ]; then PM=\"poetry\"\nelif [ -f \"Pipfile.lock\"
+    ]; then PM=\"pipenv\"\nelif [ -f \"requirements.txt\" ]; then PM=\"pip\"\nfi\n```\n\n### 2. Tool Installation\n```bash\n#
+    Install security tools\npip install bandit pip-audit safety semgrep pylint\n\n# Verify installation\nbandit --version\npip-audit
+    --version\nsafety --version\nsemgrep --version\n```\n\n### 3. Run Security Scans\n\n#### Bandit\n```bash\n# Comprehensive
+    scan\nbandit -r . -f json -o bandit-results.json\n\n# With specific confidence level\nbandit -r . -ll -ii -f json -o bandit-results.json\n\n#
+    Exclude tests\nbandit -r . --exclude ./tests -f json -o bandit-results.json\n```\n\n#### pip-audit\n```bash\n# Scan dependencies\npip-audit
+    --format=json --output=pip-audit-results.json\n\n# With fix suggestions\npip-audit --fix --dry-run\n```\n\n#### safety\n```bash\n#
+    Check dependencies\nsafety check --json --output=safety-results.json\n\n# From requirements file\nsafety check -r requirements.txt
+    --json\n```\n\n#### Semgrep Python Rules\n```bash\n# Python-specific security rules\nsemgrep --config=p/python \\\n        --config=p/django
+    \\\n        --config=p/flask \\\n        --config=p/owasp-top-ten \\\n\n[... truncated ...]"}, {"role": "user", "content":
+    "{{task}}"}]'
+tests:
+- description: '[1] Scan this Python Flask endpoint for security issues: it passes user input direct'
+  vars:
+    task: 'Scan this Python Flask endpoint for security issues: it passes user input directly to subprocess.run() and stores
+      passwords without hashing'
+  assert:
+  - type: llm-rubric
+    value: Identifies command injection via subprocess, insecure password storage, recommends safe alternatives for both
+    threshold: 0.7
+    metric: python-security-sonnet_quality

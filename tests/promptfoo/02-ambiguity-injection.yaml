@@ -1,0 +1,103 @@
+description: "Eval: ambiguity + validation injection from user_prompt_submit.py (inject_ambiguity_prompt)"
+
+# Tests whether the injection causes Claude to:
+# 1. Clarify ambiguity UPFRONT before starting work
+# 2. Mark recommended options
+# 3. NOT ask mid-task questions
+# 4. Plan to validate with 3+ methods before stopping
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 400
+      temperature: 0.0
+
+# Use OpenAI as grading model for llm-rubric assertions
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  - label: "with-ambiguity-injection"
+    raw: |
+      [
+        {
+          "role": "user",
+          "content": "BEFORE STARTING — check if this task is ambiguous:\n\nAMBIGUOUS (≥2 valid interpretations → different implementations):\n→ Ask ALL clarifying questions in ONE batch.\n→ For each choice, format as: **Option A** [Recommended] | **Option B** | **Option C**\n→ Example: \"**Database**: PostgreSQL [Recommended] | MongoDB | SQLite\"\n→ Wait for answer before coding.\n\nCLEAR (only one reasonable interpretation):\n→ Skip questions entirely. Start working immediately.\n\nTHEN — execute autonomously:\n• Never ask \"should I proceed?\" or \"want me to continue?\" — just do it.\n• Errors = fix immediately, don't ask.\n• Actions within your capability = execute them, don't say \"I recommend you run X\".\n\n{{user_task}}"
+        }
+      ]
+
+  - label: "without-injection"
+    raw: "{{user_task}}"
+
+tests:
+  - description: "Ambiguous DB choice → should clarify upfront with [Recommended]"
+    vars:
+      user_task: "Set up a database for my new app"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks clarifying questions about database choice BEFORE implementing.
+          Should present options and mark one with [Recommended].
+          Fail if: picks a database and starts implementing without asking.
+        threshold: 0.75
+        metric: "upfront_clarification"
+      - type: llm-rubric
+        value: >
+          Pass if: one option is clearly marked as recommended, preferred, or the default/best choice.
+          Accept any form: "[Recommended]", "(recommended)", "**Recommended**", "best choice",
+          "I suggest", a "Quick Start Example" that picks one option, or any indicator of a
+          preferred default among the listed choices.
+          Fail if: multiple options are listed with absolutely no indication of which is preferred.
+        threshold: 0.70
+        metric: "recommended_tag_present"
+
+  - description: "Ambiguous web scraper → should clarify target/approach"
+    vars:
+      user_task: "Write a web scraper for this site"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: asks clarifying questions before implementing. The task is
+          ambiguous (no URL, no data fields, no language). Should ask about at
+          least 2 of: target URL, data to extract, language, output format.
+          Fail if: picks a language and starts writing scraper code without asking.
+        threshold: 0.70
+        metric: "upfront_clarification"
+
+  - description: "Clear task → should proceed immediately, no unnecessary questions"
+    vars:
+      user_task: "Add a /health endpoint to my FastAPI app that returns 200 OK"
+    assert:
+      - type: llm-rubric
+        value: >
+          The endpoint path (/health), framework (FastAPI), and status code (200 OK) are fully specified.
+          Pass if: model implements the endpoint (shows code) without asking about the core specifications.
+          Pass also if: model uses the [Recommended] format to briefly note response body options
+          (JSON vs plain text) — this is a genuinely minor unspecified detail.
+          Fail if: model asks about the path itself, the HTTP framework, or the status code.
+          Fail if: model asks "should I proceed?" without showing any implementation intent.
+        threshold: 0.70
+        metric: "clear_task_proceeds"
+
+  - description: "Autonomous execution — no mid-task questions"
+    vars:
+      user_task: "Migrate our CI pipeline from CircleCI to GitHub Actions"
+    assert:
+      - type: llm-rubric
+        value: >
+          Pass if: either (a) asks upfront questions about the migration scope in
+          one batch, OR (b) states assumptions and proceeds with a concrete plan.
+          Must NOT ask "Should I proceed?" or "Want me to continue?" mid-plan.
+          Fail if: asks permission mid-task or stalls without committing.
+        threshold: 0.8
+        metric: "autonomous_execution"
+      - type: not-contains
+        value: "Should I proceed"
+        metric: "no_permission_asking"
+
+outputPath: tests/promptfoo/results/02-ambiguity-injection.json

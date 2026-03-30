@@ -204,6 +204,9 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         "agent_identity_*.json",         # Session-scoped identity files
         "current_task_*.json",           # Session-scoped task files
         "stop_authorization_*.json",     # Session-scoped auth files
+        "reviewer_approval_*.json",      # Session-scoped reviewer approval
+        "review_conversation_*.json",    # Session-scoped review conversation
+        "user_requests_*.json",          # Session-scoped user request log
     ]:
         for _path_str in _glob.glob(str(_claude_data / _pattern)):
             # Keep the current session's files
@@ -244,6 +247,62 @@ def reset_verification_record(session_id: str = "unknown") -> None:
                 pass
 
 
+def load_active_specs(cwd):
+    """Load active spec files from specs/ directory and return a context summary.
+
+    Scans <cwd>/specs/*.md for files with status: active|in-progress|planning.
+    Returns a formatted string for session context injection, or None.
+    """
+    specs_dir = Path(cwd) / "specs"
+    if not specs_dir.is_dir():
+        return None
+
+    summaries = []
+    try:
+        for spec_file in sorted(specs_dir.glob("*.md")):
+            try:
+                content = spec_file.read_text()
+                # Parse frontmatter (simple YAML between --- markers)
+                if content.startswith("---"):
+                    parts = content.split("---", 2)
+                    if len(parts) >= 3:
+                        frontmatter = parts[1].strip()
+                        title = ""
+                        status = ""
+                        priority = ""
+                        for line in frontmatter.split("\n"):
+                            line = line.strip()
+                            if line.startswith("title:"):
+                                title = line[6:].strip().strip("'\"")
+                            elif line.startswith("status:"):
+                                status = line[7:].strip()
+                            elif line.startswith("priority:"):
+                                priority = line[9:].strip()
+
+                        if status in ("active", "in-progress", "planning"):
+                            # Count acceptance criteria
+                            body = parts[2]
+                            total = body.count("- [ ]") + body.count("- [x]")
+                            done = body.count("- [x]")
+                            progress = f" ({done}/{total} criteria)" if total > 0 else ""
+                            pri = f" [{priority}]" if priority else ""
+                            summaries.append(
+                                f"  - {spec_file.name}: {title}{pri} ({status}){progress}"
+                            )
+            except Exception:
+                continue
+    except Exception:
+        return None
+
+    if not summaries:
+        return None
+
+    lines = ["--- Active Specs (specs/) ---"]
+    lines.extend(summaries)
+    lines.append("Review these specs before starting work. Spec files are protected (read-only without user approval).")
+    return "\n".join(lines)
+
+
 def load_development_context(source, agent_id=""):
     """Load relevant development context based on session source."""
     context_parts = []
@@ -270,17 +329,30 @@ def load_development_context(source, agent_id=""):
 """
     context_parts.append(session_rules)
 
-    # Verify CLAUDE.md matches current mode (auto-fix if mismatched)
+    # Assemble CLAUDE.md from base + mode-specific content (auto-fix if mismatched)
     try:
         from utils.config_loader import get_config
         current_mode = get_config().get_agent_mode().get("mode", "claude")
         claude_dir = Path.home() / ".claude"
-        source_file = claude_dir / f"CLAUDE.{current_mode}.md"
+        base_file = claude_dir / "CLAUDE.base.md"
+        mode_file = claude_dir / f"CLAUDE.mode.{current_mode}.md"
         dest_file = claude_dir / "CLAUDE.md"
-        if source_file.exists() and dest_file.exists():
-            if source_file.read_text() != dest_file.read_text():
-                import shutil
-                shutil.copy2(str(source_file), str(dest_file))
+        if base_file.exists() and mode_file.exists():
+            assembled = base_file.read_text() + mode_file.read_text()
+            if not dest_file.exists() or dest_file.read_text() != assembled:
+                dest_file.write_text(assembled)
+        elif base_file.exists():
+            # Mode file missing — use base only
+            base_content = base_file.read_text()
+            if not dest_file.exists() or dest_file.read_text() != base_content:
+                dest_file.write_text(base_content)
+        else:
+            # Fallback: try legacy full-copy files
+            legacy_file = claude_dir / f"CLAUDE.{current_mode}.md"
+            if legacy_file.exists() and dest_file.exists():
+                if legacy_file.read_text() != dest_file.read_text():
+                    import shutil
+                    shutil.copy2(str(legacy_file), str(dest_file))
     except Exception:
         pass
 
@@ -359,6 +431,11 @@ You are the architect and the quality gate. Every deliverable gets verified.
             context_parts.insert(0, session_rules_ds)  # Highest priority — must appear first
     except Exception:
         pass  # Graceful degradation
+
+    # Load active specs from specs/ directory
+    specs_context = load_active_specs(os.getcwd())
+    if specs_context:
+        context_parts.append(specs_context)
 
     # Add git information
     branch, changes = get_git_status()

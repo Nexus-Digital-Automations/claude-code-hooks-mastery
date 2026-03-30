@@ -1,27 +1,27 @@
 {
-  "evalId": "eval-9kh-2026-03-15T04:14:50",
+  "evalId": "eval-sp4-2026-03-30T03:48:37",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:14:50.904Z",
+    "timestamp": "2026-03-30T03:48:37.538Z",
     "prompts": [
       {
         "id": "071795a7689af40ff8d2d44cec27804aea37086a78a7abc05cdfe54fac908c0b",
         "raw": "[{\"role\": \"system\", \"content\": \"## Focus Areas\\n\\n- Defensive programming with strict error handling\\n- POSIX compliance and cross-platform portability\\n- Safe argument parsing and input validation\\n- Robust file operations and temporary resource management\\n- Process orchestration and pipeline safety\\n- Production-grade logging and error reporting\\n- Comprehensive testing with Bats framework\\n- Static analysis with ShellCheck and formatting with shfmt\\n- Modern Bash 5.x features and best practices\\n- CI/CD integration and automation workflows\\n\\n## Approach\\n\\n- Always use strict mode with `set -Eeuo pipefail` and proper error trapping\\n- Quote all variable expansions to prevent word splitting and globbing issues\\n- Prefer arrays and proper iteration over unsafe patterns like `for f in $(ls)`\\n- Use `[[ ]]` for Bash conditionals, fall back to `[ ]` for POSIX compliance\\n- Implement comprehensive argument parsing with `getopts` and usage functions\\n- Create temporary files and directories safely with `mktemp` and cleanup traps\\n- Prefer `printf` over `echo` for predictable output formatting\\n- Use command substitution `$()` instead of backticks for readability\\n- Implement structured logging with timestamps and configurable verbosity\\n- Design scripts to be idempotent and support dry-run modes\\n- Use `shopt -s inherit_errexit` for better error propagation in Bash 4.4+\\n- Employ `IFS=$'\\\\n\\\\t'` to prevent unwanted word splitting on spaces\\n- Validate inputs with `: \\\"${VAR:?message}\\\"` for required environment variables\\n- End option parsing with `--` and use `rm -rf -- \\\"$dir\\\"` for safe operations\\n- Support `--trace` mode with `set -x` opt-in for detailed debugging\\n- Use `xargs -0` with NUL boundaries for safe subprocess orchestration\\n- Employ `readarray`/`mapfile` for safe array population from command output\\n- Implement robust script directory detection: `SCRIPT_DIR=\\\"$(cd -- \\\"$(dirname -- \\\"${BASH_SOURCE[0]}\\\")\\\" && pwd -P)\\\"`\\n- Use NUL-safe patterns: `find -print0 | while IFS= read -r -d '' file; do ...; done`\\n\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "bash-pro",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
-          "score": 1,
-          "testPassCount": 1,
-          "testFailCount": 0,
+          "score": 0.5,
+          "testPassCount": 0,
+          "testFailCount": 1,
           "testErrorCount": 0,
-          "assertPassCount": 1,
-          "assertFailCount": 0,
-          "totalLatencyMs": 802,
+          "assertPassCount": 0,
+          "assertFailCount": 1,
+          "totalLatencyMs": 18136,
           "tokenUsage": {
-            "prompt": 496,
-            "completion": 1500,
+            "prompt": 481,
+            "completion": 944,
             "cached": 0,
-            "total": 1996,
+            "total": 1425,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1764,
-              "prompt": 1699,
-              "completion": 65,
+              "total": 1214,
+              "prompt": 1146,
+              "completion": 68,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -42,29 +42,30 @@
             }
           },
           "namedScores": {
-            "bash-pro_quality": 1
+            "bash-pro_quality": 0.5
           },
           "namedScoresCount": {
             "bash-pro_quality": 1
           },
-          "cost": 0
+          "cost": 0.00063855
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00063855,
+        "error": "The script uses 'set -Eeuo pipefail' for strict mode, includes proper quoting, has error handling with a trap, and implements logging to a specified log file, but does not mention the use of safe temp files.",
         "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
+          "pass": false,
+          "score": 0.5,
+          "reason": "The script uses 'set -Eeuo pipefail' for strict mode, includes proper quoting, has error handling with a trap, and implements logging to a specified log file, but does not mention the use of safe temp files.",
           "namedScores": {
-            "bash-pro_quality": 1
+            "bash-pro_quality": 0.5
           },
           "tokensUsed": {
-            "total": 1764,
-            "prompt": 1699,
-            "completion": 65,
+            "total": 1214,
+            "prompt": 1146,
+            "completion": 68,
             "cached": 0,
             "numRequests": 1
           },
@@ -76,13 +77,13 @@
                 "threshold": 0.7,
                 "metric": "bash-pro_quality"
               },
-              "pass": true,
-              "score": 1,
-              "reason": "The script uses `set -Eeuo pipefail` for strict error handling, properly quotes variables, includes error traps and cleanup functions, logs to stderr via `>&2`, and creates a temporary directory with safe removal in cleanup.",
+              "pass": false,
+              "score": 0.5,
+              "reason": "The script uses 'set -Eeuo pipefail' for strict mode, includes proper quoting, has error handling with a trap, and implements logging to a specified log file, but does not mention the use of safe temp files.",
               "tokensUsed": {
-                "total": 1764,
-                "prompt": 1699,
-                "completion": 65,
+                "total": 1214,
+                "prompt": 1146,
+                "completion": 68,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,25 +93,24 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n```bash\\n#!/usr/bin/env bash\\n#\\n# backup.sh - Robust directory backup with rotation and logging\\n#\\n# Usage: backup.sh [OPTIONS] <source_dir> <backup_dir>\\n#\\n# Features:\\n# - Strict error handling and defensive programming\\n# - Configurable retention policy with rotation\\n# - Comprehensive logging with multiple verbosity levels\\n# - Dry-run mode for testing\\n# - Safe temporary file handling\\n# - Cross-platform compatibility (macOS/Linux)\\n#\\n# Example:\\n#   backup.sh -r 7 -v /home/user/data /backups\\n#   backup.sh --dry-run --verbose /etc /backups/configs\\n\\nset -Eeuo pipefail\\nshopt -s inherit_errexit 2>/dev/null || true\\n\\n# Script metadata\\nreadonly SCRIPT_NAME=\\\"$(basename \\\"${BASH_SOURCE[0]}\\\")\\\"\\nreadonly SCRIPT_VERSION=\\\"1.0.0\\\"\\nreadonly SCRIPT_DIR=\\\"$(cd -- \\\"$(dirname -- \\\"${BASH_SOURCE[0]}\\\")\\\" && pwd -P)\\\"\\n\\n# Default configuration\\nreadonly DEFAULT_RETENTION_DAYS=30\\nreadonly DEFAULT_COMPRESSION=\\\"gz\\\"\\nreadonly DEFAULT_LOG_LEVEL=\\\"INFO\\\"\\nreadonly TIMESTAMP_FORMAT=\\\"%Y%m%d_%H%M%S\\\"\\n\\n# Exit codes\\nreadonly EXIT_SUCCESS=0\\nreadonly EXIT_FAILURE=1\\nreadonly EXIT_INVALID_ARGS=2\\nreadonly EXIT_NO_PERMISSION=3\\nreadonly EXIT_DISK_FULL=4\\n\\n# ANSI color codes (only if terminal supports it)\\nif [[ -t 1 ]]; then\\n    readonly COLOR_RED='\\\\033[0;31m'\\n    readonly COLOR_GREEN='\\\\033[0;32m'\\n    readonly COLOR_YELLOW='\\\\033[1;33m'\\n    readonly COLOR_BLUE='\\\\033[0;34m'\\n    readonly COLOR_RESET='\\\\033[0m'\\nelse\\n    readonly COLOR_RED=''\\n    readonly COLOR_GREEN=''\\n    readonly COLOR_YELLOW=''\\n    readonly COLOR_BLUE=''\\n    readonly COLOR_RESET=''\\nfi\\n\\n# Global variables\\ndeclare -g RETENTION_DAYS=\\\"${DEFAULT_RETENTION_DAYS}\\\"\\ndeclare -g COMPRESSION=\\\"${DEFAULT_COMPRESSION}\\\"\\ndeclare -g LOG_LEVEL=\\\"${DEFAULT_LOG_LEVEL}\\\"\\ndeclare -g DRY_RUN=false\\ndeclare -g VERBOSE=false\\ndeclare -g SOURCE_DIR=\\\"\\\"\\ndeclare -g BACKUP_DIR=\\\"\\\"\\ndeclare -g LOG_FILE=\\\"\\\"\\ndeclare -g TEMP_DIR=\\\"\\\"\\n\\n# Logging functions\\nlog() {\\n    local level=\\\"$1\\\"\\n    local message=\\\"$2\\\"\\n    local timestamp\\n    timestamp=\\\"$(date '+%Y-%m-%d %H:%M:%S')\\\"\\n    \\n    # Map log levels to numeric values\\n    local level_num=0\\n    case \\\"${level}\\\" in\\n        DEBUG) level_num=0 ;;\\n        INFO)  level_num=1 ;;\\n        WARN)  level_num=2 ;;\\n        ERROR) level_num=3 ;;\\n        FATAL) level_num=4 ;;\\n        *)     level_num=1 ;;\\n    esac\\n    \\n    local current_level_num=0\\n    case \\\"${LOG_LEVEL}\\\" in\\n        DEBUG) current_level_num=0 ;;\\n        INFO)  current_level_num=1 ;;\\n        WARN)  current_level_num=2 ;;\\n        ERROR) current_level_num=3 ;;\\n        FATAL) current_level_num=4 ;;\\n        *)     current_level_num=1 ;;\\n    esac\\n    \\n    # Only log if message level >= configured level\\n    if [[ \\\"${level_num}\\\" -ge \\\"${current_level_num}\\\" ]]; then\\n        local color=\\\"${COLOR_RESET}\\\"\\n        case \\\"${level}\\\" in\\n            ERROR|FATAL) color=\\\"${COLOR_RED}\\\" ;;\\n            WARN)        color=\\\"${COLOR_YELLOW}\\\" ;;\\n            INFO)        color=\\\"${COLOR_GREEN}\\\" ;;\\n            DEBUG)       color=\\\"${COLOR_BLUE}\\\" ;;\\n        esac\\n        \\n        printf \\\"%s [%s] %s%s%s\\\\n\\\" \\\"${timestamp}\\\" \\\"${level}\\\" \\\"${color}\\\" \\\"${message}\\\" \\\"${COLOR_RESET}\\\" >&2\\n        \\n        # Also write to log file if configured\\n        if [[ -n \\\"${LOG_FILE}\\\" ]] && [[ -w \\\"${LOG_FILE}\\\" ]] 2>/dev/null; then\\n            printf \\\"%s [%s] %s\\\\n\\\" \\\"${timestamp}\\\" \\\"${level}\\\" \\\"${message}\\\" >> \\\"${LOG_FILE}\\\"\\n        fi\\n    fi\\n}\\n\\nlog_debug() { log \\\"DEBUG\\\" \\\"$1\\\"; }\\nlog_info()  { log \\\"INFO\\\" \\\"$1\\\"; }\\nlog_warn()  { log \\\"WARN\\\" \\\"$1\\\"; }\\nlog_error() { log \\\"ERROR\\\" \\\"$1\\\"; }\\nlog_fatal() { log \\\"FATAL\\\" \\\"$1\\\"; }\\n\\n# Cleanup function\\ncleanup() {\\n    local exit_code=$?\\n    \\n    # Remove temporary directory if it exists\\n    if [[ -n \\\"${TEMP_DIR}\\\" ]] && [[ -d \\\"${TEMP_DIR}\\\" ]]; then\\n        if [[ \\\"${DRY_RUN}\\\" == true ]]; then\\n            log_debug \\\"Would remove temp directory: ${TEMP_DIR}\\\"\\n        else\\n            rm -rf -- \\\"${TEMP_DIR}\\\" 2>/dev/null || true\\n            log_debug \\\"Removed temp directory: ${TEMP_DIR}\\\"\\n        fi\\n    fi\\n    \\n    if [[ ${exit_code} -eq 0 ]]; then\\n        log_info \\\"Backup completed successfully\\\"\\n    else\\n        log_error \\\"Backup failed with exit code: ${exit_code}\\\"\\n    fi\\n    \\n    return ${exit_code}\\n}\\n\\n# Error trap\\ntrap 'log_fatal \\\"Error at line ${LINENO}: ${BASH_COMMAND}\\\"; exit ${EXIT_FAILURE}' ERR\\ntrap cleanup EXIT\\n\\n# Check if required commands are available\\ncheck_dependencies() {\\n    local missing_deps=()\\n    \\n    # Core utilities\\n    for cmd in tar find date rm mkdir cp; do\\n        if ! command -v \\\"${cmd}\\\" >/dev/null 2>&1; then\\n            missing_deps+=(\\\"${cmd}\\\")\\n        fi\\n    done\\n    \\n    # Compression utility\\n    case \\\"${COMPRESSION}\\\" in\\n        gz)\\n            if ! command -v gzip >/dev/null 2>&1; then\\n                missing_deps+=(\\\"gzip\\\")\\n            fi\\n            ;;\\n        bz2)\\n            if ! command -v bzip2 >/dev/null 2>&1; then\\n                missing_deps+=(\\\"bzip2\\\")\\n            fi\\n            ;;\\n        xz)\\n            if ! command -v xz >/dev/null 2>&1; then\\n                missing_deps+=(\\\"xz\\\")\\n            fi\\n            ;;\\n    esac\\n    \\n    if [[ ${#missing_deps[@]} -gt 0 ]]; then\\n        log_error \\\"Missing required dependencies: ${missing_deps[*]}\\\"\\n        return ${EXIT_FAIL\\n</Output>\\n<Rubric>\\nUses set -euo pipefail, proper quoting, error handling, logging to stderr, and safe temp files\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's a defensive Bash script that performs a directory backup with rotation, error handling, and logging. This script adheres to the best practices outlined in your focus areas.\\n\\n```bash\\n#!/usr/bin/env bash\\n\\n# Enable strict mode\\nset -Eeuo pipefail\\nshopt -s inherit_errexit\\n\\n# Constants\\nreadonly SCRIPT_NAME=\\\"$(basename \\\"$0\\\")\\\"\\nreadonly LOG_FILE=\\\"/var/log/${SCRIPT_NAME%.sh}.log\\\"\\nreadonly BACKUP_DIR=\\\"/path/to/backup\\\"  # Change this to your backup directory\\nreadonly SOURCE_DIR=\\\"/path/to/source\\\"    # Change this to your source directory\\nreadonly MAX_BACKUPS=5                    # Maximum number of backups to keep\\n\\n# Logging function\\nlog() {\\n    local level=\\\"$1\\\"\\n    shift\\n    local message=\\\"$*\\\"\\n    local timestamp\\n    timestamp=$(date '+%Y-%m-%d %H:%M:%S')\\n    printf '%s [%s] %s\\\\n' \\\"$timestamp\\\" \\\"$level\\\" \\\"$message\\\" >> \\\"$LOG_FILE\\\"\\n}\\n\\n# Error handling\\ntrap 'log \\\"ERROR\\\" \\\"An error occurred on line $LINENO. Exiting.\\\"' ERR\\n\\n# Function to perform backup\\nbackup() {\\n    local timestamp\\n    timestamp=$(date '+%Y%m%d_%H%M%S')\\n    local backup_file=\\\"${BACKUP_DIR}/backup_${timestamp}.tar.gz\\\"\\n\\n    log \\\"INFO\\\" \\\"Starting backup of '$SOURCE_DIR' to '$backup_file'\\\"\\n\\n    # Create a backup\\n    tar -czf \\\"$backup_file\\\" -C \\\"$SOURCE_DIR\\\" . || {\\n        log \\\"ERROR\\\" \\\"Failed to create backup.\\\"\\n        exit 1\\n    }\\n\\n    log \\\"INFO\\\" \\\"Backup created successfully: '$backup_file'\\\"\\n\\n    # Rotate backups\\n    rotate_backups\\n}\\n\\n# Function to rotate backups\\nrotate_backups() {\\n    log \\\"INFO\\\" \\\"Rotating backups in '$BACKUP_DIR'\\\"\\n\\n    # Count current backups\\n    local backup_count\\n    backup_count=$(find \\\"$BACKUP_DIR\\\" -maxdepth 1 -name 'backup_*.tar.gz' | wc -l)\\n\\n    if (( backup_count >= MAX_BACKUPS )); then\\n        local oldest_backup\\n        oldest_backup=$(ls -t \\\"$BACKUP_DIR\\\"/backup_*.tar.gz | tail -n 1)\\n\\n        log \\\"INFO\\\" \\\"Removing oldest backup: '$oldest_backup'\\\"\\n        rm -f -- \\\"$oldest_backup\\\" || {\\n            log \\\"ERROR\\\" \\\"Failed to remove old backup: '$oldest_backup'\\\"\\n            exit 1\\n        }\\n    fi\\n\\n    log \\\"INFO\\\" \\\"Backup rotation completed.\\\"\\n}\\n\\n# Main script execution\\nif [[ ! -d \\\"$SOURCE_DIR\\\" ]]; then\\n    log \\\"ERROR\\\" \\\"Source directory '$SOURCE_DIR' does not exist.\\\"\\n    exit 1\\nfi\\n\\nif [[ ! -d \\\"$BACKUP_DIR\\\" ]]; then\\n    log \\\"INFO\\\" \\\"Creating backup directory '$BACKUP_DIR'.\\\"\\n    mkdir -p -- \\\"$BACKUP_DIR\\\" || {\\n        log \\\"ERROR\\\" \\\"Failed to create backup directory '$BACKUP_DIR'.\\\"\\n        exit 1\\n    }\\nfi\\n\\nbackup\\n\\nlog \\\"INFO\\\" \\\"Backup process completed successfully.\\\"\\n```\\n\\n### Explanation of the Script:\\n\\n1. **Strict Mode**: The script uses `set -Eeuo pipefail` to ensure that it exits on errors, uninitialized variables, and failed commands.\\n\\n2. **Logging**: A logging function is defined to log messages with timestamps and log levels (INFO, ERROR). Logs are written to a specified log file.\\n\\n3. **Error Handling**: A trap is set to catch errors and log them with the line number where they occurred.\\n\\n4. **Backup Function**: The `backup` function creates a compressed tarball of the source directory and logs the process.\\n\\n5. **Rotation Function**: The `rotate_backups` function checks the number of existing backups and removes the oldest one if the maximum number of backups is exceeded.\\n\\n6. **Directory Checks**: The script checks if the source directory exists and creates the backup directory if it does not.\\n\\n7. **Execution**: The script is designed to be run as a standalone script, and it performs all necessary checks and operations.\\n\\n### Usage:\\n- Update the `SOURCE_DIR` and `BACKUP_DIR` variables to point to your desired source and backup locations.\\n- Ensure the script has execute permissions: `chmod +x backup_script.sh`.\\n- Run the script: `./backup_script.sh`.\\n\\nThis script is designed to be robust and should handle common issues gracefully while providing useful logging information.\\n</Output>\\n<Rubric>\\nUses set -euo pipefail, proper quoting, error handling, logging to stderr, and safe temp files\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "94ceda6c-9d59-41b2-8fa8-0299230235e2",
-        "latencyMs": 802,
+        "id": "176368e1-8041-4a61-87c3-e555f03548be",
+        "latencyMs": 18136,
         "namedScores": {
-          "bash-pro_quality": 1
+          "bash-pro_quality": 0.5
         },
         "prompt": {
           "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"## Focus Areas\\n\\n- Defensive programming with strict error handling\\n- POSIX compliance and cross-platform portability\\n- Safe argument parsing and input validation\\n- Robust file operations and temporary resource management\\n- Process orchestration and pipeline safety\\n- Production-grade logging and error reporting\\n- Comprehensive testing with Bats framework\\n- Static analysis with ShellCheck and formatting with shfmt\\n- Modern Bash 5.x features and best practices\\n- CI/CD integration and automation workflows\\n\\n## Approach\\n\\n- Always use strict mode with `set -Eeuo pipefail` and proper error trapping\\n- Quote all variable expansions to prevent word splitting and globbing issues\\n- Prefer arrays and proper iteration over unsafe patterns like `for f in $(ls)`\\n- Use `[[ ]]` for Bash conditionals, fall back to `[ ]` for POSIX compliance\\n- Implement comprehensive argument parsing with `getopts` and usage functions\\n- Create temporary files and directories safely with `mktemp` and cleanup traps\\n- Prefer `printf` over `echo` for predictable output formatting\\n- Use command substitution `$()` instead of backticks for readability\\n- Implement structured logging with timestamps and configurable verbosity\\n- Design scripts to be idempotent and support dry-run modes\\n- Use `shopt -s inherit_errexit` for better error propagation in Bash 4.4+\\n- Employ `IFS=$'\\\\n\\\\t'` to prevent unwanted word splitting on spaces\\n- Validate inputs with `: \\\"${VAR:?message}\\\"` for required environment variables\\n- End option parsing with `--` and use `rm -rf -- \\\"$dir\\\"` for safe operations\\n- Support `--trace` mode with `set -x` opt-in for detailed debugging\\n- Use `xargs -0` with NUL boundaries for safe subprocess orchestration\\n- Employ `readarray`/`mapfile` for safe array population from command output\\n- Implement robust script directory detection: `SCRIPT_DIR=\\\"$(cd -- \\\"$(dirname -- \\\"${BASH_SOURCE[0]}\\\")\\\" && pwd -P)\\\"`\\n- Use NUL-safe patterns: `find -print0 | while IFS= read -r -d '' file; do ...; done`\\n\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a defensive bash script that backs up a directory with rotation, error handling, and logging\"\n  }\n]",
           "label": "bash-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +118,26 @@
         "promptId": "071795a7689af40ff8d2d44cec27804aea37086a78a7abc05cdfe54fac908c0b",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "```bash\n#!/usr/bin/env bash\n#\n# backup.sh - Robust directory backup with rotation and logging\n#\n# Usage: backup.sh [OPTIONS] <source_dir> <backup_dir>\n#\n# Features:\n# - Strict error handling and defensive programming\n# - Configurable retention policy with rotation\n# - Comprehensive logging with multiple verbosity levels\n# - Dry-run mode for testing\n# - Safe temporary file handling\n# - Cross-platform compatibility (macOS/Linux)\n#\n# Example:\n#   backup.sh -r 7 -v /home/user/data /backups\n#   backup.sh --dry-run --verbose /etc /backups/configs\n\nset -Eeuo pipefail\nshopt -s inherit_errexit 2>/dev/null || true\n\n# Script metadata\nreadonly SCRIPT_NAME=\"$(basename \"${BASH_SOURCE[0]}\")\"\nreadonly SCRIPT_VERSION=\"1.0.0\"\nreadonly SCRIPT_DIR=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd -P)\"\n\n# Default configuration\nreadonly DEFAULT_RETENTION_DAYS=30\nreadonly DEFAULT_COMPRESSION=\"gz\"\nreadonly DEFAULT_LOG_LEVEL=\"INFO\"\nreadonly TIMESTAMP_FORMAT=\"%Y%m%d_%H%M%S\"\n\n# Exit codes\nreadonly EXIT_SUCCESS=0\nreadonly EXIT_FAILURE=1\nreadonly EXIT_INVALID_ARGS=2\nreadonly EXIT_NO_PERMISSION=3\nreadonly EXIT_DISK_FULL=4\n\n# ANSI color codes (only if terminal supports it)\nif [[ -t 1 ]]; then\n    readonly COLOR_RED='\\033[0;31m'\n    readonly COLOR_GREEN='\\033[0;32m'\n    readonly COLOR_YELLOW='\\033[1;33m'\n    readonly COLOR_BLUE='\\033[0;34m'\n    readonly COLOR_RESET='\\033[0m'\nelse\n    readonly COLOR_RED=''\n    readonly COLOR_GREEN=''\n    readonly COLOR_YELLOW=''\n    readonly COLOR_BLUE=''\n    readonly COLOR_RESET=''\nfi\n\n# Global variables\ndeclare -g RETENTION_DAYS=\"${DEFAULT_RETENTION_DAYS}\"\ndeclare -g COMPRESSION=\"${DEFAULT_COMPRESSION}\"\ndeclare -g LOG_LEVEL=\"${DEFAULT_LOG_LEVEL}\"\ndeclare -g DRY_RUN=false\ndeclare -g VERBOSE=false\ndeclare -g SOURCE_DIR=\"\"\ndeclare -g BACKUP_DIR=\"\"\ndeclare -g LOG_FILE=\"\"\ndeclare -g TEMP_DIR=\"\"\n\n# Logging functions\nlog() {\n    local level=\"$1\"\n    local message=\"$2\"\n    local timestamp\n    timestamp=\"$(date '+%Y-%m-%d %H:%M:%S')\"\n    \n    # Map log levels to numeric values\n    local level_num=0\n    case \"${level}\" in\n        DEBUG) level_num=0 ;;\n        INFO)  level_num=1 ;;\n        WARN)  level_num=2 ;;\n        ERROR) level_num=3 ;;\n        FATAL) level_num=4 ;;\n        *)     level_num=1 ;;\n    esac\n    \n    local current_level_num=0\n    case \"${LOG_LEVEL}\" in\n        DEBUG) current_level_num=0 ;;\n        INFO)  current_level_num=1 ;;\n        WARN)  current_level_num=2 ;;\n        ERROR) current_level_num=3 ;;\n        FATAL) current_level_num=4 ;;\n        *)     current_level_num=1 ;;\n    esac\n    \n    # Only log if message level >= configured level\n    if [[ \"${level_num}\" -ge \"${current_level_num}\" ]]; then\n        local color=\"${COLOR_RESET}\"\n        case \"${level}\" in\n            ERROR|FATAL) color=\"${COLOR_RED}\" ;;\n            WARN)        color=\"${COLOR_YELLOW}\" ;;\n            INFO)        color=\"${COLOR_GREEN}\" ;;\n            DEBUG)       color=\"${COLOR_BLUE}\" ;;\n        esac\n        \n        printf \"%s [%s] %s%s%s\\n\" \"${timestamp}\" \"${level}\" \"${color}\" \"${message}\" \"${COLOR_RESET}\" >&2\n        \n        # Also write to log file if configured\n        if [[ -n \"${LOG_FILE}\" ]] && [[ -w \"${LOG_FILE}\" ]] 2>/dev/null; then\n            printf \"%s [%s] %s\\n\" \"${timestamp}\" \"${level}\" \"${message}\" >> \"${LOG_FILE}\"\n        fi\n    fi\n}\n\nlog_debug() { log \"DEBUG\" \"$1\"; }\nlog_info()  { log \"INFO\" \"$1\"; }\nlog_warn()  { log \"WARN\" \"$1\"; }\nlog_error() { log \"ERROR\" \"$1\"; }\nlog_fatal() { log \"FATAL\" \"$1\"; }\n\n# Cleanup function\ncleanup() {\n    local exit_code=$?\n    \n    # Remove temporary directory if it exists\n    if [[ -n \"${TEMP_DIR}\" ]] && [[ -d \"${TEMP_DIR}\" ]]; then\n        if [[ \"${DRY_RUN}\" == true ]]; then\n            log_debug \"Would remove temp directory: ${TEMP_DIR}\"\n        else\n            rm -rf -- \"${TEMP_DIR}\" 2>/dev/null || true\n            log_debug \"Removed temp directory: ${TEMP_DIR}\"\n        fi\n    fi\n    \n    if [[ ${exit_code} -eq 0 ]]; then\n        log_info \"Backup completed successfully\"\n    else\n        log_error \"Backup failed with exit code: ${exit_code}\"\n    fi\n    \n    return ${exit_code}\n}\n\n# Error trap\ntrap 'log_fatal \"Error at line ${LINENO}: ${BASH_COMMAND}\"; exit ${EXIT_FAILURE}' ERR\ntrap cleanup EXIT\n\n# Check if required commands are available\ncheck_dependencies() {\n    local missing_deps=()\n    \n    # Core utilities\n    for cmd in tar find date rm mkdir cp; do\n        if ! command -v \"${cmd}\" >/dev/null 2>&1; then\n            missing_deps+=(\"${cmd}\")\n        fi\n    done\n    \n    # Compression utility\n    case \"${COMPRESSION}\" in\n        gz)\n            if ! command -v gzip >/dev/null 2>&1; then\n                missing_deps+=(\"gzip\")\n            fi\n            ;;\n        bz2)\n            if ! command -v bzip2 >/dev/null 2>&1; then\n                missing_deps+=(\"bzip2\")\n            fi\n            ;;\n        xz)\n            if ! command -v xz >/dev/null 2>&1; then\n                missing_deps+=(\"xz\")\n            fi\n            ;;\n    esac\n    \n    if [[ ${#missing_deps[@]} -gt 0 ]]; then\n        log_error \"Missing required dependencies: ${missing_deps[*]}\"\n        return ${EXIT_FAIL",
+          "output": "Here's a defensive Bash script that performs a directory backup with rotation, error handling, and logging. This script adheres to the best practices outlined in your focus areas.\n\n```bash\n#!/usr/bin/env bash\n\n# Enable strict mode\nset -Eeuo pipefail\nshopt -s inherit_errexit\n\n# Constants\nreadonly SCRIPT_NAME=\"$(basename \"$0\")\"\nreadonly LOG_FILE=\"/var/log/${SCRIPT_NAME%.sh}.log\"\nreadonly BACKUP_DIR=\"/path/to/backup\"  # Change this to your backup directory\nreadonly SOURCE_DIR=\"/path/to/source\"    # Change this to your source directory\nreadonly MAX_BACKUPS=5                    # Maximum number of backups to keep\n\n# Logging function\nlog() {\n    local level=\"$1\"\n    shift\n    local message=\"$*\"\n    local timestamp\n    timestamp=$(date '+%Y-%m-%d %H:%M:%S')\n    printf '%s [%s] %s\\n' \"$timestamp\" \"$level\" \"$message\" >> \"$LOG_FILE\"\n}\n\n# Error handling\ntrap 'log \"ERROR\" \"An error occurred on line $LINENO. Exiting.\"' ERR\n\n# Function to perform backup\nbackup() {\n    local timestamp\n    timestamp=$(date '+%Y%m%d_%H%M%S')\n    local backup_file=\"${BACKUP_DIR}/backup_${timestamp}.tar.gz\"\n\n    log \"INFO\" \"Starting backup of '$SOURCE_DIR' to '$backup_file'\"\n\n    # Create a backup\n    tar -czf \"$backup_file\" -C \"$SOURCE_DIR\" . || {\n        log \"ERROR\" \"Failed to create backup.\"\n        exit 1\n    }\n\n    log \"INFO\" \"Backup created successfully: '$backup_file'\"\n\n    # Rotate backups\n    rotate_backups\n}\n\n# Function to rotate backups\nrotate_backups() {\n    log \"INFO\" \"Rotating backups in '$BACKUP_DIR'\"\n\n    # Count current backups\n    local backup_count\n    backup_count=$(find \"$BACKUP_DIR\" -maxdepth 1 -name 'backup_*.tar.gz' | wc -l)\n\n    if (( backup_count >= MAX_BACKUPS )); then\n        local oldest_backup\n        oldest_backup=$(ls -t \"$BACKUP_DIR\"/backup_*.tar.gz | tail -n 1)\n\n        log \"INFO\" \"Removing oldest backup: '$oldest_backup'\"\n        rm -f -- \"$oldest_backup\" || {\n            log \"ERROR\" \"Failed to remove old backup: '$oldest_backup'\"\n            exit 1\n        }\n    fi\n\n    log \"INFO\" \"Backup rotation completed.\"\n}\n\n# Main script execution\nif [[ ! -d \"$SOURCE_DIR\" ]]; then\n    log \"ERROR\" \"Source directory '$SOURCE_DIR' does not exist.\"\n    exit 1\nfi\n\nif [[ ! -d \"$BACKUP_DIR\" ]]; then\n    log \"INFO\" \"Creating backup directory '$BACKUP_DIR'.\"\n    mkdir -p -- \"$BACKUP_DIR\" || {\n        log \"ERROR\" \"Failed to create backup directory '$BACKUP_DIR'.\"\n        exit 1\n    }\nfi\n\nbackup\n\nlog \"INFO\" \"Backup process completed successfully.\"\n```\n\n### Explanation of the Script:\n\n1. **Strict Mode**: The script uses `set -Eeuo pipefail` to ensure that it exits on errors, uninitialized variables, and failed commands.\n\n2. **Logging**: A logging function is defined to log messages with timestamps and log levels (INFO, ERROR). Logs are written to a specified log file.\n\n3. **Error Handling**: A trap is set to catch errors and log them with the line number where they occurred.\n\n4. **Backup Function**: The `backup` function creates a compressed tarball of the source directory and logs the process.\n\n5. **Rotation Function**: The `rotate_backups` function checks the number of existing backups and removes the oldest one if the maximum number of backups is exceeded.\n\n6. **Directory Checks**: The script checks if the source directory exists and creates the backup directory if it does not.\n\n7. **Execution**: The script is designed to be run as a standalone script, and it performs all necessary checks and operations.\n\n### Usage:\n- Update the `SOURCE_DIR` and `BACKUP_DIR` variables to point to your desired source and backup locations.\n- Ensure the script has execute permissions: `chmod +x backup_script.sh`.\n- Run the script: `./backup_script.sh`.\n\nThis script is designed to be robust and should handle common issues gracefully while providing useful logging information.",
           "tokenUsage": {
-            "total": 1996,
-            "prompt": 496,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1425,
+            "prompt": 481,
+            "completion": 944,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 802,
-          "finishReason": "length",
+          "latencyMs": 18136,
+          "finishReason": "stop",
+          "cost": 0.00063855,
           "guardrails": {
             "flagged": false
           },
@@ -140,27 +146,37 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e4423c6fc1028d8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:14:51 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:48:55 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "17949",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=uTjlhSsN.SD_AGftOw_urGzK1yyBseh8u6tK07Q60Ac-1774842517.5973682-1.0.1.1-6EQwNacUhScdK8rzTgMne9HG6VEMrho3vZ.JN1fES78D2GzpnNJj.Diws11ZF.wvacYfrbT1QiAXOLjo54RQDKRNdTsF255cX__yCD8Gz8NlD2g99wdxGET.MlCSkamS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:18:55 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 d2820253420febdf7911a2eca8959d80.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "ddfOkp3cg5p4zudc36tS8m2P1NsrKv49LXIc67fmAzi7qC5og7hxZg==",
-                "x-amz-cf-pop": "IAH50-P2",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "0eaa63bad1cfd11c981fc5b3a7bd587d"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9545",
+                "x-ratelimit-remaining-tokens": "199472",
+                "x-ratelimit-reset-requests": "1h5m22.789s",
+                "x-ratelimit-reset-tokens": "158ms",
+                "x-request-id": "req_adc76a5772924e1fa152fc3af256b5df"
               }
             }
           }
         },
-        "score": 1,
-        "success": true,
+        "score": 0.5,
+        "success": false,
         "testCase": {
           "description": "[1] Write a defensive bash script that backs up a directory with rotation, error han",
           "vars": {
@@ -176,10 +192,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,37 +209,47 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e4423c6fc1028d8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:14:51 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:48:55 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "17949",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=uTjlhSsN.SD_AGftOw_urGzK1yyBseh8u6tK07Q60Ac-1774842517.5973682-1.0.1.1-6EQwNacUhScdK8rzTgMne9HG6VEMrho3vZ.JN1fES78D2GzpnNJj.Diws11ZF.wvacYfrbT1QiAXOLjo54RQDKRNdTsF255cX__yCD8Gz8NlD2g99wdxGET.MlCSkamS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:18:55 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 d2820253420febdf7911a2eca8959d80.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "ddfOkp3cg5p4zudc36tS8m2P1NsrKv49LXIc67fmAzi7qC5og7hxZg==",
-              "x-amz-cf-pop": "IAH50-P2",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "0eaa63bad1cfd11c981fc5b3a7bd587d"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9545",
+              "x-ratelimit-remaining-tokens": "199472",
+              "x-ratelimit-reset-requests": "1h5m22.789s",
+              "x-ratelimit-reset-tokens": "158ms",
+              "x-request-id": "req_adc76a5772924e1fa152fc3af256b5df"
             }
           },
           "_promptfooFileMetadata": {}
         },
-        "failureReason": 0
+        "failureReason": 1
       }
     ],
     "stats": {
-      "successes": 1,
-      "failures": 0,
+      "successes": 0,
+      "failures": 1,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 496,
-        "completion": 1500,
+        "prompt": 481,
+        "completion": 944,
         "cached": 0,
-        "total": 1996,
+        "total": 1425,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +257,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1764,
-          "prompt": 1699,
-          "completion": 65,
+          "total": 1214,
+          "prompt": 1146,
+          "completion": 68,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +269,8 @@
           }
         }
       },
-      "durationMs": 74576,
-      "evaluationDurationMs": 74576
+      "durationMs": 20345,
+      "evaluationDurationMs": 20345
     }
   },
   "config": {
@@ -259,9 +284,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +313,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +336,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:16:05.533Z",
-    "evaluationCreatedAt": "2026-03-15T04:14:50.904Z"
+    "exportedAt": "2026-03-30T03:48:57.935Z",
+    "evaluationCreatedAt": "2026-03-30T03:48:37.538Z"
   }
 }

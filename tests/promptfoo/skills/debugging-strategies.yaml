@@ -1,0 +1,61 @@
+# Skill quality: debugging-strategies
+
+description: 'Skill quality: debugging-strategies'
+providers:
+- id: openai:chat:gpt-4o-mini
+  config:
+    apiKeyEnvar: OPENAI_API_KEY
+    max_tokens: 1500
+    temperature: 0.0
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+prompts:
+- label: debugging-strategies
+  raw: '[{"role": "system", "content": "# Debugging Strategies\n\nTransform debugging from frustrating guesswork into systematic
+    problem-solving with proven strategies, powerful tools, and methodical approaches.\n\n## When to Use This Skill\n\n- Tracking
+    down elusive bugs\n- Investigating performance issues\n- Understanding unfamiliar codebases\n- Debugging production issues\n-
+    Analyzing crash dumps and stack traces\n- Profiling application performance\n- Investigating memory leaks\n- Debugging
+    distributed systems\n\n## Core Principles\n\n### 1. The Scientific Method\n\n**1. Observe**: What''s the actual behavior?\n**2.
+    Hypothesize**: What could be causing it?\n**3. Experiment**: Test your hypothesis\n**4. Analyze**: Did it prove/disprove
+    your theory?\n**5. Repeat**: Until you find the root cause\n\n### 2. Debugging Mindset\n\n**Don''t Assume:**\n- \"It can''t
+    be X\" - Yes it can\n- \"I didn''t change Y\" - Check anyway\n- \"It works on my machine\" - Find out why\n\n**Do:**\n-
+    Reproduce consistently\n- Isolate the problem\n- Keep detailed notes\n- Question everything\n- Take breaks when stuck\n\n###
+    3. Rubber Duck Debugging\n\nExplain your code and problem out loud (to a rubber duck, colleague, or yourself). Often reveals
+    the issue.\n\n## Systematic Debugging Process\n\n### Phase 1: Reproduce\n\n```markdown\n## Reproduction Checklist\n\n1.
+    **Can you reproduce it?**\n   - Always? Sometimes? Randomly?\n   - Specific conditions needed?\n   - Can others reproduce
+    it?\n\n2. **Create minimal reproduction**\n   - Simplify to smallest example\n   - Remove unrelated code\n   - Isolate
+    the problem\n\n3. **Document steps**\n   - Write down exact steps\n   - Note environment details\n   - Capture error messages\n```\n\n###
+    Phase 2: Gather Information\n\n```markdown\n## Information Collection\n\n1. **Error Messages**\n   - Full stack trace\n   -
+    Error codes\n   - Console/log output\n\n2. **Environment**\n   - OS version\n   - Language/runtime version\n   - Dependencies
+    versions\n   - Environment variables\n\n3. **Recent Changes**\n   - Git history\n   - Deployment timeline\n   - Configuration
+    changes\n\n4. **Scope**\n   - Affects all users or specific ones?\n   - All browsers or specific ones?\n   - Production
+    only or also dev?\n```\n\n### Phase 3: Form Hypothesis\n\n```markdown\n## Hypothesis Formation\n\nBased on gathered info,
+    ask:\n\n1. **What changed?**\n   - Recent code changes\n   - Dependency updates\n   - Infrastructure changes\n\n2. **What''s
+    different?**\n   - Working vs broken environment\n   - Working vs broken user\n   - Before vs after\n\n3. **Where could
+    this fail?**\n   - Input validation\n   - Business logic\n   - Data layer\n   - External services\n```\n\n### Phase 4:
+    Test & Verify\n\n```markdown\n## Testing Strategies\n\n1. **Binary Search**\n   - Comment out half the code\n   - Narrow
+    down problematic section\n   - Repeat until found\n\n2. **Add Logging**\n   - Strategic console.log/print\n   - Track
+    variable values\n   - Trace execution flow\n\n3. **Isolate Components**\n   - Test each piece separately\n   - Mock dependencies\n   -
+    Remove complexity\n\n4. **Compare Working vs Broken**\n   - Diff configurations\n   - Diff environments\n   - Diff data\n```\n\n##
+    Debugging Tools\n\n### JavaScript/TypeScript Debugging\n\n```typescript\n// Chrome DevTools Debugger\nfunction processOrder(order:
+    Order) {\n    debugger;  // Execution pauses here\n\n    const total = calculateTotal(order);\n    console.log(''Total:'',
+    total);\n\n    // Conditional breakpoint\n    if (order.items.length > 10) {\n        debugger;  // Only breaks if condition
+    true\n    }\n\n    return total;\n}\n\n// Console debugging techniques\nconsole.log(''Value:'', value);                    //
+    Basic\nconsole.table(arrayOfObjects);                   // Table format\nconsole.time(''operation''); /* code */ console.timeEnd(''operation'');  //
+    Timing\nconsole.trace();                                 // Stack trace\nconsole.assert(value > 0, ''Value must be positive'');  //
+    Assertion\n\n// Performance profiling\nperformance.mark(''start-operation'');\n// ... operation code\nperformance.mark(''end-operation'');\nperformance.measure(''operation'',
+    ''start-operation'', ''end-operation'');\n\n[... truncated ...]"}, {"role": "user", "content": "{{task}}"}]'
+tests:
+- description: 'skill/debugging-strategies: Walk me through debugging a memory leak in a Node.js product'
+  vars:
+    task: Walk me through debugging a memory leak in a Node.js production application
+  assert:
+  - type: llm-rubric
+    value: Provides systematic debugging steps, mentions at least 2 specific tools or techniques (heap snapshots, profiler,
+      etc.)
+    threshold: 0.6
+    metric: skill_debugging-strategies_quality

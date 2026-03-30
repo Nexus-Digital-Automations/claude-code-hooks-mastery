@@ -1,27 +1,27 @@
 {
-  "evalId": "eval-ZD9-2026-03-15T04:30:55",
+  "evalId": "eval-6RE-2026-03-30T03:52:59",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:30:55.274Z",
+    "timestamp": "2026-03-30T03:52:59.414Z",
     "prompts": [
       {
         "id": "41a259abc95e0897678b195dd92e2c55a7ca67231a90207453839138fb1d5514",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a Go expert specializing in modern Go 1.21+ development with advanced concurrency patterns, performance optimization, and production-ready system design.\\n\\n## Purpose\\nExpert Go developer mastering Go 1.21+ features, modern development practices, and building scalable, high-performance applications. Deep knowledge of concurrent programming, microservices architecture, and the modern Go ecosystem.\\n\\n## Capabilities\\n\\n### Modern Go Language Features\\n- Go 1.21+ features including improved type inference and compiler optimizations\\n- Generics (type parameters) for type-safe, reusable code\\n- Go workspaces for multi-module development\\n- Context package for cancellation and timeouts\\n- Embed directive for embedding files into binaries\\n- New error handling patterns and error wrapping\\n- Advanced reflection and runtime optimizations\\n- Memory management and garbage collector understanding\\n\\n### Concurrency & Parallelism Mastery\\n- Goroutine lifecycle management and best practices\\n- Channel patterns: fan-in, fan-out, worker pools, pipeline patterns\\n- Select statements and non-blocking channel operations\\n- Context cancellation and graceful shutdown patterns\\n- Sync package: mutexes, wait groups, condition variables\\n- Memory model understanding and race condition prevention\\n- Lock-free programming and atomic operations\\n- Error handling in concurrent systems\\n\\n### Performance & Optimization\\n- CPU and memory profiling with pprof and go tool trace\\n- Benchmark-driven optimization and performance analysis\\n- Memory leak detection and prevention\\n- Garbage collection optimization and tuning\\n- CPU-bound vs I/O-bound workload optimization\\n- Caching strategies and memory pooling\\n- Network optimization and connection pooling\\n- Database performance optimization\\n\\n### Modern Go Architecture Patterns\\n- Clean architecture and hexagonal architecture in Go\\n- Domain-driven design with Go idioms\\n- Microservices patterns and service mesh integration\\n- Event-driven architecture with message queues\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "golang-pro",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
-          "score": 2,
-          "testPassCount": 2,
-          "testFailCount": 0,
+          "score": 1.7,
+          "testPassCount": 1,
+          "testFailCount": 1,
           "testErrorCount": 0,
-          "assertPassCount": 2,
-          "assertFailCount": 0,
-          "totalLatencyMs": 904,
+          "assertPassCount": 1,
+          "assertFailCount": 1,
+          "totalLatencyMs": 27467,
           "tokenUsage": {
-            "prompt": 780,
-            "completion": 3000,
+            "prompt": 792,
+            "completion": 1459,
             "cached": 0,
-            "total": 3780,
+            "total": 2251,
             "numRequests": 2,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 3492,
-              "prompt": 3389,
-              "completion": 103,
+              "total": 1971,
+              "prompt": 1856,
+              "completion": 115,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -42,18 +42,18 @@
             }
           },
           "namedScores": {
-            "golang-pro_quality": 2
+            "golang-pro_quality": 1.7
           },
           "namedScoresCount": {
             "golang-pro_quality": 2
           },
-          "cost": 0
+          "cost": 0.0009942
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.0005134499999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "golang-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1749,
-            "prompt": 1696,
-            "completion": 53,
+            "total": 1020,
+            "prompt": 957,
+            "completion": 63,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The code uses Go 1.21+ patterns like structured logging with slog, context cancellation for graceful shutdown, and proper error handling with errors.Is for http.ErrServerClosed.",
+              "reason": "The output demonstrates the use of Go 1.21+ features such as the 'slog' package for structured logging, context cancellation for graceful shutdown, and proper error handling in the server's operations.",
               "tokensUsed": {
-                "total": 1749,
-                "prompt": 1696,
-                "completion": 53,
+                "total": 1020,
+                "prompt": 957,
+                "completion": 63,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a production-ready Go HTTP server with graceful shutdown and structured logging using `slog` (Go 1.21+). This implementation includes proper error handling, health checks, and configuration management.\\n\\n```go\\n// main.go\\npackage main\\n\\nimport (\\n\\t\\\"context\\\"\\n\\t\\\"errors\\\"\\n\\t\\\"fmt\\\"\\n\\t\\\"log/slog\\\"\\n\\t\\\"net/http\\\"\\n\\t\\\"os\\\"\\n\\t\\\"os/signal\\\"\\n\\t\\\"syscall\\\"\\n\\t\\\"time\\\"\\n)\\n\\n// Config holds server configuration\\ntype Config struct {\\n\\tHost         string\\n\\tPort         int\\n\\tReadTimeout  time.Duration\\n\\tWriteTimeout time.Duration\\n\\tIdleTimeout  time.Duration\\n\\tShutdownWait time.Duration\\n}\\n\\n// DefaultConfig returns a default configuration\\nfunc DefaultConfig() Config {\\n\\treturn Config{\\n\\t\\tHost:         \\\"localhost\\\",\\n\\t\\tPort:         8080,\\n\\t\\tReadTimeout:  5 * time.Second,\\n\\t\\tWriteTimeout: 10 * time.Second,\\n\\t\\tIdleTimeout:  120 * time.Second,\\n\\t\\tShutdownWait: 30 * time.Second,\\n\\t}\\n}\\n\\n// Server represents the HTTP server\\ntype Server struct {\\n\\tconfig     Config\\n\\trouter     *http.ServeMux\\n\\thttpServer *http.Server\\n\\tlogger     *slog.Logger\\n\\tshutdown   chan struct{}\\n}\\n\\n// NewServer creates a new HTTP server\\nfunc NewServer(config Config, logger *slog.Logger) *Server {\\n\\trouter := http.NewServeMux()\\n\\t\\n\\tserver := &Server{\\n\\t\\tconfig: config,\\n\\t\\trouter: router,\\n\\t\\tlogger: logger,\\n\\t\\tshutdown: make(chan struct{}),\\n\\t}\\n\\t\\n\\t// Register routes\\n\\tserver.registerRoutes()\\n\\t\\n\\t// Create HTTP server\\n\\tserver.httpServer = &http.Server{\\n\\t\\tAddr:         fmt.Sprintf(\\\"%s:%d\\\", config.Host, config.Port),\\n\\t\\tHandler:      server.loggingMiddleware(router),\\n\\t\\tReadTimeout:  config.ReadTimeout,\\n\\t\\tWriteTimeout: config.WriteTimeout,\\n\\t\\tIdleTimeout:  config.IdleTimeout,\\n\\t}\\n\\t\\n\\treturn server\\n}\\n\\n// registerRoutes sets up all HTTP routes\\nfunc (s *Server) registerRoutes() {\\n\\t// Health check endpoint\\n\\ts.router.HandleFunc(\\\"GET /health\\\", s.handleHealth)\\n\\t\\n\\t// API endpoints\\n\\ts.router.HandleFunc(\\\"GET /api/v1/hello\\\", s.handleHello)\\n\\ts.router.HandleFunc(\\\"GET /api/v1/echo/{message}\\\", s.handleEcho)\\n\\t\\n\\t// Catch-all for 404\\n\\ts.router.HandleFunc(\\\"/\\\", s.handleNotFound)\\n}\\n\\n// loggingMiddleware adds structured logging to all requests\\nfunc (s *Server) loggingMiddleware(next http.Handler) http.Handler {\\n\\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\\n\\t\\tstart := time.Now()\\n\\t\\t\\n\\t\\t// Create response wrapper to capture status code\\n\\t\\trw := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}\\n\\t\\t\\n\\t\\t// Process request\\n\\t\\tnext.ServeHTTP(rw, r)\\n\\t\\t\\n\\t\\t// Log request details\\n\\t\\tduration := time.Since(start)\\n\\t\\t\\n\\t\\ts.logger.Info(\\\"HTTP request\\\",\\n\\t\\t\\tslog.String(\\\"method\\\", r.Method),\\n\\t\\t\\tslog.String(\\\"path\\\", r.URL.Path),\\n\\t\\t\\tslog.String(\\\"remote_addr\\\", r.RemoteAddr),\\n\\t\\t\\tslog.String(\\\"user_agent\\\", r.UserAgent()),\\n\\t\\t\\tslog.Int(\\\"status\\\", rw.statusCode),\\n\\t\\t\\tslog.Duration(\\\"duration\\\", duration),\\n\\t\\t\\tslog.Int64(\\\"duration_ms\\\", duration.Milliseconds()),\\n\\t\\t\\tslog.String(\\\"request_id\\\", r.Header.Get(\\\"X-Request-ID\\\")),\\n\\t\\t)\\n\\t})\\n}\\n\\n// responseWriter wraps http.ResponseWriter to capture status code\\ntype responseWriter struct {\\n\\thttp.ResponseWriter\\n\\tstatusCode int\\n}\\n\\nfunc (rw *responseWriter) WriteHeader(code int) {\\n\\trw.statusCode = code\\n\\trw.ResponseWriter.WriteHeader(code)\\n}\\n\\n// handleHealth handles health check requests\\nfunc (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {\\n\\tw.Header().Set(\\\"Content-Type\\\", \\\"application/json\\\")\\n\\tw.WriteHeader(http.StatusOK)\\n\\tfmt.Fprintf(w, `{\\\"status\\\": \\\"healthy\\\", \\\"timestamp\\\": \\\"%s\\\"}`, time.Now().UTC().Format(time.RFC3339))\\n}\\n\\n// handleHello returns a greeting\\nfunc (s *Server) handleHello(w http.ResponseWriter, r *http.Request) {\\n\\tw.Header().Set(\\\"Content-Type\\\", \\\"application/json\\\")\\n\\tw.WriteHeader(http.StatusOK)\\n\\tfmt.Fprintf(w, `{\\\"message\\\": \\\"Hello, World!\\\", \\\"timestamp\\\": \\\"%s\\\"}`, time.Now().UTC().Format(time.RFC3339))\\n}\\n\\n// handleEcho echoes back the message parameter\\nfunc (s *Server) handleEcho(w http.ResponseWriter, r *http.Request) {\\n\\tmessage := r.PathValue(\\\"message\\\")\\n\\tif message == \\\"\\\" {\\n\\t\\tmessage = \\\"Hello\\\"\\n\\t}\\n\\t\\n\\tw.Header().Set(\\\"Content-Type\\\", \\\"application/json\\\")\\n\\tw.WriteHeader(http.StatusOK)\\n\\tfmt.Fprintf(w, `{\\\"echo\\\": \\\"%s\\\", \\\"timestamp\\\": \\\"%s\\\"}`, message, time.Now().UTC().Format(time.RFC3339))\\n}\\n\\n// handleNotFound handles 404 responses\\nfunc (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {\\n\\ts.logger.Warn(\\\"Route not found\\\",\\n\\t\\tslog.String(\\\"path\\\", r.URL.Path),\\n\\t\\tslog.String(\\\"method\\\", r.Method),\\n\\t)\\n\\t\\n\\tw.Header().Set(\\\"Content-Type\\\", \\\"application/json\\\")\\n\\tw.WriteHeader(http.StatusNotFound)\\n\\tfmt.Fprintf(w, `{\\\"error\\\": \\\"Not Found\\\", \\\"path\\\": \\\"%s\\\"}`, r.URL.Path)\\n}\\n\\n// Start begins listening for requests\\nfunc (s *Server) Start() error {\\n\\ts.logger.Info(\\\"Starting HTTP server\\\",\\n\\t\\tslog.String(\\\"address\\\", s.httpServer.Addr),\\n\\t\\tslog.Duration(\\\"read_timeout\\\", s.config.ReadTimeout),\\n\\t\\tslog.Duration(\\\"write_timeout\\\", s.config.WriteTimeout),\\n\\t\\tslog.Duration(\\\"idle_timeout\\\", s.config.IdleTimeout),\\n\\t)\\n\\t\\n\\t// Start server in goroutine\\n\\tgo func() {\\n\\t\\tif err := s.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {\\n\\t\\t\\ts.logger.Error(\\\"HTTP server error\\\", slog.String(\\\"error\\\", err.Error()))\\n\\t\\t\\tclose(s.shutdown)\\n\\t\\t}\\n\\t}()\\n\\t\\n\\treturn nil\\n}\\n\\n// WaitForShutdown blocks until shutdown signal is received\\nfunc (s *Server) WaitForShutdown() {\\n\\t// Wait for interrupt signal\\n\\tquit := make(chan os.Signal, 1)\\n\\tsignal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)\\n\\t\\n\\tselect {\\n\\tcase <-quit:\\n\\t\\ts.logger.Info(\\\"Received shutdown signal\\\")\\n\\tcase <-s.shutdown:\\n\\t\\ts.logger.Info(\\\"Server initiated shutdown\\\")\\n\\t}\\n\\t\\n\\t// Create shutdown\\n</Output>\\n<Rubric>\\nUses modern Go 1.21+ patterns, context cancellation, slog structured logging, proper error handling\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is an example of a simple HTTP server in Go that implements graceful shutdown and uses the `slog` package for structured logging. This example assumes you are using Go 1.21 or later.\\n\\n### Go HTTP Server with Graceful Shutdown and Structured Logging\\n\\nFirst, make sure you have the `slog` package available. If you haven't installed it yet, you can do so by running:\\n\\n```bash\\ngo get golang.org/x/exp/slog\\n```\\n\\nNow, here’s the complete code for the HTTP server:\\n\\n```go\\npackage main\\n\\nimport (\\n\\t\\\"context\\\"\\n\\t\\\"net/http\\\"\\n\\t\\\"os\\\"\\n\\t\\\"os/signal\\\"\\n\\t\\\"time\\\"\\n\\n\\t\\\"golang.org/x/exp/slog\\\"\\n)\\n\\nfunc main() {\\n\\t// Create a logger\\n\\tlogger := slog.New(slog.NewJSONHandler(os.Stdout))\\n\\n\\t// Create a new HTTP server\\n\\tmux := http.NewServeMux()\\n\\tmux.HandleFunc(\\\"/\\\", func(w http.ResponseWriter, r *http.Request) {\\n\\t\\tlogger.Info(\\\"Received request\\\", \\\"method\\\", r.Method, \\\"path\\\", r.URL.Path)\\n\\t\\tw.Write([]byte(\\\"Hello, World!\\\"))\\n\\t})\\n\\n\\tserver := &http.Server{\\n\\t\\tAddr:    \\\":8080\\\",\\n\\t\\tHandler: mux,\\n\\t}\\n\\n\\t// Channel to listen for interrupt signals\\n\\tstop := make(chan os.Signal, 1)\\n\\tsignal.Notify(stop, os.Interrupt)\\n\\n\\t// Start the server in a goroutine\\n\\tgo func() {\\n\\t\\tlogger.Info(\\\"Starting server\\\", \\\"address\\\", server.Addr)\\n\\t\\tif err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {\\n\\t\\t\\tlogger.Error(\\\"Server error\\\", \\\"error\\\", err)\\n\\t\\t}\\n\\t}()\\n\\n\\t// Wait for interrupt signal\\n\\t<-stop\\n\\tlogger.Info(\\\"Shutting down server...\\\")\\n\\n\\t// Create a context with a timeout for the shutdown\\n\\tctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)\\n\\tdefer cancel()\\n\\n\\t// Attempt to gracefully shut down the server\\n\\tif err := server.Shutdown(ctx); err != nil {\\n\\t\\tlogger.Error(\\\"Server shutdown error\\\", \\\"error\\\", err)\\n\\t}\\n\\n\\tlogger.Info(\\\"Server shut down gracefully\\\")\\n}\\n```\\n\\n### Explanation\\n\\n1. **Logger Initialization**: We create a structured logger using `slog.NewJSONHandler` that outputs logs in JSON format to standard output.\\n\\n2. **HTTP Server Setup**: We set up a simple HTTP server that responds with \\\"Hello, World!\\\" to any request. The logger logs the method and path of each incoming request.\\n\\n3. **Graceful Shutdown**:\\n   - We listen for OS interrupt signals (like Ctrl+C) using the `os/signal` package.\\n   - When an interrupt signal is received, we log the shutdown process and initiate a graceful shutdown of the server using `server.Shutdown()`, which allows ongoing requests to complete before shutting down.\\n\\n4. **Timeout for Shutdown**: We use a context with a timeout of 5 seconds to ensure that the server does not hang indefinitely during shutdown.\\n\\n### Running the Server\\n\\nTo run the server, save the code in a file named `main.go`, and execute the following command:\\n\\n```bash\\ngo run main.go\\n```\\n\\nYou can then access the server at `http://localhost:8080`. To stop the server gracefully, you can press `Ctrl+C` in the terminal.\\n\\n### Logging Output\\n\\nThe logs will be output in JSON format, which is useful for structured logging and can be easily parsed by log management systems. You will see logs for incoming requests and the server's shutdown process.\\n\\nThis example provides a solid foundation for building more complex applications with structured logging and graceful shutdown capabilities in Go.\\n</Output>\\n<Rubric>\\nUses modern Go 1.21+ patterns, context cancellation, slog structured logging, proper error handling\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "83b9753d-4702-4426-a6a7-56b923297c22",
-        "latencyMs": 452,
+        "id": "5ae454f3-c4ed-4e06-9450-5a6042ab9905",
+        "latencyMs": 14205,
         "namedScores": {
           "golang-pro_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "golang-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "41a259abc95e0897678b195dd92e2c55a7ca67231a90207453839138fb1d5514",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll create a production-ready Go HTTP server with graceful shutdown and structured logging using `slog` (Go 1.21+). This implementation includes proper error handling, health checks, and configuration management.\n\n```go\n// main.go\npackage main\n\nimport (\n\t\"context\"\n\t\"errors\"\n\t\"fmt\"\n\t\"log/slog\"\n\t\"net/http\"\n\t\"os\"\n\t\"os/signal\"\n\t\"syscall\"\n\t\"time\"\n)\n\n// Config holds server configuration\ntype Config struct {\n\tHost         string\n\tPort         int\n\tReadTimeout  time.Duration\n\tWriteTimeout time.Duration\n\tIdleTimeout  time.Duration\n\tShutdownWait time.Duration\n}\n\n// DefaultConfig returns a default configuration\nfunc DefaultConfig() Config {\n\treturn Config{\n\t\tHost:         \"localhost\",\n\t\tPort:         8080,\n\t\tReadTimeout:  5 * time.Second,\n\t\tWriteTimeout: 10 * time.Second,\n\t\tIdleTimeout:  120 * time.Second,\n\t\tShutdownWait: 30 * time.Second,\n\t}\n}\n\n// Server represents the HTTP server\ntype Server struct {\n\tconfig     Config\n\trouter     *http.ServeMux\n\thttpServer *http.Server\n\tlogger     *slog.Logger\n\tshutdown   chan struct{}\n}\n\n// NewServer creates a new HTTP server\nfunc NewServer(config Config, logger *slog.Logger) *Server {\n\trouter := http.NewServeMux()\n\t\n\tserver := &Server{\n\t\tconfig: config,\n\t\trouter: router,\n\t\tlogger: logger,\n\t\tshutdown: make(chan struct{}),\n\t}\n\t\n\t// Register routes\n\tserver.registerRoutes()\n\t\n\t// Create HTTP server\n\tserver.httpServer = &http.Server{\n\t\tAddr:         fmt.Sprintf(\"%s:%d\", config.Host, config.Port),\n\t\tHandler:      server.loggingMiddleware(router),\n\t\tReadTimeout:  config.ReadTimeout,\n\t\tWriteTimeout: config.WriteTimeout,\n\t\tIdleTimeout:  config.IdleTimeout,\n\t}\n\t\n\treturn server\n}\n\n// registerRoutes sets up all HTTP routes\nfunc (s *Server) registerRoutes() {\n\t// Health check endpoint\n\ts.router.HandleFunc(\"GET /health\", s.handleHealth)\n\t\n\t// API endpoints\n\ts.router.HandleFunc(\"GET /api/v1/hello\", s.handleHello)\n\ts.router.HandleFunc(\"GET /api/v1/echo/{message}\", s.handleEcho)\n\t\n\t// Catch-all for 404\n\ts.router.HandleFunc(\"/\", s.handleNotFound)\n}\n\n// loggingMiddleware adds structured logging to all requests\nfunc (s *Server) loggingMiddleware(next http.Handler) http.Handler {\n\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n\t\tstart := time.Now()\n\t\t\n\t\t// Create response wrapper to capture status code\n\t\trw := &responseWriter{ResponseWriter: w, statusCode: http.StatusOK}\n\t\t\n\t\t// Process request\n\t\tnext.ServeHTTP(rw, r)\n\t\t\n\t\t// Log request details\n\t\tduration := time.Since(start)\n\t\t\n\t\ts.logger.Info(\"HTTP request\",\n\t\t\tslog.String(\"method\", r.Method),\n\t\t\tslog.String(\"path\", r.URL.Path),\n\t\t\tslog.String(\"remote_addr\", r.RemoteAddr),\n\t\t\tslog.String(\"user_agent\", r.UserAgent()),\n\t\t\tslog.Int(\"status\", rw.statusCode),\n\t\t\tslog.Duration(\"duration\", duration),\n\t\t\tslog.Int64(\"duration_ms\", duration.Milliseconds()),\n\t\t\tslog.String(\"request_id\", r.Header.Get(\"X-Request-ID\")),\n\t\t)\n\t})\n}\n\n// responseWriter wraps http.ResponseWriter to capture status code\ntype responseWriter struct {\n\thttp.ResponseWriter\n\tstatusCode int\n}\n\nfunc (rw *responseWriter) WriteHeader(code int) {\n\trw.statusCode = code\n\trw.ResponseWriter.WriteHeader(code)\n}\n\n// handleHealth handles health check requests\nfunc (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tw.WriteHeader(http.StatusOK)\n\tfmt.Fprintf(w, `{\"status\": \"healthy\", \"timestamp\": \"%s\"}`, time.Now().UTC().Format(time.RFC3339))\n}\n\n// handleHello returns a greeting\nfunc (s *Server) handleHello(w http.ResponseWriter, r *http.Request) {\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tw.WriteHeader(http.StatusOK)\n\tfmt.Fprintf(w, `{\"message\": \"Hello, World!\", \"timestamp\": \"%s\"}`, time.Now().UTC().Format(time.RFC3339))\n}\n\n// handleEcho echoes back the message parameter\nfunc (s *Server) handleEcho(w http.ResponseWriter, r *http.Request) {\n\tmessage := r.PathValue(\"message\")\n\tif message == \"\" {\n\t\tmessage = \"Hello\"\n\t}\n\t\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tw.WriteHeader(http.StatusOK)\n\tfmt.Fprintf(w, `{\"echo\": \"%s\", \"timestamp\": \"%s\"}`, message, time.Now().UTC().Format(time.RFC3339))\n}\n\n// handleNotFound handles 404 responses\nfunc (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {\n\ts.logger.Warn(\"Route not found\",\n\t\tslog.String(\"path\", r.URL.Path),\n\t\tslog.String(\"method\", r.Method),\n\t)\n\t\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tw.WriteHeader(http.StatusNotFound)\n\tfmt.Fprintf(w, `{\"error\": \"Not Found\", \"path\": \"%s\"}`, r.URL.Path)\n}\n\n// Start begins listening for requests\nfunc (s *Server) Start() error {\n\ts.logger.Info(\"Starting HTTP server\",\n\t\tslog.String(\"address\", s.httpServer.Addr),\n\t\tslog.Duration(\"read_timeout\", s.config.ReadTimeout),\n\t\tslog.Duration(\"write_timeout\", s.config.WriteTimeout),\n\t\tslog.Duration(\"idle_timeout\", s.config.IdleTimeout),\n\t)\n\t\n\t// Start server in goroutine\n\tgo func() {\n\t\tif err := s.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {\n\t\t\ts.logger.Error(\"HTTP server error\", slog.String(\"error\", err.Error()))\n\t\t\tclose(s.shutdown)\n\t\t}\n\t}()\n\t\n\treturn nil\n}\n\n// WaitForShutdown blocks until shutdown signal is received\nfunc (s *Server) WaitForShutdown() {\n\t// Wait for interrupt signal\n\tquit := make(chan os.Signal, 1)\n\tsignal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)\n\t\n\tselect {\n\tcase <-quit:\n\t\ts.logger.Info(\"Received shutdown signal\")\n\tcase <-s.shutdown:\n\t\ts.logger.Info(\"Server initiated shutdown\")\n\t}\n\t\n\t// Create shutdown",
+          "output": "Certainly! Below is an example of a simple HTTP server in Go that implements graceful shutdown and uses the `slog` package for structured logging. This example assumes you are using Go 1.21 or later.\n\n### Go HTTP Server with Graceful Shutdown and Structured Logging\n\nFirst, make sure you have the `slog` package available. If you haven't installed it yet, you can do so by running:\n\n```bash\ngo get golang.org/x/exp/slog\n```\n\nNow, here’s the complete code for the HTTP server:\n\n```go\npackage main\n\nimport (\n\t\"context\"\n\t\"net/http\"\n\t\"os\"\n\t\"os/signal\"\n\t\"time\"\n\n\t\"golang.org/x/exp/slog\"\n)\n\nfunc main() {\n\t// Create a logger\n\tlogger := slog.New(slog.NewJSONHandler(os.Stdout))\n\n\t// Create a new HTTP server\n\tmux := http.NewServeMux()\n\tmux.HandleFunc(\"/\", func(w http.ResponseWriter, r *http.Request) {\n\t\tlogger.Info(\"Received request\", \"method\", r.Method, \"path\", r.URL.Path)\n\t\tw.Write([]byte(\"Hello, World!\"))\n\t})\n\n\tserver := &http.Server{\n\t\tAddr:    \":8080\",\n\t\tHandler: mux,\n\t}\n\n\t// Channel to listen for interrupt signals\n\tstop := make(chan os.Signal, 1)\n\tsignal.Notify(stop, os.Interrupt)\n\n\t// Start the server in a goroutine\n\tgo func() {\n\t\tlogger.Info(\"Starting server\", \"address\", server.Addr)\n\t\tif err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {\n\t\t\tlogger.Error(\"Server error\", \"error\", err)\n\t\t}\n\t}()\n\n\t// Wait for interrupt signal\n\t<-stop\n\tlogger.Info(\"Shutting down server...\")\n\n\t// Create a context with a timeout for the shutdown\n\tctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)\n\tdefer cancel()\n\n\t// Attempt to gracefully shut down the server\n\tif err := server.Shutdown(ctx); err != nil {\n\t\tlogger.Error(\"Server shutdown error\", \"error\", err)\n\t}\n\n\tlogger.Info(\"Server shut down gracefully\")\n}\n```\n\n### Explanation\n\n1. **Logger Initialization**: We create a structured logger using `slog.NewJSONHandler` that outputs logs in JSON format to standard output.\n\n2. **HTTP Server Setup**: We set up a simple HTTP server that responds with \"Hello, World!\" to any request. The logger logs the method and path of each incoming request.\n\n3. **Graceful Shutdown**:\n   - We listen for OS interrupt signals (like Ctrl+C) using the `os/signal` package.\n   - When an interrupt signal is received, we log the shutdown process and initiate a graceful shutdown of the server using `server.Shutdown()`, which allows ongoing requests to complete before shutting down.\n\n4. **Timeout for Shutdown**: We use a context with a timeout of 5 seconds to ensure that the server does not hang indefinitely during shutdown.\n\n### Running the Server\n\nTo run the server, save the code in a file named `main.go`, and execute the following command:\n\n```bash\ngo run main.go\n```\n\nYou can then access the server at `http://localhost:8080`. To stop the server gracefully, you can press `Ctrl+C` in the terminal.\n\n### Logging Output\n\nThe logs will be output in JSON format, which is useful for structured logging and can be easily parsed by log management systems. You will see logs for incoming requests and the server's shutdown process.\n\nThis example provides a solid foundation for building more complex applications with structured logging and graceful shutdown capabilities in Go.",
           "tokenUsage": {
-            "total": 1889,
-            "prompt": 389,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1152,
+            "prompt": 395,
+            "completion": 757,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 452,
-          "finishReason": "length",
+          "latencyMs": 14205,
+          "finishReason": "stop",
+          "cost": 0.0005134499999999999,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e442a2bef9dc30b-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:30:55 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:53:13 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "14030",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=z8VEHobuSsCdqZ_1f0IB6cxEbOpfru9KlwXvJhBJ9_Y-1774842779.501027-1.0.1.1-wzDwHBQxECHp_ASiC0xV0E2GbkQnbcMMDsGpy_uQZnPkLXACW_JVU_JhuOl9g5efJLAzj3ileTOWb.ijEIs3khyisjufnw0zb_yvQY_n60DIPkPTBGVVjXZ4ddeyvz0C; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:13 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 4969d3779d2434ea67cd63de6552e5a2.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "90GzaxjJfwG1KWE0-ksdW6EZmu_kV7ksfK11caX9CuolKd8zzgDz-g==",
-                "x-amz-cf-pop": "IAH50-P5",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "2f7193a069b84b6189730c5bcc62c781"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9548",
+                "x-ratelimit-remaining-tokens": "199473",
+                "x-ratelimit-reset-requests": "1h5m2.816s",
+                "x-ratelimit-reset-tokens": "158ms",
+                "x-request-id": "req_5054db4031b34b35b835940cf83f55e5"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e442a2bef9dc30b-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:30:55 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:53:13 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "14030",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=z8VEHobuSsCdqZ_1f0IB6cxEbOpfru9KlwXvJhBJ9_Y-1774842779.501027-1.0.1.1-wzDwHBQxECHp_ASiC0xV0E2GbkQnbcMMDsGpy_uQZnPkLXACW_JVU_JhuOl9g5efJLAzj3ileTOWb.ijEIs3khyisjufnw0zb_yvQY_n60DIPkPTBGVVjXZ4ddeyvz0C; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:13 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 4969d3779d2434ea67cd63de6552e5a2.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "90GzaxjJfwG1KWE0-ksdW6EZmu_kV7ksfK11caX9CuolKd8zzgDz-g==",
-              "x-amz-cf-pop": "IAH50-P5",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "2f7193a069b84b6189730c5bcc62c781"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9548",
+              "x-ratelimit-remaining-tokens": "199473",
+              "x-ratelimit-reset-requests": "1h5m2.816s",
+              "x-ratelimit-reset-tokens": "158ms",
+              "x-request-id": "req_5054db4031b34b35b835940cf83f55e5"
             }
           },
           "_promptfooFileMetadata": {}
@@ -216,18 +240,19 @@
         "failureReason": 0
       },
       {
-        "cost": 0,
+        "cost": 0.00048075,
+        "error": "The output correctly implements goroutines and channels for task processing, uses a WaitGroup to synchronize the completion of workers, but does not handle context cancellation.",
         "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
+          "pass": false,
+          "score": 0.7,
+          "reason": "The output correctly implements goroutines and channels for task processing, uses a WaitGroup to synchronize the completion of workers, but does not handle context cancellation.",
           "namedScores": {
-            "golang-pro_quality": 1
+            "golang-pro_quality": 0.7
           },
           "tokensUsed": {
-            "total": 1743,
-            "prompt": 1693,
-            "completion": 50,
+            "total": 951,
+            "prompt": 899,
+            "completion": 52,
             "cached": 0,
             "numRequests": 1
           },
@@ -239,13 +264,13 @@
                 "threshold": 0.6,
                 "metric": "golang-pro_quality"
               },
-              "pass": true,
-              "score": 1,
-              "reason": "The implementation correctly uses goroutines for workers, channels for task distribution and results, context for cancellation, and sync.WaitGroup for synchronization.",
+              "pass": false,
+              "score": 0.7,
+              "reason": "The output correctly implements goroutines and channels for task processing, uses a WaitGroup to synchronize the completion of workers, but does not handle context cancellation.",
               "tokensUsed": {
-                "total": 1743,
-                "prompt": 1693,
-                "completion": 50,
+                "total": 951,
+                "prompt": 899,
+                "completion": 52,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -255,25 +280,24 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's a comprehensive implementation of a worker pool pattern in Go with modern best practices:\\n\\n## Basic Worker Pool Implementation\\n\\n```go\\npackage main\\n\\nimport (\\n    \\\"context\\\"\\n    \\\"fmt\\\"\\n    \\\"sync\\\"\\n    \\\"time\\\"\\n)\\n\\n// Task represents a unit of work\\ntype Task struct {\\n    ID   int\\n    Data interface{}\\n}\\n\\n// Result represents the processed task output\\ntype Result struct {\\n    TaskID int\\n    Output interface{}\\n    Err    error\\n}\\n\\n// WorkerPool manages a pool of worker goroutines\\ntype WorkerPool struct {\\n    numWorkers int\\n    tasks      chan Task\\n    results    chan Result\\n    wg         sync.WaitGroup\\n    ctx        context.Context\\n    cancel     context.CancelFunc\\n}\\n\\n// NewWorkerPool creates a new worker pool\\nfunc NewWorkerPool(numWorkers, bufferSize int) *WorkerPool {\\n    ctx, cancel := context.WithCancel(context.Background())\\n    \\n    return &WorkerPool{\\n        numWorkers: numWorkers,\\n        tasks:      make(chan Task, bufferSize),\\n        results:    make(chan Result, bufferSize),\\n        ctx:        ctx,\\n        cancel:     cancel,\\n    }\\n}\\n\\n// Start initializes and starts the worker pool\\nfunc (wp *WorkerPool) Start(processor func(Task) (interface{}, error)) {\\n    wp.wg.Add(wp.numWorkers)\\n    \\n    for i := 0; i < wp.numWorkers; i++ {\\n        go wp.worker(i, processor)\\n    }\\n}\\n\\n// worker processes tasks from the channel\\nfunc (wp *WorkerPool) worker(id int, processor func(Task) (interface{}, error)) {\\n    defer wp.wg.Done()\\n    \\n    for {\\n        select {\\n        case <-wp.ctx.Done():\\n            return\\n        case task, ok := <-wp.tasks:\\n            if !ok {\\n                return\\n            }\\n            \\n            // Process the task\\n            output, err := processor(task)\\n            \\n            // Send result\\n            select {\\n            case <-wp.ctx.Done():\\n                return\\n            case wp.results <- Result{\\n                TaskID: task.ID,\\n                Output: output,\\n                Err:    err,\\n            }:\\n            }\\n        }\\n    }\\n}\\n\\n// Submit adds a task to the pool\\nfunc (wp *WorkerPool) Submit(task Task) error {\\n    select {\\n    case <-wp.ctx.Done():\\n        return fmt.Errorf(\\\"worker pool stopped\\\")\\n    case wp.tasks <- task:\\n        return nil\\n    }\\n}\\n\\n// Results returns a channel to receive processed results\\nfunc (wp *WorkerPool) Results() <-chan Result {\\n    return wp.results\\n}\\n\\n// Stop gracefully shuts down the worker pool\\nfunc (wp *WorkerPool) Stop() {\\n    wp.cancel()      // Signal all workers to stop\\n    close(wp.tasks)  // Close tasks channel\\n    wp.wg.Wait()     // Wait for all workers to finish\\n    close(wp.results) // Close results channel\\n}\\n\\n// Example usage\\nfunc main() {\\n    // Create a worker pool with 5 workers and buffer size 100\\n    pool := NewWorkerPool(5, 100)\\n    \\n    // Define task processor\\n    processor := func(task Task) (interface{}, error) {\\n        // Simulate processing time\\n        time.Sleep(100 * time.Millisecond)\\n        \\n        // Example processing: square the ID\\n        if data, ok := task.Data.(int); ok {\\n            return data * data, nil\\n        }\\n        return nil, fmt.Errorf(\\\"invalid data type\\\")\\n    }\\n    \\n    // Start the worker pool\\n    pool.Start(processor)\\n    \\n    // Submit tasks in a separate goroutine\\n    go func() {\\n        for i := 0; i < 20; i++ {\\n            task := Task{\\n                ID:   i,\\n                Data: i,\\n            }\\n            if err := pool.Submit(task); err != nil {\\n                fmt.Printf(\\\"Failed to submit task %d: %v\\\\n\\\", i, err)\\n            }\\n        }\\n    }()\\n    \\n    // Collect results\\n    go func() {\\n        for result := range pool.Results() {\\n            if result.Err != nil {\\n                fmt.Printf(\\\"Task %d failed: %v\\\\n\\\", result.TaskID, result.Err)\\n            } else {\\n                fmt.Printf(\\\"Task %d result: %v\\\\n\\\", result.TaskID, result.Output)\\n            }\\n        }\\n    }()\\n    \\n    // Wait for processing to complete\\n    time.Sleep(2 * time.Second)\\n    pool.Stop()\\n}\\n```\\n\\n## Advanced Features & Best Practices\\n\\n### 1. **Dynamic Worker Scaling**\\n```go\\ntype DynamicWorkerPool struct {\\n    minWorkers int\\n    maxWorkers int\\n    tasks      chan Task\\n    results    chan Result\\n    workerCount int32\\n    mu         sync.RWMutex\\n}\\n\\nfunc (dwp *DynamicWorkerPool) scaleWorkers() {\\n    // Monitor queue length and scale workers dynamically\\n    // based on load\\n}\\n```\\n\\n### 2. **Error Handling with Retry Logic**\\n```go\\ntype TaskWithRetry struct {\\n    Task\\n    MaxRetries int\\n    RetryDelay time.Duration\\n}\\n\\nfunc (wp *WorkerPool) SubmitWithRetry(task TaskWithRetry) {\\n    // Implement exponential backoff retry logic\\n}\\n```\\n\\n### 3. **Priority Queue Support**\\n```go\\ntype PriorityTask struct {\\n    Task\\n    Priority int\\n}\\n\\ntype PriorityWorkerPool struct {\\n    highPriority chan PriorityTask\\n    lowPriority  chan PriorityTask\\n    // ... rest of implementation\\n}\\n```\\n\\n### 4. **Metrics and Monitoring**\\n```go\\ntype WorkerPoolMetrics struct {\\n    TasksProcessed    int64\\n    TasksFailed       int64\\n    AvgProcessingTime time.Duration\\n    QueueLength       int\\n    ActiveWorkers     int\\n}\\n\\nfunc (wp *WorkerPool) CollectMetrics() WorkerPoolMetrics {\\n    // Collect runtime metrics for monitoring\\n}\\n```\\n\\n### 5. **Graceful Shutdown Pattern**\\n```go\\nfunc (wp *WorkerPool) GracefulStop(timeout time.Duration) error {\\n    stopChan := make(chan struct{})\\n    go func() {\\n        wp.Stop()\\n        close(stopChan)\\n    }()\\n    \\n    select {\\n    case <-stopChan:\\n        return nil\\n    case <-time.After(timeout):\\n        return fmt.Errorf(\\\"graceful shutdown timeout\\\")\\n    }\\n}\\n```\\n\\n## Key Design Considerations\\n\\n1. **Channel Buffering**: Size buffers appropriately for your workload\\n2. **Context Propagation**: Use context for cancellation and timeouts\\n3. **Resource Limits**: Implement backpressure when queue is full\\n4. **Error Isolation**: Prevent panics from crashing the entire pool\\n5. **Memory Management**: Use object pools for frequently allocated objects\\n\\n## Production-Ready Enhancements\\n\\n```go\\n// With panic recovery in workers\\nfunc (wp *WorkerPool) worker(id int, processor func(Task) (interface{}, error)) {\\n    defer wp.wg.Done()\\n    defer func() {\\n        if r := recover(); r !=\\n</Output>\\n<Rubric>\\nUses goroutines and channels correctly, handles context cancellation, uses WaitGroup or similar synchronization\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nImplementing a worker pool pattern in Go is a great way to manage concurrent tasks efficiently. The worker pool pattern allows you to limit the number of goroutines that are running concurrently, which can help manage resource usage and improve performance. Below is a step-by-step guide to implementing a worker pool in Go.\\n\\n### Step 1: Define the Task\\n\\nFirst, define the type of task that you want to process. For this example, let's say we have a simple task that just processes an integer.\\n\\n```go\\ntype Task struct {\\n    ID int\\n}\\n```\\n\\n### Step 2: Create a Worker\\n\\nNext, create a worker that will process tasks. Each worker will read from a channel of tasks and execute them.\\n\\n```go\\nfunc worker(id int, tasks <-chan Task, wg *sync.WaitGroup) {\\n    defer wg.Done()\\n    for task := range tasks {\\n        fmt.Printf(\\\"Worker %d processing task %d\\\\n\\\", id, task.ID)\\n        // Simulate work\\n        time.Sleep(time.Second)\\n    }\\n}\\n```\\n\\n### Step 3: Set Up the Worker Pool\\n\\nNow, set up the worker pool. You will create a fixed number of workers and a channel to send tasks to them.\\n\\n```go\\nfunc main() {\\n    const numWorkers = 3\\n    tasks := make(chan Task, 10) // Buffered channel for tasks\\n    var wg sync.WaitGroup\\n\\n    // Start workers\\n    for i := 1; i <= numWorkers; i++ {\\n        wg.Add(1)\\n        go worker(i, tasks, &wg)\\n    }\\n\\n    // Send tasks to the workers\\n    for i := 1; i <= 10; i++ {\\n        tasks <- Task{ID: i}\\n    }\\n    close(tasks) // Close the channel to signal no more tasks\\n\\n    // Wait for all workers to finish\\n    wg.Wait()\\n    fmt.Println(\\\"All tasks processed.\\\")\\n}\\n```\\n\\n### Explanation\\n\\n1. **Task Definition**: We define a `Task` struct that represents the work to be done.\\n\\n2. **Worker Function**: The `worker` function takes an ID, a channel of tasks, and a `sync.WaitGroup`. It processes tasks from the channel until the channel is closed.\\n\\n3. **Main Function**:\\n   - We define the number of workers and create a buffered channel for tasks.\\n   - We start the workers in a loop, each running in its own goroutine.\\n   - We send tasks to the channel. After sending all tasks, we close the channel to signal to the workers that there are no more tasks.\\n   - Finally, we wait for all workers to finish using `sync.WaitGroup`.\\n\\n### Step 4: Run the Program\\n\\nWhen you run the program, you should see output indicating that workers are processing tasks concurrently. The number of concurrent tasks will be limited to the number of workers you defined.\\n\\n### Additional Considerations\\n\\n- **Error Handling**: You may want to add error handling within the worker function to handle any errors that occur during task processing.\\n- **Dynamic Task Generation**: If tasks are generated dynamically, you can implement a mechanism to add tasks to the channel while workers are still running.\\n- **Graceful Shutdown**: Consider implementing a graceful shutdown mechanism to handle signals and clean up resources properly.\\n\\nThis worker pool pattern is a powerful way to manage concurrency in Go, allowing you to efficiently process tasks while controlling resource usage.\\n</Output>\\n<Rubric>\\nUses goroutines and channels correctly, handles context cancellation, uses WaitGroup or similar synchronization\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "6db7ac30-e29e-43bb-aeab-f1cad3902925",
-        "latencyMs": 452,
+        "id": "b5be9955-b4ba-4281-8180-a5f107ef0829",
+        "latencyMs": 13262,
         "namedScores": {
-          "golang-pro_quality": 1
+          "golang-pro_quality": 0.7
         },
         "prompt": {
           "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Go expert specializing in modern Go 1.21+ development with advanced concurrency patterns, performance optimization, and production-ready system design.\\n\\n## Purpose\\nExpert Go developer mastering Go 1.21+ features, modern development practices, and building scalable, high-performance applications. Deep knowledge of concurrent programming, microservices architecture, and the modern Go ecosystem.\\n\\n## Capabilities\\n\\n### Modern Go Language Features\\n- Go 1.21+ features including improved type inference and compiler optimizations\\n- Generics (type parameters) for type-safe, reusable code\\n- Go workspaces for multi-module development\\n- Context package for cancellation and timeouts\\n- Embed directive for embedding files into binaries\\n- New error handling patterns and error wrapping\\n- Advanced reflection and runtime optimizations\\n- Memory management and garbage collector understanding\\n\\n### Concurrency & Parallelism Mastery\\n- Goroutine lifecycle management and best practices\\n- Channel patterns: fan-in, fan-out, worker pools, pipeline patterns\\n- Select statements and non-blocking channel operations\\n- Context cancellation and graceful shutdown patterns\\n- Sync package: mutexes, wait groups, condition variables\\n- Memory model understanding and race condition prevention\\n- Lock-free programming and atomic operations\\n- Error handling in concurrent systems\\n\\n### Performance & Optimization\\n- CPU and memory profiling with pprof and go tool trace\\n- Benchmark-driven optimization and performance analysis\\n- Memory leak detection and prevention\\n- Garbage collection optimization and tuning\\n- CPU-bound vs I/O-bound workload optimization\\n- Caching strategies and memory pooling\\n- Network optimization and connection pooling\\n- Database performance optimization\\n\\n### Modern Go Architecture Patterns\\n- Clean architecture and hexagonal architecture in Go\\n- Domain-driven design with Go idioms\\n- Microservices patterns and service mesh integration\\n- Event-driven architecture with message queues\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"How do you implement a worker pool pattern in Go for processing concurrent tasks?\"\n  }\n]",
           "label": "golang-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -281,20 +305,26 @@
         "promptId": "41a259abc95e0897678b195dd92e2c55a7ca67231a90207453839138fb1d5514",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "Here's a comprehensive implementation of a worker pool pattern in Go with modern best practices:\n\n## Basic Worker Pool Implementation\n\n```go\npackage main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"sync\"\n    \"time\"\n)\n\n// Task represents a unit of work\ntype Task struct {\n    ID   int\n    Data interface{}\n}\n\n// Result represents the processed task output\ntype Result struct {\n    TaskID int\n    Output interface{}\n    Err    error\n}\n\n// WorkerPool manages a pool of worker goroutines\ntype WorkerPool struct {\n    numWorkers int\n    tasks      chan Task\n    results    chan Result\n    wg         sync.WaitGroup\n    ctx        context.Context\n    cancel     context.CancelFunc\n}\n\n// NewWorkerPool creates a new worker pool\nfunc NewWorkerPool(numWorkers, bufferSize int) *WorkerPool {\n    ctx, cancel := context.WithCancel(context.Background())\n    \n    return &WorkerPool{\n        numWorkers: numWorkers,\n        tasks:      make(chan Task, bufferSize),\n        results:    make(chan Result, bufferSize),\n        ctx:        ctx,\n        cancel:     cancel,\n    }\n}\n\n// Start initializes and starts the worker pool\nfunc (wp *WorkerPool) Start(processor func(Task) (interface{}, error)) {\n    wp.wg.Add(wp.numWorkers)\n    \n    for i := 0; i < wp.numWorkers; i++ {\n        go wp.worker(i, processor)\n    }\n}\n\n// worker processes tasks from the channel\nfunc (wp *WorkerPool) worker(id int, processor func(Task) (interface{}, error)) {\n    defer wp.wg.Done()\n    \n    for {\n        select {\n        case <-wp.ctx.Done():\n            return\n        case task, ok := <-wp.tasks:\n            if !ok {\n                return\n            }\n            \n            // Process the task\n            output, err := processor(task)\n            \n            // Send result\n            select {\n            case <-wp.ctx.Done():\n                return\n            case wp.results <- Result{\n                TaskID: task.ID,\n                Output: output,\n                Err:    err,\n            }:\n            }\n        }\n    }\n}\n\n// Submit adds a task to the pool\nfunc (wp *WorkerPool) Submit(task Task) error {\n    select {\n    case <-wp.ctx.Done():\n        return fmt.Errorf(\"worker pool stopped\")\n    case wp.tasks <- task:\n        return nil\n    }\n}\n\n// Results returns a channel to receive processed results\nfunc (wp *WorkerPool) Results() <-chan Result {\n    return wp.results\n}\n\n// Stop gracefully shuts down the worker pool\nfunc (wp *WorkerPool) Stop() {\n    wp.cancel()      // Signal all workers to stop\n    close(wp.tasks)  // Close tasks channel\n    wp.wg.Wait()     // Wait for all workers to finish\n    close(wp.results) // Close results channel\n}\n\n// Example usage\nfunc main() {\n    // Create a worker pool with 5 workers and buffer size 100\n    pool := NewWorkerPool(5, 100)\n    \n    // Define task processor\n    processor := func(task Task) (interface{}, error) {\n        // Simulate processing time\n        time.Sleep(100 * time.Millisecond)\n        \n        // Example processing: square the ID\n        if data, ok := task.Data.(int); ok {\n            return data * data, nil\n        }\n        return nil, fmt.Errorf(\"invalid data type\")\n    }\n    \n    // Start the worker pool\n    pool.Start(processor)\n    \n    // Submit tasks in a separate goroutine\n    go func() {\n        for i := 0; i < 20; i++ {\n            task := Task{\n                ID:   i,\n                Data: i,\n            }\n            if err := pool.Submit(task); err != nil {\n                fmt.Printf(\"Failed to submit task %d: %v\\n\", i, err)\n            }\n        }\n    }()\n    \n    // Collect results\n    go func() {\n        for result := range pool.Results() {\n            if result.Err != nil {\n                fmt.Printf(\"Task %d failed: %v\\n\", result.TaskID, result.Err)\n            } else {\n                fmt.Printf(\"Task %d result: %v\\n\", result.TaskID, result.Output)\n            }\n        }\n    }()\n    \n    // Wait for processing to complete\n    time.Sleep(2 * time.Second)\n    pool.Stop()\n}\n```\n\n## Advanced Features & Best Practices\n\n### 1. **Dynamic Worker Scaling**\n```go\ntype DynamicWorkerPool struct {\n    minWorkers int\n    maxWorkers int\n    tasks      chan Task\n    results    chan Result\n    workerCount int32\n    mu         sync.RWMutex\n}\n\nfunc (dwp *DynamicWorkerPool) scaleWorkers() {\n    // Monitor queue length and scale workers dynamically\n    // based on load\n}\n```\n\n### 2. **Error Handling with Retry Logic**\n```go\ntype TaskWithRetry struct {\n    Task\n    MaxRetries int\n    RetryDelay time.Duration\n}\n\nfunc (wp *WorkerPool) SubmitWithRetry(task TaskWithRetry) {\n    // Implement exponential backoff retry logic\n}\n```\n\n### 3. **Priority Queue Support**\n```go\ntype PriorityTask struct {\n    Task\n    Priority int\n}\n\ntype PriorityWorkerPool struct {\n    highPriority chan PriorityTask\n    lowPriority  chan PriorityTask\n    // ... rest of implementation\n}\n```\n\n### 4. **Metrics and Monitoring**\n```go\ntype WorkerPoolMetrics struct {\n    TasksProcessed    int64\n    TasksFailed       int64\n    AvgProcessingTime time.Duration\n    QueueLength       int\n    ActiveWorkers     int\n}\n\nfunc (wp *WorkerPool) CollectMetrics() WorkerPoolMetrics {\n    // Collect runtime metrics for monitoring\n}\n```\n\n### 5. **Graceful Shutdown Pattern**\n```go\nfunc (wp *WorkerPool) GracefulStop(timeout time.Duration) error {\n    stopChan := make(chan struct{})\n    go func() {\n        wp.Stop()\n        close(stopChan)\n    }()\n    \n    select {\n    case <-stopChan:\n        return nil\n    case <-time.After(timeout):\n        return fmt.Errorf(\"graceful shutdown timeout\")\n    }\n}\n```\n\n## Key Design Considerations\n\n1. **Channel Buffering**: Size buffers appropriately for your workload\n2. **Context Propagation**: Use context for cancellation and timeouts\n3. **Resource Limits**: Implement backpressure when queue is full\n4. **Error Isolation**: Prevent panics from crashing the entire pool\n5. **Memory Management**: Use object pools for frequently allocated objects\n\n## Production-Ready Enhancements\n\n```go\n// With panic recovery in workers\nfunc (wp *WorkerPool) worker(id int, processor func(Task) (interface{}, error)) {\n    defer wp.wg.Done()\n    defer func() {\n        if r := recover(); r !=",
+          "output": "Implementing a worker pool pattern in Go is a great way to manage concurrent tasks efficiently. The worker pool pattern allows you to limit the number of goroutines that are running concurrently, which can help manage resource usage and improve performance. Below is a step-by-step guide to implementing a worker pool in Go.\n\n### Step 1: Define the Task\n\nFirst, define the type of task that you want to process. For this example, let's say we have a simple task that just processes an integer.\n\n```go\ntype Task struct {\n    ID int\n}\n```\n\n### Step 2: Create a Worker\n\nNext, create a worker that will process tasks. Each worker will read from a channel of tasks and execute them.\n\n```go\nfunc worker(id int, tasks <-chan Task, wg *sync.WaitGroup) {\n    defer wg.Done()\n    for task := range tasks {\n        fmt.Printf(\"Worker %d processing task %d\\n\", id, task.ID)\n        // Simulate work\n        time.Sleep(time.Second)\n    }\n}\n```\n\n### Step 3: Set Up the Worker Pool\n\nNow, set up the worker pool. You will create a fixed number of workers and a channel to send tasks to them.\n\n```go\nfunc main() {\n    const numWorkers = 3\n    tasks := make(chan Task, 10) // Buffered channel for tasks\n    var wg sync.WaitGroup\n\n    // Start workers\n    for i := 1; i <= numWorkers; i++ {\n        wg.Add(1)\n        go worker(i, tasks, &wg)\n    }\n\n    // Send tasks to the workers\n    for i := 1; i <= 10; i++ {\n        tasks <- Task{ID: i}\n    }\n    close(tasks) // Close the channel to signal no more tasks\n\n    // Wait for all workers to finish\n    wg.Wait()\n    fmt.Println(\"All tasks processed.\")\n}\n```\n\n### Explanation\n\n1. **Task Definition**: We define a `Task` struct that represents the work to be done.\n\n2. **Worker Function**: The `worker` function takes an ID, a channel of tasks, and a `sync.WaitGroup`. It processes tasks from the channel until the channel is closed.\n\n3. **Main Function**:\n   - We define the number of workers and create a buffered channel for tasks.\n   - We start the workers in a loop, each running in its own goroutine.\n   - We send tasks to the channel. After sending all tasks, we close the channel to signal to the workers that there are no more tasks.\n   - Finally, we wait for all workers to finish using `sync.WaitGroup`.\n\n### Step 4: Run the Program\n\nWhen you run the program, you should see output indicating that workers are processing tasks concurrently. The number of concurrent tasks will be limited to the number of workers you defined.\n\n### Additional Considerations\n\n- **Error Handling**: You may want to add error handling within the worker function to handle any errors that occur during task processing.\n- **Dynamic Task Generation**: If tasks are generated dynamically, you can implement a mechanism to add tasks to the channel while workers are still running.\n- **Graceful Shutdown**: Consider implementing a graceful shutdown mechanism to handle signals and clean up resources properly.\n\nThis worker pool pattern is a powerful way to manage concurrency in Go, allowing you to efficiently process tasks while controlling resource usage.",
           "tokenUsage": {
-            "total": 1891,
-            "prompt": 391,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1099,
+            "prompt": 397,
+            "completion": 702,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 452,
-          "finishReason": "length",
+          "latencyMs": 13262,
+          "finishReason": "stop",
+          "cost": 0.00048075,
           "guardrails": {
             "flagged": false
           },
@@ -303,27 +333,37 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e442a2bfb1ec303-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:30:55 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:53:12 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "13053",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=XPVvbM1wptELrs.yGQJ8k0AQp.vb.3RLbYoyE8Lp8sA-1774842779.5207303-1.0.1.1-qtV7bh8DvyVmhHM2YHYAQc4BVclaV7QWgrHXCpHV3Gf0_Ep77onQ9iWsv8sGSZS0UQFdbS6hbgCrcpquxUHRJTC3IyAxxMmzNm1aMc3QHw7.kWHUz4FSrI4N8PAit82P; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:12 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 15f4b81cf4fb2904fd07313fc2263b38.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "iLHk62K6qNXOeHRoInV8iEyXG0CLLSd6XS_IXulKaTz6BtQPcf9izQ==",
-                "x-amz-cf-pop": "IAH50-P4",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "0aed17d1edf5b069feff9bb24b38558d"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9548",
+                "x-ratelimit-remaining-tokens": "199473",
+                "x-ratelimit-reset-requests": "1h5m2.766s",
+                "x-ratelimit-reset-tokens": "158ms",
+                "x-request-id": "req_721eea03e37d4bd99823a95218d522cc"
               }
             }
           }
         },
-        "score": 1,
-        "success": true,
+        "score": 0.7,
+        "success": false,
         "testCase": {
           "description": "[2] How do you implement a worker pool pattern in Go for processing concurrent tasks",
           "vars": {
@@ -339,10 +379,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -357,37 +396,47 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e442a2bfb1ec303-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:30:55 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:53:12 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "13053",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=XPVvbM1wptELrs.yGQJ8k0AQp.vb.3RLbYoyE8Lp8sA-1774842779.5207303-1.0.1.1-qtV7bh8DvyVmhHM2YHYAQc4BVclaV7QWgrHXCpHV3Gf0_Ep77onQ9iWsv8sGSZS0UQFdbS6hbgCrcpquxUHRJTC3IyAxxMmzNm1aMc3QHw7.kWHUz4FSrI4N8PAit82P; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:12 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 15f4b81cf4fb2904fd07313fc2263b38.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "iLHk62K6qNXOeHRoInV8iEyXG0CLLSd6XS_IXulKaTz6BtQPcf9izQ==",
-              "x-amz-cf-pop": "IAH50-P4",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "0aed17d1edf5b069feff9bb24b38558d"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9548",
+              "x-ratelimit-remaining-tokens": "199473",
+              "x-ratelimit-reset-requests": "1h5m2.766s",
+              "x-ratelimit-reset-tokens": "158ms",
+              "x-request-id": "req_721eea03e37d4bd99823a95218d522cc"
             }
           },
           "_promptfooFileMetadata": {}
         },
-        "failureReason": 0
+        "failureReason": 1
       }
     ],
     "stats": {
-      "successes": 2,
-      "failures": 0,
+      "successes": 1,
+      "failures": 1,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 780,
-        "completion": 3000,
+        "prompt": 792,
+        "completion": 1459,
         "cached": 0,
-        "total": 3780,
+        "total": 2251,
         "numRequests": 2,
         "completionDetails": {
           "reasoning": 0,
@@ -395,9 +444,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 3492,
-          "prompt": 3389,
-          "completion": 103,
+          "total": 1971,
+          "prompt": 1856,
+          "completion": 115,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -407,8 +456,8 @@
           }
         }
       },
-      "durationMs": 71959,
-      "evaluationDurationMs": 71959
+      "durationMs": 15735,
+      "evaluationDurationMs": 15735
     }
   },
   "config": {
@@ -422,9 +471,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -466,9 +514,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -490,7 +537,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:32:07.304Z",
-    "evaluationCreatedAt": "2026-03-15T04:30:55.274Z"
+    "exportedAt": "2026-03-30T03:53:15.191Z",
+    "evaluationCreatedAt": "2026-03-30T03:52:59.414Z"
   }
 }

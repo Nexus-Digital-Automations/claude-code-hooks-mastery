@@ -1,0 +1,131 @@
+description: "A/B comparison: current hook prompt texts vs. proposed improvements"
+
+# Side-by-side comparison of current hook prompt wording vs. tighter alternatives.
+# Use this to find which variant actually drives better LLM behavior.
+
+providers:
+  - id: openai:chat:gpt-4o-mini
+    config:
+      apiKeyEnvar: OPENAI_API_KEY
+      max_tokens: 400
+      temperature: 0.0
+
+# Use OpenAI as grading model for llm-rubric assertions
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:gpt-4o-mini
+      config:
+        apiKeyEnvar: OPENAI_API_KEY
+
+prompts:
+  # --- ROUTING DIRECTIVE variants ---
+
+  - label: "routing-v1-current"
+    raw: |
+      [{"role":"user","content":"== AGENT ROUTING DIRECTIVE ==\nBefore responding, evaluate whether this task warrants a specialized subagent.\nUse the Task tool to dispatch one or more agents if the task has clear domain specialization.\nDiscretionary — skip for greetings, clarifications, or tasks you can handle directly.\nIf you dispatch agents, announce: \"Routing to [agent-name] for [reason].\"\n\nWHEN TO USE AN AGENT: deep domain expertise required, substantial work (>15 min), clear specialist fit\nWHEN NOT TO USE: simple questions, short fixes, user asked you to do it yourself\n\n{{user_task}}"}]
+
+  - label: "routing-v2-action-first"
+    raw: |
+      [{"role":"user","content":"BEFORE ANSWERING: If this task requires >15 min of deep specialist work, call Task(subagent_type=\"<agent>\") and announce \"Routing to <agent> for <reason>\".\nSpecialists: python-pro, typescript-pro, rust-pro, golang-pro, java-pro (languages); backend-architect, fastapi-pro, django-pro (backend); frontend-developer, flutter-expert (frontend); security-auditor, owasp-guardian-sonnet (security); data-scientist, ml-engineer, mlops-engineer (ML); kubernetes-architect, terraform-specialist (infra); test-automator, tdd-orchestrator (testing); debugger, incident-responder (ops).\nFor simple Q&A, explanations, or short tasks: answer directly.\n\n{{user_task}}"}]
+
+  - label: "routing-v3-minimal"
+    raw: |
+      [{"role":"user","content":"If this is substantial specialist work (>15 min), dispatch: Task(subagent_type=\"<name>\"). Available: python-pro, typescript-pro, rust-pro, golang-pro, backend-architect, fastapi-pro, frontend-developer, security-auditor, owasp-guardian-sonnet, data-scientist, ml-engineer, kubernetes-architect, terraform-specialist, test-automator, debugger, incident-responder. Short Q&A: answer directly.\n\n{{user_task}}"}]
+
+  # --- AMBIGUITY + VALIDATION variants ---
+
+  - label: "ambiguity-v1-current"
+    raw: |
+      [{"role":"user","content":"UPFRONT: Clarify ambiguity NOW. Mark recommended with [Recommended].\n\nPLAN VALIDATION (3+ methods before stopping):\n• Tests: npm test, pytest, cargo test\n• Build: npm run build, tsc --noEmit\n• Lint: eslint, flake8, mypy\n• Logs: console.log, app logs\n• Runtime: start app, verify\n• Browser: Puppeteer screenshots\n• API: curl endpoints\n\nExecute autonomously—no mid-task questions.\n\n{{user_task}}"}]
+
+  - label: "ambiguity-v2-structured"
+    raw: |
+      [{"role":"user","content":"RULES:\n1. If the task is ambiguous, ask ALL clarifying questions NOW (not during work). Mark your preferred option [Recommended].\n2. After finishing, run ≥3 validation checks and show actual output (not claims).\n3. Never ask \"should I proceed?\" — just proceed.\n\n{{user_task}}"}]
+
+  # --- Production snapshots (what the hook currently emits) ---
+
+  - label: "routing-v4-production"
+    raw: |
+      [{"role":"user","content":"If this is substantial specialist work (>15 min), dispatch: Task(subagent_type=\"<name>\").\nAvailable: python-pro, typescript-pro, rust-pro, golang-pro, backend-architect, fastapi-pro,\nfrontend-developer, security-auditor, owasp-guardian-sonnet, data-scientist, ml-engineer,\nkubernetes-architect, terraform-specialist, test-automator, debugger, incident-responder.\nShort Q&A, explanations, quick edits: answer directly.\n\n{{user_task}}"}]
+
+  - label: "ambiguity-v3-star"
+    raw: |
+      [{"role":"user","content":"STEP 1 — UPFRONT CLARITY: If this task has ≥2 valid interpretations that would lead to\ndifferent implementations, ask ALL clarifying questions in one batch NOW. For each option,\nmark your preferred choice with ★. Then wait for a response before proceeding.\nIf the task is clear, skip to Step 2 immediately.\n\nSTEP 2 — AUTONOMOUS EXECUTION: Once task is clear, proceed fully autonomously.\nNever ask \"should I proceed?\", \"do you want me to X?\", or \"want me to continue?\".\nErrors = fix immediately. Mid-task ambiguity = resolve with best judgment, don't ask.\n\n{{user_task}}"}]
+
+tests:
+  # Routing comparison tests
+
+  - description: "Rust tokio server: does directive cause correct agent mention?"
+    vars:
+      user_task: "Write a production-ready Rust TCP server with tokio, connection pooling, and graceful shutdown"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response mentions delegating to rust-pro or a Rust specialist.
+          Score 1.0 if agent name is explicit, 0.5 if Rust specialty is mentioned
+          without exact agent name, 0.0 if no delegation is mentioned.
+        metric: "routing_agent_dispatch"
+      - type: select-best
+        value: "Which response better identifies the specialist agent and explains why it's routing there?"
+        metric: "routing_best_variant"
+
+  - description: "ML training pipeline: correct ML agent chain?"
+    vars:
+      user_task: "Train a BERT classifier on customer reviews, evaluate it, then deploy to production with monitoring"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response identifies multiple relevant agents: data-scientist for training,
+          ml-engineer for productionization, mlops-engineer for deployment/monitoring.
+          Score based on how many are correctly identified.
+        metric: "routing_multi_agent"
+      - type: select-best
+        value: "Which response provides the most specific and accurate agent routing for this ML pipeline task?"
+        metric: "routing_best_variant"
+
+  - description: "Trivial question: no routing for simple Q&A"
+    vars:
+      user_task: "What is the difference between a list and a tuple in Python?"
+    assert:
+      - type: llm-rubric
+        value: >
+          Score 1.0 if the response directly answers the Python question without
+          routing to any agent. Score 0.0 if it routes to python-pro for this
+          trivial knowledge question.
+        metric: "routing_no_dispatch_simple"
+      - type: select-best
+        value: "Which response handles this simple question better — directly answers vs. unnecessarily routes to an agent?"
+        metric: "routing_best_variant"
+
+  # Ambiguity injection comparison tests
+
+  - description: "Ambiguous deploy request: clarify upfront?"
+    vars:
+      user_task: "Deploy my application"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response asks clarifying questions BEFORE starting deployment steps.
+          It should ask about: where to deploy (cloud provider), what app type,
+          environment (staging/prod), etc. And marks one option [Recommended].
+        metric: "ambiguity_upfront_questions"
+      - type: select-best
+        value: "Which response better clarifies the ambiguous deploy request upfront before acting?"
+        metric: "ambiguity_best_variant"
+
+  - description: "Validation awareness for auth implementation"
+    vars:
+      user_task: "Implement user authentication with email/password"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response includes a plan to validate the auth implementation —
+          mentions testing login/logout flows, checking token expiry, running
+          security checks, etc. Prefers showing proof over claims.
+        metric: "validation_awareness"
+      - type: select-best
+        value: "Which response shows a better validation plan for the auth implementation?"
+        metric: "ambiguity_best_variant"
+
+outputPath: tests/promptfoo/results/04-ab-comparison.json

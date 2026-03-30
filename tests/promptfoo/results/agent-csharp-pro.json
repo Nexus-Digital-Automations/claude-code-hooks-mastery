@@ -1,14 +1,14 @@
 {
-  "evalId": "eval-cTY-2026-03-15T04:20:56",
+  "evalId": "eval-6gS-2026-03-30T03:50:14",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-15T04:20:56.213Z",
+    "timestamp": "2026-03-30T03:50:14.285Z",
     "prompts": [
       {
         "id": "85365cd958afd1e1f9ccd7d1c3d8055ea49bce306d11d0a96f45335b7c4bc814",
         "raw": "[{\"role\": \"system\", \"content\": \"You are a C# expert specializing in modern .NET development and enterprise-grade applications.\\n\\n## Focus Areas\\n\\n- Modern C# features (records, pattern matching, nullable reference types)\\n- .NET ecosystem and frameworks (ASP.NET Core, Entity Framework, Blazor)\\n- SOLID principles and design patterns in C#\\n- Performance optimization and memory management\\n- Async/await and concurrent programming with TPL\\n- Comprehensive testing (xUnit, NUnit, Moq, FluentAssertions)\\n- Enterprise patterns and microservices architecture\\n\\n## Approach\\n\\n1. Leverage modern C# features for clean, expressive code\\n2. Follow SOLID principles and favor composition over inheritance\\n3. Use nullable reference types and comprehensive error handling\\n4. Optimize for performance with span, memory, and value types\\n5. Implement proper async patterns without blocking\\n6. Maintain high test coverage with meaningful unit tests\\n\\n## Output\\n\\n- Clean C# code with modern language features\\n- Comprehensive unit tests with proper mocking\\n- Performance benchmarks using BenchmarkDotNet\\n- Async/await implementations with proper exception handling\\n- NuGet package configuration and dependency management\\n- Code analysis and style configuration (EditorConfig, analyzers)\\n- Enterprise architecture patterns when applicable\\n\\nFollow .NET coding standards and include comprehensive XML documentation.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
         "label": "csharp-pro",
-        "provider": "openai:chat:deepseek-chat",
+        "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
           "score": 1,
           "testPassCount": 1,
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 378,
+          "totalLatencyMs": 12662,
           "tokenUsage": {
-            "prompt": 284,
-            "completion": 1500,
+            "prompt": 287,
+            "completion": 783,
             "cached": 0,
-            "total": 1784,
+            "total": 1070,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1760,
-              "prompt": 1693,
-              "completion": 67,
+              "total": 1031,
+              "prompt": 981,
+              "completion": 50,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "csharp-pro_quality": 1
           },
-          "cost": 0
+          "cost": 0.00051285
         }
       }
     ],
     "results": [
       {
-        "cost": 0,
+        "cost": 0.00051285,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "csharp-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1760,
-            "prompt": 1693,
-            "completion": 67,
+            "total": 1031,
+            "prompt": 981,
+            "completion": 50,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output uses C# records for domain entities (CustomerId, Email, PhoneNumber, Address), implements pattern matching via the Result<T> type's Match method, and handles domain errors through the Result<T> pattern without throwing exceptions for validation failures.",
+              "reason": "The output demonstrates the use of modern C# records for defining domain models and employs the Result<T> pattern for clean error handling without exceptions.",
               "tokensUsed": {
-                "total": 1760,
-                "prompt": 1693,
-                "completion": 67,
+                "total": 1031,
+                "prompt": 981,
+                "completion": 50,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive domain model with validation using a Result<T> pattern, leveraging modern C# features.\\n\\n```csharp\\n// Result pattern implementation\\npublic readonly record struct Result<T>\\n{\\n    private readonly T? _value;\\n    private readonly List<ValidationError>? _errors;\\n\\n    public T Value => IsSuccess \\n        ? _value! \\n        : throw new InvalidOperationException(\\\"Cannot access Value when result is not successful\\\");\\n\\n    public IReadOnlyList<ValidationError> Errors => _errors ?? [];\\n    public bool IsSuccess => _errors is null || _errors.Count == 0;\\n    public bool IsFailure => !IsSuccess;\\n\\n    private Result(T value)\\n    {\\n        _value = value;\\n        _errors = null;\\n    }\\n\\n    private Result(IEnumerable<ValidationError> errors)\\n    {\\n        _value = default;\\n        _errors = [..errors];\\n    }\\n\\n    public static Result<T> Success(T value) => new(value);\\n    public static Result<T> Failure(IEnumerable<ValidationError> errors) => new(errors);\\n    public static Result<T> Failure(string errorMessage, string propertyName = \\\"\\\") \\n        => new([new ValidationError(errorMessage, propertyName)]);\\n\\n    public Result<TResult> Bind<TResult>(Func<T, Result<TResult>> binder)\\n        => IsSuccess ? binder(Value) : Result<TResult>.Failure(Errors);\\n\\n    public TResult Match<TResult>(\\n        Func<T, TResult> onSuccess,\\n        Func<IReadOnlyList<ValidationError>, TResult> onFailure)\\n        => IsSuccess ? onSuccess(Value) : onFailure(Errors);\\n\\n    public static implicit operator Result<T>(T value) => Success(value);\\n}\\n\\npublic sealed record ValidationError(string Message, string PropertyName = \\\"\\\")\\n{\\n    public override string ToString() \\n        => string.IsNullOrEmpty(PropertyName) \\n            ? Message \\n            : $\\\"{PropertyName}: {Message}\\\";\\n}\\n\\n// Domain model base types\\npublic abstract record Entity<TId>(TId Id) where TId : notnull\\n{\\n    public override int GetHashCode() => Id.GetHashCode();\\n    public virtual bool Equals(Entity<TId>? other) => other is not null && Id.Equals(other.Id);\\n}\\n\\npublic abstract record ValueObject\\n{\\n    protected abstract IEnumerable<object> GetEqualityComponents();\\n\\n    public override int GetHashCode()\\n        => GetEqualityComponents()\\n            .Select(x => x?.GetHashCode() ?? 0)\\n            .Aggregate((x, y) => x ^ y);\\n\\n    public virtual bool Equals(ValueObject? other)\\n        => other is not null && GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());\\n}\\n\\n// Domain model records with validation\\npublic sealed record CustomerId(Guid Value) : ValueObject\\n{\\n    public static Result<CustomerId> Create(Guid value)\\n    {\\n        var errors = new List<ValidationError>();\\n\\n        if (value == Guid.Empty)\\n            errors.Add(new ValidationError(\\\"Customer ID cannot be empty\\\", nameof(Value)));\\n\\n        return errors.Count == 0 \\n            ? Result<CustomerId>.Success(new CustomerId(value)) \\n            : Result<CustomerId>.Failure(errors);\\n    }\\n\\n    protected override IEnumerable<object> GetEqualityComponents()\\n    {\\n        yield return Value;\\n    }\\n\\n    public static implicit operator Guid(CustomerId id) => id.Value;\\n    public static implicit operator CustomerId(Guid value) => new(value);\\n}\\n\\npublic sealed record Email(string Value) : ValueObject\\n{\\n    private const string EmailPattern = @\\\"^[^@\\\\s]+@[^@\\\\s]+\\\\.[^@\\\\s]+$\\\";\\n\\n    public static Result<Email> Create(string value)\\n    {\\n        var errors = new List<ValidationError>();\\n\\n        if (string.IsNullOrWhiteSpace(value))\\n            errors.Add(new ValidationError(\\\"Email cannot be empty\\\", nameof(Value)));\\n        else if (value.Length > 254)\\n            errors.Add(new ValidationError(\\\"Email cannot exceed 254 characters\\\", nameof(Value)));\\n        else if (!System.Text.RegularExpressions.Regex.IsMatch(value, EmailPattern))\\n            errors.Add(new ValidationError(\\\"Invalid email format\\\", nameof(Value)));\\n\\n        return errors.Count == 0 \\n            ? Result<Email>.Success(new Email(value.Trim())) \\n            : Result<Email>.Failure(errors);\\n    }\\n\\n    protected override IEnumerable<object> GetEqualityComponents()\\n    {\\n        yield return Value;\\n    }\\n\\n    public static implicit operator string(Email email) => email.Value;\\n}\\n\\npublic sealed record PhoneNumber(string Value) : ValueObject\\n{\\n    private const string PhonePattern = @\\\"^\\\\+?[1-9]\\\\d{1,14}$\\\";\\n\\n    public static Result<PhoneNumber> Create(string value)\\n    {\\n        var errors = new List<ValidationError>();\\n\\n        if (string.IsNullOrWhiteSpace(value))\\n            errors.Add(new ValidationError(\\\"Phone number cannot be empty\\\", nameof(Value)));\\n        else if (!System.Text.RegularExpressions.Regex.IsMatch(value, PhonePattern))\\n            errors.Add(new ValidationError(\\\"Invalid phone number format\\\", nameof(Value)));\\n\\n        return errors.Count == 0 \\n            ? Result<PhoneNumber>.Success(new PhoneNumber(value.Trim())) \\n            : Result<PhoneNumber>.Failure(errors);\\n    }\\n\\n    protected override IEnumerable<object> GetEqualityComponents()\\n    {\\n        yield return Value;\\n    }\\n\\n    public static implicit operator string(PhoneNumber phone) => phone.Value;\\n}\\n\\npublic sealed record Address : ValueObject\\n{\\n    public string Street { get; }\\n    public string City { get; }\\n    public string State { get; }\\n    public string ZipCode { get; }\\n    public string Country { get; }\\n\\n    private Address(string street, string city, string state, string zipCode, string country)\\n    {\\n        Street = street;\\n        City = city;\\n        State = state;\\n        ZipCode = zipCode;\\n        Country = country;\\n    }\\n\\n    public static Result<Address> Create(\\n        string street,\\n        string city,\\n        string state,\\n        string zipCode,\\n        string country)\\n    {\\n        var errors = new List<ValidationError>();\\n\\n        if (string.IsNullOrWhiteSpace(street))\\n            errors.Add(new ValidationError(\\\"Street is required\\\", nameof(Street)));\\n        else if (street.Length > 200)\\n            errors.Add(new ValidationError(\\\"Street cannot exceed 200 characters\\\", nameof(Street)));\\n\\n        if (string.IsNullOrWhiteSpace(city))\\n            errors.Add(new ValidationError(\\\"City is required\\\", nameof(City)));\\n        else if (city.Length > 100)\\n            errors.Add(new ValidationError(\\\"City cannot exceed 100 characters\\\", nameof(City)));\\n\\n        if (string.IsNullOrWhiteSpace(state))\\n            errors.Add(new ValidationError(\\\"State is required\\\", nameof(State)));\\n        else if (state.Length > 50)\\n            errors.Add(new ValidationError(\\\"State cannot exceed 50 characters\\\", nameof(State)));\\n\\n        if (string.IsNullOrWhiteSpace(zipCode))\\n            errors.Add(new ValidationError(\\\"Zip code is required\\\", nameof(ZipCode)));\\n        else if (!System.Text.RegularExpressions.Regex.IsMatch(zipCode,\\n</Output>\\n<Rubric>\\nUses modern C# records, pattern matching, and clean error handling without exceptions for domain errors\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nIn modern C#, we can leverage record types to create a clean and immutable domain model. Additionally, we can implement a `Result<T>` pattern to handle validation and return either a successful result or an error. Below is an example of a simple domain model for a user registration scenario, including a record type hierarchy and validation using the `Result<T>` pattern.\\n\\n### Domain Model\\n\\nWe'll create a `User` record and a `UserRegistration` record that contains validation logic. The `Result<T>` class will encapsulate the outcome of the validation.\\n\\n```csharp\\nusing System;\\nusing System.Collections.Generic;\\n\\nnamespace DomainModel\\n{\\n    // Result class to encapsulate success or failure\\n    public class Result<T>\\n    {\\n        public T Value { get; }\\n        public List<string> Errors { get; }\\n        public bool IsSuccess => Errors.Count == 0;\\n\\n        private Result(T value, List<string> errors)\\n        {\\n            Value = value;\\n            Errors = errors;\\n        }\\n\\n        public static Result<T> Success(T value) => new Result<T>(value, new List<string>());\\n        public static Result<T> Failure(List<string> errors) => new Result<T>(default!, errors);\\n    }\\n\\n    // Base record for User\\n    public record User(Guid Id, string FirstName, string LastName, string Email);\\n\\n    // Record for User Registration with validation\\n    public record UserRegistration(string FirstName, string LastName, string Email)\\n    {\\n        public Result<User> Validate()\\n        {\\n            var errors = new List<string>();\\n\\n            if (string.IsNullOrWhiteSpace(FirstName))\\n                errors.Add(\\\"First name is required.\\\");\\n\\n            if (string.IsNullOrWhiteSpace(LastName))\\n                errors.Add(\\\"Last name is required.\\\");\\n\\n            if (string.IsNullOrWhiteSpace(Email) || !Email.Contains(\\\"@\\\"))\\n                errors.Add(\\\"A valid email is required.\\\");\\n\\n            if (errors.Count > 0)\\n                return Result<User>.Failure(errors);\\n\\n            // If validation passes, create a new User\\n            var user = new User(Guid.NewGuid(), FirstName, LastName, Email);\\n            return Result<User>.Success(user);\\n        }\\n    }\\n}\\n```\\n\\n### Explanation\\n\\n1. **Result<T> Class**: This class encapsulates the result of an operation. It contains the value of type `T`, a list of error messages, and a boolean property `IsSuccess` to indicate if the operation was successful.\\n\\n2. **User Record**: This is a simple record representing a user with an `Id`, `FirstName`, `LastName`, and `Email`.\\n\\n3. **UserRegistration Record**: This record contains properties for user registration and a `Validate` method that checks the validity of the input data. If validation fails, it returns a `Result<User>` with the errors; if it succeeds, it creates a new `User` instance and returns it wrapped in a `Result<T>`.\\n\\n### Usage Example\\n\\nHere’s how you might use the `UserRegistration` record and its validation:\\n\\n```csharp\\nclass Program\\n{\\n    static void Main()\\n    {\\n        var registration = new UserRegistration(\\\"John\\\", \\\"Doe\\\", \\\"john.doe@example.com\\\");\\n        var result = registration.Validate();\\n\\n        if (result.IsSuccess)\\n        {\\n            Console.WriteLine($\\\"User created: {result.Value}\\\");\\n        }\\n        else\\n        {\\n            Console.WriteLine(\\\"Registration failed with the following errors:\\\");\\n            foreach (var error in result.Errors)\\n            {\\n                Console.WriteLine($\\\"- {error}\\\");\\n            }\\n        }\\n    }\\n}\\n```\\n\\n### Conclusion\\n\\nThis example demonstrates how to create a domain model using C# record types and implement validation using the `Result<T>` pattern. This approach provides a clean and expressive way to handle validation and errors in your domain logic while leveraging modern C# features.\\n</Output>\\n<Rubric>\\nUses modern C# records, pattern matching, and clean error handling without exceptions for domain errors\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "f811134b-e6f9-4b9b-ada5-b2a44c377f4f",
-        "latencyMs": 378,
+        "id": "e5035c1f-2699-497d-9e78-5fe7f61c8024",
+        "latencyMs": 12662,
         "namedScores": {
           "csharp-pro_quality": 1
         },
@@ -107,10 +107,9 @@
           "label": "csharp-pro",
           "config": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           }
@@ -118,20 +117,26 @@
         "promptId": "85365cd958afd1e1f9ccd7d1c3d8055ea49bce306d11d0a96f45335b7c4bc814",
         "promptIdx": 0,
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "label": ""
         },
         "response": {
-          "output": "I'll create a comprehensive domain model with validation using a Result<T> pattern, leveraging modern C# features.\n\n```csharp\n// Result pattern implementation\npublic readonly record struct Result<T>\n{\n    private readonly T? _value;\n    private readonly List<ValidationError>? _errors;\n\n    public T Value => IsSuccess \n        ? _value! \n        : throw new InvalidOperationException(\"Cannot access Value when result is not successful\");\n\n    public IReadOnlyList<ValidationError> Errors => _errors ?? [];\n    public bool IsSuccess => _errors is null || _errors.Count == 0;\n    public bool IsFailure => !IsSuccess;\n\n    private Result(T value)\n    {\n        _value = value;\n        _errors = null;\n    }\n\n    private Result(IEnumerable<ValidationError> errors)\n    {\n        _value = default;\n        _errors = [..errors];\n    }\n\n    public static Result<T> Success(T value) => new(value);\n    public static Result<T> Failure(IEnumerable<ValidationError> errors) => new(errors);\n    public static Result<T> Failure(string errorMessage, string propertyName = \"\") \n        => new([new ValidationError(errorMessage, propertyName)]);\n\n    public Result<TResult> Bind<TResult>(Func<T, Result<TResult>> binder)\n        => IsSuccess ? binder(Value) : Result<TResult>.Failure(Errors);\n\n    public TResult Match<TResult>(\n        Func<T, TResult> onSuccess,\n        Func<IReadOnlyList<ValidationError>, TResult> onFailure)\n        => IsSuccess ? onSuccess(Value) : onFailure(Errors);\n\n    public static implicit operator Result<T>(T value) => Success(value);\n}\n\npublic sealed record ValidationError(string Message, string PropertyName = \"\")\n{\n    public override string ToString() \n        => string.IsNullOrEmpty(PropertyName) \n            ? Message \n            : $\"{PropertyName}: {Message}\";\n}\n\n// Domain model base types\npublic abstract record Entity<TId>(TId Id) where TId : notnull\n{\n    public override int GetHashCode() => Id.GetHashCode();\n    public virtual bool Equals(Entity<TId>? other) => other is not null && Id.Equals(other.Id);\n}\n\npublic abstract record ValueObject\n{\n    protected abstract IEnumerable<object> GetEqualityComponents();\n\n    public override int GetHashCode()\n        => GetEqualityComponents()\n            .Select(x => x?.GetHashCode() ?? 0)\n            .Aggregate((x, y) => x ^ y);\n\n    public virtual bool Equals(ValueObject? other)\n        => other is not null && GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());\n}\n\n// Domain model records with validation\npublic sealed record CustomerId(Guid Value) : ValueObject\n{\n    public static Result<CustomerId> Create(Guid value)\n    {\n        var errors = new List<ValidationError>();\n\n        if (value == Guid.Empty)\n            errors.Add(new ValidationError(\"Customer ID cannot be empty\", nameof(Value)));\n\n        return errors.Count == 0 \n            ? Result<CustomerId>.Success(new CustomerId(value)) \n            : Result<CustomerId>.Failure(errors);\n    }\n\n    protected override IEnumerable<object> GetEqualityComponents()\n    {\n        yield return Value;\n    }\n\n    public static implicit operator Guid(CustomerId id) => id.Value;\n    public static implicit operator CustomerId(Guid value) => new(value);\n}\n\npublic sealed record Email(string Value) : ValueObject\n{\n    private const string EmailPattern = @\"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$\";\n\n    public static Result<Email> Create(string value)\n    {\n        var errors = new List<ValidationError>();\n\n        if (string.IsNullOrWhiteSpace(value))\n            errors.Add(new ValidationError(\"Email cannot be empty\", nameof(Value)));\n        else if (value.Length > 254)\n            errors.Add(new ValidationError(\"Email cannot exceed 254 characters\", nameof(Value)));\n        else if (!System.Text.RegularExpressions.Regex.IsMatch(value, EmailPattern))\n            errors.Add(new ValidationError(\"Invalid email format\", nameof(Value)));\n\n        return errors.Count == 0 \n            ? Result<Email>.Success(new Email(value.Trim())) \n            : Result<Email>.Failure(errors);\n    }\n\n    protected override IEnumerable<object> GetEqualityComponents()\n    {\n        yield return Value;\n    }\n\n    public static implicit operator string(Email email) => email.Value;\n}\n\npublic sealed record PhoneNumber(string Value) : ValueObject\n{\n    private const string PhonePattern = @\"^\\+?[1-9]\\d{1,14}$\";\n\n    public static Result<PhoneNumber> Create(string value)\n    {\n        var errors = new List<ValidationError>();\n\n        if (string.IsNullOrWhiteSpace(value))\n            errors.Add(new ValidationError(\"Phone number cannot be empty\", nameof(Value)));\n        else if (!System.Text.RegularExpressions.Regex.IsMatch(value, PhonePattern))\n            errors.Add(new ValidationError(\"Invalid phone number format\", nameof(Value)));\n\n        return errors.Count == 0 \n            ? Result<PhoneNumber>.Success(new PhoneNumber(value.Trim())) \n            : Result<PhoneNumber>.Failure(errors);\n    }\n\n    protected override IEnumerable<object> GetEqualityComponents()\n    {\n        yield return Value;\n    }\n\n    public static implicit operator string(PhoneNumber phone) => phone.Value;\n}\n\npublic sealed record Address : ValueObject\n{\n    public string Street { get; }\n    public string City { get; }\n    public string State { get; }\n    public string ZipCode { get; }\n    public string Country { get; }\n\n    private Address(string street, string city, string state, string zipCode, string country)\n    {\n        Street = street;\n        City = city;\n        State = state;\n        ZipCode = zipCode;\n        Country = country;\n    }\n\n    public static Result<Address> Create(\n        string street,\n        string city,\n        string state,\n        string zipCode,\n        string country)\n    {\n        var errors = new List<ValidationError>();\n\n        if (string.IsNullOrWhiteSpace(street))\n            errors.Add(new ValidationError(\"Street is required\", nameof(Street)));\n        else if (street.Length > 200)\n            errors.Add(new ValidationError(\"Street cannot exceed 200 characters\", nameof(Street)));\n\n        if (string.IsNullOrWhiteSpace(city))\n            errors.Add(new ValidationError(\"City is required\", nameof(City)));\n        else if (city.Length > 100)\n            errors.Add(new ValidationError(\"City cannot exceed 100 characters\", nameof(City)));\n\n        if (string.IsNullOrWhiteSpace(state))\n            errors.Add(new ValidationError(\"State is required\", nameof(State)));\n        else if (state.Length > 50)\n            errors.Add(new ValidationError(\"State cannot exceed 50 characters\", nameof(State)));\n\n        if (string.IsNullOrWhiteSpace(zipCode))\n            errors.Add(new ValidationError(\"Zip code is required\", nameof(ZipCode)));\n        else if (!System.Text.RegularExpressions.Regex.IsMatch(zipCode,",
+          "output": "In modern C#, we can leverage record types to create a clean and immutable domain model. Additionally, we can implement a `Result<T>` pattern to handle validation and return either a successful result or an error. Below is an example of a simple domain model for a user registration scenario, including a record type hierarchy and validation using the `Result<T>` pattern.\n\n### Domain Model\n\nWe'll create a `User` record and a `UserRegistration` record that contains validation logic. The `Result<T>` class will encapsulate the outcome of the validation.\n\n```csharp\nusing System;\nusing System.Collections.Generic;\n\nnamespace DomainModel\n{\n    // Result class to encapsulate success or failure\n    public class Result<T>\n    {\n        public T Value { get; }\n        public List<string> Errors { get; }\n        public bool IsSuccess => Errors.Count == 0;\n\n        private Result(T value, List<string> errors)\n        {\n            Value = value;\n            Errors = errors;\n        }\n\n        public static Result<T> Success(T value) => new Result<T>(value, new List<string>());\n        public static Result<T> Failure(List<string> errors) => new Result<T>(default!, errors);\n    }\n\n    // Base record for User\n    public record User(Guid Id, string FirstName, string LastName, string Email);\n\n    // Record for User Registration with validation\n    public record UserRegistration(string FirstName, string LastName, string Email)\n    {\n        public Result<User> Validate()\n        {\n            var errors = new List<string>();\n\n            if (string.IsNullOrWhiteSpace(FirstName))\n                errors.Add(\"First name is required.\");\n\n            if (string.IsNullOrWhiteSpace(LastName))\n                errors.Add(\"Last name is required.\");\n\n            if (string.IsNullOrWhiteSpace(Email) || !Email.Contains(\"@\"))\n                errors.Add(\"A valid email is required.\");\n\n            if (errors.Count > 0)\n                return Result<User>.Failure(errors);\n\n            // If validation passes, create a new User\n            var user = new User(Guid.NewGuid(), FirstName, LastName, Email);\n            return Result<User>.Success(user);\n        }\n    }\n}\n```\n\n### Explanation\n\n1. **Result<T> Class**: This class encapsulates the result of an operation. It contains the value of type `T`, a list of error messages, and a boolean property `IsSuccess` to indicate if the operation was successful.\n\n2. **User Record**: This is a simple record representing a user with an `Id`, `FirstName`, `LastName`, and `Email`.\n\n3. **UserRegistration Record**: This record contains properties for user registration and a `Validate` method that checks the validity of the input data. If validation fails, it returns a `Result<User>` with the errors; if it succeeds, it creates a new `User` instance and returns it wrapped in a `Result<T>`.\n\n### Usage Example\n\nHere’s how you might use the `UserRegistration` record and its validation:\n\n```csharp\nclass Program\n{\n    static void Main()\n    {\n        var registration = new UserRegistration(\"John\", \"Doe\", \"john.doe@example.com\");\n        var result = registration.Validate();\n\n        if (result.IsSuccess)\n        {\n            Console.WriteLine($\"User created: {result.Value}\");\n        }\n        else\n        {\n            Console.WriteLine(\"Registration failed with the following errors:\");\n            foreach (var error in result.Errors)\n            {\n                Console.WriteLine($\"- {error}\");\n            }\n        }\n    }\n}\n```\n\n### Conclusion\n\nThis example demonstrates how to create a domain model using C# record types and implement validation using the `Result<T>` pattern. This approach provides a clean and expressive way to handle validation and errors in your domain logic while leveraging modern C# features.",
           "tokenUsage": {
-            "total": 1784,
-            "prompt": 284,
-            "completion": 1500,
-            "numRequests": 1
+            "total": 1070,
+            "prompt": 287,
+            "completion": 783,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            }
           },
           "cached": false,
-          "latencyMs": 378,
-          "finishReason": "length",
+          "latencyMs": 12662,
+          "finishReason": "stop",
+          "cost": 0.00051285,
           "guardrails": {
             "flagged": false
           },
@@ -140,21 +145,31 @@
               "status": 200,
               "statusText": "OK",
               "headers": {
-                "access-control-allow-credentials": "true",
+                "access-control-expose-headers": "X-Request-ID",
+                "alt-svc": "h3=\":443\"; ma=86400",
+                "cf-cache-status": "DYNAMIC",
+                "cf-ray": "9e442623afd316c0-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Sun, 15 Mar 2026 04:20:56 GMT",
-                "server": "elb",
+                "date": "Mon, 30 Mar 2026 03:50:26 GMT",
+                "openai-organization": "nexus-digital-automations",
+                "openai-processing-ms": "12427",
+                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+                "openai-version": "2020-10-01",
+                "server": "cloudflare",
+                "set-cookie": "__cf_bm=8SdbG_69.rZI6bbxC1r0qRIxmw3cgl9Drhg.7O.O2z8-1774842614.3447042-1.0.1.1-YxLGWyodUHHnCJ.UAY7lZ9h2w7DuqBzjq1vkVJJ8JRNP_9EPTZ2Abjq4gKnI7JqOXUS68PGHro31GDNnv4pXSz9iFkKMC.Bav6zJEumROI5LvjTYxE0Z.LLYNat.Z8_G; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:20:26 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
-                "vary": "origin, access-control-request-method, access-control-request-headers",
-                "via": "1.1 3b855a6ae22a2464ebe493a34f4daff4.cloudfront.net (CloudFront)",
-                "x-amz-cf-id": "IeU6Lw32Onf9KvsWvSQVuL7nJdBpHUbAg1VoZbeHctpXqivJ7iGHgg==",
-                "x-amz-cf-pop": "IAH50-P1",
-                "x-cache": "Miss from cloudfront",
                 "x-content-type-options": "nosniff",
-                "x-ds-trace-id": "54820a9ae57abb6108760f79df0aa3e1"
+                "x-openai-proxy-wasm": "v0.1",
+                "x-ratelimit-limit-requests": "10000",
+                "x-ratelimit-limit-tokens": "200000",
+                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-tokens": "199635",
+                "x-ratelimit-reset-requests": "1h5m12.38s",
+                "x-ratelimit-reset-tokens": "109ms",
+                "x-request-id": "req_fd5a727182c1434a800b387fe7bd7124"
               }
             }
           }
@@ -176,10 +191,9 @@
           ],
           "options": {
             "provider": {
-              "id": "openai:chat:deepseek-chat",
+              "id": "openai:chat:gpt-4o-mini",
               "config": {
-                "apiBaseUrl": "https://api.deepseek.com",
-                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+                "apiKeyEnvar": "OPENAI_API_KEY"
               }
             }
           },
@@ -194,21 +208,31 @@
             "status": 200,
             "statusText": "OK",
             "headers": {
-              "access-control-allow-credentials": "true",
+              "access-control-expose-headers": "X-Request-ID",
+              "alt-svc": "h3=\":443\"; ma=86400",
+              "cf-cache-status": "DYNAMIC",
+              "cf-ray": "9e442623afd316c0-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Sun, 15 Mar 2026 04:20:56 GMT",
-              "server": "elb",
+              "date": "Mon, 30 Mar 2026 03:50:26 GMT",
+              "openai-organization": "nexus-digital-automations",
+              "openai-processing-ms": "12427",
+              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
+              "openai-version": "2020-10-01",
+              "server": "cloudflare",
+              "set-cookie": "__cf_bm=8SdbG_69.rZI6bbxC1r0qRIxmw3cgl9Drhg.7O.O2z8-1774842614.3447042-1.0.1.1-YxLGWyodUHHnCJ.UAY7lZ9h2w7DuqBzjq1vkVJJ8JRNP_9EPTZ2Abjq4gKnI7JqOXUS68PGHro31GDNnv4pXSz9iFkKMC.Bav6zJEumROI5LvjTYxE0Z.LLYNat.Z8_G; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:20:26 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
-              "vary": "origin, access-control-request-method, access-control-request-headers",
-              "via": "1.1 3b855a6ae22a2464ebe493a34f4daff4.cloudfront.net (CloudFront)",
-              "x-amz-cf-id": "IeU6Lw32Onf9KvsWvSQVuL7nJdBpHUbAg1VoZbeHctpXqivJ7iGHgg==",
-              "x-amz-cf-pop": "IAH50-P1",
-              "x-cache": "Miss from cloudfront",
               "x-content-type-options": "nosniff",
-              "x-ds-trace-id": "54820a9ae57abb6108760f79df0aa3e1"
+              "x-openai-proxy-wasm": "v0.1",
+              "x-ratelimit-limit-requests": "10000",
+              "x-ratelimit-limit-tokens": "200000",
+              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-tokens": "199635",
+              "x-ratelimit-reset-requests": "1h5m12.38s",
+              "x-ratelimit-reset-tokens": "109ms",
+              "x-request-id": "req_fd5a727182c1434a800b387fe7bd7124"
             }
           },
           "_promptfooFileMetadata": {}
@@ -221,10 +245,10 @@
       "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 284,
-        "completion": 1500,
+        "prompt": 287,
+        "completion": 783,
         "cached": 0,
-        "total": 1784,
+        "total": 1070,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -232,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1760,
-          "prompt": 1693,
-          "completion": 67,
+          "total": 1031,
+          "prompt": 981,
+          "completion": 50,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -244,8 +268,8 @@
           }
         }
       },
-      "durationMs": 67694,
-      "evaluationDurationMs": 67694
+      "durationMs": 13947,
+      "evaluationDurationMs": 13947
     }
   },
   "config": {
@@ -259,9 +283,8 @@
     ],
     "providers": [
       {
-        "id": "openai:chat:deepseek-chat",
+        "id": "openai:chat:gpt-4o-mini",
         "config": {
-          "apiBaseUrl": "https://api.deepseek.com",
           "apiKeyEnvar": "[REDACTED]",
           "max_tokens": 1500,
           "temperature": 0
@@ -289,9 +312,8 @@
     "defaultTest": {
       "options": {
         "provider": {
-          "id": "openai:chat:deepseek-chat",
+          "id": "openai:chat:gpt-4o-mini",
           "config": {
-            "apiBaseUrl": "https://api.deepseek.com",
             "apiKeyEnvar": "[REDACTED]"
           }
         }
@@ -313,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-15T04:22:03.942Z",
-    "evaluationCreatedAt": "2026-03-15T04:20:56.213Z"
+    "exportedAt": "2026-03-30T03:50:28.267Z",
+    "evaluationCreatedAt": "2026-03-30T03:50:14.285Z"
   }
 }
