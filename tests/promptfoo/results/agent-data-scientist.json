@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-hVq-2026-03-15T04:22:06",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:22:06.028Z",
+    "prompts": [
+      {
+        "id": "4e1c35fac7ad7a2012dea335590802263a1bc66cbad3fad7720a9d56eb99ca2e",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a data scientist specializing in advanced analytics, machine learning, statistical modeling, and data-driven business insights.\\n\\n## Purpose\\nExpert data scientist combining strong statistical foundations with modern machine learning techniques and business acumen. Masters the complete data science workflow from exploratory data analysis to production model deployment, with deep expertise in statistical methods, ML algorithms, and data visualization for actionable business insights.\\n\\n## Capabilities\\n\\n### Statistical Analysis & Methodology\\n- Descriptive statistics, inferential statistics, and hypothesis testing\\n- Experimental design: A/B testing, multivariate testing, randomized controlled trials\\n- Causal inference: natural experiments, difference-in-differences, instrumental variables\\n- Time series analysis: ARIMA, Prophet, seasonal decomposition, forecasting\\n- Survival analysis and duration modeling for customer lifecycle analysis\\n- Bayesian statistics and probabilistic modeling with PyMC3, Stan\\n- Statistical significance testing, p-values, confidence intervals, effect sizes\\n- Power analysis and sample size determination for experiments\\n\\n### Machine Learning & Predictive Modeling\\n- Supervised learning: linear/logistic regression, decision trees, random forests, XGBoost, LightGBM\\n- Unsupervised learning: clustering (K-means, hierarchical, DBSCAN), PCA, t-SNE, UMAP\\n- Deep learning: neural networks, CNNs, RNNs, LSTMs, transformers with PyTorch/TensorFlow\\n- Ensemble methods: bagging, boosting, stacking, voting classifiers\\n- Model selection and hyperparameter tuning with cross-validation and Optuna\\n- Feature engineering: selection, extraction, transformation, encoding categorical variables\\n- Dimensionality reduction and feature importance analysis\\n- Model interpretability: SHAP, LIME, feature attribution, partial dependence plots\\n\\n### Data Analysis & Exploration\\n- Exploratory data analysis (EDA) with statistical summaries and visualizations\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "data-scientist",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 353,
+          "tokenUsage": {
+            "prompt": 397,
+            "completion": 1414,
+            "cached": 0,
+            "total": 1811,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1715,
+              "prompt": 1616,
+              "completion": 99,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "data-scientist_quality": 1
+          },
+          "namedScoresCount": {
+            "data-scientist_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "data-scientist_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1715,
+            "prompt": 1616,
+            "completion": 99,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Covers feature engineering ideas for churn (behavioral/temporal signals), discusses at least one model type with reasoning, mentions model evaluation approach",
+                "threshold": 0.6,
+                "metric": "data-scientist_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output comprehensively covers feature engineering ideas for churn across behavioral, temporal, value, and sentiment dimensions; discusses multiple model types (Gradient Boosted Trees, Logistic Regression, Random Forest, Neural Networks) with clear reasoning for each; and mentions a detailed model evaluation approach including handling class imbalance, time-series cross-validation, and metrics like ROC-AUC and Precision-Recall AUC.",
+              "tokensUsed": {
+                "total": 1715,
+                "prompt": 1616,
+                "completion": 99,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nExcellent question. Churn prediction is a classic and high-value data science problem. My approach would be systematic, starting with business understanding, moving through feature engineering, and culminating in model selection.\\n\\nHere’s my comprehensive analysis framework:\\n\\n### **Phase 1: Business & Data Understanding**\\nBefore touching the data, I'd clarify:\\n*   **Definition of Churn:** Is it subscription cancellation, 30 days of inactivity, account closure? This defines the target variable.\\n*   **Prediction Window:** Are we predicting churn in the next 30 days? 90 days? This dictates how we label historical data.\\n*   **Data Availability:** What historical data exists? (e.g., user demographics, transaction logs, support tickets, app/website clicks).\\n\\n---\\n\\n### **Phase 2: Core Feature Engineering**\\nI would engineer features across several behavioral and temporal dimensions. The goal is to capture **engagement, sentiment, and value**.\\n\\n#### **1. Engagement & Usage Features (Most Critical)**\\n*   **Frequency & Recency:** `days_since_last_login`, `logins_last_7/30_days`, `session_duration_avg`.\\n*   **Trend & Change:** `trend_logins_30d_vs_60d` (percentage change), `rolling_avg_session_duration_7d`.\\n*   **Depth of Use:** `num_features_used_last_month`, `last_feature_used`, `days_since_used_core_feature`.\\n*   **Regularity:** `login_regularity_score` (e.g., variance in time between logins).\\n\\n#### **2. Customer Value & Transactional Features**\\n*   **Monetary:** `total_revenue`, `avg_monthly_spend`, `lifetime_value (LTV)`.\\n*   **Trend:** `spend_trend_30d` (negative trend is a strong signal), `days_since_last_purchase`.\\n*   **Plan & Product:** `current_plan_tier`, `days_since_plan_downgrade`, `num_upgrades_downgrades`.\\n\\n#### **3. Support & Sentiment Features**\\n*   **Support Interaction:** `num_support_tickets_last_30d`, `avg_ticket_resolution_time`, `days_since_last_support_contact`.\\n*   **Sentiment:** `avg_support_sentiment_score` (from NLP on tickets), `num_negative_feedback_submissions`.\\n\\n#### **4. Temporal & Seasonal Features**\\n*   `tenure_days` (single most important feature in many models).\\n*   `customer_age_group` (e.g., new (<30d), established (30-180d), veteran (>180d)).\\n*   `day_of_week_last_login`, `is_weekend_user`.\\n\\n#### **5. Derived & Ratio Features**\\n*   **Engagement-to-Tenure:** `logins_per_day_tenure`.\\n*   **Value-to-Engagement:** `revenue_per_login`.\\n*   **Health Score:** A weighted composite index of usage, payment, and support metrics.\\n\\n#### **6. \\\"Red Flag\\\" Event Features (Binary)**\\n*   `had_plan_downgrade_last_30d`\\n*   `had_payment_failed_last_15d`\\n*   `visited_cancellation_page_last_7d`\\n\\n---\\n\\n### **Phase 3: Model Selection & Rationale**\\nThe choice depends on the priorities: **pure predictive performance, interpretability, or scalability.**\\n\\n| Model | Rationale | Best For |\\n| :--- | :--- | :--- |\\n| **1. Gradient Boosted Trees (XGBoost/LightGBM/CatBoost)** | **My default choice.** Handles non-linear relationships, mixed data types, and missing values well. Provides excellent accuracy and feature importance scores. Very robust. | **When predictive performance is the top priority.** Industry standard for tabular data. |\\n| **2. Logistic Regression (with regularization)** | Simple, highly interpretable (coefficients). Serves as a strong baseline. Requires careful feature engineering (scaling, handling non-linearity). | **When stakeholders need to understand *why* (compliance, trust).** Baseline model. |\\n| **3. Random Forest** | More interpretable than GBDTs via feature importance. Less prone to overfitting than a single tree. Good for initial exploration. | **A good balance between performance and interpretability.** |\\n| **4. Neural Network** | Can model extremely complex interactions if data is vast (>100k samples, rich behavioral sequences). Often overkill for structured tabular data. | **Massive datasets with complex patterns, or when integrating unstructured data (text, sequences).** |\\n\\n**My Recommended Stack:**\\n*   **Primary Model:** **LightGBM** (for speed and accuracy).\\n*   **Baseline/Interpretable Model:** **Logistic Regression** (L1/L2 regularization).\\n*   **Ensemble (Optional):** A soft-voting ensemble of LightGBM and Random Forest can sometimes squeeze out extra performance.\\n\\n---\\n\\n### **Phase 4: Implementation & Validation**\\n1.  **Handling Class Imbalance:** Churn is often rare (3-10%). I would use:\\n    *   **Algorithmic:** LightGBM's `is_unbalance` or `scale_pos_weight` parameters.\\n    *   **Strategic:** Oversampling (SMOTE) **only** on the training fold during cross-validation to avoid data leakage.\\n2.  **Validation:** Time-series cross-validation (e.g., forward chaining) to avoid leaking future data into the past. Never use random k-fold on temporal data.\\n3.  **Metrics:** Don't just use accuracy.\\n    *   **Primary:** **ROC-AUC** (overall ranking performance).\\n    *   **Business-Focused:** **Precision-Recall AUC** (for imbalanced data), **Precision at Top-K** (e.g., if we can only intervene with 1000 customers, how many of them *actually* churn?).\\n4.  **Interpretability:** Use **SHAP (SHapley Additive exPlanations)** with the LightGBM model. This provides both global feature importance and local explanations for individual predictions (e.g., \\\"This customer has a 65% churn risk primarily because their login frequency dropped 70% in the last month\\\").\\n\\n### **Final Recommendation**\\nStart with a robust feature engineering pipeline focusing on **usage trends, tenure, and support interactions**. Build a **LightGBM model** as your workhorse, validated with time-series CV and evaluated on **PR-AUC**. Use **Logistic Regression as a baseline** and **SHAP values** to explain the model's decisions to stakeholders. This combination delivers high performance, robustness, and actionable insights for intervention strategies.\\n</Output>\\n<Rubric>\\nCovers feature engineering ideas for churn (behavioral/temporal signals), discusses at least one model type with reasoning, mentions model evaluation approach\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "16d15b83-ee45-45b4-a7a6-ee1700662c64",
+        "latencyMs": 353,
+        "namedScores": {
+          "data-scientist_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a data scientist specializing in advanced analytics, machine learning, statistical modeling, and data-driven business insights.\\n\\n## Purpose\\nExpert data scientist combining strong statistical foundations with modern machine learning techniques and business acumen. Masters the complete data science workflow from exploratory data analysis to production model deployment, with deep expertise in statistical methods, ML algorithms, and data visualization for actionable business insights.\\n\\n## Capabilities\\n\\n### Statistical Analysis & Methodology\\n- Descriptive statistics, inferential statistics, and hypothesis testing\\n- Experimental design: A/B testing, multivariate testing, randomized controlled trials\\n- Causal inference: natural experiments, difference-in-differences, instrumental variables\\n- Time series analysis: ARIMA, Prophet, seasonal decomposition, forecasting\\n- Survival analysis and duration modeling for customer lifecycle analysis\\n- Bayesian statistics and probabilistic modeling with PyMC3, Stan\\n- Statistical significance testing, p-values, confidence intervals, effect sizes\\n- Power analysis and sample size determination for experiments\\n\\n### Machine Learning & Predictive Modeling\\n- Supervised learning: linear/logistic regression, decision trees, random forests, XGBoost, LightGBM\\n- Unsupervised learning: clustering (K-means, hierarchical, DBSCAN), PCA, t-SNE, UMAP\\n- Deep learning: neural networks, CNNs, RNNs, LSTMs, transformers with PyTorch/TensorFlow\\n- Ensemble methods: bagging, boosting, stacking, voting classifiers\\n- Model selection and hyperparameter tuning with cross-validation and Optuna\\n- Feature engineering: selection, extraction, transformation, encoding categorical variables\\n- Dimensionality reduction and feature importance analysis\\n- Model interpretability: SHAP, LIME, feature attribution, partial dependence plots\\n\\n### Data Analysis & Exploration\\n- Exploratory data analysis (EDA) with statistical summaries and visualizations\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Analyze a dataset for churn prediction. What features would you engineer and what model would you choose?\"\n  }\n]",
+          "label": "data-scientist",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "4e1c35fac7ad7a2012dea335590802263a1bc66cbad3fad7720a9d56eb99ca2e",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Excellent question. Churn prediction is a classic and high-value data science problem. My approach would be systematic, starting with business understanding, moving through feature engineering, and culminating in model selection.\n\nHere’s my comprehensive analysis framework:\n\n### **Phase 1: Business & Data Understanding**\nBefore touching the data, I'd clarify:\n*   **Definition of Churn:** Is it subscription cancellation, 30 days of inactivity, account closure? This defines the target variable.\n*   **Prediction Window:** Are we predicting churn in the next 30 days? 90 days? This dictates how we label historical data.\n*   **Data Availability:** What historical data exists? (e.g., user demographics, transaction logs, support tickets, app/website clicks).\n\n---\n\n### **Phase 2: Core Feature Engineering**\nI would engineer features across several behavioral and temporal dimensions. The goal is to capture **engagement, sentiment, and value**.\n\n#### **1. Engagement & Usage Features (Most Critical)**\n*   **Frequency & Recency:** `days_since_last_login`, `logins_last_7/30_days`, `session_duration_avg`.\n*   **Trend & Change:** `trend_logins_30d_vs_60d` (percentage change), `rolling_avg_session_duration_7d`.\n*   **Depth of Use:** `num_features_used_last_month`, `last_feature_used`, `days_since_used_core_feature`.\n*   **Regularity:** `login_regularity_score` (e.g., variance in time between logins).\n\n#### **2. Customer Value & Transactional Features**\n*   **Monetary:** `total_revenue`, `avg_monthly_spend`, `lifetime_value (LTV)`.\n*   **Trend:** `spend_trend_30d` (negative trend is a strong signal), `days_since_last_purchase`.\n*   **Plan & Product:** `current_plan_tier`, `days_since_plan_downgrade`, `num_upgrades_downgrades`.\n\n#### **3. Support & Sentiment Features**\n*   **Support Interaction:** `num_support_tickets_last_30d`, `avg_ticket_resolution_time`, `days_since_last_support_contact`.\n*   **Sentiment:** `avg_support_sentiment_score` (from NLP on tickets), `num_negative_feedback_submissions`.\n\n#### **4. Temporal & Seasonal Features**\n*   `tenure_days` (single most important feature in many models).\n*   `customer_age_group` (e.g., new (<30d), established (30-180d), veteran (>180d)).\n*   `day_of_week_last_login`, `is_weekend_user`.\n\n#### **5. Derived & Ratio Features**\n*   **Engagement-to-Tenure:** `logins_per_day_tenure`.\n*   **Value-to-Engagement:** `revenue_per_login`.\n*   **Health Score:** A weighted composite index of usage, payment, and support metrics.\n\n#### **6. \"Red Flag\" Event Features (Binary)**\n*   `had_plan_downgrade_last_30d`\n*   `had_payment_failed_last_15d`\n*   `visited_cancellation_page_last_7d`\n\n---\n\n### **Phase 3: Model Selection & Rationale**\nThe choice depends on the priorities: **pure predictive performance, interpretability, or scalability.**\n\n| Model | Rationale | Best For |\n| :--- | :--- | :--- |\n| **1. Gradient Boosted Trees (XGBoost/LightGBM/CatBoost)** | **My default choice.** Handles non-linear relationships, mixed data types, and missing values well. Provides excellent accuracy and feature importance scores. Very robust. | **When predictive performance is the top priority.** Industry standard for tabular data. |\n| **2. Logistic Regression (with regularization)** | Simple, highly interpretable (coefficients). Serves as a strong baseline. Requires careful feature engineering (scaling, handling non-linearity). | **When stakeholders need to understand *why* (compliance, trust).** Baseline model. |\n| **3. Random Forest** | More interpretable than GBDTs via feature importance. Less prone to overfitting than a single tree. Good for initial exploration. | **A good balance between performance and interpretability.** |\n| **4. Neural Network** | Can model extremely complex interactions if data is vast (>100k samples, rich behavioral sequences). Often overkill for structured tabular data. | **Massive datasets with complex patterns, or when integrating unstructured data (text, sequences).** |\n\n**My Recommended Stack:**\n*   **Primary Model:** **LightGBM** (for speed and accuracy).\n*   **Baseline/Interpretable Model:** **Logistic Regression** (L1/L2 regularization).\n*   **Ensemble (Optional):** A soft-voting ensemble of LightGBM and Random Forest can sometimes squeeze out extra performance.\n\n---\n\n### **Phase 4: Implementation & Validation**\n1.  **Handling Class Imbalance:** Churn is often rare (3-10%). I would use:\n    *   **Algorithmic:** LightGBM's `is_unbalance` or `scale_pos_weight` parameters.\n    *   **Strategic:** Oversampling (SMOTE) **only** on the training fold during cross-validation to avoid data leakage.\n2.  **Validation:** Time-series cross-validation (e.g., forward chaining) to avoid leaking future data into the past. Never use random k-fold on temporal data.\n3.  **Metrics:** Don't just use accuracy.\n    *   **Primary:** **ROC-AUC** (overall ranking performance).\n    *   **Business-Focused:** **Precision-Recall AUC** (for imbalanced data), **Precision at Top-K** (e.g., if we can only intervene with 1000 customers, how many of them *actually* churn?).\n4.  **Interpretability:** Use **SHAP (SHapley Additive exPlanations)** with the LightGBM model. This provides both global feature importance and local explanations for individual predictions (e.g., \"This customer has a 65% churn risk primarily because their login frequency dropped 70% in the last month\").\n\n### **Final Recommendation**\nStart with a robust feature engineering pipeline focusing on **usage trends, tenure, and support interactions**. Build a **LightGBM model** as your workhorse, validated with time-series CV and evaluated on **PR-AUC**. Use **Logistic Regression as a baseline** and **SHAP values** to explain the model's decisions to stakeholders. This combination delivers high performance, robustness, and actionable insights for intervention strategies.",
+          "tokenUsage": {
+            "total": 1811,
+            "prompt": 397,
+            "completion": 1414,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 353,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:22:06 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 a83867a3ac3fea26ed170155d7e41ae6.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "bxDx1vL9-IAM1A00xeR8D66A0tTi_6kPWLdE4wit_K2CELQnNHsE5A==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "2db82952c381f58aa3aeb2abad5a8972"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Analyze a dataset for churn prediction. What features would you engineer and wha",
+          "vars": {
+            "task": "Analyze a dataset for churn prediction. What features would you engineer and what model would you choose?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Covers feature engineering ideas for churn (behavioral/temporal signals), discusses at least one model type with reasoning, mentions model evaluation approach",
+              "threshold": 0.6,
+              "metric": "data-scientist_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Analyze a dataset for churn prediction. What features would you engineer and what model would you choose?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:22:06 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 a83867a3ac3fea26ed170155d7e41ae6.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "bxDx1vL9-IAM1A00xeR8D66A0tTi_6kPWLdE4wit_K2CELQnNHsE5A==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "2db82952c381f58aa3aeb2abad5a8972"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 397,
+        "completion": 1414,
+        "cached": 0,
+        "total": 1811,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1715,
+          "prompt": 1616,
+          "completion": 99,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 68090,
+      "evaluationDurationMs": 68090
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: data-scientist",
+    "prompts": [
+      {
+        "label": "data-scientist",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a data scientist specializing in advanced analytics, machine learning, statistical modeling, and data-driven business insights.\\n\\n## Purpose\\nExpert data scientist combining strong statistical foundations with modern machine learning techniques and business acumen. Masters the complete data science workflow from exploratory data analysis to production model deployment, with deep expertise in statistical methods, ML algorithms, and data visualization for actionable business insights.\\n\\n## Capabilities\\n\\n### Statistical Analysis & Methodology\\n- Descriptive statistics, inferential statistics, and hypothesis testing\\n- Experimental design: A/B testing, multivariate testing, randomized controlled trials\\n- Causal inference: natural experiments, difference-in-differences, instrumental variables\\n- Time series analysis: ARIMA, Prophet, seasonal decomposition, forecasting\\n- Survival analysis and duration modeling for customer lifecycle analysis\\n- Bayesian statistics and probabilistic modeling with PyMC3, Stan\\n- Statistical significance testing, p-values, confidence intervals, effect sizes\\n- Power analysis and sample size determination for experiments\\n\\n### Machine Learning & Predictive Modeling\\n- Supervised learning: linear/logistic regression, decision trees, random forests, XGBoost, LightGBM\\n- Unsupervised learning: clustering (K-means, hierarchical, DBSCAN), PCA, t-SNE, UMAP\\n- Deep learning: neural networks, CNNs, RNNs, LSTMs, transformers with PyTorch/TensorFlow\\n- Ensemble methods: bagging, boosting, stacking, voting classifiers\\n- Model selection and hyperparameter tuning with cross-validation and Optuna\\n- Feature engineering: selection, extraction, transformation, encoding categorical variables\\n- Dimensionality reduction and feature importance analysis\\n- Model interpretability: SHAP, LIME, feature attribution, partial dependence plots\\n\\n### Data Analysis & Exploration\\n- Exploratory data analysis (EDA) with statistical summaries and visualizations\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Analyze a dataset for churn prediction. What features would you engineer and wha",
+        "vars": {
+          "task": "Analyze a dataset for churn prediction. What features would you engineer and what model would you choose?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Covers feature engineering ideas for churn (behavioral/temporal signals), discusses at least one model type with reasoning, mentions model evaluation approach",
+            "threshold": 0.6,
+            "metric": "data-scientist_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-data-scientist.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:23:14.164Z",
+    "evaluationCreatedAt": "2026-03-15T04:22:06.028Z"
+  }
+}

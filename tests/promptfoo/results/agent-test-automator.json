@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-MXB-2026-03-15T04:52:23",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:52:23.247Z",
+    "prompts": [
+      {
+        "id": "31eccdbc9ebc759222dd1163c8d58fb3005d53f2ec0e9c2317de6d9d05082808",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are an expert test automation engineer specializing in AI-powered testing, modern frameworks, and comprehensive quality engineering strategies.\\n\\n## Purpose\\nExpert test automation engineer focused on building robust, maintainable, and intelligent testing ecosystems. Masters modern testing frameworks, AI-powered test generation, and self-healing test automation to ensure high-quality software delivery at scale. Combines technical expertise with quality engineering principles to optimize testing efficiency and effectiveness.\\n\\n## Capabilities\\n\\n### Test-Driven Development (TDD) Excellence\\n- Test-first development patterns with red-green-refactor cycle automation\\n- Failing test generation and verification for proper TDD flow\\n- Minimal implementation guidance for passing tests efficiently\\n- Refactoring test support with regression safety validation\\n- TDD cycle metrics tracking including cycle time and test growth\\n- Integration with TDD orchestrator for large-scale TDD initiatives\\n- Chicago School (state-based) and London School (interaction-based) TDD approaches\\n- Property-based TDD with automated property discovery and validation\\n- BDD integration for behavior-driven test specifications\\n- TDD kata automation and practice session facilitation\\n- Test triangulation techniques for comprehensive coverage\\n- Fast feedback loop optimization with incremental test execution\\n- TDD compliance monitoring and team adherence metrics\\n- Baby steps methodology support with micro-commit tracking\\n- Test naming conventions and intent documentation automation\\n\\n### AI-Powered Testing Frameworks\\n- Self-healing test automation with tools like Testsigma, Testim, and Applitools\\n- AI-driven test case generation and maintenance using natural language processing\\n- Machine learning for test optimization and failure prediction\\n- Visual AI testing for UI validation and regression detection\\n- Predictive analytics for test execution optimization\\n- Intelligent test data generation and management\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "test-automator",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 391,
+          "tokenUsage": {
+            "prompt": 379,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1879,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1745,
+              "prompt": 1694,
+              "completion": 51,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "test-automator_quality": 1
+          },
+          "namedScoresCount": {
+            "test-automator_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "test-automator_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1745,
+            "prompt": 1694,
+            "completion": 51,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses Playwright best practices, page objects, handles both success and failure cases, screenshot comparison",
+                "threshold": 0.7,
+                "metric": "test-automator_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output implements Playwright best practices with page object model, includes both successful and failure test cases, and incorporates screenshot comparison for visual regression testing.",
+              "tokensUsed": {
+                "total": 1745,
+                "prompt": 1694,
+                "completion": 51,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive Playwright E2E test for a login flow with 2FA, error handling, and visual regression. This will include modern testing patterns, AI-powered visual testing, and robust error handling.\\n\\n```typescript\\n// tests/login-flow.spec.ts\\nimport { test, expect, Page } from '@playwright/test';\\nimport { LoginPage } from '../pages/login-page';\\nimport { TwoFactorPage } from '../pages/two-factor-page';\\nimport { DashboardPage } from '../pages/dashboard-page';\\nimport { VisualRegressionTracker } from '@visual-regression-tracker/agent-playwright';\\n\\n// Test data\\nconst TEST_USERS = {\\n  valid: {\\n    email: 'test@example.com',\\n    password: 'SecurePass123!',\\n    twoFactorCode: '123456'\\n  },\\n  invalid: {\\n    email: 'invalid@example.com',\\n    password: 'WrongPass!',\\n    twoFactorCode: '000000'\\n  },\\n  locked: {\\n    email: 'locked@example.com',\\n    password: 'LockedPass123!'\\n  }\\n};\\n\\n// Test configuration\\nconst TEST_CONFIG = {\\n  visualRegression: {\\n    project: 'login-flow',\\n    ciBuildId: process.env.CI_BUILD_ID || 'local-run',\\n    enableSoftAssert: true,\\n    tolerance: 0.5 // 0.5% pixel difference tolerance\\n  },\\n  timeout: {\\n    twoFactor: 30000,\\n    navigation: 15000\\n  }\\n};\\n\\n// Initialize Visual Regression Tracker\\nlet vrt: VisualRegressionTracker;\\n\\ntest.beforeAll(async () => {\\n  if (process.env.VRT_ENABLED === 'true') {\\n    vrt = new VisualRegressionTracker({\\n      apiUrl: process.env.VRT_API_URL || 'http://localhost:4200',\\n      apiKey: process.env.VRT_API_KEY || 'your-api-key',\\n      project: TEST_CONFIG.visualRegression.project,\\n      ciBuildId: TEST_CONFIG.visualRegression.ciBuildId,\\n      branchName: process.env.GIT_BRANCH || 'main',\\n      enableSoftAssert: TEST_CONFIG.visualRegression.enableSoftAssert\\n    });\\n    await vrt.start();\\n  }\\n});\\n\\ntest.beforeEach(async ({ page }) => {\\n  // Set default timeout\\n  page.setDefaultTimeout(TEST_CONFIG.timeout.navigation);\\n  \\n  // Capture network requests for debugging\\n  await page.route('**/*', route => {\\n    console.log(`Request: ${route.request().url()}`);\\n    route.continue();\\n  });\\n});\\n\\ntest.afterAll(async () => {\\n  if (vrt) {\\n    await vrt.stop();\\n  }\\n});\\n\\ntest.describe('Login Flow with 2FA', () => {\\n  test('Successful login with valid credentials and 2FA', async ({ page }) => {\\n    const loginPage = new LoginPage(page);\\n    const twoFactorPage = new TwoFactorPage(page);\\n    const dashboardPage = new DashboardPage(page);\\n\\n    // Step 1: Navigate to login page\\n    await loginPage.navigate();\\n    \\n    // Visual regression: Capture login page\\n    if (vrt) {\\n      await vrt.track({\\n        name: 'login-page-initial',\\n        image: await page.screenshot(),\\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance,\\n        os: process.platform,\\n        browser: page.context().browser()?.browserType().name() || 'chromium',\\n        viewport: `${page.viewportSize()?.width}x${page.viewportSize()?.height}`,\\n        device: 'Desktop'\\n      });\\n    }\\n\\n    // Step 2: Enter valid credentials\\n    await loginPage.enterEmail(TEST_USERS.valid.email);\\n    await loginPage.enterPassword(TEST_USERS.valid.password);\\n    \\n    // Visual regression: Capture filled login form\\n    if (vrt) {\\n      await vrt.track({\\n        name: 'login-form-filled',\\n        image: await page.screenshot(),\\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\\n      });\\n    }\\n\\n    // Step 3: Submit login form\\n    await loginPage.submit();\\n    \\n    // Wait for 2FA page to load\\n    await twoFactorPage.waitForPageLoad();\\n\\n    // Step 4: Verify 2FA page is displayed\\n    await expect(twoFactorPage.pageTitle).toBeVisible();\\n    await expect(twoFactorPage.twoFactorInput).toBeVisible();\\n    \\n    // Visual regression: Capture 2FA page\\n    if (vrt) {\\n      await vrt.track({\\n        name: '2fa-page',\\n        image: await page.screenshot(),\\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\\n      });\\n    }\\n\\n    // Step 5: Enter valid 2FA code\\n    await twoFactorPage.enterTwoFactorCode(TEST_USERS.valid.twoFactorCode);\\n    await twoFactorPage.submit();\\n\\n    // Step 6: Verify successful login\\n    await dashboardPage.waitForPageLoad();\\n    await expect(dashboardPage.welcomeMessage).toContainText('Welcome');\\n    await expect(page).toHaveURL(/dashboard/);\\n    \\n    // Verify session is established\\n    const cookies = await page.context().cookies();\\n    const sessionCookie = cookies.find(cookie => cookie.name.includes('session'));\\n    expect(sessionCookie).toBeDefined();\\n    expect(sessionCookie?.value).toBeTruthy();\\n\\n    // Visual regression: Capture dashboard\\n    if (vrt) {\\n      await vrt.track({\\n        name: 'dashboard-after-login',\\n        image: await page.screenshot(),\\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\\n      });\\n    }\\n  });\\n\\n  test('Login failure with invalid credentials', async ({ page }) => {\\n    const loginPage = new LoginPage(page);\\n\\n    await loginPage.navigate();\\n    \\n    // Enter invalid credentials\\n    await loginPage.enterEmail(TEST_USERS.invalid.email);\\n    await loginPage.enterPassword(TEST_USERS.invalid.password);\\n    await loginPage.submit();\\n\\n    // Verify error message is displayed\\n    await expect(loginPage.errorMessage).toBeVisible();\\n    await expect(loginPage.errorMessage).toContainText('Invalid credentials');\\n    \\n    // Verify user is not redirected\\n    await expect(page).not.toHaveURL(/dashboard/);\\n    \\n    // Verify form fields are cleared (security measure)\\n    await expect(loginPage.emailInput).toHaveValue('');\\n    await expect(loginPage.passwordInput).toHaveValue('');\\n\\n    // Visual regression: Capture error state\\n    if (vrt) {\\n      await vrt.track({\\n        name: 'login-error-invalid-credentials',\\n        image: await page.screenshot(),\\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\\n      });\\n    }\\n  });\\n\\n  test('Login failure with invalid 2FA code', async ({ page }) => {\\n    const loginPage = new LoginPage(page);\\n    const twoFactorPage = new TwoFactorPage(page);\\n\\n    await loginPage.navigate();\\n    \\n    // Enter valid credentials\\n    await loginPage.enterEmail(TEST\\n</Output>\\n<Rubric>\\nUses Playwright best practices, page objects, handles both success and failure cases, screenshot comparison\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "c10c3f35-b42a-473d-a398-392c950b99d8",
+        "latencyMs": 391,
+        "namedScores": {
+          "test-automator_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are an expert test automation engineer specializing in AI-powered testing, modern frameworks, and comprehensive quality engineering strategies.\\n\\n## Purpose\\nExpert test automation engineer focused on building robust, maintainable, and intelligent testing ecosystems. Masters modern testing frameworks, AI-powered test generation, and self-healing test automation to ensure high-quality software delivery at scale. Combines technical expertise with quality engineering principles to optimize testing efficiency and effectiveness.\\n\\n## Capabilities\\n\\n### Test-Driven Development (TDD) Excellence\\n- Test-first development patterns with red-green-refactor cycle automation\\n- Failing test generation and verification for proper TDD flow\\n- Minimal implementation guidance for passing tests efficiently\\n- Refactoring test support with regression safety validation\\n- TDD cycle metrics tracking including cycle time and test growth\\n- Integration with TDD orchestrator for large-scale TDD initiatives\\n- Chicago School (state-based) and London School (interaction-based) TDD approaches\\n- Property-based TDD with automated property discovery and validation\\n- BDD integration for behavior-driven test specifications\\n- TDD kata automation and practice session facilitation\\n- Test triangulation techniques for comprehensive coverage\\n- Fast feedback loop optimization with incremental test execution\\n- TDD compliance monitoring and team adherence metrics\\n- Baby steps methodology support with micro-commit tracking\\n- Test naming conventions and intent documentation automation\\n\\n### AI-Powered Testing Frameworks\\n- Self-healing test automation with tools like Testsigma, Testim, and Applitools\\n- AI-driven test case generation and maintenance using natural language processing\\n- Machine learning for test optimization and failure prediction\\n- Visual AI testing for UI validation and regression detection\\n- Predictive analytics for test execution optimization\\n- Intelligent test data generation and management\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a comprehensive Playwright E2E test for a login flow with 2FA, error handling, and visual regression\"\n  }\n]",
+          "label": "test-automator",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "31eccdbc9ebc759222dd1163c8d58fb3005d53f2ec0e9c2317de6d9d05082808",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a comprehensive Playwright E2E test for a login flow with 2FA, error handling, and visual regression. This will include modern testing patterns, AI-powered visual testing, and robust error handling.\n\n```typescript\n// tests/login-flow.spec.ts\nimport { test, expect, Page } from '@playwright/test';\nimport { LoginPage } from '../pages/login-page';\nimport { TwoFactorPage } from '../pages/two-factor-page';\nimport { DashboardPage } from '../pages/dashboard-page';\nimport { VisualRegressionTracker } from '@visual-regression-tracker/agent-playwright';\n\n// Test data\nconst TEST_USERS = {\n  valid: {\n    email: 'test@example.com',\n    password: 'SecurePass123!',\n    twoFactorCode: '123456'\n  },\n  invalid: {\n    email: 'invalid@example.com',\n    password: 'WrongPass!',\n    twoFactorCode: '000000'\n  },\n  locked: {\n    email: 'locked@example.com',\n    password: 'LockedPass123!'\n  }\n};\n\n// Test configuration\nconst TEST_CONFIG = {\n  visualRegression: {\n    project: 'login-flow',\n    ciBuildId: process.env.CI_BUILD_ID || 'local-run',\n    enableSoftAssert: true,\n    tolerance: 0.5 // 0.5% pixel difference tolerance\n  },\n  timeout: {\n    twoFactor: 30000,\n    navigation: 15000\n  }\n};\n\n// Initialize Visual Regression Tracker\nlet vrt: VisualRegressionTracker;\n\ntest.beforeAll(async () => {\n  if (process.env.VRT_ENABLED === 'true') {\n    vrt = new VisualRegressionTracker({\n      apiUrl: process.env.VRT_API_URL || 'http://localhost:4200',\n      apiKey: process.env.VRT_API_KEY || 'your-api-key',\n      project: TEST_CONFIG.visualRegression.project,\n      ciBuildId: TEST_CONFIG.visualRegression.ciBuildId,\n      branchName: process.env.GIT_BRANCH || 'main',\n      enableSoftAssert: TEST_CONFIG.visualRegression.enableSoftAssert\n    });\n    await vrt.start();\n  }\n});\n\ntest.beforeEach(async ({ page }) => {\n  // Set default timeout\n  page.setDefaultTimeout(TEST_CONFIG.timeout.navigation);\n  \n  // Capture network requests for debugging\n  await page.route('**/*', route => {\n    console.log(`Request: ${route.request().url()}`);\n    route.continue();\n  });\n});\n\ntest.afterAll(async () => {\n  if (vrt) {\n    await vrt.stop();\n  }\n});\n\ntest.describe('Login Flow with 2FA', () => {\n  test('Successful login with valid credentials and 2FA', async ({ page }) => {\n    const loginPage = new LoginPage(page);\n    const twoFactorPage = new TwoFactorPage(page);\n    const dashboardPage = new DashboardPage(page);\n\n    // Step 1: Navigate to login page\n    await loginPage.navigate();\n    \n    // Visual regression: Capture login page\n    if (vrt) {\n      await vrt.track({\n        name: 'login-page-initial',\n        image: await page.screenshot(),\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance,\n        os: process.platform,\n        browser: page.context().browser()?.browserType().name() || 'chromium',\n        viewport: `${page.viewportSize()?.width}x${page.viewportSize()?.height}`,\n        device: 'Desktop'\n      });\n    }\n\n    // Step 2: Enter valid credentials\n    await loginPage.enterEmail(TEST_USERS.valid.email);\n    await loginPage.enterPassword(TEST_USERS.valid.password);\n    \n    // Visual regression: Capture filled login form\n    if (vrt) {\n      await vrt.track({\n        name: 'login-form-filled',\n        image: await page.screenshot(),\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\n      });\n    }\n\n    // Step 3: Submit login form\n    await loginPage.submit();\n    \n    // Wait for 2FA page to load\n    await twoFactorPage.waitForPageLoad();\n\n    // Step 4: Verify 2FA page is displayed\n    await expect(twoFactorPage.pageTitle).toBeVisible();\n    await expect(twoFactorPage.twoFactorInput).toBeVisible();\n    \n    // Visual regression: Capture 2FA page\n    if (vrt) {\n      await vrt.track({\n        name: '2fa-page',\n        image: await page.screenshot(),\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\n      });\n    }\n\n    // Step 5: Enter valid 2FA code\n    await twoFactorPage.enterTwoFactorCode(TEST_USERS.valid.twoFactorCode);\n    await twoFactorPage.submit();\n\n    // Step 6: Verify successful login\n    await dashboardPage.waitForPageLoad();\n    await expect(dashboardPage.welcomeMessage).toContainText('Welcome');\n    await expect(page).toHaveURL(/dashboard/);\n    \n    // Verify session is established\n    const cookies = await page.context().cookies();\n    const sessionCookie = cookies.find(cookie => cookie.name.includes('session'));\n    expect(sessionCookie).toBeDefined();\n    expect(sessionCookie?.value).toBeTruthy();\n\n    // Visual regression: Capture dashboard\n    if (vrt) {\n      await vrt.track({\n        name: 'dashboard-after-login',\n        image: await page.screenshot(),\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\n      });\n    }\n  });\n\n  test('Login failure with invalid credentials', async ({ page }) => {\n    const loginPage = new LoginPage(page);\n\n    await loginPage.navigate();\n    \n    // Enter invalid credentials\n    await loginPage.enterEmail(TEST_USERS.invalid.email);\n    await loginPage.enterPassword(TEST_USERS.invalid.password);\n    await loginPage.submit();\n\n    // Verify error message is displayed\n    await expect(loginPage.errorMessage).toBeVisible();\n    await expect(loginPage.errorMessage).toContainText('Invalid credentials');\n    \n    // Verify user is not redirected\n    await expect(page).not.toHaveURL(/dashboard/);\n    \n    // Verify form fields are cleared (security measure)\n    await expect(loginPage.emailInput).toHaveValue('');\n    await expect(loginPage.passwordInput).toHaveValue('');\n\n    // Visual regression: Capture error state\n    if (vrt) {\n      await vrt.track({\n        name: 'login-error-invalid-credentials',\n        image: await page.screenshot(),\n        diffTolerancePercent: TEST_CONFIG.visualRegression.tolerance\n      });\n    }\n  });\n\n  test('Login failure with invalid 2FA code', async ({ page }) => {\n    const loginPage = new LoginPage(page);\n    const twoFactorPage = new TwoFactorPage(page);\n\n    await loginPage.navigate();\n    \n    // Enter valid credentials\n    await loginPage.enterEmail(TEST",
+          "tokenUsage": {
+            "total": 1879,
+            "prompt": 379,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 391,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:52:23 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 aa607ef1463ae664cd2325eb41bbec6c.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "W1l8ohFqaI2vwJCdaKxNtTVfykyiMs58rAYuCds9XTYXhMV_fnBFNw==",
+                "x-amz-cf-pop": "IAH50-P4",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "44d6b004974095a7075706201f6782c4"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Write a comprehensive Playwright E2E test for a login flow with 2FA, error handl",
+          "vars": {
+            "task": "Write a comprehensive Playwright E2E test for a login flow with 2FA, error handling, and visual regression"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses Playwright best practices, page objects, handles both success and failure cases, screenshot comparison",
+              "threshold": 0.7,
+              "metric": "test-automator_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Write a comprehensive Playwright E2E test for a login flow with 2FA, error handling, and visual regression"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:52:23 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 aa607ef1463ae664cd2325eb41bbec6c.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "W1l8ohFqaI2vwJCdaKxNtTVfykyiMs58rAYuCds9XTYXhMV_fnBFNw==",
+              "x-amz-cf-pop": "IAH50-P4",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "44d6b004974095a7075706201f6782c4"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 379,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1879,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1745,
+          "prompt": 1694,
+          "completion": 51,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 66637,
+      "evaluationDurationMs": 66637
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: test-automator",
+    "prompts": [
+      {
+        "label": "test-automator",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are an expert test automation engineer specializing in AI-powered testing, modern frameworks, and comprehensive quality engineering strategies.\\n\\n## Purpose\\nExpert test automation engineer focused on building robust, maintainable, and intelligent testing ecosystems. Masters modern testing frameworks, AI-powered test generation, and self-healing test automation to ensure high-quality software delivery at scale. Combines technical expertise with quality engineering principles to optimize testing efficiency and effectiveness.\\n\\n## Capabilities\\n\\n### Test-Driven Development (TDD) Excellence\\n- Test-first development patterns with red-green-refactor cycle automation\\n- Failing test generation and verification for proper TDD flow\\n- Minimal implementation guidance for passing tests efficiently\\n- Refactoring test support with regression safety validation\\n- TDD cycle metrics tracking including cycle time and test growth\\n- Integration with TDD orchestrator for large-scale TDD initiatives\\n- Chicago School (state-based) and London School (interaction-based) TDD approaches\\n- Property-based TDD with automated property discovery and validation\\n- BDD integration for behavior-driven test specifications\\n- TDD kata automation and practice session facilitation\\n- Test triangulation techniques for comprehensive coverage\\n- Fast feedback loop optimization with incremental test execution\\n- TDD compliance monitoring and team adherence metrics\\n- Baby steps methodology support with micro-commit tracking\\n- Test naming conventions and intent documentation automation\\n\\n### AI-Powered Testing Frameworks\\n- Self-healing test automation with tools like Testsigma, Testim, and Applitools\\n- AI-driven test case generation and maintenance using natural language processing\\n- Machine learning for test optimization and failure prediction\\n- Visual AI testing for UI validation and regression detection\\n- Predictive analytics for test execution optimization\\n- Intelligent test data generation and management\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Write a comprehensive Playwright E2E test for a login flow with 2FA, error handl",
+        "vars": {
+          "task": "Write a comprehensive Playwright E2E test for a login flow with 2FA, error handling, and visual regression"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses Playwright best practices, page objects, handles both success and failure cases, screenshot comparison",
+            "threshold": 0.7,
+            "metric": "test-automator_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-test-automator.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:53:29.913Z",
+    "evaluationCreatedAt": "2026-03-15T04:52:23.247Z"
+  }
+}

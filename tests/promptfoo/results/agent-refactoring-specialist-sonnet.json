@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-6Ld-2026-03-15T04:44:52",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:44:52.117Z",
+    "prompts": [
+      {
+        "id": "888b53a9b05bc1ac56e0c05057ce77922c7f2d9b824816e5424085971374a378",
+        "raw": "[{\"role\": \"system\", \"content\": \"# Purpose\\nYou are a refactoring specialist who identifies opportunities to improve code structure, reduce technical debt, and apply design patterns. Your role is to make code cleaner, more maintainable, and easier to extend without changing its external behavior.\\n\\n## Workflow\\n\\nWhen invoked, you must follow these steps:\\n\\n1. **Analyze Current Code**\\n   - Read the code that needs refactoring\\n   - Understand its current functionality and behavior\\n   - Identify all dependencies and usage points\\n   - Map out the current architecture\\n\\n2. **Identify Code Smells**\\n   - **Long Methods**: Functions > 50 lines\\n   - **Large Classes**: Classes with > 10 methods or > 300 lines\\n   - **Duplicate Code**: Similar logic in multiple places\\n   - **Long Parameter Lists**: Functions with > 4 parameters\\n   - **Primitive Obsession**: Using primitives instead of objects\\n   - **Feature Envy**: Methods that use other classes more than their own\\n   - **Shotgun Surgery**: Changes requiring edits in many places\\n   - **God Objects**: Classes that know/do too much\\n\\n3. **Propose Refactoring Strategies**\\n   - **Extract Method**: Break down long functions\\n   - **Extract Class**: Separate responsibilities\\n   - **Introduce Parameter Object**: Replace long parameter lists\\n   - **Replace Conditional with Polymorphism**: Eliminate complex if/else\\n   - **Consolidate Duplicate Code**: DRY principle\\n   - **Simplify Conditional Expressions**: Use guard clauses, early returns\\n   - **Replace Magic Numbers**: Use named constants\\n\\n4. **Apply Design Patterns (where appropriate)**\\n   - Strategy Pattern: Replace conditional logic\\n   - Factory Pattern: Centralize object creation\\n   - Observer Pattern: Decouple event handling\\n   - Decorator Pattern: Add functionality dynamically\\n   - Template Method: Share algorithm structure\\n\\n5. **Execute Refactoring**\\n   - Use Edit/MultiEdit tools to apply changes\\n   - Make small, incremental changes\\n   - Ensure tests still pass after each change\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "refactoring-specialist-sonnet",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 608,
+          "tokenUsage": {
+            "prompt": 489,
+            "completion": 611,
+            "cached": 0,
+            "total": 1100,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 855,
+              "prompt": 806,
+              "completion": 49,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "refactoring-specialist-sonnet_quality": 1
+          },
+          "namedScoresCount": {
+            "refactoring-specialist-sonnet_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "refactoring-specialist-sonnet_quality": 1
+          },
+          "tokensUsed": {
+            "total": 855,
+            "prompt": 806,
+            "completion": 49,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Suggests early returns / guard clauses, or strategy pattern, or table-driven approach — with actual code",
+                "threshold": 0.7,
+                "metric": "refactoring-specialist-sonnet_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output provides multiple refactoring approaches including guard clauses with early returns and the strategy pattern, complete with actual code examples for each.",
+              "tokensUsed": {
+                "total": 855,
+                "prompt": 806,
+                "completion": 49,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nLooking at this deeply nested if-else structure, I can see several code smells: **nested conditionals** and **arrow code** (indentation that points to the right). This makes the logic hard to follow and maintain.\\n\\nLet me refactor this using **guard clauses** and **early returns** to flatten the structure:\\n\\n```python\\n# Original nested structure\\nif condition1:\\n    if condition2:\\n        if condition3:\\n            do_something()\\n        else:\\n            do_other()\\n    else:\\n        fallback()\\nelse:\\n    default()\\n```\\n\\n**Refactored version using guard clauses:**\\n\\n```python\\n# Flattened structure with early returns\\nif not condition1:\\n    default()\\n    return\\n\\nif not condition2:\\n    fallback()\\n    return\\n\\nif condition3:\\n    do_something()\\nelse:\\n    do_other()\\n```\\n\\n**Alternative: Extract to a function with clear intent:**\\n\\n```python\\ndef handle_conditions(condition1, condition2, condition3):\\n    \\\"\\\"\\\"Handle the complex conditional logic in a readable way.\\\"\\\"\\\"\\n    \\n    # Guard clauses for invalid states\\n    if not condition1:\\n        return default()\\n    \\n    if not condition2:\\n        return fallback()\\n    \\n    # Main logic path\\n    if condition3:\\n        return do_something()\\n    else:\\n        return do_other()\\n\\n# Usage\\nresult = handle_conditions(condition1, condition2, condition3)\\n```\\n\\n**Alternative: Strategy pattern if conditions represent different behaviors:**\\n\\n```python\\nfrom abc import ABC, abstractmethod\\n\\nclass ConditionHandler(ABC):\\n    @abstractmethod\\n    def handle(self):\\n        pass\\n\\nclass DefaultHandler(ConditionHandler):\\n    def handle(self):\\n        return default()\\n\\nclass FallbackHandler(ConditionHandler):\\n    def handle(self):\\n        return fallback()\\n\\nclass SomethingHandler(ConditionHandler):\\n    def handle(self):\\n        return do_something()\\n\\nclass OtherHandler(ConditionHandler):\\n    def handle(self):\\n        return do_other()\\n\\ndef get_handler(condition1, condition2, condition3):\\n    \\\"\\\"\\\"Factory method to get appropriate handler.\\\"\\\"\\\"\\n    if not condition1:\\n        return DefaultHandler()\\n    if not condition2:\\n        return FallbackHandler()\\n    if condition3:\\n        return SomethingHandler()\\n    return OtherHandler()\\n\\n# Usage\\nhandler = get_handler(condition1, condition2, condition3)\\nresult = handler.handle()\\n```\\n\\n**Benefits of the refactoring:**\\n1. **Flattened structure** - No more deep nesting\\n2. **Early returns** - Clear exit points for each condition\\n3. **Readability** - Each condition is checked independently\\n4. **Maintainability** - Easy to add/remove conditions\\n5. **Testability** - Each path can be tested independently\\n\\nThe **guard clause approach** is usually best for simple conditional logic like this. The **strategy pattern** is better when each branch represents significantly different behavior that might need to be extended or modified independently.\\n</Output>\\n<Rubric>\\nSuggests early returns / guard clauses, or strategy pattern, or table-driven approach — with actual code\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "c21ade63-cc72-4264-b8d2-9edd381ce510",
+        "latencyMs": 608,
+        "namedScores": {
+          "refactoring-specialist-sonnet_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"# Purpose\\nYou are a refactoring specialist who identifies opportunities to improve code structure, reduce technical debt, and apply design patterns. Your role is to make code cleaner, more maintainable, and easier to extend without changing its external behavior.\\n\\n## Workflow\\n\\nWhen invoked, you must follow these steps:\\n\\n1. **Analyze Current Code**\\n   - Read the code that needs refactoring\\n   - Understand its current functionality and behavior\\n   - Identify all dependencies and usage points\\n   - Map out the current architecture\\n\\n2. **Identify Code Smells**\\n   - **Long Methods**: Functions > 50 lines\\n   - **Large Classes**: Classes with > 10 methods or > 300 lines\\n   - **Duplicate Code**: Similar logic in multiple places\\n   - **Long Parameter Lists**: Functions with > 4 parameters\\n   - **Primitive Obsession**: Using primitives instead of objects\\n   - **Feature Envy**: Methods that use other classes more than their own\\n   - **Shotgun Surgery**: Changes requiring edits in many places\\n   - **God Objects**: Classes that know/do too much\\n\\n3. **Propose Refactoring Strategies**\\n   - **Extract Method**: Break down long functions\\n   - **Extract Class**: Separate responsibilities\\n   - **Introduce Parameter Object**: Replace long parameter lists\\n   - **Replace Conditional with Polymorphism**: Eliminate complex if/else\\n   - **Consolidate Duplicate Code**: DRY principle\\n   - **Simplify Conditional Expressions**: Use guard clauses, early returns\\n   - **Replace Magic Numbers**: Use named constants\\n\\n4. **Apply Design Patterns (where appropriate)**\\n   - Strategy Pattern: Replace conditional logic\\n   - Factory Pattern: Centralize object creation\\n   - Observer Pattern: Decouple event handling\\n   - Decorator Pattern: Add functionality dynamically\\n   - Template Method: Share algorithm structure\\n\\n5. **Execute Refactoring**\\n   - Use Edit/MultiEdit tools to apply changes\\n   - Make small, incremental changes\\n   - Ensure tests still pass after each change\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Refactor this deeply nested if-else block into a cleaner pattern:\\nif condition1:\\n  if condition2:\\n    if condition3:\\n      do_something()\\n    else:\\n      do_other()\\n  else:\\n    fallback()\\nelse:\\n  default()\"\n  }\n]",
+          "label": "refactoring-specialist-sonnet",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "888b53a9b05bc1ac56e0c05057ce77922c7f2d9b824816e5424085971374a378",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Looking at this deeply nested if-else structure, I can see several code smells: **nested conditionals** and **arrow code** (indentation that points to the right). This makes the logic hard to follow and maintain.\n\nLet me refactor this using **guard clauses** and **early returns** to flatten the structure:\n\n```python\n# Original nested structure\nif condition1:\n    if condition2:\n        if condition3:\n            do_something()\n        else:\n            do_other()\n    else:\n        fallback()\nelse:\n    default()\n```\n\n**Refactored version using guard clauses:**\n\n```python\n# Flattened structure with early returns\nif not condition1:\n    default()\n    return\n\nif not condition2:\n    fallback()\n    return\n\nif condition3:\n    do_something()\nelse:\n    do_other()\n```\n\n**Alternative: Extract to a function with clear intent:**\n\n```python\ndef handle_conditions(condition1, condition2, condition3):\n    \"\"\"Handle the complex conditional logic in a readable way.\"\"\"\n    \n    # Guard clauses for invalid states\n    if not condition1:\n        return default()\n    \n    if not condition2:\n        return fallback()\n    \n    # Main logic path\n    if condition3:\n        return do_something()\n    else:\n        return do_other()\n\n# Usage\nresult = handle_conditions(condition1, condition2, condition3)\n```\n\n**Alternative: Strategy pattern if conditions represent different behaviors:**\n\n```python\nfrom abc import ABC, abstractmethod\n\nclass ConditionHandler(ABC):\n    @abstractmethod\n    def handle(self):\n        pass\n\nclass DefaultHandler(ConditionHandler):\n    def handle(self):\n        return default()\n\nclass FallbackHandler(ConditionHandler):\n    def handle(self):\n        return fallback()\n\nclass SomethingHandler(ConditionHandler):\n    def handle(self):\n        return do_something()\n\nclass OtherHandler(ConditionHandler):\n    def handle(self):\n        return do_other()\n\ndef get_handler(condition1, condition2, condition3):\n    \"\"\"Factory method to get appropriate handler.\"\"\"\n    if not condition1:\n        return DefaultHandler()\n    if not condition2:\n        return FallbackHandler()\n    if condition3:\n        return SomethingHandler()\n    return OtherHandler()\n\n# Usage\nhandler = get_handler(condition1, condition2, condition3)\nresult = handler.handle()\n```\n\n**Benefits of the refactoring:**\n1. **Flattened structure** - No more deep nesting\n2. **Early returns** - Clear exit points for each condition\n3. **Readability** - Each condition is checked independently\n4. **Maintainability** - Easy to add/remove conditions\n5. **Testability** - Each path can be tested independently\n\nThe **guard clause approach** is usually best for simple conditional logic like this. The **strategy pattern** is better when each branch represents significantly different behavior that might need to be extended or modified independently.",
+          "tokenUsage": {
+            "total": 1100,
+            "prompt": 489,
+            "completion": 611,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 608,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:44:52 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 c78a54e8d883d4a91f660aa437dc6a84.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "mecx1u6qSpQPQWQAD5MFN1gxCSP1Ch9byBDtH5daJxfvG9i92U6f0w==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "81f6c88112d0c59e5ca8ef9dd930f4ad"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Refactor this deeply nested if-else block into a cleaner pattern:\nif condition1:",
+          "vars": {
+            "task": "Refactor this deeply nested if-else block into a cleaner pattern:\nif condition1:\n  if condition2:\n    if condition3:\n      do_something()\n    else:\n      do_other()\n  else:\n    fallback()\nelse:\n  default()"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Suggests early returns / guard clauses, or strategy pattern, or table-driven approach — with actual code",
+              "threshold": 0.7,
+              "metric": "refactoring-specialist-sonnet_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Refactor this deeply nested if-else block into a cleaner pattern:\nif condition1:\n  if condition2:\n    if condition3:\n      do_something()\n    else:\n      do_other()\n  else:\n    fallback()\nelse:\n  default()"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:44:52 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 c78a54e8d883d4a91f660aa437dc6a84.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "mecx1u6qSpQPQWQAD5MFN1gxCSP1Ch9byBDtH5daJxfvG9i92U6f0w==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "81f6c88112d0c59e5ca8ef9dd930f4ad"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 489,
+        "completion": 611,
+        "cached": 0,
+        "total": 1100,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 855,
+          "prompt": 806,
+          "completion": 49,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 32936,
+      "evaluationDurationMs": 32936
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: refactoring-specialist-sonnet",
+    "prompts": [
+      {
+        "label": "refactoring-specialist-sonnet",
+        "raw": "[{\"role\":\"system\",\"content\":\"# Purpose\\nYou are a refactoring specialist who identifies opportunities to improve code structure, reduce technical debt, and apply design patterns. Your role is to make code cleaner, more maintainable, and easier to extend without changing its external behavior.\\n\\n## Workflow\\n\\nWhen invoked, you must follow these steps:\\n\\n1. **Analyze Current Code**\\n   - Read the code that needs refactoring\\n   - Understand its current functionality and behavior\\n   - Identify all dependencies and usage points\\n   - Map out the current architecture\\n\\n2. **Identify Code Smells**\\n   - **Long Methods**: Functions > 50 lines\\n   - **Large Classes**: Classes with > 10 methods or > 300 lines\\n   - **Duplicate Code**: Similar logic in multiple places\\n   - **Long Parameter Lists**: Functions with > 4 parameters\\n   - **Primitive Obsession**: Using primitives instead of objects\\n   - **Feature Envy**: Methods that use other classes more than their own\\n   - **Shotgun Surgery**: Changes requiring edits in many places\\n   - **God Objects**: Classes that know/do too much\\n\\n3. **Propose Refactoring Strategies**\\n   - **Extract Method**: Break down long functions\\n   - **Extract Class**: Separate responsibilities\\n   - **Introduce Parameter Object**: Replace long parameter lists\\n   - **Replace Conditional with Polymorphism**: Eliminate complex if/else\\n   - **Consolidate Duplicate Code**: DRY principle\\n   - **Simplify Conditional Expressions**: Use guard clauses, early returns\\n   - **Replace Magic Numbers**: Use named constants\\n\\n4. **Apply Design Patterns (where appropriate)**\\n   - Strategy Pattern: Replace conditional logic\\n   - Factory Pattern: Centralize object creation\\n   - Observer Pattern: Decouple event handling\\n   - Decorator Pattern: Add functionality dynamically\\n   - Template Method: Share algorithm structure\\n\\n5. **Execute Refactoring**\\n   - Use Edit/MultiEdit tools to apply changes\\n   - Make small, incremental changes\\n   - Ensure tests still pass after each change\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Refactor this deeply nested if-else block into a cleaner pattern:\nif condition1:",
+        "vars": {
+          "task": "Refactor this deeply nested if-else block into a cleaner pattern:\nif condition1:\n  if condition2:\n    if condition3:\n      do_something()\n    else:\n      do_other()\n  else:\n    fallback()\nelse:\n  default()"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Suggests early returns / guard clauses, or strategy pattern, or table-driven approach — with actual code",
+            "threshold": 0.7,
+            "metric": "refactoring-specialist-sonnet_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-refactoring-specialist-sonnet.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:45:25.115Z",
+    "evaluationCreatedAt": "2026-03-15T04:44:52.117Z"
+  }
+}

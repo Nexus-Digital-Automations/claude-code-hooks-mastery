@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-wCp-2026-03-15T04:51:12",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:51:12.537Z",
+    "prompts": [
+      {
+        "id": "7e52c7c07884841708d93def5b6170d1bedeaf7b46ed9662534d20719317510c",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a Terraform/OpenTofu specialist focused on advanced infrastructure automation, state management, and modern IaC practices.\\n\\n## Purpose\\nExpert Infrastructure as Code specialist with comprehensive knowledge of Terraform, OpenTofu, and modern IaC ecosystems. Masters advanced module design, state management, provider development, and enterprise-scale infrastructure automation. Specializes in GitOps workflows, policy as code, and complex multi-cloud deployments.\\n\\n## Capabilities\\n\\n### Terraform/OpenTofu Expertise\\n- **Core concepts**: Resources, data sources, variables, outputs, locals, expressions\\n- **Advanced features**: Dynamic blocks, for_each loops, conditional expressions, complex type constraints\\n- **State management**: Remote backends, state locking, state encryption, workspace strategies\\n- **Module development**: Composition patterns, versioning strategies, testing frameworks\\n- **Provider ecosystem**: Official and community providers, custom provider development\\n- **OpenTofu migration**: Terraform to OpenTofu migration strategies, compatibility considerations\\n\\n### Advanced Module Design\\n- **Module architecture**: Hierarchical module design, root modules, child modules\\n- **Composition patterns**: Module composition, dependency injection, interface segregation\\n- **Reusability**: Generic modules, environment-specific configurations, module registries\\n- **Testing**: Terratest, unit testing, integration testing, contract testing\\n- **Documentation**: Auto-generated documentation, examples, usage patterns\\n- **Versioning**: Semantic versioning, compatibility matrices, upgrade guides\\n\\n### State Management & Security\\n- **Backend configuration**: S3, Azure Storage, GCS, Terraform Cloud, Consul, etcd\\n- **State encryption**: Encryption at rest, encryption in transit, key management\\n- **State locking**: DynamoDB, Azure Storage, GCS, Redis locking mechanisms\\n- **State operations**: Import, move, remove, refresh, advanced state manipulation\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "terraform-specialist",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 438,
+          "tokenUsage": {
+            "prompt": 414,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1914,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1802,
+              "prompt": 1696,
+              "completion": 106,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "terraform-specialist_quality": 1
+          },
+          "namedScoresCount": {
+            "terraform-specialist_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "terraform-specialist_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1802,
+            "prompt": 1696,
+            "completion": 106,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Proper Terraform module structure, uses variables/outputs, IAM IRSA pattern, EKS managed node groups",
+                "threshold": 0.7,
+                "metric": "terraform-specialist_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output demonstrates a proper Terraform module structure with separate files for versions, variables, and IAM resources. It uses variables for configuration, includes IAM roles for both cluster and node groups, implements the IRSA pattern through the 'enable_irsa' variable and IAM role definitions, and configures EKS managed node groups through the 'node_groups' variable with comprehensive configuration options.",
+              "tokensUsed": {
+                "total": 1802,
+                "prompt": 1696,
+                "completion": 106,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive Terraform module for an AWS EKS cluster with node groups and IAM roles. This module will follow best practices for security, scalability, and maintainability.\\n\\n## AWS EKS Cluster Module\\n\\n### Directory Structure\\n```\\nmodules/eks/\\n├── main.tf\\n├── variables.tf\\n├── outputs.tf\\n├── iam.tf\\n├── node-groups.tf\\n├── security.tf\\n├── versions.tf\\n└── README.md\\n```\\n\\n### 1. `versions.tf` - Provider and Terraform Version Constraints\\n```hcl\\nterraform {\\n  required_version = \\\">= 1.0.0\\\"\\n  \\n  required_providers {\\n    aws = {\\n      source  = \\\"hashicorp/aws\\\"\\n      version = \\\">= 5.0\\\"\\n    }\\n    kubernetes = {\\n      source  = \\\"hashicorp/kubernetes\\\"\\n      version = \\\">= 2.23\\\"\\n    }\\n    helm = {\\n      source  = \\\"hashicorp/helm\\\"\\n      version = \\\">= 2.11\\\"\\n    }\\n  }\\n}\\n```\\n\\n### 2. `variables.tf` - Input Variables\\n```hcl\\nvariable \\\"cluster_name\\\" {\\n  description = \\\"Name of the EKS cluster\\\"\\n  type        = string\\n}\\n\\nvariable \\\"cluster_version\\\" {\\n  description = \\\"Kubernetes version for the EKS cluster\\\"\\n  type        = string\\n  default     = \\\"1.28\\\"\\n}\\n\\nvariable \\\"vpc_id\\\" {\\n  description = \\\"VPC ID where the EKS cluster will be deployed\\\"\\n  type        = string\\n}\\n\\nvariable \\\"private_subnet_ids\\\" {\\n  description = \\\"List of private subnet IDs for EKS cluster\\\"\\n  type        = list(string)\\n}\\n\\nvariable \\\"public_subnet_ids\\\" {\\n  description = \\\"List of public subnet IDs for EKS cluster (for public load balancers)\\\"\\n  type        = list(string)\\n}\\n\\nvariable \\\"cluster_endpoint_public_access\\\" {\\n  description = \\\"Whether the EKS cluster API server endpoint is publicly accessible\\\"\\n  type        = bool\\n  default     = false\\n}\\n\\nvariable \\\"cluster_endpoint_private_access\\\" {\\n  description = \\\"Whether the EKS cluster API server endpoint is privately accessible\\\"\\n  type        = bool\\n  default     = true\\n}\\n\\nvariable \\\"enabled_cluster_log_types\\\" {\\n  description = \\\"List of control plane logging types to enable\\\"\\n  type        = list(string)\\n  default     = [\\\"api\\\", \\\"audit\\\", \\\"authenticator\\\", \\\"controllerManager\\\", \\\"scheduler\\\"]\\n}\\n\\nvariable \\\"cluster_additional_security_group_ids\\\" {\\n  description = \\\"Additional security group IDs to attach to the cluster\\\"\\n  type        = list(string)\\n  default     = []\\n}\\n\\n# Node Group Variables\\nvariable \\\"node_groups\\\" {\\n  description = \\\"Map of node group configurations\\\"\\n  type = map(object({\\n    instance_types      = list(string)\\n    capacity_type       = string\\n    min_size           = number\\n    max_size           = number\\n    desired_size       = number\\n    disk_size          = number\\n    ami_type           = string\\n    labels             = map(string)\\n    taints = list(object({\\n      key    = string\\n      value  = string\\n      effect = string\\n    }))\\n    update_config = object({\\n      max_unavailable_percentage = number\\n    })\\n    tags = map(string)\\n  }))\\n  default = {\\n    main = {\\n      instance_types      = [\\\"t3.medium\\\"]\\n      capacity_type       = \\\"ON_DEMAND\\\"\\n      min_size           = 1\\n      max_size           = 3\\n      desired_size       = 2\\n      disk_size          = 20\\n      ami_type           = \\\"AL2_x86_64\\\"\\n      labels             = {}\\n      taints             = []\\n      update_config = {\\n        max_unavailable_percentage = 33\\n      }\\n      tags = {}\\n    }\\n  }\\n}\\n\\nvariable \\\"tags\\\" {\\n  description = \\\"Tags to apply to all resources\\\"\\n  type        = map(string)\\n  default     = {}\\n}\\n\\nvariable \\\"enable_irsa\\\" {\\n  description = \\\"Enable IAM Roles for Service Accounts\\\"\\n  type        = bool\\n  default     = true\\n}\\n\\nvariable \\\"create_aws_auth_configmap\\\" {\\n  description = \\\"Create aws-auth configmap for cluster access\\\"\\n  type        = bool\\n  default     = true\\n}\\n\\nvariable \\\"map_users\\\" {\\n  description = \\\"Additional IAM users to add to the aws-auth configmap\\\"\\n  type = list(object({\\n    userarn  = string\\n    username = string\\n    groups   = list(string)\\n  }))\\n  default = []\\n}\\n\\nvariable \\\"map_roles\\\" {\\n  description = \\\"Additional IAM roles to add to the aws-auth configmap\\\"\\n  type = list(object({\\n    rolearn  = string\\n    username = string\\n    groups   = list(string)\\n  }))\\n  default = []\\n}\\n\\nvariable \\\"enable_cluster_autoscaler\\\" {\\n  description = \\\"Enable cluster autoscaler addon\\\"\\n  type        = bool\\n  default     = true\\n}\\n\\nvariable \\\"enable_aws_load_balancer_controller\\\" {\\n  description = \\\"Enable AWS Load Balancer Controller\\\"\\n  type        = bool\\n  default     = true\\n}\\n\\nvariable \\\"enable_external_dns\\\" {\\n  description = \\\"Enable External DNS addon\\\"\\n  type        = bool\\n  default     = false\\n}\\n```\\n\\n### 3. `iam.tf` - IAM Roles and Policies\\n```hcl\\n# IAM Role for EKS Cluster\\nresource \\\"aws_iam_role\\\" \\\"cluster\\\" {\\n  name = \\\"${var.cluster_name}-cluster-role\\\"\\n\\n  assume_role_policy = jsonencode({\\n    Version = \\\"2012-10-17\\\"\\n    Statement = [\\n      {\\n        Action = \\\"sts:AssumeRole\\\"\\n        Effect = \\\"Allow\\\"\\n        Principal = {\\n          Service = \\\"eks.amazonaws.com\\\"\\n        }\\n      }\\n    ]\\n  })\\n\\n  tags = merge(var.tags, {\\n    Name = \\\"${var.cluster_name}-cluster-role\\\"\\n  })\\n}\\n\\nresource \\\"aws_iam_role_policy_attachment\\\" \\\"cluster_AmazonEKSClusterPolicy\\\" {\\n  policy_arn = \\\"arn:aws:iam::aws:policy/AmazonEKSClusterPolicy\\\"\\n  role       = aws_iam_role.cluster.name\\n}\\n\\nresource \\\"aws_iam_role_policy_attachment\\\" \\\"cluster_AmazonEKSVPCResourceController\\\" {\\n  policy_arn = \\\"arn:aws:iam::aws:policy/AmazonEKSVPCResourceController\\\"\\n  role       = aws_iam_role.cluster.name\\n}\\n\\n# IAM Role for Node Groups\\nresource \\\"aws_iam_role\\\" \\\"node_group\\\" {\\n  for_each = var.node_groups\\n\\n  name = \\\"${var.cluster_name}-${each.key}-node-role\\\"\\n\\n  assume_role_policy = jsonencode({\\n    Version = \\\"2012-10-17\\\"\\n    Statement = [\\n      {\\n        Action = \\\"sts:AssumeRole\\\"\\n        Effect = \\\"Allow\\\"\\n       \\n</Output>\\n<Rubric>\\nProper Terraform module structure, uses variables/outputs, IAM IRSA pattern, EKS managed node groups\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "aeab31ed-81de-41ac-b80f-0ecd734157b9",
+        "latencyMs": 438,
+        "namedScores": {
+          "terraform-specialist_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Terraform/OpenTofu specialist focused on advanced infrastructure automation, state management, and modern IaC practices.\\n\\n## Purpose\\nExpert Infrastructure as Code specialist with comprehensive knowledge of Terraform, OpenTofu, and modern IaC ecosystems. Masters advanced module design, state management, provider development, and enterprise-scale infrastructure automation. Specializes in GitOps workflows, policy as code, and complex multi-cloud deployments.\\n\\n## Capabilities\\n\\n### Terraform/OpenTofu Expertise\\n- **Core concepts**: Resources, data sources, variables, outputs, locals, expressions\\n- **Advanced features**: Dynamic blocks, for_each loops, conditional expressions, complex type constraints\\n- **State management**: Remote backends, state locking, state encryption, workspace strategies\\n- **Module development**: Composition patterns, versioning strategies, testing frameworks\\n- **Provider ecosystem**: Official and community providers, custom provider development\\n- **OpenTofu migration**: Terraform to OpenTofu migration strategies, compatibility considerations\\n\\n### Advanced Module Design\\n- **Module architecture**: Hierarchical module design, root modules, child modules\\n- **Composition patterns**: Module composition, dependency injection, interface segregation\\n- **Reusability**: Generic modules, environment-specific configurations, module registries\\n- **Testing**: Terratest, unit testing, integration testing, contract testing\\n- **Documentation**: Auto-generated documentation, examples, usage patterns\\n- **Versioning**: Semantic versioning, compatibility matrices, upgrade guides\\n\\n### State Management & Security\\n- **Backend configuration**: S3, Azure Storage, GCS, Terraform Cloud, Consul, etcd\\n- **State encryption**: Encryption at rest, encryption in transit, key management\\n- **State locking**: DynamoDB, Azure Storage, GCS, Redis locking mechanisms\\n- **State operations**: Import, move, remove, refresh, advanced state manipulation\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a Terraform module for an AWS EKS cluster with node groups and IAM roles\"\n  }\n]",
+          "label": "terraform-specialist",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "7e52c7c07884841708d93def5b6170d1bedeaf7b46ed9662534d20719317510c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a comprehensive Terraform module for an AWS EKS cluster with node groups and IAM roles. This module will follow best practices for security, scalability, and maintainability.\n\n## AWS EKS Cluster Module\n\n### Directory Structure\n```\nmodules/eks/\n├── main.tf\n├── variables.tf\n├── outputs.tf\n├── iam.tf\n├── node-groups.tf\n├── security.tf\n├── versions.tf\n└── README.md\n```\n\n### 1. `versions.tf` - Provider and Terraform Version Constraints\n```hcl\nterraform {\n  required_version = \">= 1.0.0\"\n  \n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \">= 5.0\"\n    }\n    kubernetes = {\n      source  = \"hashicorp/kubernetes\"\n      version = \">= 2.23\"\n    }\n    helm = {\n      source  = \"hashicorp/helm\"\n      version = \">= 2.11\"\n    }\n  }\n}\n```\n\n### 2. `variables.tf` - Input Variables\n```hcl\nvariable \"cluster_name\" {\n  description = \"Name of the EKS cluster\"\n  type        = string\n}\n\nvariable \"cluster_version\" {\n  description = \"Kubernetes version for the EKS cluster\"\n  type        = string\n  default     = \"1.28\"\n}\n\nvariable \"vpc_id\" {\n  description = \"VPC ID where the EKS cluster will be deployed\"\n  type        = string\n}\n\nvariable \"private_subnet_ids\" {\n  description = \"List of private subnet IDs for EKS cluster\"\n  type        = list(string)\n}\n\nvariable \"public_subnet_ids\" {\n  description = \"List of public subnet IDs for EKS cluster (for public load balancers)\"\n  type        = list(string)\n}\n\nvariable \"cluster_endpoint_public_access\" {\n  description = \"Whether the EKS cluster API server endpoint is publicly accessible\"\n  type        = bool\n  default     = false\n}\n\nvariable \"cluster_endpoint_private_access\" {\n  description = \"Whether the EKS cluster API server endpoint is privately accessible\"\n  type        = bool\n  default     = true\n}\n\nvariable \"enabled_cluster_log_types\" {\n  description = \"List of control plane logging types to enable\"\n  type        = list(string)\n  default     = [\"api\", \"audit\", \"authenticator\", \"controllerManager\", \"scheduler\"]\n}\n\nvariable \"cluster_additional_security_group_ids\" {\n  description = \"Additional security group IDs to attach to the cluster\"\n  type        = list(string)\n  default     = []\n}\n\n# Node Group Variables\nvariable \"node_groups\" {\n  description = \"Map of node group configurations\"\n  type = map(object({\n    instance_types      = list(string)\n    capacity_type       = string\n    min_size           = number\n    max_size           = number\n    desired_size       = number\n    disk_size          = number\n    ami_type           = string\n    labels             = map(string)\n    taints = list(object({\n      key    = string\n      value  = string\n      effect = string\n    }))\n    update_config = object({\n      max_unavailable_percentage = number\n    })\n    tags = map(string)\n  }))\n  default = {\n    main = {\n      instance_types      = [\"t3.medium\"]\n      capacity_type       = \"ON_DEMAND\"\n      min_size           = 1\n      max_size           = 3\n      desired_size       = 2\n      disk_size          = 20\n      ami_type           = \"AL2_x86_64\"\n      labels             = {}\n      taints             = []\n      update_config = {\n        max_unavailable_percentage = 33\n      }\n      tags = {}\n    }\n  }\n}\n\nvariable \"tags\" {\n  description = \"Tags to apply to all resources\"\n  type        = map(string)\n  default     = {}\n}\n\nvariable \"enable_irsa\" {\n  description = \"Enable IAM Roles for Service Accounts\"\n  type        = bool\n  default     = true\n}\n\nvariable \"create_aws_auth_configmap\" {\n  description = \"Create aws-auth configmap for cluster access\"\n  type        = bool\n  default     = true\n}\n\nvariable \"map_users\" {\n  description = \"Additional IAM users to add to the aws-auth configmap\"\n  type = list(object({\n    userarn  = string\n    username = string\n    groups   = list(string)\n  }))\n  default = []\n}\n\nvariable \"map_roles\" {\n  description = \"Additional IAM roles to add to the aws-auth configmap\"\n  type = list(object({\n    rolearn  = string\n    username = string\n    groups   = list(string)\n  }))\n  default = []\n}\n\nvariable \"enable_cluster_autoscaler\" {\n  description = \"Enable cluster autoscaler addon\"\n  type        = bool\n  default     = true\n}\n\nvariable \"enable_aws_load_balancer_controller\" {\n  description = \"Enable AWS Load Balancer Controller\"\n  type        = bool\n  default     = true\n}\n\nvariable \"enable_external_dns\" {\n  description = \"Enable External DNS addon\"\n  type        = bool\n  default     = false\n}\n```\n\n### 3. `iam.tf` - IAM Roles and Policies\n```hcl\n# IAM Role for EKS Cluster\nresource \"aws_iam_role\" \"cluster\" {\n  name = \"${var.cluster_name}-cluster-role\"\n\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Action = \"sts:AssumeRole\"\n        Effect = \"Allow\"\n        Principal = {\n          Service = \"eks.amazonaws.com\"\n        }\n      }\n    ]\n  })\n\n  tags = merge(var.tags, {\n    Name = \"${var.cluster_name}-cluster-role\"\n  })\n}\n\nresource \"aws_iam_role_policy_attachment\" \"cluster_AmazonEKSClusterPolicy\" {\n  policy_arn = \"arn:aws:iam::aws:policy/AmazonEKSClusterPolicy\"\n  role       = aws_iam_role.cluster.name\n}\n\nresource \"aws_iam_role_policy_attachment\" \"cluster_AmazonEKSVPCResourceController\" {\n  policy_arn = \"arn:aws:iam::aws:policy/AmazonEKSVPCResourceController\"\n  role       = aws_iam_role.cluster.name\n}\n\n# IAM Role for Node Groups\nresource \"aws_iam_role\" \"node_group\" {\n  for_each = var.node_groups\n\n  name = \"${var.cluster_name}-${each.key}-node-role\"\n\n  assume_role_policy = jsonencode({\n    Version = \"2012-10-17\"\n    Statement = [\n      {\n        Action = \"sts:AssumeRole\"\n        Effect = \"Allow\"\n       ",
+          "tokenUsage": {
+            "total": 1914,
+            "prompt": 414,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 438,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:51:12 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 99c686fc9c9d4a98b7d399cdb556c932.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "DK7ZPuC187VKbgp07TV_YLkVwri2sPBaXnXzma5WZyOCh0HhXfjgmg==",
+                "x-amz-cf-pop": "IAH50-P4",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "b08f4999547995f9884770a2a987a4ed"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Write a Terraform module for an AWS EKS cluster with node groups and IAM roles",
+          "vars": {
+            "task": "Write a Terraform module for an AWS EKS cluster with node groups and IAM roles"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Proper Terraform module structure, uses variables/outputs, IAM IRSA pattern, EKS managed node groups",
+              "threshold": 0.7,
+              "metric": "terraform-specialist_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Write a Terraform module for an AWS EKS cluster with node groups and IAM roles"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:51:12 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 99c686fc9c9d4a98b7d399cdb556c932.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "DK7ZPuC187VKbgp07TV_YLkVwri2sPBaXnXzma5WZyOCh0HhXfjgmg==",
+              "x-amz-cf-pop": "IAH50-P4",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "b08f4999547995f9884770a2a987a4ed"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 414,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1914,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1802,
+          "prompt": 1696,
+          "completion": 106,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 68577,
+      "evaluationDurationMs": 68577
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: terraform-specialist",
+    "prompts": [
+      {
+        "label": "terraform-specialist",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a Terraform/OpenTofu specialist focused on advanced infrastructure automation, state management, and modern IaC practices.\\n\\n## Purpose\\nExpert Infrastructure as Code specialist with comprehensive knowledge of Terraform, OpenTofu, and modern IaC ecosystems. Masters advanced module design, state management, provider development, and enterprise-scale infrastructure automation. Specializes in GitOps workflows, policy as code, and complex multi-cloud deployments.\\n\\n## Capabilities\\n\\n### Terraform/OpenTofu Expertise\\n- **Core concepts**: Resources, data sources, variables, outputs, locals, expressions\\n- **Advanced features**: Dynamic blocks, for_each loops, conditional expressions, complex type constraints\\n- **State management**: Remote backends, state locking, state encryption, workspace strategies\\n- **Module development**: Composition patterns, versioning strategies, testing frameworks\\n- **Provider ecosystem**: Official and community providers, custom provider development\\n- **OpenTofu migration**: Terraform to OpenTofu migration strategies, compatibility considerations\\n\\n### Advanced Module Design\\n- **Module architecture**: Hierarchical module design, root modules, child modules\\n- **Composition patterns**: Module composition, dependency injection, interface segregation\\n- **Reusability**: Generic modules, environment-specific configurations, module registries\\n- **Testing**: Terratest, unit testing, integration testing, contract testing\\n- **Documentation**: Auto-generated documentation, examples, usage patterns\\n- **Versioning**: Semantic versioning, compatibility matrices, upgrade guides\\n\\n### State Management & Security\\n- **Backend configuration**: S3, Azure Storage, GCS, Terraform Cloud, Consul, etcd\\n- **State encryption**: Encryption at rest, encryption in transit, key management\\n- **State locking**: DynamoDB, Azure Storage, GCS, Redis locking mechanisms\\n- **State operations**: Import, move, remove, refresh, advanced state manipulation\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Write a Terraform module for an AWS EKS cluster with node groups and IAM roles",
+        "vars": {
+          "task": "Write a Terraform module for an AWS EKS cluster with node groups and IAM roles"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Proper Terraform module structure, uses variables/outputs, IAM IRSA pattern, EKS managed node groups",
+            "threshold": 0.7,
+            "metric": "terraform-specialist_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-terraform-specialist.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:52:21.174Z",
+    "evaluationCreatedAt": "2026-03-15T04:51:12.537Z"
+  }
+}

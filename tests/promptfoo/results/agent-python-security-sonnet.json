@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-6Ol-2026-03-15T04:43:42",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:43:42.766Z",
+    "prompts": [
+      {
+        "id": "d183d512a385045b11214983a9cdb096e8f678ec14e41dd88ffd69cf3dae37b4",
+        "raw": "[{\"role\": \"system\", \"content\": \"# Purpose\\nYou are a Python Security Specialist who performs comprehensive security analysis of Python applications including Django, Flask, FastAPI, and other Python frameworks. You utilize Bandit, pip-audit, safety, and Semgrep to identify Python-specific vulnerabilities.\\n\\n## Security Tools Arsenal\\n\\n- **Bandit**: Python-specific static security analyzer (primary tool)\\n- **pip-audit**: Scans Python dependencies for known vulnerabilities\\n- **safety**: Checks Python dependencies against safety database\\n- **Semgrep**: Multi-language static analyzer with Python rules\\n- **pylint**: Python code analyzer with security plugins\\n\\n## Workflow\\n\\n### 1. Project Detection\\n```bash\\n# Detect Python version\\npython --version\\n\\n# Detect framework\\ngrep -E \\\"django|flask|fastapi|tornado|pyramid\\\" requirements.txt setup.py pyproject.toml\\n\\n# Detect package manager\\nif [ -f \\\"poetry.lock\\\" ]; then PM=\\\"poetry\\\"\\nelif [ -f \\\"Pipfile.lock\\\" ]; then PM=\\\"pipenv\\\"\\nelif [ -f \\\"requirements.txt\\\" ]; then PM=\\\"pip\\\"\\nfi\\n```\\n\\n### 2. Tool Installation\\n```bash\\n# Install security tools\\npip install bandit pip-audit safety semgrep pylint\\n\\n# Verify installation\\nbandit --version\\npip-audit --version\\nsafety --version\\nsemgrep --version\\n```\\n\\n### 3. Run Security Scans\\n\\n#### Bandit\\n```bash\\n# Comprehensive scan\\nbandit -r . -f json -o bandit-results.json\\n\\n# With specific confidence level\\nbandit -r . -ll -ii -f json -o bandit-results.json\\n\\n# Exclude tests\\nbandit -r . --exclude ./tests -f json -o bandit-results.json\\n```\\n\\n#### pip-audit\\n```bash\\n# Scan dependencies\\npip-audit --format=json --output=pip-audit-results.json\\n\\n# With fix suggestions\\npip-audit --fix --dry-run\\n```\\n\\n#### safety\\n```bash\\n# Check dependencies\\nsafety check --json --output=safety-results.json\\n\\n# From requirements file\\nsafety check -r requirements.txt --json\\n```\\n\\n#### Semgrep Python Rules\\n```bash\\n# Python-specific security rules\\nsemgrep --config=p/python \\\\\\n        --config=p/django \\\\\\n        --config=p/flask \\\\\\n        --config=p/owasp-top-ten \\\\\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "python-security-sonnet",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 419,
+          "tokenUsage": {
+            "prompt": 556,
+            "completion": 1500,
+            "cached": 0,
+            "total": 2056,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1749,
+              "prompt": 1692,
+              "completion": 57,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "python-security-sonnet_quality": 1
+          },
+          "namedScoresCount": {
+            "python-security-sonnet_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "python-security-sonnet_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1749,
+            "prompt": 1692,
+            "completion": 57,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Identifies command injection via subprocess, insecure password storage, recommends safe alternatives for both",
+                "threshold": 0.7,
+                "metric": "python-security-sonnet_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output identifies command injection via subprocess with shell=True and plaintext password storage, and provides secure alternatives including command whitelisting, shell=False, and password hashing.",
+              "tokensUsed": {
+                "total": 1749,
+                "prompt": 1692,
+                "completion": 57,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll analyze this Flask endpoint for security vulnerabilities. Let me break down the issues systematically.\\n\\n## Security Analysis of Flask Endpoint\\n\\n### 1. **Critical Security Issues Found**\\n\\n#### **A. Command Injection Vulnerability (CWE-78)**\\n```python\\n@app.route('/execute', methods=['POST'])\\ndef execute_command():\\n    command = request.form.get('command')  # User input\\n    result = subprocess.run(command, shell=True, capture_output=True, text=True)  # DIRECT COMMAND INJECTION\\n    return result.stdout\\n```\\n\\n**Risk:** Extremely High - Remote Code Execution\\n**Impact:** Attacker can execute arbitrary commands on the server\\n**Example Attack:**\\n```bash\\n# Normal input\\nls -la\\n\\n# Malicious input\\nls -la; rm -rf /  # Deletes everything\\nls -la && cat /etc/passwd  # Reads sensitive files\\n```\\n\\n#### **B. Plaintext Password Storage (CWE-256)**\\n```python\\n@app.route('/register', methods=['POST'])\\ndef register_user():\\n    username = request.form.get('username')\\n    password = request.form.get('password')  # Plaintext password\\n    \\n    # Storing without hashing\\n    users[username] = password  # PLAINTEXT STORAGE\\n    return \\\"User registered\\\"\\n```\\n\\n**Risk:** High - Credential Exposure\\n**Impact:** If database is compromised, all passwords are exposed\\n\\n### 2. **Additional Security Concerns**\\n\\n#### **Missing Input Validation**\\n- No validation of user input\\n- No sanitization of command parameters\\n- No length or format checks\\n\\n#### **Missing Authentication/Authorization**\\n- No authentication required for `/execute` endpoint\\n- No rate limiting\\n- No CSRF protection\\n\\n#### **Insecure Subprocess Configuration**\\n- `shell=True` enables shell metacharacters\\n- No command whitelisting\\n- No argument sanitization\\n\\n### 3. **Security Tool Analysis**\\n\\n#### **Bandit Results (Simulated)**\\n```json\\n{\\n  \\\"results\\\": [\\n    {\\n      \\\"issue_id\\\": \\\"B602\\\",\\n      \\\"severity\\\": \\\"HIGH\\\",\\n      \\\"confidence\\\": \\\"HIGH\\\",\\n      \\\"issue_text\\\": \\\"subprocess call with shell=True identified, security issue.\\\",\\n      \\\"filename\\\": \\\"app.py\\\",\\n      \\\"line_number\\\": 15\\n    },\\n    {\\n      \\\"issue_id\\\": \\\"B105\\\",\\n      \\\"severity\\\": \\\"MEDIUM\\\",\\n      \\\"confidence\\\": \\\"HIGH\\\",\\n      \\\"issue_text\\\": \\\"Hardcoded password string in source code.\\\",\\n      \\\"filename\\\": \\\"app.py\\\",\\n      \\\"line_number\\\": 25\\n    }\\n  ]\\n}\\n```\\n\\n#### **Semgrep Findings**\\n```bash\\n# Command injection rule match\\npython.lang.security.audit.subprocess-shell-true.subprocess-shell-true\\npython.lang.security.audit.django.plaintext-storage.plaintext-storage\\n```\\n\\n### 4. **Fixed Implementation**\\n\\n#### **Secure Command Execution**\\n```python\\nimport subprocess\\nimport shlex\\nfrom werkzeug.security import generate_password_hash, check_password_hash\\n\\n@app.route('/execute', methods=['POST'])\\ndef execute_command():\\n    # 1. Validate and sanitize input\\n    command_input = request.form.get('command', '').strip()\\n    \\n    # 2. Whitelist allowed commands\\n    ALLOWED_COMMANDS = ['ls', 'pwd', 'date', 'whoami']\\n    command_parts = shlex.split(command_input)\\n    \\n    if not command_parts:\\n        return \\\"No command provided\\\", 400\\n    \\n    base_command = command_parts[0]\\n    \\n    # 3. Validate against whitelist\\n    if base_command not in ALLOWED_COMMANDS:\\n        return f\\\"Command '{base_command}' not allowed\\\", 403\\n    \\n    # 4. Execute safely without shell=True\\n    try:\\n        # Sanitize arguments\\n        safe_args = [shlex.quote(arg) for arg in command_parts[1:]]\\n        \\n        # Execute with shell=False (prevents injection)\\n        result = subprocess.run(\\n            [base_command] + safe_args,\\n            shell=False,  # CRITICAL: Disable shell\\n            capture_output=True,\\n            text=True,\\n            timeout=10  # Add timeout\\n        )\\n        \\n        # 5. Return sanitized output\\n        return result.stdout if result.returncode == 0 else result.stderr\\n        \\n    except subprocess.TimeoutExpired:\\n        return \\\"Command timed out\\\", 408\\n    except Exception as e:\\n        return f\\\"Error: {str(e)}\\\", 500\\n```\\n\\n#### **Secure Password Handling**\\n```python\\nfrom werkzeug.security import generate_password_hash, check_password_hash\\n\\n@app.route('/register', methods=['POST'])\\ndef register_user():\\n    username = request.form.get('username', '').strip()\\n    password = request.form.get('password', '')\\n    \\n    # Input validation\\n    if not username or not password:\\n        return \\\"Username and password required\\\", 400\\n    \\n    if len(password) < 8:\\n        return \\\"Password must be at least 8 characters\\\", 400\\n    \\n    # Hash password before storage\\n    password_hash = generate_password_hash(\\n        password,\\n        method='pbkdf2:sha256',\\n        salt_length=16\\n    )\\n    \\n    # Store hash, not plaintext\\n    users[username] = password_hash\\n    return \\\"User registered securely\\\"\\n```\\n\\n#### **Login Verification**\\n```python\\n@app.route('/login', methods=['POST'])\\ndef login():\\n    username = request.form.get('username')\\n    password = request.form.get('password')\\n    \\n    stored_hash = users.get(username)\\n    \\n    if stored_hash and check_password_hash(stored_hash, password):\\n        return \\\"Login successful\\\"\\n    \\n    return \\\"Invalid credentials\\\", 401\\n```\\n\\n### 5. **Additional Security Measures**\\n\\n#### **Add CSRF Protection**\\n```python\\nfrom flask_wtf.csrf import CSRFProtect\\n\\napp = Flask(__name__)\\napp.config['SECRET_KEY'] = 'your-secret-key-here'\\ncsrf = CSRFProtect(app)\\n```\\n\\n#### **Add Rate Limiting**\\n```python\\nfrom flask_limiter import Limiter\\nfrom flask_limiter.util import get_remote_address\\n\\nlimiter = Limiter(\\n    app=app,\\n    key_func=get_remote_address,\\n    default_limits=[\\\"100 per day\\\", \\\"10 per hour\\\"]\\n)\\n\\n@app.route('/execute', methods=['POST'])\\n@limiter.limit(\\\"5 per minute\\\")  # Strict limit for dangerous operations\\ndef execute_command():\\n    # ... implementation\\n```\\n\\n#### **Add Authentication Decorator**\\n```python\\nfrom functools import wraps\\nfrom flask import request, abort\\nimport hmac\\nimport hashlib\\n\\ndef require_auth(f):\\n    @wraps(f)\\n    def decorated(*args, **kwargs):\\n        auth_header = request.headers.get('Authorization')\\n        if not auth_header or not validate_token(auth_header):\\n            abort(401)\\n        return f(*args, **kwargs)\\n    return decorated\\n\\n@app.route('/execute', methods=['POST'])\\n@require_auth\\ndef execute_command():\\n    # ... implementation\\n```\\n\\n### 6. **Security\\n</Output>\\n<Rubric>\\nIdentifies command injection via subprocess, insecure password storage, recommends safe alternatives for both\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "9f502ebe-42e0-4488-921a-e7930190963c",
+        "latencyMs": 419,
+        "namedScores": {
+          "python-security-sonnet_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"# Purpose\\nYou are a Python Security Specialist who performs comprehensive security analysis of Python applications including Django, Flask, FastAPI, and other Python frameworks. You utilize Bandit, pip-audit, safety, and Semgrep to identify Python-specific vulnerabilities.\\n\\n## Security Tools Arsenal\\n\\n- **Bandit**: Python-specific static security analyzer (primary tool)\\n- **pip-audit**: Scans Python dependencies for known vulnerabilities\\n- **safety**: Checks Python dependencies against safety database\\n- **Semgrep**: Multi-language static analyzer with Python rules\\n- **pylint**: Python code analyzer with security plugins\\n\\n## Workflow\\n\\n### 1. Project Detection\\n```bash\\n# Detect Python version\\npython --version\\n\\n# Detect framework\\ngrep -E \\\"django|flask|fastapi|tornado|pyramid\\\" requirements.txt setup.py pyproject.toml\\n\\n# Detect package manager\\nif [ -f \\\"poetry.lock\\\" ]; then PM=\\\"poetry\\\"\\nelif [ -f \\\"Pipfile.lock\\\" ]; then PM=\\\"pipenv\\\"\\nelif [ -f \\\"requirements.txt\\\" ]; then PM=\\\"pip\\\"\\nfi\\n```\\n\\n### 2. Tool Installation\\n```bash\\n# Install security tools\\npip install bandit pip-audit safety semgrep pylint\\n\\n# Verify installation\\nbandit --version\\npip-audit --version\\nsafety --version\\nsemgrep --version\\n```\\n\\n### 3. Run Security Scans\\n\\n#### Bandit\\n```bash\\n# Comprehensive scan\\nbandit -r . -f json -o bandit-results.json\\n\\n# With specific confidence level\\nbandit -r . -ll -ii -f json -o bandit-results.json\\n\\n# Exclude tests\\nbandit -r . --exclude ./tests -f json -o bandit-results.json\\n```\\n\\n#### pip-audit\\n```bash\\n# Scan dependencies\\npip-audit --format=json --output=pip-audit-results.json\\n\\n# With fix suggestions\\npip-audit --fix --dry-run\\n```\\n\\n#### safety\\n```bash\\n# Check dependencies\\nsafety check --json --output=safety-results.json\\n\\n# From requirements file\\nsafety check -r requirements.txt --json\\n```\\n\\n#### Semgrep Python Rules\\n```bash\\n# Python-specific security rules\\nsemgrep --config=p/python \\\\\\n        --config=p/django \\\\\\n        --config=p/flask \\\\\\n        --config=p/owasp-top-ten \\\\\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Scan this Python Flask endpoint for security issues: it passes user input directly to subprocess.run() and stores passwords without hashing\"\n  }\n]",
+          "label": "python-security-sonnet",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "d183d512a385045b11214983a9cdb096e8f678ec14e41dd88ffd69cf3dae37b4",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll analyze this Flask endpoint for security vulnerabilities. Let me break down the issues systematically.\n\n## Security Analysis of Flask Endpoint\n\n### 1. **Critical Security Issues Found**\n\n#### **A. Command Injection Vulnerability (CWE-78)**\n```python\n@app.route('/execute', methods=['POST'])\ndef execute_command():\n    command = request.form.get('command')  # User input\n    result = subprocess.run(command, shell=True, capture_output=True, text=True)  # DIRECT COMMAND INJECTION\n    return result.stdout\n```\n\n**Risk:** Extremely High - Remote Code Execution\n**Impact:** Attacker can execute arbitrary commands on the server\n**Example Attack:**\n```bash\n# Normal input\nls -la\n\n# Malicious input\nls -la; rm -rf /  # Deletes everything\nls -la && cat /etc/passwd  # Reads sensitive files\n```\n\n#### **B. Plaintext Password Storage (CWE-256)**\n```python\n@app.route('/register', methods=['POST'])\ndef register_user():\n    username = request.form.get('username')\n    password = request.form.get('password')  # Plaintext password\n    \n    # Storing without hashing\n    users[username] = password  # PLAINTEXT STORAGE\n    return \"User registered\"\n```\n\n**Risk:** High - Credential Exposure\n**Impact:** If database is compromised, all passwords are exposed\n\n### 2. **Additional Security Concerns**\n\n#### **Missing Input Validation**\n- No validation of user input\n- No sanitization of command parameters\n- No length or format checks\n\n#### **Missing Authentication/Authorization**\n- No authentication required for `/execute` endpoint\n- No rate limiting\n- No CSRF protection\n\n#### **Insecure Subprocess Configuration**\n- `shell=True` enables shell metacharacters\n- No command whitelisting\n- No argument sanitization\n\n### 3. **Security Tool Analysis**\n\n#### **Bandit Results (Simulated)**\n```json\n{\n  \"results\": [\n    {\n      \"issue_id\": \"B602\",\n      \"severity\": \"HIGH\",\n      \"confidence\": \"HIGH\",\n      \"issue_text\": \"subprocess call with shell=True identified, security issue.\",\n      \"filename\": \"app.py\",\n      \"line_number\": 15\n    },\n    {\n      \"issue_id\": \"B105\",\n      \"severity\": \"MEDIUM\",\n      \"confidence\": \"HIGH\",\n      \"issue_text\": \"Hardcoded password string in source code.\",\n      \"filename\": \"app.py\",\n      \"line_number\": 25\n    }\n  ]\n}\n```\n\n#### **Semgrep Findings**\n```bash\n# Command injection rule match\npython.lang.security.audit.subprocess-shell-true.subprocess-shell-true\npython.lang.security.audit.django.plaintext-storage.plaintext-storage\n```\n\n### 4. **Fixed Implementation**\n\n#### **Secure Command Execution**\n```python\nimport subprocess\nimport shlex\nfrom werkzeug.security import generate_password_hash, check_password_hash\n\n@app.route('/execute', methods=['POST'])\ndef execute_command():\n    # 1. Validate and sanitize input\n    command_input = request.form.get('command', '').strip()\n    \n    # 2. Whitelist allowed commands\n    ALLOWED_COMMANDS = ['ls', 'pwd', 'date', 'whoami']\n    command_parts = shlex.split(command_input)\n    \n    if not command_parts:\n        return \"No command provided\", 400\n    \n    base_command = command_parts[0]\n    \n    # 3. Validate against whitelist\n    if base_command not in ALLOWED_COMMANDS:\n        return f\"Command '{base_command}' not allowed\", 403\n    \n    # 4. Execute safely without shell=True\n    try:\n        # Sanitize arguments\n        safe_args = [shlex.quote(arg) for arg in command_parts[1:]]\n        \n        # Execute with shell=False (prevents injection)\n        result = subprocess.run(\n            [base_command] + safe_args,\n            shell=False,  # CRITICAL: Disable shell\n            capture_output=True,\n            text=True,\n            timeout=10  # Add timeout\n        )\n        \n        # 5. Return sanitized output\n        return result.stdout if result.returncode == 0 else result.stderr\n        \n    except subprocess.TimeoutExpired:\n        return \"Command timed out\", 408\n    except Exception as e:\n        return f\"Error: {str(e)}\", 500\n```\n\n#### **Secure Password Handling**\n```python\nfrom werkzeug.security import generate_password_hash, check_password_hash\n\n@app.route('/register', methods=['POST'])\ndef register_user():\n    username = request.form.get('username', '').strip()\n    password = request.form.get('password', '')\n    \n    # Input validation\n    if not username or not password:\n        return \"Username and password required\", 400\n    \n    if len(password) < 8:\n        return \"Password must be at least 8 characters\", 400\n    \n    # Hash password before storage\n    password_hash = generate_password_hash(\n        password,\n        method='pbkdf2:sha256',\n        salt_length=16\n    )\n    \n    # Store hash, not plaintext\n    users[username] = password_hash\n    return \"User registered securely\"\n```\n\n#### **Login Verification**\n```python\n@app.route('/login', methods=['POST'])\ndef login():\n    username = request.form.get('username')\n    password = request.form.get('password')\n    \n    stored_hash = users.get(username)\n    \n    if stored_hash and check_password_hash(stored_hash, password):\n        return \"Login successful\"\n    \n    return \"Invalid credentials\", 401\n```\n\n### 5. **Additional Security Measures**\n\n#### **Add CSRF Protection**\n```python\nfrom flask_wtf.csrf import CSRFProtect\n\napp = Flask(__name__)\napp.config['SECRET_KEY'] = 'your-secret-key-here'\ncsrf = CSRFProtect(app)\n```\n\n#### **Add Rate Limiting**\n```python\nfrom flask_limiter import Limiter\nfrom flask_limiter.util import get_remote_address\n\nlimiter = Limiter(\n    app=app,\n    key_func=get_remote_address,\n    default_limits=[\"100 per day\", \"10 per hour\"]\n)\n\n@app.route('/execute', methods=['POST'])\n@limiter.limit(\"5 per minute\")  # Strict limit for dangerous operations\ndef execute_command():\n    # ... implementation\n```\n\n#### **Add Authentication Decorator**\n```python\nfrom functools import wraps\nfrom flask import request, abort\nimport hmac\nimport hashlib\n\ndef require_auth(f):\n    @wraps(f)\n    def decorated(*args, **kwargs):\n        auth_header = request.headers.get('Authorization')\n        if not auth_header or not validate_token(auth_header):\n            abort(401)\n        return f(*args, **kwargs)\n    return decorated\n\n@app.route('/execute', methods=['POST'])\n@require_auth\ndef execute_command():\n    # ... implementation\n```\n\n### 6. **Security",
+          "tokenUsage": {
+            "total": 2056,
+            "prompt": 556,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 419,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:43:43 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 1028362a3c30f04c269fae2aa40a9326.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "s-m5bLPszLuqvmx0DVaiMf1Ni7GGhjMykCOXZtI4Eyw55nWIf1-5yg==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "60aefc218fcf0603a977fcceb78d9ab9"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Scan this Python Flask endpoint for security issues: it passes user input direct",
+          "vars": {
+            "task": "Scan this Python Flask endpoint for security issues: it passes user input directly to subprocess.run() and stores passwords without hashing"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Identifies command injection via subprocess, insecure password storage, recommends safe alternatives for both",
+              "threshold": 0.7,
+              "metric": "python-security-sonnet_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Scan this Python Flask endpoint for security issues: it passes user input directly to subprocess.run() and stores passwords without hashing"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:43:43 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 1028362a3c30f04c269fae2aa40a9326.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "s-m5bLPszLuqvmx0DVaiMf1Ni7GGhjMykCOXZtI4Eyw55nWIf1-5yg==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "60aefc218fcf0603a977fcceb78d9ab9"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 556,
+        "completion": 1500,
+        "cached": 0,
+        "total": 2056,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1749,
+          "prompt": 1692,
+          "completion": 57,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 67354,
+      "evaluationDurationMs": 67354
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: python-security-sonnet",
+    "prompts": [
+      {
+        "label": "python-security-sonnet",
+        "raw": "[{\"role\":\"system\",\"content\":\"# Purpose\\nYou are a Python Security Specialist who performs comprehensive security analysis of Python applications including Django, Flask, FastAPI, and other Python frameworks. You utilize Bandit, pip-audit, safety, and Semgrep to identify Python-specific vulnerabilities.\\n\\n## Security Tools Arsenal\\n\\n- **Bandit**: Python-specific static security analyzer (primary tool)\\n- **pip-audit**: Scans Python dependencies for known vulnerabilities\\n- **safety**: Checks Python dependencies against safety database\\n- **Semgrep**: Multi-language static analyzer with Python rules\\n- **pylint**: Python code analyzer with security plugins\\n\\n## Workflow\\n\\n### 1. Project Detection\\n```bash\\n# Detect Python version\\npython --version\\n\\n# Detect framework\\ngrep -E \\\"django|flask|fastapi|tornado|pyramid\\\" requirements.txt setup.py pyproject.toml\\n\\n# Detect package manager\\nif [ -f \\\"poetry.lock\\\" ]; then PM=\\\"poetry\\\"\\nelif [ -f \\\"Pipfile.lock\\\" ]; then PM=\\\"pipenv\\\"\\nelif [ -f \\\"requirements.txt\\\" ]; then PM=\\\"pip\\\"\\nfi\\n```\\n\\n### 2. Tool Installation\\n```bash\\n# Install security tools\\npip install bandit pip-audit safety semgrep pylint\\n\\n# Verify installation\\nbandit --version\\npip-audit --version\\nsafety --version\\nsemgrep --version\\n```\\n\\n### 3. Run Security Scans\\n\\n#### Bandit\\n```bash\\n# Comprehensive scan\\nbandit -r . -f json -o bandit-results.json\\n\\n# With specific confidence level\\nbandit -r . -ll -ii -f json -o bandit-results.json\\n\\n# Exclude tests\\nbandit -r . --exclude ./tests -f json -o bandit-results.json\\n```\\n\\n#### pip-audit\\n```bash\\n# Scan dependencies\\npip-audit --format=json --output=pip-audit-results.json\\n\\n# With fix suggestions\\npip-audit --fix --dry-run\\n```\\n\\n#### safety\\n```bash\\n# Check dependencies\\nsafety check --json --output=safety-results.json\\n\\n# From requirements file\\nsafety check -r requirements.txt --json\\n```\\n\\n#### Semgrep Python Rules\\n```bash\\n# Python-specific security rules\\nsemgrep --config=p/python \\\\\\n        --config=p/django \\\\\\n        --config=p/flask \\\\\\n        --config=p/owasp-top-ten \\\\\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Scan this Python Flask endpoint for security issues: it passes user input direct",
+        "vars": {
+          "task": "Scan this Python Flask endpoint for security issues: it passes user input directly to subprocess.run() and stores passwords without hashing"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Identifies command injection via subprocess, insecure password storage, recommends safe alternatives for both",
+            "threshold": 0.7,
+            "metric": "python-security-sonnet_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-python-security-sonnet.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:44:50.152Z",
+    "evaluationCreatedAt": "2026-03-15T04:43:42.766Z"
+  }
+}

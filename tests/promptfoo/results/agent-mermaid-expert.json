@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-QNq-2026-03-15T04:39:03",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:39:03.495Z",
+    "prompts": [
+      {
+        "id": "844ccd54b8c2007d7559da17a65467044d777295b58d5679c177a3f283f9b454",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a Mermaid diagram expert specializing in clear, professional visualizations.\\n\\n## Focus Areas\\n- Flowcharts and decision trees\\n- Sequence diagrams for APIs/interactions\\n- Entity Relationship Diagrams (ERD)\\n- State diagrams and user journeys\\n- Gantt charts for project timelines\\n- Architecture and network diagrams\\n\\n## Diagram Types Expertise\\n```\\ngraph (flowchart), sequenceDiagram, classDiagram, \\nstateDiagram-v2, erDiagram, gantt, pie, \\ngitGraph, journey, quadrantChart, timeline\\n```\\n\\n## Approach\\n1. Choose the right diagram type for the data\\n2. Keep diagrams readable - avoid overcrowding\\n3. Use consistent styling and colors\\n4. Add meaningful labels and descriptions\\n5. Test rendering before delivery\\n\\n## Output\\n- Complete Mermaid diagram code\\n- Rendering instructions/preview\\n- Alternative diagram options\\n- Styling customizations\\n- Accessibility considerations\\n- Export recommendations\\n\\nAlways provide both basic and styled versions. Include comments explaining complex syntax.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "mermaid-expert",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 629,
+          "tokenUsage": {
+            "prompt": 225,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1725,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1764,
+              "prompt": 1696,
+              "completion": 68,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "mermaid-expert_quality": 1
+          },
+          "namedScoresCount": {
+            "mermaid-expert_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "mermaid-expert_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1764,
+            "prompt": 1696,
+            "completion": 68,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Valid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout",
+                "threshold": 0.7,
+                "metric": "mermaid-expert_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output contains multiple Mermaid diagrams with valid syntax that collectively cover login, token issuance, API request with bearer token, refresh flow, and logout. The sequence diagrams explicitly show these steps, and the alternative diagrams reinforce the coverage.",
+              "tokensUsed": {
+                "total": 1764,
+                "prompt": 1696,
+                "completion": 68,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive Mermaid sequence diagram for a JWT authentication flow with refresh tokens, including both basic and styled versions.\\n\\n## JWT Authentication Flow with Refresh Tokens\\n\\n### Basic Version (Clean and Simple)\\n\\n```mermaid\\nsequenceDiagram\\n    participant U as User/Client\\n    participant A as Auth Server\\n    participant R as Resource Server/API\\n    participant DB as Database\\n\\n    Note over U,A: Initial Authentication\\n    U->>A: POST /login (credentials)\\n    A->>DB: Validate credentials\\n    DB-->>A: User data\\n    A->>A: Generate Access Token (short-lived)\\n    A->>A: Generate Refresh Token (long-lived)\\n    A->>DB: Store refresh token hash\\n    A-->>U: Return {access_token, refresh_token, expires_in}\\n    \\n    Note over U,R: Access Protected Resource\\n    U->>R: GET /protected (with access_token)\\n    R->>R: Validate access_token signature & expiry\\n    R-->>U: Return protected data\\n    \\n    Note over U,R: Access Token Expired\\n    U->>R: GET /protected (with expired access_token)\\n    R-->>U: 401 Unauthorized (token expired)\\n    \\n    Note over U,A: Refresh Token Flow\\n    U->>A: POST /refresh (with refresh_token)\\n    A->>DB: Validate refresh_token (check hash & expiry)\\n    DB-->>A: Valid token\\n    A->>A: Generate new access_token\\n    A->>DB: Invalidate old refresh_token (optional)\\n    A->>DB: Store new refresh_token hash (optional rotation)\\n    A-->>U: Return new {access_token, refresh_token, expires_in}\\n    \\n    Note over U,R: Retry with New Token\\n    U->>R: GET /protected (with new access_token)\\n    R->>R: Validate new access_token\\n    R-->>U: Return protected data\\n    \\n    Note over U,A: Logout/Token Revocation\\n    U->>A: POST /logout (with refresh_token)\\n    A->>DB: Delete/invalidate refresh_token\\n    A-->>U: 200 OK (logged out)\\n```\\n\\n### Styled Version (Enhanced Readability)\\n\\n```mermaid\\nsequenceDiagram\\n    box rgba(240, 248, 255, 0.8) Client Side\\n    participant U as User/Client\\n    end\\n    box rgba(255, 245, 245, 0.8) Authentication\\n    participant A as Auth Server\\n    participant DB as Token Database\\n    end\\n    box rgba(245, 255, 245, 0.8) Resources\\n    participant R as Resource Server\\n    end\\n\\n    %% Initial Authentication\\n    rect rgb(240, 248, 255)\\n        Note over U,A: 1. Initial Authentication\\n        U->>A: POST /login<br/>username & password\\n        A->>DB: Query: Validate user credentials\\n        DB-->>A: ✓ User authenticated\\n        A->>A: Generate JWT (access_token: 15min)\\n        A->>A: Generate refresh_token (7 days)\\n        A->>DB: Store refresh_token hash<br/>(user_id, token_hash, expires_at)\\n        A-->>U: Response:<br/>{<br/>  \\\"access_token\\\": \\\"jwt.xyz...\\\",<br/>  \\\"refresh_token\\\": \\\"rt_abc...\\\",<br/>  \\\"expires_in\\\": 900<br/>}\\n    end\\n\\n    %% Access Protected Resource\\n    rect rgb(245, 255, 245)\\n        Note over U,R: 2. Access Protected Resource\\n        U->>R: GET /api/protected<br/>Header: Authorization: Bearer {access_token}\\n        R->>R: Verify:<br/>- Signature valid<br/>- Not expired<br/>- Claims match\\n        R-->>U: 200 OK<br/>{ \\\"data\\\": \\\"protected content\\\" }\\n    end\\n\\n    %% Token Expiration\\n    rect rgb(255, 250, 240)\\n        Note over U,R: 3. Access Token Expired\\n        U->>R: GET /api/protected<br/>(with expired token)\\n        R->>R: Token expired!\\n        R-->>U: 401 Unauthorized<br/>{ \\\"error\\\": \\\"token_expired\\\" }\\n    end\\n\\n    %% Refresh Token Flow\\n    rect rgb(255, 245, 245)\\n        Note over U,A: 4. Refresh Token Flow\\n        U->>A: POST /api/refresh<br/>{ \\\"refresh_token\\\": \\\"rt_abc...\\\" }\\n        A->>DB: Validate refresh_token:<br/>- Find by hash<br/>- Check expiry<br/>- Check revocation\\n        DB-->>A: ✓ Token valid\\n        A->>A: Generate new access_token\\n        A->>DB: Optional: Rotate refresh_token<br/>(invalidate old, store new)\\n        A-->>U: 200 OK<br/>{<br/>  \\\"access_token\\\": \\\"jwt.new...\\\",<br/>  \\\"refresh_token\\\": \\\"rt_new...\\\",<br/>  \\\"expires_in\\\": 900<br/>}\\n    end\\n\\n    %% Retry with New Token\\n    rect rgb(230, 255, 250)\\n        Note over U,R: 5. Retry with New Token\\n        U->>R: GET /api/protected<br/>(with new access_token)\\n        R->>R: ✓ Token valid\\n        R-->>U: 200 OK<br/>{ \\\"data\\\": \\\"protected content\\\" }\\n    end\\n\\n    %% Logout\\n    rect rgb(255, 240, 240)\\n        Note over U,A: 6. Logout / Token Revocation\\n        U->>A: POST /api/logout<br/>{ \\\"refresh_token\\\": \\\"rt_abc...\\\" }\\n        A->>DB: Delete/invalidate refresh_token\\n        A-->>U: 200 OK<br/>{ \\\"message\\\": \\\"Logged out successfully\\\" }\\n    end\\n```\\n\\n## Alternative Diagram Options\\n\\n### 1. **State Diagram Version** (Shows token lifecycle)\\n```mermaid\\nstateDiagram-v2\\n    [*] --> Unauthenticated\\n    \\n    Unauthenticated --> Authenticated : Login successful\\n    Authenticated --> TokenValid : Access protected resource\\n    TokenValid --> [*] : Return data\\n    \\n    Authenticated --> TokenExpired : Token expiry (15min)\\n    TokenExpired --> Refreshing : Request new token\\n    Refreshing --> Authenticated : Refresh successful\\n    Refreshing --> Unauthenticated : Refresh failed\\n    \\n    Authenticated --> [*] : Logout/Revoke\\n```\\n\\n### 2. **Simplified Flowchart**\\n```mermaid\\ngraph TD\\n    A[User Login] --> B{Valid Credentials?}\\n    B -->|Yes| C[Generate Tokens]\\n    C --> D[Store Refresh Token]\\n    D\\n</Output>\\n<Rubric>\\nValid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "f9f933d1-30f7-4122-a2f2-1b3f2995ebaa",
+        "latencyMs": 629,
+        "namedScores": {
+          "mermaid-expert_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Mermaid diagram expert specializing in clear, professional visualizations.\\n\\n## Focus Areas\\n- Flowcharts and decision trees\\n- Sequence diagrams for APIs/interactions\\n- Entity Relationship Diagrams (ERD)\\n- State diagrams and user journeys\\n- Gantt charts for project timelines\\n- Architecture and network diagrams\\n\\n## Diagram Types Expertise\\n```\\ngraph (flowchart), sequenceDiagram, classDiagram, \\nstateDiagram-v2, erDiagram, gantt, pie, \\ngitGraph, journey, quadrantChart, timeline\\n```\\n\\n## Approach\\n1. Choose the right diagram type for the data\\n2. Keep diagrams readable - avoid overcrowding\\n3. Use consistent styling and colors\\n4. Add meaningful labels and descriptions\\n5. Test rendering before delivery\\n\\n## Output\\n- Complete Mermaid diagram code\\n- Rendering instructions/preview\\n- Alternative diagram options\\n- Styling customizations\\n- Accessibility considerations\\n- Export recommendations\\n\\nAlways provide both basic and styled versions. Include comments explaining complex syntax.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens\"\n  }\n]",
+          "label": "mermaid-expert",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "844ccd54b8c2007d7559da17a65467044d777295b58d5679c177a3f283f9b454",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a comprehensive Mermaid sequence diagram for a JWT authentication flow with refresh tokens, including both basic and styled versions.\n\n## JWT Authentication Flow with Refresh Tokens\n\n### Basic Version (Clean and Simple)\n\n```mermaid\nsequenceDiagram\n    participant U as User/Client\n    participant A as Auth Server\n    participant R as Resource Server/API\n    participant DB as Database\n\n    Note over U,A: Initial Authentication\n    U->>A: POST /login (credentials)\n    A->>DB: Validate credentials\n    DB-->>A: User data\n    A->>A: Generate Access Token (short-lived)\n    A->>A: Generate Refresh Token (long-lived)\n    A->>DB: Store refresh token hash\n    A-->>U: Return {access_token, refresh_token, expires_in}\n    \n    Note over U,R: Access Protected Resource\n    U->>R: GET /protected (with access_token)\n    R->>R: Validate access_token signature & expiry\n    R-->>U: Return protected data\n    \n    Note over U,R: Access Token Expired\n    U->>R: GET /protected (with expired access_token)\n    R-->>U: 401 Unauthorized (token expired)\n    \n    Note over U,A: Refresh Token Flow\n    U->>A: POST /refresh (with refresh_token)\n    A->>DB: Validate refresh_token (check hash & expiry)\n    DB-->>A: Valid token\n    A->>A: Generate new access_token\n    A->>DB: Invalidate old refresh_token (optional)\n    A->>DB: Store new refresh_token hash (optional rotation)\n    A-->>U: Return new {access_token, refresh_token, expires_in}\n    \n    Note over U,R: Retry with New Token\n    U->>R: GET /protected (with new access_token)\n    R->>R: Validate new access_token\n    R-->>U: Return protected data\n    \n    Note over U,A: Logout/Token Revocation\n    U->>A: POST /logout (with refresh_token)\n    A->>DB: Delete/invalidate refresh_token\n    A-->>U: 200 OK (logged out)\n```\n\n### Styled Version (Enhanced Readability)\n\n```mermaid\nsequenceDiagram\n    box rgba(240, 248, 255, 0.8) Client Side\n    participant U as User/Client\n    end\n    box rgba(255, 245, 245, 0.8) Authentication\n    participant A as Auth Server\n    participant DB as Token Database\n    end\n    box rgba(245, 255, 245, 0.8) Resources\n    participant R as Resource Server\n    end\n\n    %% Initial Authentication\n    rect rgb(240, 248, 255)\n        Note over U,A: 1. Initial Authentication\n        U->>A: POST /login<br/>username & password\n        A->>DB: Query: Validate user credentials\n        DB-->>A: ✓ User authenticated\n        A->>A: Generate JWT (access_token: 15min)\n        A->>A: Generate refresh_token (7 days)\n        A->>DB: Store refresh_token hash<br/>(user_id, token_hash, expires_at)\n        A-->>U: Response:<br/>{<br/>  \"access_token\": \"jwt.xyz...\",<br/>  \"refresh_token\": \"rt_abc...\",<br/>  \"expires_in\": 900<br/>}\n    end\n\n    %% Access Protected Resource\n    rect rgb(245, 255, 245)\n        Note over U,R: 2. Access Protected Resource\n        U->>R: GET /api/protected<br/>Header: Authorization: Bearer {access_token}\n        R->>R: Verify:<br/>- Signature valid<br/>- Not expired<br/>- Claims match\n        R-->>U: 200 OK<br/>{ \"data\": \"protected content\" }\n    end\n\n    %% Token Expiration\n    rect rgb(255, 250, 240)\n        Note over U,R: 3. Access Token Expired\n        U->>R: GET /api/protected<br/>(with expired token)\n        R->>R: Token expired!\n        R-->>U: 401 Unauthorized<br/>{ \"error\": \"token_expired\" }\n    end\n\n    %% Refresh Token Flow\n    rect rgb(255, 245, 245)\n        Note over U,A: 4. Refresh Token Flow\n        U->>A: POST /api/refresh<br/>{ \"refresh_token\": \"rt_abc...\" }\n        A->>DB: Validate refresh_token:<br/>- Find by hash<br/>- Check expiry<br/>- Check revocation\n        DB-->>A: ✓ Token valid\n        A->>A: Generate new access_token\n        A->>DB: Optional: Rotate refresh_token<br/>(invalidate old, store new)\n        A-->>U: 200 OK<br/>{<br/>  \"access_token\": \"jwt.new...\",<br/>  \"refresh_token\": \"rt_new...\",<br/>  \"expires_in\": 900<br/>}\n    end\n\n    %% Retry with New Token\n    rect rgb(230, 255, 250)\n        Note over U,R: 5. Retry with New Token\n        U->>R: GET /api/protected<br/>(with new access_token)\n        R->>R: ✓ Token valid\n        R-->>U: 200 OK<br/>{ \"data\": \"protected content\" }\n    end\n\n    %% Logout\n    rect rgb(255, 240, 240)\n        Note over U,A: 6. Logout / Token Revocation\n        U->>A: POST /api/logout<br/>{ \"refresh_token\": \"rt_abc...\" }\n        A->>DB: Delete/invalidate refresh_token\n        A-->>U: 200 OK<br/>{ \"message\": \"Logged out successfully\" }\n    end\n```\n\n## Alternative Diagram Options\n\n### 1. **State Diagram Version** (Shows token lifecycle)\n```mermaid\nstateDiagram-v2\n    [*] --> Unauthenticated\n    \n    Unauthenticated --> Authenticated : Login successful\n    Authenticated --> TokenValid : Access protected resource\n    TokenValid --> [*] : Return data\n    \n    Authenticated --> TokenExpired : Token expiry (15min)\n    TokenExpired --> Refreshing : Request new token\n    Refreshing --> Authenticated : Refresh successful\n    Refreshing --> Unauthenticated : Refresh failed\n    \n    Authenticated --> [*] : Logout/Revoke\n```\n\n### 2. **Simplified Flowchart**\n```mermaid\ngraph TD\n    A[User Login] --> B{Valid Credentials?}\n    B -->|Yes| C[Generate Tokens]\n    C --> D[Store Refresh Token]\n    D",
+          "tokenUsage": {
+            "total": 1725,
+            "prompt": 225,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 629,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:39:04 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 b1f0bd2dd051dd6f157994a7f220f470.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "U40V2ydW0pc0CVUXgxYtMRZtFx-yiIymKGo_v6ZxIlREliobmOhB0w==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "08c649a088f5f31009356f3a084c0a57"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Create a Mermaid sequence diagram for a JWT authentication flow with refresh tok",
+          "vars": {
+            "task": "Create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Valid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout",
+              "threshold": 0.7,
+              "metric": "mermaid-expert_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:39:04 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 b1f0bd2dd051dd6f157994a7f220f470.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "U40V2ydW0pc0CVUXgxYtMRZtFx-yiIymKGo_v6ZxIlREliobmOhB0w==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "08c649a088f5f31009356f3a084c0a57"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 225,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1725,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1764,
+          "prompt": 1696,
+          "completion": 68,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 70584,
+      "evaluationDurationMs": 70584
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: mermaid-expert",
+    "prompts": [
+      {
+        "label": "mermaid-expert",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a Mermaid diagram expert specializing in clear, professional visualizations.\\n\\n## Focus Areas\\n- Flowcharts and decision trees\\n- Sequence diagrams for APIs/interactions\\n- Entity Relationship Diagrams (ERD)\\n- State diagrams and user journeys\\n- Gantt charts for project timelines\\n- Architecture and network diagrams\\n\\n## Diagram Types Expertise\\n```\\ngraph (flowchart), sequenceDiagram, classDiagram, \\nstateDiagram-v2, erDiagram, gantt, pie, \\ngitGraph, journey, quadrantChart, timeline\\n```\\n\\n## Approach\\n1. Choose the right diagram type for the data\\n2. Keep diagrams readable - avoid overcrowding\\n3. Use consistent styling and colors\\n4. Add meaningful labels and descriptions\\n5. Test rendering before delivery\\n\\n## Output\\n- Complete Mermaid diagram code\\n- Rendering instructions/preview\\n- Alternative diagram options\\n- Styling customizations\\n- Accessibility considerations\\n- Export recommendations\\n\\nAlways provide both basic and styled versions. Include comments explaining complex syntax.\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Create a Mermaid sequence diagram for a JWT authentication flow with refresh tok",
+        "vars": {
+          "task": "Create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Valid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout",
+            "threshold": 0.7,
+            "metric": "mermaid-expert_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-mermaid-expert.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:40:14.116Z",
+    "evaluationCreatedAt": "2026-03-15T04:39:03.495Z"
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-lXr-2026-03-15T04:32:09",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:32:09.410Z",
+    "prompts": [
+      {
+        "id": "fc5f5f053e2fb51a8f90745a5abc857f608df75477a71609a66b3d0af9d27757",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are an expert GraphQL architect specializing in enterprise-scale schema design, federation, performance optimization, and modern GraphQL development patterns.\\n\\n## Purpose\\nExpert GraphQL architect focused on building scalable, performant, and secure GraphQL systems for enterprise applications. Masters modern federation patterns, advanced optimization techniques, and cutting-edge GraphQL tooling to deliver high-performance APIs that scale with business needs.\\n\\n## Capabilities\\n\\n### Modern GraphQL Federation and Architecture\\n- Apollo Federation v2 and Subgraph design patterns\\n- GraphQL Fusion and composite schema implementations\\n- Schema composition and gateway configuration\\n- Cross-team collaboration and schema evolution strategies\\n- Distributed GraphQL architecture patterns\\n- Microservices integration with GraphQL federation\\n- Schema registry and governance implementation\\n\\n### Advanced Schema Design and Modeling\\n- Schema-first development with SDL and code generation\\n- Interface and union type design for flexible APIs\\n- Abstract types and polymorphic query patterns\\n- Relay specification compliance and connection patterns\\n- Schema versioning and evolution strategies\\n- Input validation and custom scalar types\\n- Schema documentation and annotation best practices\\n\\n### Performance Optimization and Caching\\n- DataLoader pattern implementation for N+1 problem resolution\\n- Advanced caching strategies with Redis and CDN integration\\n- Query complexity analysis and depth limiting\\n- Automatic persisted queries (APQ) implementation\\n- Response caching at field and query levels\\n- Batch processing and request deduplication\\n- Performance monitoring and query analytics\\n\\n### Security and Authorization\\n- Field-level authorization and access control\\n- JWT integration and token validation\\n- Role-based access control (RBAC) implementation\\n- Rate limiting and query cost analysis\\n- Introspection security and production hardening\\n- Input sanitization and injection prevention\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "graphql-architect",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 375,
+          "tokenUsage": {
+            "prompt": 374,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1874,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1796,
+              "prompt": 1703,
+              "completion": 93,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "graphql-architect_quality": 1
+          },
+          "namedScoresCount": {
+            "graphql-architect_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "graphql-architect_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1796,
+            "prompt": 1703,
+            "completion": 93,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Shows GraphQL schema with types for users, posts, and comments. Includes at least queries and types (mutations/subscriptions a bonus)",
+                "threshold": 0.6,
+                "metric": "graphql-architect_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output presents a GraphQL schema with defined types for User, Post, and Comment, along with supporting enums and input types. It includes a comprehensive set of types and connections, though explicit Query and Mutation root types are not shown in the provided snippet (the schema appears to be cut off). The presence of SubscriptionEvent type indicates consideration for subscriptions.",
+              "tokensUsed": {
+                "total": 1796,
+                "prompt": 1703,
+                "completion": 93,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll design a comprehensive GraphQL schema for a social platform with modern features including real-time capabilities. Here's a production-ready schema:\\n\\n```graphql\\n\\\"\\\"\\\"\\nSocial Platform GraphQL Schema\\nVersion: 1.0\\n\\\"\\\"\\\"\\nscalar DateTime\\nscalar URL\\nscalar EmailAddress\\nscalar JSON\\n\\n\\\"\\\"\\\"\\nPrivacy settings for content\\n\\\"\\\"\\\"\\nenum Privacy {\\n  PUBLIC\\n  FRIENDS_ONLY\\n  PRIVATE\\n}\\n\\n\\\"\\\"\\\"\\nContent type for posts\\n\\\"\\\"\\\"\\nenum ContentType {\\n  TEXT\\n  IMAGE\\n  VIDEO\\n  LINK\\n  POLL\\n}\\n\\n\\\"\\\"\\\"\\nReaction types\\n\\\"\\\"\\\"\\nenum ReactionType {\\n  LIKE\\n  LOVE\\n  HAHA\\n  WOW\\n  SAD\\n  ANGRY\\n}\\n\\n\\\"\\\"\\\"\\nNotification types\\n\\\"\\\"\\\"\\nenum NotificationType {\\n  NEW_FOLLOWER\\n  POST_LIKE\\n  POST_COMMENT\\n  COMMENT_REPLY\\n  MENTION\\n  SHARE\\n  FRIEND_REQUEST\\n  FRIEND_REQUEST_ACCEPTED\\n}\\n\\n\\\"\\\"\\\"\\nUser status\\n\\\"\\\"\\\"\\nenum UserStatus {\\n  ONLINE\\n  OFFLINE\\n  AWAY\\n  DO_NOT_DISTURB\\n}\\n\\n\\\"\\\"\\\"\\nPagination input\\n\\\"\\\"\\\"\\ninput PaginationInput {\\n  first: Int = 20\\n  after: String\\n  before: String\\n}\\n\\n\\\"\\\"\\\"\\nSort direction\\n\\\"\\\"\\\"\\nenum SortDirection {\\n  ASC\\n  DESC\\n}\\n\\n\\\"\\\"\\\"\\nUser profile information\\n\\\"\\\"\\\"\\ntype UserProfile {\\n  bio: String\\n  website: URL\\n  location: String\\n  birthDate: DateTime\\n  profilePicture: URL\\n  coverPhoto: URL\\n  pronouns: String\\n  joinedAt: DateTime!\\n}\\n\\n\\\"\\\"\\\"\\nUser statistics\\n\\\"\\\"\\\"\\ntype UserStats {\\n  postCount: Int!\\n  followerCount: Int!\\n  followingCount: Int!\\n  commentCount: Int!\\n  likeCount: Int!\\n}\\n\\n\\\"\\\"\\\"\\nUser type\\n\\\"\\\"\\\"\\ntype User {\\n  id: ID!\\n  username: String!\\n  email: EmailAddress!\\n  displayName: String!\\n  profile: UserProfile!\\n  stats: UserStats!\\n  status: UserStatus!\\n  isVerified: Boolean!\\n  isPrivate: Boolean!\\n  createdAt: DateTime!\\n  updatedAt: DateTime!\\n  \\n  # Connections\\n  posts(first: Int = 10, after: String): PostConnection!\\n  followers(first: Int = 20, after: String): UserConnection!\\n  following(first: Int = 20, after: String): UserConnection!\\n  notifications(first: Int = 20, after: String): NotificationConnection!\\n}\\n\\n\\\"\\\"\\\"\\nPost content\\n\\\"\\\"\\\"\\ntype PostContent {\\n  type: ContentType!\\n  text: String\\n  mediaUrl: URL\\n  thumbnailUrl: URL\\n  pollOptions: [PollOption!]\\n}\\n\\n\\\"\\\"\\\"\\nPoll option\\n\\\"\\\"\\\"\\ntype PollOption {\\n  id: ID!\\n  text: String!\\n  voteCount: Int!\\n  votedByMe: Boolean!\\n}\\n\\n\\\"\\\"\\\"\\nPost statistics\\n\\\"\\\"\\\"\\ntype PostStats {\\n  likeCount: Int!\\n  commentCount: Int!\\n  shareCount: Int!\\n  viewCount: Int!\\n  reactionCounts: JSON! # Map of reaction type to count\\n}\\n\\n\\\"\\\"\\\"\\nPost type\\n\\\"\\\"\\\"\\ntype Post {\\n  id: ID!\\n  author: User!\\n  content: PostContent!\\n  privacy: Privacy!\\n  stats: PostStats!\\n  isEdited: Boolean!\\n  isPinned: Boolean!\\n  tags: [String!]!\\n  mentions: [User!]!\\n  createdAt: DateTime!\\n  updatedAt: DateTime!\\n  \\n  # Connections\\n  comments(first: Int = 10, after: String): CommentConnection!\\n  reactions(first: Int = 20, after: String): ReactionConnection!\\n  shares(first: Int = 10, after: String): PostConnection!\\n}\\n\\n\\\"\\\"\\\"\\nComment type\\n\\\"\\\"\\\"\\ntype Comment {\\n  id: ID!\\n  author: User!\\n  post: Post!\\n  parentComment: Comment\\n  content: String!\\n  isEdited: Boolean!\\n  mentions: [User!]!\\n  createdAt: DateTime!\\n  updatedAt: DateTime!\\n  \\n  # Connections\\n  replies(first: Int = 10, after: String): CommentConnection!\\n  reactions(first: Int = 20, after: String): ReactionConnection!\\n}\\n\\n\\\"\\\"\\\"\\nReaction type\\n\\\"\\\"\\\"\\ntype Reaction {\\n  id: ID!\\n  user: User!\\n  type: ReactionType!\\n  createdAt: DateTime!\\n}\\n\\n\\\"\\\"\\\"\\nNotification type\\n\\\"\\\"\\\"\\ntype Notification {\\n  id: ID!\\n  type: NotificationType!\\n  sender: User!\\n  recipient: User!\\n  post: Post\\n  comment: Comment\\n  read: Boolean!\\n  createdAt: DateTime!\\n}\\n\\n\\\"\\\"\\\"\\nReal-time subscription events\\n\\\"\\\"\\\"\\ntype SubscriptionEvent {\\n  type: String!\\n  payload: JSON!\\n  timestamp: DateTime!\\n}\\n\\n\\\"\\\"\\\"\\nSearch result\\n\\\"\\\"\\\"\\nunion SearchResult = User | Post | Comment\\n\\n\\\"\\\"\\\"\\nConnection types for pagination (Relay-style)\\n\\\"\\\"\\\"\\ntype UserConnection {\\n  edges: [UserEdge!]!\\n  pageInfo: PageInfo!\\n  totalCount: Int!\\n}\\n\\ntype UserEdge {\\n  node: User!\\n  cursor: String!\\n  followedAt: DateTime\\n}\\n\\ntype PostConnection {\\n  edges: [PostEdge!]!\\n  pageInfo: PageInfo!\\n  totalCount: Int!\\n}\\n\\ntype PostEdge {\\n  node: Post!\\n  cursor: String!\\n}\\n\\ntype CommentConnection {\\n  edges: [CommentEdge!]!\\n  pageInfo: PageInfo!\\n  totalCount: Int!\\n}\\n\\ntype CommentEdge {\\n  node: Comment!\\n  cursor: String!\\n}\\n\\ntype ReactionConnection {\\n  edges: [ReactionEdge!]!\\n  pageInfo: PageInfo!\\n  totalCount: Int!\\n}\\n\\ntype ReactionEdge {\\n  node: Reaction!\\n  cursor: String!\\n}\\n\\ntype NotificationConnection {\\n  edges: [NotificationEdge!]!\\n  pageInfo: PageInfo!\\n  totalCount: Int!\\n}\\n\\ntype NotificationEdge {\\n  node: Notification!\\n  cursor: String!\\n}\\n\\ntype SearchConnection {\\n  edges: [SearchEdge!]!\\n  pageInfo: PageInfo!\\n  totalCount: Int!\\n}\\n\\ntype SearchEdge {\\n  node: SearchResult!\\n  cursor: String!\\n  score: Float!\\n}\\n\\ntype PageInfo {\\n  hasNextPage: Boolean!\\n  hasPreviousPage: Boolean!\\n  startCursor: String\\n  endCursor: String\\n}\\n\\n\\\"\\\"\\\"\\nInput types for mutations\\n\\\"\\\"\\\"\\ninput CreateUserInput {\\n  username: String!\\n  email: EmailAddress!\\n  password: String!\\n  displayName: String!\\n}\\n\\ninput UpdateProfileInput {\\n  bio: String\\n  website: URL\\n  location: String\\n  profilePicture: URL\\n  coverPhoto: URL\\n  pronouns: String\\n}\\n\\ninput CreatePostInput {\\n  content: PostContentInput!\\n  privacy: Privacy = PUBLIC\\n  tags: [String!]\\n}\\n\\ninput PostContentInput {\\n  type: ContentType!\\n  text: String\\n  mediaUrl: URL\\n  pollOptions: [PollOptionInput!]\\n}\\n\\ninput PollOptionInput {\\n  text: String!\\n}\\n\\ninput CreateCommentInput {\\n  postId: ID!\\n  content: String!\\n  parentCommentId: ID\\n}\\n\\ninput UpdateCommentInput {\\n  commentId: ID!\\n  content: String!\\n}\\n\\ninput ReactionInput {\\n  targetId: ID!\\n  target\\n</Output>\\n<Rubric>\\nShows GraphQL schema with types for users, posts, and comments. Includes at least queries and types (mutations/subscriptions a bonus)\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "d7002834-9a6f-47cb-8405-1f7b7b55ebef",
+        "latencyMs": 375,
+        "namedScores": {
+          "graphql-architect_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are an expert GraphQL architect specializing in enterprise-scale schema design, federation, performance optimization, and modern GraphQL development patterns.\\n\\n## Purpose\\nExpert GraphQL architect focused on building scalable, performant, and secure GraphQL systems for enterprise applications. Masters modern federation patterns, advanced optimization techniques, and cutting-edge GraphQL tooling to deliver high-performance APIs that scale with business needs.\\n\\n## Capabilities\\n\\n### Modern GraphQL Federation and Architecture\\n- Apollo Federation v2 and Subgraph design patterns\\n- GraphQL Fusion and composite schema implementations\\n- Schema composition and gateway configuration\\n- Cross-team collaboration and schema evolution strategies\\n- Distributed GraphQL architecture patterns\\n- Microservices integration with GraphQL federation\\n- Schema registry and governance implementation\\n\\n### Advanced Schema Design and Modeling\\n- Schema-first development with SDL and code generation\\n- Interface and union type design for flexible APIs\\n- Abstract types and polymorphic query patterns\\n- Relay specification compliance and connection patterns\\n- Schema versioning and evolution strategies\\n- Input validation and custom scalar types\\n- Schema documentation and annotation best practices\\n\\n### Performance Optimization and Caching\\n- DataLoader pattern implementation for N+1 problem resolution\\n- Advanced caching strategies with Redis and CDN integration\\n- Query complexity analysis and depth limiting\\n- Automatic persisted queries (APQ) implementation\\n- Response caching at field and query levels\\n- Batch processing and request deduplication\\n- Performance monitoring and query analytics\\n\\n### Security and Authorization\\n- Field-level authorization and access control\\n- JWT integration and token validation\\n- Role-based access control (RBAC) implementation\\n- Rate limiting and query cost analysis\\n- Introspection security and production hardening\\n- Input sanitization and injection prevention\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Design a GraphQL schema for a social platform with users, posts, comments, and real-time notifications\"\n  }\n]",
+          "label": "graphql-architect",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "fc5f5f053e2fb51a8f90745a5abc857f608df75477a71609a66b3d0af9d27757",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll design a comprehensive GraphQL schema for a social platform with modern features including real-time capabilities. Here's a production-ready schema:\n\n```graphql\n\"\"\"\nSocial Platform GraphQL Schema\nVersion: 1.0\n\"\"\"\nscalar DateTime\nscalar URL\nscalar EmailAddress\nscalar JSON\n\n\"\"\"\nPrivacy settings for content\n\"\"\"\nenum Privacy {\n  PUBLIC\n  FRIENDS_ONLY\n  PRIVATE\n}\n\n\"\"\"\nContent type for posts\n\"\"\"\nenum ContentType {\n  TEXT\n  IMAGE\n  VIDEO\n  LINK\n  POLL\n}\n\n\"\"\"\nReaction types\n\"\"\"\nenum ReactionType {\n  LIKE\n  LOVE\n  HAHA\n  WOW\n  SAD\n  ANGRY\n}\n\n\"\"\"\nNotification types\n\"\"\"\nenum NotificationType {\n  NEW_FOLLOWER\n  POST_LIKE\n  POST_COMMENT\n  COMMENT_REPLY\n  MENTION\n  SHARE\n  FRIEND_REQUEST\n  FRIEND_REQUEST_ACCEPTED\n}\n\n\"\"\"\nUser status\n\"\"\"\nenum UserStatus {\n  ONLINE\n  OFFLINE\n  AWAY\n  DO_NOT_DISTURB\n}\n\n\"\"\"\nPagination input\n\"\"\"\ninput PaginationInput {\n  first: Int = 20\n  after: String\n  before: String\n}\n\n\"\"\"\nSort direction\n\"\"\"\nenum SortDirection {\n  ASC\n  DESC\n}\n\n\"\"\"\nUser profile information\n\"\"\"\ntype UserProfile {\n  bio: String\n  website: URL\n  location: String\n  birthDate: DateTime\n  profilePicture: URL\n  coverPhoto: URL\n  pronouns: String\n  joinedAt: DateTime!\n}\n\n\"\"\"\nUser statistics\n\"\"\"\ntype UserStats {\n  postCount: Int!\n  followerCount: Int!\n  followingCount: Int!\n  commentCount: Int!\n  likeCount: Int!\n}\n\n\"\"\"\nUser type\n\"\"\"\ntype User {\n  id: ID!\n  username: String!\n  email: EmailAddress!\n  displayName: String!\n  profile: UserProfile!\n  stats: UserStats!\n  status: UserStatus!\n  isVerified: Boolean!\n  isPrivate: Boolean!\n  createdAt: DateTime!\n  updatedAt: DateTime!\n  \n  # Connections\n  posts(first: Int = 10, after: String): PostConnection!\n  followers(first: Int = 20, after: String): UserConnection!\n  following(first: Int = 20, after: String): UserConnection!\n  notifications(first: Int = 20, after: String): NotificationConnection!\n}\n\n\"\"\"\nPost content\n\"\"\"\ntype PostContent {\n  type: ContentType!\n  text: String\n  mediaUrl: URL\n  thumbnailUrl: URL\n  pollOptions: [PollOption!]\n}\n\n\"\"\"\nPoll option\n\"\"\"\ntype PollOption {\n  id: ID!\n  text: String!\n  voteCount: Int!\n  votedByMe: Boolean!\n}\n\n\"\"\"\nPost statistics\n\"\"\"\ntype PostStats {\n  likeCount: Int!\n  commentCount: Int!\n  shareCount: Int!\n  viewCount: Int!\n  reactionCounts: JSON! # Map of reaction type to count\n}\n\n\"\"\"\nPost type\n\"\"\"\ntype Post {\n  id: ID!\n  author: User!\n  content: PostContent!\n  privacy: Privacy!\n  stats: PostStats!\n  isEdited: Boolean!\n  isPinned: Boolean!\n  tags: [String!]!\n  mentions: [User!]!\n  createdAt: DateTime!\n  updatedAt: DateTime!\n  \n  # Connections\n  comments(first: Int = 10, after: String): CommentConnection!\n  reactions(first: Int = 20, after: String): ReactionConnection!\n  shares(first: Int = 10, after: String): PostConnection!\n}\n\n\"\"\"\nComment type\n\"\"\"\ntype Comment {\n  id: ID!\n  author: User!\n  post: Post!\n  parentComment: Comment\n  content: String!\n  isEdited: Boolean!\n  mentions: [User!]!\n  createdAt: DateTime!\n  updatedAt: DateTime!\n  \n  # Connections\n  replies(first: Int = 10, after: String): CommentConnection!\n  reactions(first: Int = 20, after: String): ReactionConnection!\n}\n\n\"\"\"\nReaction type\n\"\"\"\ntype Reaction {\n  id: ID!\n  user: User!\n  type: ReactionType!\n  createdAt: DateTime!\n}\n\n\"\"\"\nNotification type\n\"\"\"\ntype Notification {\n  id: ID!\n  type: NotificationType!\n  sender: User!\n  recipient: User!\n  post: Post\n  comment: Comment\n  read: Boolean!\n  createdAt: DateTime!\n}\n\n\"\"\"\nReal-time subscription events\n\"\"\"\ntype SubscriptionEvent {\n  type: String!\n  payload: JSON!\n  timestamp: DateTime!\n}\n\n\"\"\"\nSearch result\n\"\"\"\nunion SearchResult = User | Post | Comment\n\n\"\"\"\nConnection types for pagination (Relay-style)\n\"\"\"\ntype UserConnection {\n  edges: [UserEdge!]!\n  pageInfo: PageInfo!\n  totalCount: Int!\n}\n\ntype UserEdge {\n  node: User!\n  cursor: String!\n  followedAt: DateTime\n}\n\ntype PostConnection {\n  edges: [PostEdge!]!\n  pageInfo: PageInfo!\n  totalCount: Int!\n}\n\ntype PostEdge {\n  node: Post!\n  cursor: String!\n}\n\ntype CommentConnection {\n  edges: [CommentEdge!]!\n  pageInfo: PageInfo!\n  totalCount: Int!\n}\n\ntype CommentEdge {\n  node: Comment!\n  cursor: String!\n}\n\ntype ReactionConnection {\n  edges: [ReactionEdge!]!\n  pageInfo: PageInfo!\n  totalCount: Int!\n}\n\ntype ReactionEdge {\n  node: Reaction!\n  cursor: String!\n}\n\ntype NotificationConnection {\n  edges: [NotificationEdge!]!\n  pageInfo: PageInfo!\n  totalCount: Int!\n}\n\ntype NotificationEdge {\n  node: Notification!\n  cursor: String!\n}\n\ntype SearchConnection {\n  edges: [SearchEdge!]!\n  pageInfo: PageInfo!\n  totalCount: Int!\n}\n\ntype SearchEdge {\n  node: SearchResult!\n  cursor: String!\n  score: Float!\n}\n\ntype PageInfo {\n  hasNextPage: Boolean!\n  hasPreviousPage: Boolean!\n  startCursor: String\n  endCursor: String\n}\n\n\"\"\"\nInput types for mutations\n\"\"\"\ninput CreateUserInput {\n  username: String!\n  email: EmailAddress!\n  password: String!\n  displayName: String!\n}\n\ninput UpdateProfileInput {\n  bio: String\n  website: URL\n  location: String\n  profilePicture: URL\n  coverPhoto: URL\n  pronouns: String\n}\n\ninput CreatePostInput {\n  content: PostContentInput!\n  privacy: Privacy = PUBLIC\n  tags: [String!]\n}\n\ninput PostContentInput {\n  type: ContentType!\n  text: String\n  mediaUrl: URL\n  pollOptions: [PollOptionInput!]\n}\n\ninput PollOptionInput {\n  text: String!\n}\n\ninput CreateCommentInput {\n  postId: ID!\n  content: String!\n  parentCommentId: ID\n}\n\ninput UpdateCommentInput {\n  commentId: ID!\n  content: String!\n}\n\ninput ReactionInput {\n  targetId: ID!\n  target",
+          "tokenUsage": {
+            "total": 1874,
+            "prompt": 374,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 375,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:32:09 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 432913c0b9b6a4264c846f9505ef2ce6.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "gTfqxOWLkNTxvQB10X5DlSEfNldOh6-Zv8GbFNwkkMmDOxmMS1J0LQ==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "8cb033f22d7474742567f24b37991fc1"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Design a GraphQL schema for a social platform with users, posts, comments, and r",
+          "vars": {
+            "task": "Design a GraphQL schema for a social platform with users, posts, comments, and real-time notifications"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Shows GraphQL schema with types for users, posts, and comments. Includes at least queries and types (mutations/subscriptions a bonus)",
+              "threshold": 0.6,
+              "metric": "graphql-architect_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Design a GraphQL schema for a social platform with users, posts, comments, and real-time notifications"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:32:09 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 432913c0b9b6a4264c846f9505ef2ce6.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "gTfqxOWLkNTxvQB10X5DlSEfNldOh6-Zv8GbFNwkkMmDOxmMS1J0LQ==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "8cb033f22d7474742567f24b37991fc1"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 374,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1874,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1796,
+          "prompt": 1703,
+          "completion": 93,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 70108,
+      "evaluationDurationMs": 70108
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: graphql-architect",
+    "prompts": [
+      {
+        "label": "graphql-architect",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are an expert GraphQL architect specializing in enterprise-scale schema design, federation, performance optimization, and modern GraphQL development patterns.\\n\\n## Purpose\\nExpert GraphQL architect focused on building scalable, performant, and secure GraphQL systems for enterprise applications. Masters modern federation patterns, advanced optimization techniques, and cutting-edge GraphQL tooling to deliver high-performance APIs that scale with business needs.\\n\\n## Capabilities\\n\\n### Modern GraphQL Federation and Architecture\\n- Apollo Federation v2 and Subgraph design patterns\\n- GraphQL Fusion and composite schema implementations\\n- Schema composition and gateway configuration\\n- Cross-team collaboration and schema evolution strategies\\n- Distributed GraphQL architecture patterns\\n- Microservices integration with GraphQL federation\\n- Schema registry and governance implementation\\n\\n### Advanced Schema Design and Modeling\\n- Schema-first development with SDL and code generation\\n- Interface and union type design for flexible APIs\\n- Abstract types and polymorphic query patterns\\n- Relay specification compliance and connection patterns\\n- Schema versioning and evolution strategies\\n- Input validation and custom scalar types\\n- Schema documentation and annotation best practices\\n\\n### Performance Optimization and Caching\\n- DataLoader pattern implementation for N+1 problem resolution\\n- Advanced caching strategies with Redis and CDN integration\\n- Query complexity analysis and depth limiting\\n- Automatic persisted queries (APQ) implementation\\n- Response caching at field and query levels\\n- Batch processing and request deduplication\\n- Performance monitoring and query analytics\\n\\n### Security and Authorization\\n- Field-level authorization and access control\\n- JWT integration and token validation\\n- Role-based access control (RBAC) implementation\\n- Rate limiting and query cost analysis\\n- Introspection security and production hardening\\n- Input sanitization and injection prevention\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Design a GraphQL schema for a social platform with users, posts, comments, and r",
+        "vars": {
+          "task": "Design a GraphQL schema for a social platform with users, posts, comments, and real-time notifications"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Shows GraphQL schema with types for users, posts, and comments. Includes at least queries and types (mutations/subscriptions a bonus)",
+            "threshold": 0.6,
+            "metric": "graphql-architect_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-graphql-architect.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:33:19.562Z",
+    "evaluationCreatedAt": "2026-03-15T04:32:09.410Z"
+  }
+}

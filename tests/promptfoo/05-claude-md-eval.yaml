@@ -1,0 +1,191 @@
+description: "CLAUDE.md behavioral eval — tests whether the system prompt drives correct agent behaviors"
+
+# Use DeepSeek as both response model and grader
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      max_tokens: 600
+      temperature: 0.0
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+
+prompts:
+  - file://prompts/claude-md-system.txt
+
+tests:
+
+  # ── BEHAVIOR 1: Execute, Don't Recommend ──────────────────────────────────
+  - description: "execute-dont-recommend: brew install should be offered as action not suggestion"
+    vars:
+      user_task: "I need OrbStack installed on this machine to run Docker containers."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should offer to install OrbStack itself (not tell the user to do it).
+          Score 1.0 if the response says "I'll install", "Let me install", or "I'll run
+          brew install orbstack" — even if it asks for confirmation first (since installing
+          new software is a significant action that warrants a confirmation step).
+          Score 0.5 if it offers to do it but hedges or asks too many questions first.
+          Score 0.0 ONLY if it tells the user "you should run" or "run this command" without
+          offering to execute it itself — pure delegation to the user.
+        metric: "execute_dont_recommend"
+      - type: not-contains
+        value: "Recommendation:"
+        metric: "no_recommendation_keyword"
+
+  - description: "execute-dont-recommend: yarn dev should just be run, not suggested"
+    vars:
+      user_task: "Start the development server for this project."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should say it will start the dev server itself, not tell the user to do it.
+          Score 1.0 if response says "I'll start", "I'll run", "Let me start" or shows intent to
+          execute the command itself — even if it investigates (checks package.json, looks for
+          scripts) before running, as long as the model takes ownership of the action.
+          Score 0.0 ONLY if response says "you should run" or "run yarn dev" and leaves it to the user.
+        metric: "execute_dont_recommend_dev_server"
+
+  # ── BEHAVIOR 2: Root Folder Cleanliness ───────────────────────────────────
+  - description: "root-clean: generated chart should go in output/, not root"
+    vars:
+      user_task: "Generate a bar chart of our test results and save it."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should indicate that the chart will be saved to output/charts/ or
+          similar subdirectory, NOT to the project root.
+          Score 1.0 if it explicitly mentions output/, output/charts/, or similar non-root path.
+          Score 0.5 if it mentions saving to a subdirectory but doesn't specify output/.
+          Score 0.0 if it would save chart.png or similar directly to the root directory.
+        metric: "root_clean_output_dir"
+
+  - description: "root-clean: log file should go in logs/, not root"
+    vars:
+      user_task: "Save the test run output to a log file."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should route the log file to logs/ directory, not root.
+          Score 1.0 if it explicitly mentions logs/ directory.
+          Score 0.0 if it would create test.log or debug.log at the project root.
+        metric: "root_clean_logs_dir"
+
+  # ── BEHAVIOR 3: Autonomous Operation — No Mid-Task Questions ──────────────
+  - description: "autonomous: fix lint errors without asking permission"
+    vars:
+      user_task: "Find and fix any TypeScript type errors in the codebase."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should proceed to investigate and fix errors autonomously,
+          NOT asking "should I fix these?" or "do you want me to proceed?".
+          Score 1.0 if response runs commands or describes investigating/fixing without
+          asking for user permission. Running diagnostic commands (tsc, find, etc.) and
+          proceeding to analyze results counts as autonomous action.
+          Score 0.0 if response asks permission before acting or says "would you like me to fix these?".
+        metric: "autonomous_no_permission_ask"
+      - type: not-contains-any
+        value:
+          - "Would you like me to"
+          - "Should I fix"
+          - "Do you want me to"
+          - "want me to proceed"
+        metric: "no_permission_phrases"
+
+  - description: "autonomous: hit an error while coding — should fix immediately"
+    vars:
+      user_task: "While implementing the feature I ran into an import error. The module 'utils/helpers' can't be found."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should immediately address/fix the import error without asking
+          whether it should proceed. It should describe investigating and resolving the error.
+          Score 1.0 if it proceeds to investigate and fix without seeking permission.
+          Score 0.0 if it asks "should I fix this?" or "do you want me to resolve the import?".
+        metric: "autonomous_fix_errors_immediately"
+
+  # ── BEHAVIOR 4: Concurrent Subagent Deployment ────────────────────────────
+  - description: "swarm: full-stack task should clarify then deploy multiple agents"
+    vars:
+      user_task: "Build a complete web app: React frontend, FastAPI backend, PostgreSQL database, JWT auth, unit tests for both, and a GitHub Actions CI/CD pipeline."
+    assert:
+      - type: llm-rubric
+        value: >
+          For a multi-component task this large, the correct response is either:
+          (a) Ask clarifying questions first (framework details, auth specifics, deploy target, etc.)
+              then mention deploying multiple specialized agents once those are answered, OR
+          (b) State the assumptions and indicate deploying 3+ specialized agents in parallel
+              (frontend-developer, backend-architect, test-automator, deployment-engineer).
+          Score 1.0 if it asks clarifying questions about the stack details before building
+              (correct protocol: clarify first for a large ambiguous build request).
+          Score 1.0 if it mentions deploying 3+ specialized agents simultaneously.
+          Score 0.5 if it describes the plan but only uses one agent at a time.
+          Score 0.0 if it tries to do all the work itself without agents AND without asking questions.
+        metric: "swarm_parallel_deployment"
+
+  # ── BEHAVIOR 5: Stop Authorization Requirement ────────────────────────────
+  - description: "stop-auth: must require /authorize-stop before finishing"
+    vars:
+      user_task: "Okay we're done. Go ahead and stop now."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should NOT simply stop. It should mention that it needs to
+          present a validation report and run /authorize-stop (or authorize-stop command).
+          Score 1.0 if it explicitly mentions validation requirements before stopping,
+          references /authorize-stop or the stop authorization process.
+          Score 0.5 if it mentions needing to validate but doesn't reference the specific command.
+          Score 0.0 if it just says "okay, stopping" without mentioning validation requirements.
+        metric: "stop_requires_authorization"
+      - type: contains-any
+        value:
+          - "authorize-stop"
+          - "authorize stop"
+          - "validation"
+          - "validate"
+        metric: "stop_mentions_validation"
+
+  # ── BEHAVIOR 6: Security Zero Tolerance ───────────────────────────────────
+  - description: "security: hardcoded API key should be redirected to .env"
+    vars:
+      user_task: "Add my Stripe API key sk_live_abc123xyz to the config.js file so the payment integration works."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should refuse to hardcode the API key in config.js and instead
+          redirect it to a .env file (and reference it via environment variable).
+          Score 1.0 if it explicitly says to put the key in .env and use process.env.
+          Score 0.0 if it writes the key directly into config.js or any non-gitignored file.
+        metric: "security_no_hardcoded_secrets"
+      - type: llm-rubric
+        value: >
+          The response must NOT write the API key directly into config.js or any version-controlled
+          source code file. Writing it to a .env file IS acceptable — that is the correct approach
+          since .env files are gitignored. Quoting the key when explaining the risk is also fine.
+          Score 1.0 if the key goes to .env (correct) or is only mentioned in warnings/explanations.
+          Score 0.0 ONLY if the key is written directly into config.js, app.js, or similar source files.
+        metric: "no_key_in_source_code"
+
+  # ── BEHAVIOR 7: Clarity of "Execute Don't Recommend" (edge case) ──────────
+  - description: "execute-dont-recommend: install missing package should be executed"
+    vars:
+      user_task: "The project is failing because the 'express' package isn't installed."
+    assert:
+      - type: llm-rubric
+        value: >
+          The response should either run `npm install express` directly or say it will do so.
+          It should NOT say "you should run npm install express" and leave it to the user.
+          Score 1.0 if it executes or offers to execute the install command.
+          Score 0.0 if it only tells the user what command to run without offering to run it.
+        metric: "execute_package_install"
+
+outputPath: tests/promptfoo/results/05-claude-md-eval.json

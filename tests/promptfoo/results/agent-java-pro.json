@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-3Qv-2026-03-15T04:34:10",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:34:10.575Z",
+    "prompts": [
+      {
+        "id": "cbf0fec28b69dec31ba4831005eecd76493f34e4c4a759b511a9c6ca6d14d44d",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a Java expert specializing in modern Java 21+ development with cutting-edge JVM features, Spring ecosystem mastery, and production-ready enterprise applications.\\n\\n## Purpose\\nExpert Java developer mastering Java 21+ features including virtual threads, pattern matching, and modern JVM optimizations. Deep knowledge of Spring Boot 3.x, cloud-native patterns, and building scalable enterprise applications.\\n\\n## Capabilities\\n\\n### Modern Java Language Features\\n- Java 21+ LTS features including virtual threads (Project Loom)\\n- Pattern matching for switch expressions and instanceof\\n- Record classes for immutable data carriers\\n- Text blocks and string templates for better readability\\n- Sealed classes and interfaces for controlled inheritance\\n- Local variable type inference with var keyword\\n- Enhanced switch expressions and yield statements\\n- Foreign Function & Memory API for native interoperability\\n\\n### Virtual Threads & Concurrency\\n- Virtual threads for massive concurrency without platform thread overhead\\n- Structured concurrency patterns for reliable concurrent programming\\n- CompletableFuture and reactive programming with virtual threads\\n- Thread-local optimization and scoped values\\n- Performance tuning for virtual thread workloads\\n- Migration strategies from platform threads to virtual threads\\n- Concurrent collections and thread-safe patterns\\n- Lock-free programming and atomic operations\\n\\n### Spring Framework Ecosystem\\n- Spring Boot 3.x with Java 21 optimization features\\n- Spring WebMVC and WebFlux for reactive programming\\n- Spring Data JPA with Hibernate 6+ performance features\\n- Spring Security 6 with OAuth2 and JWT patterns\\n- Spring Cloud for microservices and distributed systems\\n- Spring Native with GraalVM for fast startup and low memory\\n- Actuator endpoints for production monitoring and health checks\\n- Configuration management with profiles and externalized config\\n\\n### JVM Performance & Optimization\\n- GraalVM Native Image compilation for cloud deployments\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "java-pro",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 442,
+          "tokenUsage": {
+            "prompt": 398,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1898,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1759,
+              "prompt": 1694,
+              "completion": 65,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "java-pro_quality": 1
+          },
+          "namedScoresCount": {
+            "java-pro_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "java-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1759,
+            "prompt": 1694,
+            "completion": 65,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses Project Loom virtual threads correctly, structured concurrency, modern Java 21+ patterns",
+                "threshold": 0.7,
+                "metric": "java-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The code uses Executors.newVirtualThreadPerTaskExecutor() for virtual threads, employs structured concurrency via ExecutorService with graceful shutdown, and utilizes modern Java 21+ features like switch expressions and text blocks.",
+              "tokensUsed": {
+                "total": 1759,
+                "prompt": 1694,
+                "completion": 65,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a high-performance HTTP server using Java 21 virtual threads that can handle 10,000+ concurrent connections efficiently. Here's a complete implementation:\\n\\n```java\\nimport java.io.*;\\nimport java.net.*;\\nimport java.nio.charset.StandardCharsets;\\nimport java.time.Duration;\\nimport java.time.LocalDateTime;\\nimport java.util.concurrent.*;\\nimport java.util.concurrent.atomic.AtomicInteger;\\n\\npublic class VirtualThreadHttpServer {\\n    private static final int PORT = 8080;\\n    private static final int BACKLOG = 10_000;\\n    private static final Duration TIMEOUT = Duration.ofSeconds(30);\\n    private static final AtomicInteger activeConnections = new AtomicInteger(0);\\n    private static final AtomicInteger totalRequests = new AtomicInteger(0);\\n    private static volatile boolean running = true;\\n    \\n    public static void main(String[] args) throws IOException {\\n        System.out.println(\\\"Starting Virtual Thread HTTP Server on port \\\" + PORT);\\n        System.out.println(\\\"Java Version: \\\" + System.getProperty(\\\"java.version\\\"));\\n        System.out.println(\\\"Available Processors: \\\" + Runtime.getRuntime().availableProcessors());\\n        \\n        // Create server socket with high backlog for concurrent connections\\n        try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {\\n            serverSocket.setReuseAddress(true);\\n            \\n            // Start statistics thread\\n            Thread statsThread = Thread.ofVirtual().start(VirtualThreadHttpServer::printStatistics);\\n            \\n            // Start graceful shutdown hook\\n            Runtime.getRuntime().addShutdownHook(new Thread(() -> {\\n                System.out.println(\\\"\\\\nShutting down server...\\\");\\n                running = false;\\n                try {\\n                    statsThread.join(2000);\\n                } catch (InterruptedException e) {\\n                    Thread.currentThread().interrupt();\\n                }\\n            }));\\n            \\n            // Create virtual thread executor for connection handling\\n            ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();\\n            \\n            System.out.println(\\\"Server ready to accept connections...\\\");\\n            \\n            // Main accept loop\\n            while (running) {\\n                try {\\n                    Socket clientSocket = serverSocket.accept();\\n                    clientSocket.setSoTimeout((int) TIMEOUT.toMillis());\\n                    clientSocket.setTcpNoDelay(true);\\n                    \\n                    // Submit connection handling to virtual thread\\n                    virtualThreadExecutor.submit(() -> handleConnection(clientSocket));\\n                    \\n                } catch (SocketException e) {\\n                    if (running) {\\n                        System.err.println(\\\"Socket error: \\\" + e.getMessage());\\n                    }\\n                } catch (IOException e) {\\n                    System.err.println(\\\"Accept error: \\\" + e.getMessage());\\n                }\\n            }\\n            \\n            // Graceful shutdown\\n            virtualThreadExecutor.shutdown();\\n            try {\\n                if (!virtualThreadExecutor.awaitTermination(10, TimeUnit.SECONDS)) {\\n                    virtualThreadExecutor.shutdownNow();\\n                }\\n            } catch (InterruptedException e) {\\n                virtualThreadExecutor.shutdownNow();\\n                Thread.currentThread().interrupt();\\n            }\\n            \\n        } catch (IOException e) {\\n            System.err.println(\\\"Failed to start server: \\\" + e.getMessage());\\n            System.exit(1);\\n        }\\n    }\\n    \\n    private static void handleConnection(Socket clientSocket) {\\n        int connectionId = activeConnections.incrementAndGet();\\n        String clientAddress = clientSocket.getInetAddress().getHostAddress();\\n        \\n        try (clientSocket;\\n             BufferedReader reader = new BufferedReader(\\n                 new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));\\n             OutputStream output = clientSocket.getOutputStream()) {\\n            \\n            // Parse HTTP request\\n            String requestLine = reader.readLine();\\n            if (requestLine == null || requestLine.isEmpty()) {\\n                return;\\n            }\\n            \\n            totalRequests.incrementAndGet();\\n            \\n            // Parse method and path\\n            String[] requestParts = requestLine.split(\\\" \\\");\\n            if (requestParts.length < 2) {\\n                sendErrorResponse(output, 400, \\\"Bad Request\\\");\\n                return;\\n            }\\n            \\n            String method = requestParts[0];\\n            String path = requestParts[1];\\n            \\n            // Skip headers (simplified - in production you'd parse them properly)\\n            String line;\\n            while ((line = reader.readLine()) != null && !line.isEmpty()) {\\n                // Headers end with empty line\\n            }\\n            \\n            // Handle different HTTP methods\\n            switch (method) {\\n                case \\\"GET\\\" -> handleGetRequest(path, output);\\n                case \\\"POST\\\" -> handlePostRequest(reader, output);\\n                default -> sendErrorResponse(output, 405, \\\"Method Not Allowed\\\");\\n            }\\n            \\n        } catch (SocketTimeoutException e) {\\n            System.out.println(\\\"Connection timeout: \\\" + clientAddress);\\n        } catch (IOException e) {\\n            System.err.println(\\\"Connection error [\\\" + connectionId + \\\"]: \\\" + e.getMessage());\\n        } finally {\\n            activeConnections.decrementAndGet();\\n        }\\n    }\\n    \\n    private static void handleGetRequest(String path, OutputStream output) throws IOException {\\n        String response;\\n        String contentType;\\n        \\n        switch (path) {\\n            case \\\"/\\\", \\\"/index.html\\\" -> {\\n                response = \\\"\\\"\\\"\\n                    <!DOCTYPE html>\\n                    <html>\\n                    <head>\\n                        <title>Virtual Thread Server</title>\\n                        <style>\\n                            body { font-family: Arial, sans-serif; margin: 40px; }\\n                            .stats { background: #f5f5f5; padding: 20px; border-radius: 5px; }\\n                            code { background: #eee; padding: 2px 4px; border-radius: 3px; }\\n                        </style>\\n                    </head>\\n                    <body>\\n                        <h1>🚀 Java 21 Virtual Thread HTTP Server</h1>\\n                        <div class=\\\"stats\\\">\\n                            <h2>Server Statistics</h2>\\n                            <p><strong>Active Connections:</strong> %d</p>\\n                            <p><strong>Total Requests:</strong> %d</p>\\n                            <p><strong>Java Version:</strong> %s</p>\\n                            <p><strong>Timestamp:</strong> %s</p>\\n                        </div>\\n                        <h3>Test Endpoints:</h3>\\n                        <ul>\\n                            <li><a href=\\\"/api/hello\\\">/api/hello</a> - Simple JSON response</li>\\n                            <li><a href=\\\"/api/stats\\\">/api/stats</a> - Server statistics</li>\\n                            <li><a href=\\\"/api/slow\\\">/api/slow</a> - Simulated slow endpoint (3s)</li>\\n                            <li><a href=\\\"/api/echo?message=Hello\\\">/api/echo?message=Hello</a> - Echo service</li>\\n                        </ul>\\n                    </body>\\n                    </html>\\n                    \\\"\\\"\\\".formatted(\\n                        activeConnections.get(),\\n                        totalRequests.get(),\\n                        System.getProperty(\\\"java.version\\\"),\\n                        LocalDateTime.now()\\n                    );\\n                contentType = \\\"text/html; charset=utf-8\\\";\\n            }\\n            \\n            case \\\"/api/hello\\\" -> {\\n                response = \\\"\\\"\\\"\\n                    {\\n                        \\\"status\\\": \\\"success\\\",\\n                        \\\"message\\\": \\\"Hello from Java 21 Virtual Threads\\n</Output>\\n<Rubric>\\nUses Project Loom virtual threads correctly, structured concurrency, modern Java 21+ patterns\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "48328b0d-b655-426e-87ef-158969db7f6b",
+        "latencyMs": 442,
+        "namedScores": {
+          "java-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Java expert specializing in modern Java 21+ development with cutting-edge JVM features, Spring ecosystem mastery, and production-ready enterprise applications.\\n\\n## Purpose\\nExpert Java developer mastering Java 21+ features including virtual threads, pattern matching, and modern JVM optimizations. Deep knowledge of Spring Boot 3.x, cloud-native patterns, and building scalable enterprise applications.\\n\\n## Capabilities\\n\\n### Modern Java Language Features\\n- Java 21+ LTS features including virtual threads (Project Loom)\\n- Pattern matching for switch expressions and instanceof\\n- Record classes for immutable data carriers\\n- Text blocks and string templates for better readability\\n- Sealed classes and interfaces for controlled inheritance\\n- Local variable type inference with var keyword\\n- Enhanced switch expressions and yield statements\\n- Foreign Function & Memory API for native interoperability\\n\\n### Virtual Threads & Concurrency\\n- Virtual threads for massive concurrency without platform thread overhead\\n- Structured concurrency patterns for reliable concurrent programming\\n- CompletableFuture and reactive programming with virtual threads\\n- Thread-local optimization and scoped values\\n- Performance tuning for virtual thread workloads\\n- Migration strategies from platform threads to virtual threads\\n- Concurrent collections and thread-safe patterns\\n- Lock-free programming and atomic operations\\n\\n### Spring Framework Ecosystem\\n- Spring Boot 3.x with Java 21 optimization features\\n- Spring WebMVC and WebFlux for reactive programming\\n- Spring Data JPA with Hibernate 6+ performance features\\n- Spring Security 6 with OAuth2 and JWT patterns\\n- Spring Cloud for microservices and distributed systems\\n- Spring Native with GraalVM for fast startup and low memory\\n- Actuator endpoints for production monitoring and health checks\\n- Configuration management with profiles and externalized config\\n\\n### JVM Performance & Optimization\\n- GraalVM Native Image compilation for cloud deployments\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a Java 21 virtual threads-based HTTP server that handles 10,000 concurrent connections\"\n  }\n]",
+          "label": "java-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "cbf0fec28b69dec31ba4831005eecd76493f34e4c4a759b511a9c6ca6d14d44d",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a high-performance HTTP server using Java 21 virtual threads that can handle 10,000+ concurrent connections efficiently. Here's a complete implementation:\n\n```java\nimport java.io.*;\nimport java.net.*;\nimport java.nio.charset.StandardCharsets;\nimport java.time.Duration;\nimport java.time.LocalDateTime;\nimport java.util.concurrent.*;\nimport java.util.concurrent.atomic.AtomicInteger;\n\npublic class VirtualThreadHttpServer {\n    private static final int PORT = 8080;\n    private static final int BACKLOG = 10_000;\n    private static final Duration TIMEOUT = Duration.ofSeconds(30);\n    private static final AtomicInteger activeConnections = new AtomicInteger(0);\n    private static final AtomicInteger totalRequests = new AtomicInteger(0);\n    private static volatile boolean running = true;\n    \n    public static void main(String[] args) throws IOException {\n        System.out.println(\"Starting Virtual Thread HTTP Server on port \" + PORT);\n        System.out.println(\"Java Version: \" + System.getProperty(\"java.version\"));\n        System.out.println(\"Available Processors: \" + Runtime.getRuntime().availableProcessors());\n        \n        // Create server socket with high backlog for concurrent connections\n        try (ServerSocket serverSocket = new ServerSocket(PORT, BACKLOG)) {\n            serverSocket.setReuseAddress(true);\n            \n            // Start statistics thread\n            Thread statsThread = Thread.ofVirtual().start(VirtualThreadHttpServer::printStatistics);\n            \n            // Start graceful shutdown hook\n            Runtime.getRuntime().addShutdownHook(new Thread(() -> {\n                System.out.println(\"\\nShutting down server...\");\n                running = false;\n                try {\n                    statsThread.join(2000);\n                } catch (InterruptedException e) {\n                    Thread.currentThread().interrupt();\n                }\n            }));\n            \n            // Create virtual thread executor for connection handling\n            ExecutorService virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();\n            \n            System.out.println(\"Server ready to accept connections...\");\n            \n            // Main accept loop\n            while (running) {\n                try {\n                    Socket clientSocket = serverSocket.accept();\n                    clientSocket.setSoTimeout((int) TIMEOUT.toMillis());\n                    clientSocket.setTcpNoDelay(true);\n                    \n                    // Submit connection handling to virtual thread\n                    virtualThreadExecutor.submit(() -> handleConnection(clientSocket));\n                    \n                } catch (SocketException e) {\n                    if (running) {\n                        System.err.println(\"Socket error: \" + e.getMessage());\n                    }\n                } catch (IOException e) {\n                    System.err.println(\"Accept error: \" + e.getMessage());\n                }\n            }\n            \n            // Graceful shutdown\n            virtualThreadExecutor.shutdown();\n            try {\n                if (!virtualThreadExecutor.awaitTermination(10, TimeUnit.SECONDS)) {\n                    virtualThreadExecutor.shutdownNow();\n                }\n            } catch (InterruptedException e) {\n                virtualThreadExecutor.shutdownNow();\n                Thread.currentThread().interrupt();\n            }\n            \n        } catch (IOException e) {\n            System.err.println(\"Failed to start server: \" + e.getMessage());\n            System.exit(1);\n        }\n    }\n    \n    private static void handleConnection(Socket clientSocket) {\n        int connectionId = activeConnections.incrementAndGet();\n        String clientAddress = clientSocket.getInetAddress().getHostAddress();\n        \n        try (clientSocket;\n             BufferedReader reader = new BufferedReader(\n                 new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8));\n             OutputStream output = clientSocket.getOutputStream()) {\n            \n            // Parse HTTP request\n            String requestLine = reader.readLine();\n            if (requestLine == null || requestLine.isEmpty()) {\n                return;\n            }\n            \n            totalRequests.incrementAndGet();\n            \n            // Parse method and path\n            String[] requestParts = requestLine.split(\" \");\n            if (requestParts.length < 2) {\n                sendErrorResponse(output, 400, \"Bad Request\");\n                return;\n            }\n            \n            String method = requestParts[0];\n            String path = requestParts[1];\n            \n            // Skip headers (simplified - in production you'd parse them properly)\n            String line;\n            while ((line = reader.readLine()) != null && !line.isEmpty()) {\n                // Headers end with empty line\n            }\n            \n            // Handle different HTTP methods\n            switch (method) {\n                case \"GET\" -> handleGetRequest(path, output);\n                case \"POST\" -> handlePostRequest(reader, output);\n                default -> sendErrorResponse(output, 405, \"Method Not Allowed\");\n            }\n            \n        } catch (SocketTimeoutException e) {\n            System.out.println(\"Connection timeout: \" + clientAddress);\n        } catch (IOException e) {\n            System.err.println(\"Connection error [\" + connectionId + \"]: \" + e.getMessage());\n        } finally {\n            activeConnections.decrementAndGet();\n        }\n    }\n    \n    private static void handleGetRequest(String path, OutputStream output) throws IOException {\n        String response;\n        String contentType;\n        \n        switch (path) {\n            case \"/\", \"/index.html\" -> {\n                response = \"\"\"\n                    <!DOCTYPE html>\n                    <html>\n                    <head>\n                        <title>Virtual Thread Server</title>\n                        <style>\n                            body { font-family: Arial, sans-serif; margin: 40px; }\n                            .stats { background: #f5f5f5; padding: 20px; border-radius: 5px; }\n                            code { background: #eee; padding: 2px 4px; border-radius: 3px; }\n                        </style>\n                    </head>\n                    <body>\n                        <h1>🚀 Java 21 Virtual Thread HTTP Server</h1>\n                        <div class=\"stats\">\n                            <h2>Server Statistics</h2>\n                            <p><strong>Active Connections:</strong> %d</p>\n                            <p><strong>Total Requests:</strong> %d</p>\n                            <p><strong>Java Version:</strong> %s</p>\n                            <p><strong>Timestamp:</strong> %s</p>\n                        </div>\n                        <h3>Test Endpoints:</h3>\n                        <ul>\n                            <li><a href=\"/api/hello\">/api/hello</a> - Simple JSON response</li>\n                            <li><a href=\"/api/stats\">/api/stats</a> - Server statistics</li>\n                            <li><a href=\"/api/slow\">/api/slow</a> - Simulated slow endpoint (3s)</li>\n                            <li><a href=\"/api/echo?message=Hello\">/api/echo?message=Hello</a> - Echo service</li>\n                        </ul>\n                    </body>\n                    </html>\n                    \"\"\".formatted(\n                        activeConnections.get(),\n                        totalRequests.get(),\n                        System.getProperty(\"java.version\"),\n                        LocalDateTime.now()\n                    );\n                contentType = \"text/html; charset=utf-8\";\n            }\n            \n            case \"/api/hello\" -> {\n                response = \"\"\"\n                    {\n                        \"status\": \"success\",\n                        \"message\": \"Hello from Java 21 Virtual Threads",
+          "tokenUsage": {
+            "total": 1898,
+            "prompt": 398,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 442,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:34:10 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 327170f103d7ce2b6a3a10fa66d7ac7c.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "VgUgAJH96WNgleWtbsOfqhC0tsYRPIDlNgxdTeXEuzQbbEle4QKzfw==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "a4cbb7f5e0d5e753ffc44083806da089"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Write a Java 21 virtual threads-based HTTP server that handles 10,000 concurrent",
+          "vars": {
+            "task": "Write a Java 21 virtual threads-based HTTP server that handles 10,000 concurrent connections"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses Project Loom virtual threads correctly, structured concurrency, modern Java 21+ patterns",
+              "threshold": 0.7,
+              "metric": "java-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Write a Java 21 virtual threads-based HTTP server that handles 10,000 concurrent connections"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:34:10 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 327170f103d7ce2b6a3a10fa66d7ac7c.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "VgUgAJH96WNgleWtbsOfqhC0tsYRPIDlNgxdTeXEuzQbbEle4QKzfw==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "a4cbb7f5e0d5e753ffc44083806da089"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 398,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1898,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1759,
+          "prompt": 1694,
+          "completion": 65,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 69573,
+      "evaluationDurationMs": 69573
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: java-pro",
+    "prompts": [
+      {
+        "label": "java-pro",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a Java expert specializing in modern Java 21+ development with cutting-edge JVM features, Spring ecosystem mastery, and production-ready enterprise applications.\\n\\n## Purpose\\nExpert Java developer mastering Java 21+ features including virtual threads, pattern matching, and modern JVM optimizations. Deep knowledge of Spring Boot 3.x, cloud-native patterns, and building scalable enterprise applications.\\n\\n## Capabilities\\n\\n### Modern Java Language Features\\n- Java 21+ LTS features including virtual threads (Project Loom)\\n- Pattern matching for switch expressions and instanceof\\n- Record classes for immutable data carriers\\n- Text blocks and string templates for better readability\\n- Sealed classes and interfaces for controlled inheritance\\n- Local variable type inference with var keyword\\n- Enhanced switch expressions and yield statements\\n- Foreign Function & Memory API for native interoperability\\n\\n### Virtual Threads & Concurrency\\n- Virtual threads for massive concurrency without platform thread overhead\\n- Structured concurrency patterns for reliable concurrent programming\\n- CompletableFuture and reactive programming with virtual threads\\n- Thread-local optimization and scoped values\\n- Performance tuning for virtual thread workloads\\n- Migration strategies from platform threads to virtual threads\\n- Concurrent collections and thread-safe patterns\\n- Lock-free programming and atomic operations\\n\\n### Spring Framework Ecosystem\\n- Spring Boot 3.x with Java 21 optimization features\\n- Spring WebMVC and WebFlux for reactive programming\\n- Spring Data JPA with Hibernate 6+ performance features\\n- Spring Security 6 with OAuth2 and JWT patterns\\n- Spring Cloud for microservices and distributed systems\\n- Spring Native with GraalVM for fast startup and low memory\\n- Actuator endpoints for production monitoring and health checks\\n- Configuration management with profiles and externalized config\\n\\n### JVM Performance & Optimization\\n- GraalVM Native Image compilation for cloud deployments\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Write a Java 21 virtual threads-based HTTP server that handles 10,000 concurrent",
+        "vars": {
+          "task": "Write a Java 21 virtual threads-based HTTP server that handles 10,000 concurrent connections"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses Project Loom virtual threads correctly, structured concurrency, modern Java 21+ patterns",
+            "threshold": 0.7,
+            "metric": "java-pro_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-java-pro.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:35:20.185Z",
+    "evaluationCreatedAt": "2026-03-15T04:34:10.575Z"
+  }
+}

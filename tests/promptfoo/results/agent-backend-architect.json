@@ -1,0 +1,496 @@
+{
+  "evalId": "eval-506-2026-03-15T04:12:14",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:12:14.140Z",
+    "prompts": [
+      {
+        "id": "a028ec6561a3e940cc25d5f3bb66949386e34ab4f5fc000bc61477d4ea60c591",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a backend system architect specializing in scalable, resilient, and maintainable backend systems and APIs.\\n\\n## Purpose\\nExpert backend architect with comprehensive knowledge of modern API design, microservices patterns, distributed systems, and event-driven architectures. Masters service boundary definition, inter-service communication, resilience patterns, and observability. Specializes in designing backend systems that are performant, maintainable, and scalable from day one.\\n\\n## Core Philosophy\\nDesign backend systems with clear boundaries, well-defined contracts, and resilience patterns built in from the start. Focus on practical implementation, favor simplicity over complexity, and build systems that are observable, testable, and maintainable.\\n\\n## Capabilities\\n\\n### API Design & Patterns\\n- **RESTful APIs**: Resource modeling, HTTP methods, status codes, versioning strategies\\n- **GraphQL APIs**: Schema design, resolvers, mutations, subscriptions, DataLoader patterns\\n- **gRPC Services**: Protocol Buffers, streaming (unary, server, client, bidirectional), service definition\\n- **WebSocket APIs**: Real-time communication, connection management, scaling patterns\\n- **Server-Sent Events**: One-way streaming, event formats, reconnection strategies\\n- **Webhook patterns**: Event delivery, retry logic, signature verification, idempotency\\n- **API versioning**: URL versioning, header versioning, content negotiation, deprecation strategies\\n- **Pagination strategies**: Offset, cursor-based, keyset pagination, infinite scroll\\n- **Filtering & sorting**: Query parameters, GraphQL arguments, search capabilities\\n- **Batch operations**: Bulk endpoints, batch mutations, transaction handling\\n- **HATEOAS**: Hypermedia controls, discoverable APIs, link relations\\n\\n### API Contract & Documentation\\n- **OpenAPI/Swagger**: Schema definition, code generation, documentation generation\\n- **GraphQL Schema**: Schema-first design, type system, directives, federation\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "backend-architect",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 2,
+          "testPassCount": 2,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 2,
+          "assertFailCount": 0,
+          "totalLatencyMs": 769,
+          "tokenUsage": {
+            "prompt": 831,
+            "completion": 2868,
+            "cached": 0,
+            "total": 3699,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 3409,
+              "prompt": 3254,
+              "completion": 155,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "backend-architect_quality": 2
+          },
+          "namedScoresCount": {
+            "backend-architect_quality": 2
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "backend-architect_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1782,
+            "prompt": 1695,
+            "completion": 87,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Defines service boundaries using DDD, explains inter-service communication, mentions resilience patterns like circuit breakers",
+                "threshold": 0.7,
+                "metric": "backend-architect_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output defines service boundaries using domain-driven design (e.g., Order Service for order lifecycle, Inventory Service for stock management), explains both synchronous (HTTP/gRPC) and asynchronous (event-driven) inter-service communication, and mentions resilience patterns including circuit breakers, retry with exponential backoff, and the Saga pattern.",
+              "tokensUsed": {
+                "total": 1782,
+                "prompt": 1695,
+                "completion": 87,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n# E-Commerce Microservices Architecture\\n\\n## **System Overview**\\nA scalable, resilient e-commerce platform with clear service boundaries and event-driven communication.\\n\\n## **Core Services**\\n\\n### **1. API Gateway Service**\\n- **Purpose**: Single entry point, request routing, authentication, rate limiting\\n- **Tech**: Kong/Envoy + OAuth2/JWT\\n- **Responsibilities**:\\n  - Route requests to appropriate services\\n  - Authentication & authorization\\n  - Request/response transformation\\n  - Rate limiting per customer/IP\\n  - API version management\\n\\n### **2. Order Service**\\n- **Domain**: Order lifecycle management\\n- **Database**: PostgreSQL (orders, order_items tables)\\n- **Key Operations**:\\n  - Create/update/cancel orders\\n  - Order status tracking (pending → processing → shipped → delivered)\\n  - Order history and search\\n- **Events Published**:\\n  - `OrderCreated`\\n  - `OrderStatusChanged`\\n  - `OrderCancelled`\\n\\n### **3. Inventory Service**\\n- **Domain**: Stock management and reservations\\n- **Database**: PostgreSQL with optimistic locking\\n- **Key Operations**:\\n  - Check product availability\\n  - Reserve stock on order creation\\n  - Update stock on shipment\\n  - Low stock alerts\\n- **Patterns**:\\n  - Saga pattern for distributed transactions\\n  - Event sourcing for audit trail\\n\\n### **4. Payment Service**\\n- **Domain**: Payment processing and reconciliation\\n- **Database**: PostgreSQL (PCI-compliant isolation)\\n- **Key Operations**:\\n  - Process payments (credit card, PayPal, etc.)\\n  - Refund handling\\n  - Payment status webhooks\\n  - Fraud detection integration\\n- **Security**: Tokenization, PCI-DSS compliance\\n\\n### **5. Product Catalog Service**\\n- **Domain**: Product information and search\\n- **Database**: PostgreSQL (products) + Elasticsearch (search)\\n- **Key Operations**:\\n  - CRUD for products/categories\\n  - Full-text search with filters\\n  - Inventory aggregation (eventual consistency)\\n  - Caching layer for hot products\\n\\n### **6. User Service**\\n- **Domain**: Customer profiles and authentication\\n- **Database**: PostgreSQL (users, addresses, preferences)\\n- **Key Operations**:\\n  - User registration/login\\n  - Profile management\\n  - Address book\\n  - Order history aggregation\\n\\n## **Communication Patterns**\\n\\n### **Synchronous Communication (HTTP/gRPC)**\\n```\\nClient → API Gateway → Service\\n```\\n- Used for: Immediate responses, data retrieval\\n- Examples: Get product details, user profile\\n\\n### **Asynchronous Communication (Event-Driven)**\\n```\\nOrderCreated → [Inventory: reserve stock]\\n              → [Payment: process payment]\\n              → [Notification: send confirmation]\\n```\\n- **Message Broker**: Apache Kafka/RabbitMQ\\n- **Events**:\\n  - `OrderCreated`\\n  - `PaymentProcessed`\\n  - `InventoryReserved`\\n  - `OrderShipped`\\n\\n## **Data Management**\\n\\n### **Database Per Service**\\n- Each service owns its database\\n- No direct database access between services\\n- Use events for data consistency\\n\\n### **Caching Strategy**\\n- **Redis Cluster** for:\\n  - Product catalog (5-minute TTL)\\n  - User sessions\\n  - Shopping cart (temporary)\\n- Cache invalidation via events\\n\\n### **Search Optimization**\\n- Elasticsearch for product search\\n- Updated via `ProductUpdated` events\\n\\n## **Resilience Patterns**\\n\\n### **Circuit Breaker**\\n- Between services for dependent calls\\n- Configurable thresholds and timeouts\\n\\n### **Retry with Exponential Backoff**\\n- For transient failures (payment gateway, inventory updates)\\n\\n### **Saga Pattern for Distributed Transactions**\\n```typescript\\n// Order creation saga\\n1. OrderService: Create order (PENDING)\\n2. InventoryService: Reserve items\\n3. PaymentService: Process payment\\n4. If all succeed: OrderService: Confirm order (CONFIRMED)\\n5. If any fail: Compensating transactions\\n```\\n\\n### **Dead Letter Queues**\\n- For unprocessable events\\n- Manual review and reprocessing\\n\\n## **Deployment & Scaling**\\n\\n### **Containerization**\\n- Docker containers for each service\\n- Kubernetes for orchestration\\n\\n### **Scaling Strategy**\\n- **Stateless services**: Horizontal scaling (Order, API Gateway)\\n- **Stateful services**: Read replicas (Product Catalog, User)\\n- **Message consumers**: Multiple instances with consumer groups\\n\\n### **Service Mesh**\\n- Istio/Linkerd for:\\n  - Service discovery\\n  - Load balancing\\n  - Observability\\n  - Security (mTLS)\\n\\n## **Monitoring & Observability**\\n\\n### **Metrics**\\n- Prometheus for metrics collection\\n- Grafana dashboards for:\\n  - Service latency (p95, p99)\\n  - Error rates\\n  - Queue depths\\n  - Database connections\\n\\n### **Distributed Tracing**\\n- Jaeger/Zipkin for request tracing across services\\n- Correlation IDs for all requests\\n\\n### **Logging**\\n- Centralized logging (ELK stack)\\n- Structured logging with request IDs\\n\\n## **Security**\\n\\n### **API Security**\\n- JWT tokens for authentication\\n- Role-based access control (RBAC)\\n- API keys for external integrations\\n\\n### **Data Security**\\n- Encryption at rest (database)\\n- Encryption in transit (TLS 1.3)\\n- PCI-DSS compliance for payment data\\n- Tokenization for sensitive data\\n\\n### **Network Security**\\n- Service mesh with mTLS\\n- Network policies in Kubernetes\\n- Private subnets for databases\\n\\n## **Development & DevOps**\\n\\n### **CI/CD Pipeline**\\n- GitOps approach with ArgoCD\\n- Automated testing:\\n  - Unit tests per service\\n  - Contract tests (Pact)\\n  - Integration tests\\n  - Performance tests\\n\\n### **Configuration Management**\\n- Externalized configuration\\n- Feature flags for gradual rollouts\\n- Secrets management (HashiCorp Vault)\\n\\n## **Cost Optimization**\\n\\n### **Resource Allocation**\\n- Auto-scaling based on metrics\\n- Spot instances for stateless workloads\\n- Reserved instances for databases\\n\\n### **Caching Strategy**\\n- Multi-level caching to reduce database load\\n- CDN for static assets\\n\\n## **Evolution & Maintenance**\\n\\n### **Versioning Strategy**\\n- API versioning in URL/headers\\n- Backward compatibility for 2 major versions\\n- Automated deprecation notifications\\n\\n### **Deployment Strategies**\\n- Blue-green deployments\\n- Canary releases with feature flags\\n- Database migration strategies per service\\n\\n---\\n\\n## **Key Benefits**\\n1. **Independent scaling**: Scale inventory during sales, payments during checkout peaks\\n2. **Resilience**: Failure in one service doesn't cascade\\n3. **Team autonomy**: Each team owns their service end-to-end\\n4. **Technology flexibility**: Use best tool for each service\\n5. **Faster deployments**: Deploy services independently\\n\\n## **Trade-offs Accepted**\\n1. **Eventual consistency**: Inventory counts may be temporarily inconsistent\\n2. **Operational complexity**: More services to monitor and deploy\\n3. **Distributed transactions**: Requires saga pattern instead of ACID transactions\\n\\nThis architecture provides a solid foundation that can scale from startup to enterprise while maintaining developer velocity and system reliability\\n</Output>\\n<Rubric>\\nDefines service boundaries using DDD, explains inter-service communication, mentions resilience patterns like circuit breakers\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "b6184713-059d-4004-afd2-0a650cbe3983",
+        "latencyMs": 381,
+        "namedScores": {
+          "backend-architect_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a backend system architect specializing in scalable, resilient, and maintainable backend systems and APIs.\\n\\n## Purpose\\nExpert backend architect with comprehensive knowledge of modern API design, microservices patterns, distributed systems, and event-driven architectures. Masters service boundary definition, inter-service communication, resilience patterns, and observability. Specializes in designing backend systems that are performant, maintainable, and scalable from day one.\\n\\n## Core Philosophy\\nDesign backend systems with clear boundaries, well-defined contracts, and resilience patterns built in from the start. Focus on practical implementation, favor simplicity over complexity, and build systems that are observable, testable, and maintainable.\\n\\n## Capabilities\\n\\n### API Design & Patterns\\n- **RESTful APIs**: Resource modeling, HTTP methods, status codes, versioning strategies\\n- **GraphQL APIs**: Schema design, resolvers, mutations, subscriptions, DataLoader patterns\\n- **gRPC Services**: Protocol Buffers, streaming (unary, server, client, bidirectional), service definition\\n- **WebSocket APIs**: Real-time communication, connection management, scaling patterns\\n- **Server-Sent Events**: One-way streaming, event formats, reconnection strategies\\n- **Webhook patterns**: Event delivery, retry logic, signature verification, idempotency\\n- **API versioning**: URL versioning, header versioning, content negotiation, deprecation strategies\\n- **Pagination strategies**: Offset, cursor-based, keyset pagination, infinite scroll\\n- **Filtering & sorting**: Query parameters, GraphQL arguments, search capabilities\\n- **Batch operations**: Bulk endpoints, batch mutations, transaction handling\\n- **HATEOAS**: Hypermedia controls, discoverable APIs, link relations\\n\\n### API Contract & Documentation\\n- **OpenAPI/Swagger**: Schema definition, code generation, documentation generation\\n- **GraphQL Schema**: Schema-first design, type system, directives, federation\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Design a microservices architecture for an e-commerce platform with order management, inventory, and payments\"\n  }\n]",
+          "label": "backend-architect",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "a028ec6561a3e940cc25d5f3bb66949386e34ab4f5fc000bc61477d4ea60c591",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "# E-Commerce Microservices Architecture\n\n## **System Overview**\nA scalable, resilient e-commerce platform with clear service boundaries and event-driven communication.\n\n## **Core Services**\n\n### **1. API Gateway Service**\n- **Purpose**: Single entry point, request routing, authentication, rate limiting\n- **Tech**: Kong/Envoy + OAuth2/JWT\n- **Responsibilities**:\n  - Route requests to appropriate services\n  - Authentication & authorization\n  - Request/response transformation\n  - Rate limiting per customer/IP\n  - API version management\n\n### **2. Order Service**\n- **Domain**: Order lifecycle management\n- **Database**: PostgreSQL (orders, order_items tables)\n- **Key Operations**:\n  - Create/update/cancel orders\n  - Order status tracking (pending → processing → shipped → delivered)\n  - Order history and search\n- **Events Published**:\n  - `OrderCreated`\n  - `OrderStatusChanged`\n  - `OrderCancelled`\n\n### **3. Inventory Service**\n- **Domain**: Stock management and reservations\n- **Database**: PostgreSQL with optimistic locking\n- **Key Operations**:\n  - Check product availability\n  - Reserve stock on order creation\n  - Update stock on shipment\n  - Low stock alerts\n- **Patterns**:\n  - Saga pattern for distributed transactions\n  - Event sourcing for audit trail\n\n### **4. Payment Service**\n- **Domain**: Payment processing and reconciliation\n- **Database**: PostgreSQL (PCI-compliant isolation)\n- **Key Operations**:\n  - Process payments (credit card, PayPal, etc.)\n  - Refund handling\n  - Payment status webhooks\n  - Fraud detection integration\n- **Security**: Tokenization, PCI-DSS compliance\n\n### **5. Product Catalog Service**\n- **Domain**: Product information and search\n- **Database**: PostgreSQL (products) + Elasticsearch (search)\n- **Key Operations**:\n  - CRUD for products/categories\n  - Full-text search with filters\n  - Inventory aggregation (eventual consistency)\n  - Caching layer for hot products\n\n### **6. User Service**\n- **Domain**: Customer profiles and authentication\n- **Database**: PostgreSQL (users, addresses, preferences)\n- **Key Operations**:\n  - User registration/login\n  - Profile management\n  - Address book\n  - Order history aggregation\n\n## **Communication Patterns**\n\n### **Synchronous Communication (HTTP/gRPC)**\n```\nClient → API Gateway → Service\n```\n- Used for: Immediate responses, data retrieval\n- Examples: Get product details, user profile\n\n### **Asynchronous Communication (Event-Driven)**\n```\nOrderCreated → [Inventory: reserve stock]\n              → [Payment: process payment]\n              → [Notification: send confirmation]\n```\n- **Message Broker**: Apache Kafka/RabbitMQ\n- **Events**:\n  - `OrderCreated`\n  - `PaymentProcessed`\n  - `InventoryReserved`\n  - `OrderShipped`\n\n## **Data Management**\n\n### **Database Per Service**\n- Each service owns its database\n- No direct database access between services\n- Use events for data consistency\n\n### **Caching Strategy**\n- **Redis Cluster** for:\n  - Product catalog (5-minute TTL)\n  - User sessions\n  - Shopping cart (temporary)\n- Cache invalidation via events\n\n### **Search Optimization**\n- Elasticsearch for product search\n- Updated via `ProductUpdated` events\n\n## **Resilience Patterns**\n\n### **Circuit Breaker**\n- Between services for dependent calls\n- Configurable thresholds and timeouts\n\n### **Retry with Exponential Backoff**\n- For transient failures (payment gateway, inventory updates)\n\n### **Saga Pattern for Distributed Transactions**\n```typescript\n// Order creation saga\n1. OrderService: Create order (PENDING)\n2. InventoryService: Reserve items\n3. PaymentService: Process payment\n4. If all succeed: OrderService: Confirm order (CONFIRMED)\n5. If any fail: Compensating transactions\n```\n\n### **Dead Letter Queues**\n- For unprocessable events\n- Manual review and reprocessing\n\n## **Deployment & Scaling**\n\n### **Containerization**\n- Docker containers for each service\n- Kubernetes for orchestration\n\n### **Scaling Strategy**\n- **Stateless services**: Horizontal scaling (Order, API Gateway)\n- **Stateful services**: Read replicas (Product Catalog, User)\n- **Message consumers**: Multiple instances with consumer groups\n\n### **Service Mesh**\n- Istio/Linkerd for:\n  - Service discovery\n  - Load balancing\n  - Observability\n  - Security (mTLS)\n\n## **Monitoring & Observability**\n\n### **Metrics**\n- Prometheus for metrics collection\n- Grafana dashboards for:\n  - Service latency (p95, p99)\n  - Error rates\n  - Queue depths\n  - Database connections\n\n### **Distributed Tracing**\n- Jaeger/Zipkin for request tracing across services\n- Correlation IDs for all requests\n\n### **Logging**\n- Centralized logging (ELK stack)\n- Structured logging with request IDs\n\n## **Security**\n\n### **API Security**\n- JWT tokens for authentication\n- Role-based access control (RBAC)\n- API keys for external integrations\n\n### **Data Security**\n- Encryption at rest (database)\n- Encryption in transit (TLS 1.3)\n- PCI-DSS compliance for payment data\n- Tokenization for sensitive data\n\n### **Network Security**\n- Service mesh with mTLS\n- Network policies in Kubernetes\n- Private subnets for databases\n\n## **Development & DevOps**\n\n### **CI/CD Pipeline**\n- GitOps approach with ArgoCD\n- Automated testing:\n  - Unit tests per service\n  - Contract tests (Pact)\n  - Integration tests\n  - Performance tests\n\n### **Configuration Management**\n- Externalized configuration\n- Feature flags for gradual rollouts\n- Secrets management (HashiCorp Vault)\n\n## **Cost Optimization**\n\n### **Resource Allocation**\n- Auto-scaling based on metrics\n- Spot instances for stateless workloads\n- Reserved instances for databases\n\n### **Caching Strategy**\n- Multi-level caching to reduce database load\n- CDN for static assets\n\n## **Evolution & Maintenance**\n\n### **Versioning Strategy**\n- API versioning in URL/headers\n- Backward compatibility for 2 major versions\n- Automated deprecation notifications\n\n### **Deployment Strategies**\n- Blue-green deployments\n- Canary releases with feature flags\n- Database migration strategies per service\n\n---\n\n## **Key Benefits**\n1. **Independent scaling**: Scale inventory during sales, payments during checkout peaks\n2. **Resilience**: Failure in one service doesn't cascade\n3. **Team autonomy**: Each team owns their service end-to-end\n4. **Technology flexibility**: Use best tool for each service\n5. **Faster deployments**: Deploy services independently\n\n## **Trade-offs Accepted**\n1. **Eventual consistency**: Inventory counts may be temporarily inconsistent\n2. **Operational complexity**: More services to monitor and deploy\n3. **Distributed transactions**: Requires saga pattern instead of ACID transactions\n\nThis architecture provides a solid foundation that can scale from startup to enterprise while maintaining developer velocity and system reliability",
+          "tokenUsage": {
+            "total": 1916,
+            "prompt": 416,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 381,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:12:14 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 cdb27cf2afdd9e6a77395bc390dff594.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "-VMM9338-FMqOwTlY8byi1AvPF2kh4DgnedkI8NnMYuvpip-FVBhtg==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "3dfe3adcbf7bf3bf36640b8e9fdaf342"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Design a microservices architecture for an e-commerce platform with order manage",
+          "vars": {
+            "task": "Design a microservices architecture for an e-commerce platform with order management, inventory, and payments"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Defines service boundaries using DDD, explains inter-service communication, mentions resilience patterns like circuit breakers",
+              "threshold": 0.7,
+              "metric": "backend-architect_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Design a microservices architecture for an e-commerce platform with order management, inventory, and payments"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:12:14 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 cdb27cf2afdd9e6a77395bc390dff594.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "-VMM9338-FMqOwTlY8byi1AvPF2kh4DgnedkI8NnMYuvpip-FVBhtg==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "3dfe3adcbf7bf3bf36640b8e9fdaf342"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "backend-architect_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1627,
+            "prompt": 1559,
+            "completion": 68,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Provides specific trade-offs, mentions eventual consistency, gives guidance on when to use each approach",
+                "threshold": 0.7,
+                "metric": "backend-architect_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output provides specific trade-offs for both synchronous REST and asynchronous event-driven communication, explicitly discusses eventual consistency as a disadvantage of asynchronous communication, and offers clear guidance on when to use each approach, including a decision framework and hybrid recommendations.",
+              "tokensUsed": {
+                "total": 1627,
+                "prompt": 1559,
+                "completion": 68,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nExcellent question that gets to the heart of modern distributed system design. The choice between synchronous REST and asynchronous event-driven communication is fundamental and shapes your system's characteristics. Let's break down the trade-offs across key dimensions.\\n\\n### **Synchronous REST (Request/Response)**\\n\\n**Characteristics:** Direct, immediate communication where the caller blocks and waits for a response. Typically uses HTTP/HTTPS with JSON/XML.\\n\\n#### **Advantages (Trade-Offs in Favor of REST)**\\n1.  **Simplicity & Familiarity:** The mental model is straightforward—call a service and get a response. Vast tooling, libraries, and developer expertise exist.\\n2.  **Immediate Feedback:** The caller knows the outcome (success/failure) immediately. Essential for user-facing operations where a UI must update right away (e.g., \\\"Add to Cart\\\").\\n3.  **Simplified Error Handling:** Errors can be propagated directly back to the caller in the same request/response cycle. Retry logic is local to the caller.\\n4.  **Easier Debugging & Tracing:** A single call chain is easier to trace in logs (correlation IDs still needed, but the flow is linear).\\n\\n#### **Disadvantages (Trade-Offs Against REST)**\\n1.  **Temporal Coupling:** Both services must be available *at the same time* for the call to succeed. This creates a distributed monolith risk—if Service B is down, Service A fails.\\n2.  **Performance & Latency:** Latencies are additive. The total response time is the sum of all downstream service calls plus network overhead. The \\\"chain of calls\\\" problem.\\n3.  **Resilience Challenges:** Requires robust client-side patterns (retries, circuit breakers, timeouts) to prevent cascading failures. Without them, one slow service can bring down the entire chain.\\n4.  **Data Consistency Model:** Enforces strong, immediate consistency. All services see updated data by the end of the call. This can become a bottleneck.\\n\\n---\\n\\n### **Asynchronous Event-Driven Communication**\\n\\n**Characteristics:** Communication via messages/events (e.g., using Kafka, RabbitMQ, SQS). Services emit events without expecting an immediate response. Interested services consume them independently.\\n\\n#### **Advantages (Trade-Offs in Favor of Events)**\\n1.  **Loose Temporal Coupling:** Producers and consumers do not need to be available simultaneously. A service can be down and process events when it comes back online (within message retention limits). This dramatically improves **resilience**.\\n2.  **Improved Scalability & Performance:** The producer is not blocked. It can quickly acknowledge the event and move on. Consumers process at their own pace. This enables high-throughput systems.\\n3.  **Workflow Decoupling:** Complex business processes can be modeled as a series of events. New services can be added to react to existing events without modifying the producer (**extensibility**).\\n4.  **Natural Audit Log:** The event stream becomes a persistent log of \\\"what happened,\\\" invaluable for debugging, analytics, and replaying scenarios.\\n\\n#### **Disadvantages (Trade-Offs Against Events)**\\n1.  **Complexity Overhead:** Introduces new infrastructure (message brokers), new failure modes (poison pills, duplicate messages), and requires thinking in terms of eventual consistency.\\n2.  **Immediate Feedback Not Possible:** The caller (event publisher) does not know if or when the action will be processed. Requires alternative patterns like **\\\"Return Address\\\"** or **\\\"Polling Status Endpoints\\\"** to provide user feedback.\\n3.  **Eventual Consistency:** Data is not immediately consistent across all services. This must be designed for and communicated to the UI/UX. Can be confusing for developers used to strong consistency.\\n4.  **Debugging & Observability is Harder:** Tracing a business flow across multiple asynchronous events is more complex than following a synchronous call stack. Requires excellent distributed tracing.\\n\\n---\\n\\n### **Decision Framework: When to Choose Which?**\\n\\n| **Dimension** | **Favor Synchronous REST** | **Favor Asynchronous Events** |\\n| :--- | :--- | :--- |\\n| **User Interaction** | **Direct user action requiring immediate confirmation.**<br>e.g., Login, Place Order (payment auth), Update profile. | **Background processing or long-running workflows.**<br>e.g., Send order confirmation email, Generate monthly report, Update recommendations. |\\n| **Data Consistency** | **Strong, immediate consistency is a business requirement.**<br>e.g., Inventory deduction at checkout, seat reservation. | **Eventual consistency is acceptable or preferred.**<br>e.g., Updating a read model (CQRS), cache invalidation, data replication. |\\n| **System Coupling** | Tight control over the workflow is acceptable. | Need to **decouple services** to allow independent development, scaling, and deployment. |\\n| **Performance Profile** | Low-latency response for a single action is critical. | High throughput, background processing, or \\\"fire-and-forget\\\" operations. |\\n| **Error Handling** | Errors must be handled and communicated within the same interaction. | Errors can be handled offline, with retry queues and dead-letter queues. |\\n\\n### **Architectural Recommendation: The Hybrid Approach**\\n\\nMost robust microservices architectures use **both patterns**, choosing the right tool for each interaction.\\n\\n1.  **Synchronous for the \\\"Command\\\"**: Use a synchronous API call for the initial user-facing command and immediate validation.\\n    *   *Example:* `POST /orders` validates items, checks customer auth, and returns a `202 Accepted` with an `orderId`.\\n\\n2.  **Asynchronous for the \\\"Process\\\"**: The order service then emits an `OrderPlaced` event. Downstream services (payment, inventory, shipping, notifications) consume it asynchronously to complete the workflow.\\n\\n3.  **Asynchronous for \\\"Notifications/Updates\\\"**: The UI can use Server-Sent Events (SSE) or WebSockets to listen for `OrderStatusUpdated` events pushed from the backend.\\n\\n**Key Principle:** **Synchronize on the outside (API boundary), asynchronize on the inside (service-to-service).** Your public API provides a synchronous contract to clients, while your internal service mesh leverages events for resilience and scalability.\\n\\n**Final Trade-off Summary:** Choose **synchronous REST** for simplicity, immediate feedback, and strong consistency in user-facing calls. Choose **asynchronous events** for resilience, scalability, and decoupling in internal workflows and background processing. The most scalable systems intelligently blend both.\\n</Output>\\n<Rubric>\\nProvides specific trade-offs, mentions eventual consistency, gives guidance on when to use each approach\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "681c2fe2-d20c-4844-9a6e-6ad1aae347e0",
+        "latencyMs": 388,
+        "namedScores": {
+          "backend-architect_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a backend system architect specializing in scalable, resilient, and maintainable backend systems and APIs.\\n\\n## Purpose\\nExpert backend architect with comprehensive knowledge of modern API design, microservices patterns, distributed systems, and event-driven architectures. Masters service boundary definition, inter-service communication, resilience patterns, and observability. Specializes in designing backend systems that are performant, maintainable, and scalable from day one.\\n\\n## Core Philosophy\\nDesign backend systems with clear boundaries, well-defined contracts, and resilience patterns built in from the start. Focus on practical implementation, favor simplicity over complexity, and build systems that are observable, testable, and maintainable.\\n\\n## Capabilities\\n\\n### API Design & Patterns\\n- **RESTful APIs**: Resource modeling, HTTP methods, status codes, versioning strategies\\n- **GraphQL APIs**: Schema design, resolvers, mutations, subscriptions, DataLoader patterns\\n- **gRPC Services**: Protocol Buffers, streaming (unary, server, client, bidirectional), service definition\\n- **WebSocket APIs**: Real-time communication, connection management, scaling patterns\\n- **Server-Sent Events**: One-way streaming, event formats, reconnection strategies\\n- **Webhook patterns**: Event delivery, retry logic, signature verification, idempotency\\n- **API versioning**: URL versioning, header versioning, content negotiation, deprecation strategies\\n- **Pagination strategies**: Offset, cursor-based, keyset pagination, infinite scroll\\n- **Filtering & sorting**: Query parameters, GraphQL arguments, search capabilities\\n- **Batch operations**: Bulk endpoints, batch mutations, transaction handling\\n- **HATEOAS**: Hypermedia controls, discoverable APIs, link relations\\n\\n### API Contract & Documentation\\n- **OpenAPI/Swagger**: Schema definition, code generation, documentation generation\\n- **GraphQL Schema**: Schema-first design, type system, directives, federation\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"What are the trade-offs between synchronous REST and asynchronous event-driven communication in microservices?\"\n  }\n]",
+          "label": "backend-architect",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "a028ec6561a3e940cc25d5f3bb66949386e34ab4f5fc000bc61477d4ea60c591",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Excellent question that gets to the heart of modern distributed system design. The choice between synchronous REST and asynchronous event-driven communication is fundamental and shapes your system's characteristics. Let's break down the trade-offs across key dimensions.\n\n### **Synchronous REST (Request/Response)**\n\n**Characteristics:** Direct, immediate communication where the caller blocks and waits for a response. Typically uses HTTP/HTTPS with JSON/XML.\n\n#### **Advantages (Trade-Offs in Favor of REST)**\n1.  **Simplicity & Familiarity:** The mental model is straightforward—call a service and get a response. Vast tooling, libraries, and developer expertise exist.\n2.  **Immediate Feedback:** The caller knows the outcome (success/failure) immediately. Essential for user-facing operations where a UI must update right away (e.g., \"Add to Cart\").\n3.  **Simplified Error Handling:** Errors can be propagated directly back to the caller in the same request/response cycle. Retry logic is local to the caller.\n4.  **Easier Debugging & Tracing:** A single call chain is easier to trace in logs (correlation IDs still needed, but the flow is linear).\n\n#### **Disadvantages (Trade-Offs Against REST)**\n1.  **Temporal Coupling:** Both services must be available *at the same time* for the call to succeed. This creates a distributed monolith risk—if Service B is down, Service A fails.\n2.  **Performance & Latency:** Latencies are additive. The total response time is the sum of all downstream service calls plus network overhead. The \"chain of calls\" problem.\n3.  **Resilience Challenges:** Requires robust client-side patterns (retries, circuit breakers, timeouts) to prevent cascading failures. Without them, one slow service can bring down the entire chain.\n4.  **Data Consistency Model:** Enforces strong, immediate consistency. All services see updated data by the end of the call. This can become a bottleneck.\n\n---\n\n### **Asynchronous Event-Driven Communication**\n\n**Characteristics:** Communication via messages/events (e.g., using Kafka, RabbitMQ, SQS). Services emit events without expecting an immediate response. Interested services consume them independently.\n\n#### **Advantages (Trade-Offs in Favor of Events)**\n1.  **Loose Temporal Coupling:** Producers and consumers do not need to be available simultaneously. A service can be down and process events when it comes back online (within message retention limits). This dramatically improves **resilience**.\n2.  **Improved Scalability & Performance:** The producer is not blocked. It can quickly acknowledge the event and move on. Consumers process at their own pace. This enables high-throughput systems.\n3.  **Workflow Decoupling:** Complex business processes can be modeled as a series of events. New services can be added to react to existing events without modifying the producer (**extensibility**).\n4.  **Natural Audit Log:** The event stream becomes a persistent log of \"what happened,\" invaluable for debugging, analytics, and replaying scenarios.\n\n#### **Disadvantages (Trade-Offs Against Events)**\n1.  **Complexity Overhead:** Introduces new infrastructure (message brokers), new failure modes (poison pills, duplicate messages), and requires thinking in terms of eventual consistency.\n2.  **Immediate Feedback Not Possible:** The caller (event publisher) does not know if or when the action will be processed. Requires alternative patterns like **\"Return Address\"** or **\"Polling Status Endpoints\"** to provide user feedback.\n3.  **Eventual Consistency:** Data is not immediately consistent across all services. This must be designed for and communicated to the UI/UX. Can be confusing for developers used to strong consistency.\n4.  **Debugging & Observability is Harder:** Tracing a business flow across multiple asynchronous events is more complex than following a synchronous call stack. Requires excellent distributed tracing.\n\n---\n\n### **Decision Framework: When to Choose Which?**\n\n| **Dimension** | **Favor Synchronous REST** | **Favor Asynchronous Events** |\n| :--- | :--- | :--- |\n| **User Interaction** | **Direct user action requiring immediate confirmation.**<br>e.g., Login, Place Order (payment auth), Update profile. | **Background processing or long-running workflows.**<br>e.g., Send order confirmation email, Generate monthly report, Update recommendations. |\n| **Data Consistency** | **Strong, immediate consistency is a business requirement.**<br>e.g., Inventory deduction at checkout, seat reservation. | **Eventual consistency is acceptable or preferred.**<br>e.g., Updating a read model (CQRS), cache invalidation, data replication. |\n| **System Coupling** | Tight control over the workflow is acceptable. | Need to **decouple services** to allow independent development, scaling, and deployment. |\n| **Performance Profile** | Low-latency response for a single action is critical. | High throughput, background processing, or \"fire-and-forget\" operations. |\n| **Error Handling** | Errors must be handled and communicated within the same interaction. | Errors can be handled offline, with retry queues and dead-letter queues. |\n\n### **Architectural Recommendation: The Hybrid Approach**\n\nMost robust microservices architectures use **both patterns**, choosing the right tool for each interaction.\n\n1.  **Synchronous for the \"Command\"**: Use a synchronous API call for the initial user-facing command and immediate validation.\n    *   *Example:* `POST /orders` validates items, checks customer auth, and returns a `202 Accepted` with an `orderId`.\n\n2.  **Asynchronous for the \"Process\"**: The order service then emits an `OrderPlaced` event. Downstream services (payment, inventory, shipping, notifications) consume it asynchronously to complete the workflow.\n\n3.  **Asynchronous for \"Notifications/Updates\"**: The UI can use Server-Sent Events (SSE) or WebSockets to listen for `OrderStatusUpdated` events pushed from the backend.\n\n**Key Principle:** **Synchronize on the outside (API boundary), asynchronize on the inside (service-to-service).** Your public API provides a synchronous contract to clients, while your internal service mesh leverages events for resilience and scalability.\n\n**Final Trade-off Summary:** Choose **synchronous REST** for simplicity, immediate feedback, and strong consistency in user-facing calls. Choose **asynchronous events** for resilience, scalability, and decoupling in internal workflows and background processing. The most scalable systems intelligently blend both.",
+          "tokenUsage": {
+            "total": 1783,
+            "prompt": 415,
+            "completion": 1368,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 388,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:12:14 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 c394b304f0944b3e9f46b58b7e0d2e66.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "x_d-vIRi9xdjQ0yRs8gbTuUlUNbrmzatiBDqTzU1_CHZR9gl7L4ctg==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "ee1c52c60c2d2c3e07d4be1be18ebac6"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[2] What are the trade-offs between synchronous REST and asynchronous event-driven c",
+          "vars": {
+            "task": "What are the trade-offs between synchronous REST and asynchronous event-driven communication in microservices?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Provides specific trade-offs, mentions eventual consistency, gives guidance on when to use each approach",
+              "threshold": 0.7,
+              "metric": "backend-architect_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "task": "What are the trade-offs between synchronous REST and asynchronous event-driven communication in microservices?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:12:14 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 c394b304f0944b3e9f46b58b7e0d2e66.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "x_d-vIRi9xdjQ0yRs8gbTuUlUNbrmzatiBDqTzU1_CHZR9gl7L4ctg==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "ee1c52c60c2d2c3e07d4be1be18ebac6"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 2,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 831,
+        "completion": 2868,
+        "cached": 0,
+        "total": 3699,
+        "numRequests": 2,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 3409,
+          "prompt": 3254,
+          "completion": 155,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 78122,
+      "evaluationDurationMs": 78122
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: backend-architect",
+    "prompts": [
+      {
+        "label": "backend-architect",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a backend system architect specializing in scalable, resilient, and maintainable backend systems and APIs.\\n\\n## Purpose\\nExpert backend architect with comprehensive knowledge of modern API design, microservices patterns, distributed systems, and event-driven architectures. Masters service boundary definition, inter-service communication, resilience patterns, and observability. Specializes in designing backend systems that are performant, maintainable, and scalable from day one.\\n\\n## Core Philosophy\\nDesign backend systems with clear boundaries, well-defined contracts, and resilience patterns built in from the start. Focus on practical implementation, favor simplicity over complexity, and build systems that are observable, testable, and maintainable.\\n\\n## Capabilities\\n\\n### API Design & Patterns\\n- **RESTful APIs**: Resource modeling, HTTP methods, status codes, versioning strategies\\n- **GraphQL APIs**: Schema design, resolvers, mutations, subscriptions, DataLoader patterns\\n- **gRPC Services**: Protocol Buffers, streaming (unary, server, client, bidirectional), service definition\\n- **WebSocket APIs**: Real-time communication, connection management, scaling patterns\\n- **Server-Sent Events**: One-way streaming, event formats, reconnection strategies\\n- **Webhook patterns**: Event delivery, retry logic, signature verification, idempotency\\n- **API versioning**: URL versioning, header versioning, content negotiation, deprecation strategies\\n- **Pagination strategies**: Offset, cursor-based, keyset pagination, infinite scroll\\n- **Filtering & sorting**: Query parameters, GraphQL arguments, search capabilities\\n- **Batch operations**: Bulk endpoints, batch mutations, transaction handling\\n- **HATEOAS**: Hypermedia controls, discoverable APIs, link relations\\n\\n### API Contract & Documentation\\n- **OpenAPI/Swagger**: Schema definition, code generation, documentation generation\\n- **GraphQL Schema**: Schema-first design, type system, directives, federation\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Design a microservices architecture for an e-commerce platform with order manage",
+        "vars": {
+          "task": "Design a microservices architecture for an e-commerce platform with order management, inventory, and payments"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Defines service boundaries using DDD, explains inter-service communication, mentions resilience patterns like circuit breakers",
+            "threshold": 0.7,
+            "metric": "backend-architect_quality"
+          }
+        ]
+      },
+      {
+        "description": "[2] What are the trade-offs between synchronous REST and asynchronous event-driven c",
+        "vars": {
+          "task": "What are the trade-offs between synchronous REST and asynchronous event-driven communication in microservices?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Provides specific trade-offs, mentions eventual consistency, gives guidance on when to use each approach",
+            "threshold": 0.7,
+            "metric": "backend-architect_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-backend-architect.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:13:32.330Z",
+    "evaluationCreatedAt": "2026-03-15T04:12:14.140Z"
+  }
+}

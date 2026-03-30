@@ -1,0 +1,2580 @@
+{
+  "evalId": "eval-Bs3-2026-03-26T09:17:52",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-26T09:17:52.963Z",
+    "prompts": [
+      {
+        "id": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\n{{user_task}}\"\n  }\n]\n",
+        "label": "with-routing-directive",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 7,
+          "testPassCount": 7,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 7,
+          "assertFailCount": 0,
+          "totalLatencyMs": 2434,
+          "tokenUsage": {
+            "prompt": 2906,
+            "completion": 1061,
+            "cached": 0,
+            "total": 3967,
+            "numRequests": 7,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 2825,
+              "prompt": 2490,
+              "completion": 335,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "correct_agent_dispatch": 4,
+            "avoids_unnecessary_dispatch": 3
+          },
+          "namedScoresCount": {
+            "correct_agent_dispatch": 4,
+            "avoids_unnecessary_dispatch": 3
+          },
+          "cost": 0
+        }
+      },
+      {
+        "id": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "raw": "{{user_task}}",
+        "label": "without-routing-directive",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 3,
+          "testPassCount": 3,
+          "testFailCount": 4,
+          "testErrorCount": 0,
+          "assertPassCount": 3,
+          "assertFailCount": 4,
+          "totalLatencyMs": 3001,
+          "tokenUsage": {
+            "prompt": 113,
+            "completion": 1985,
+            "cached": 0,
+            "total": 2098,
+            "numRequests": 7,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 3772,
+              "prompt": 3417,
+              "completion": 355,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "correct_agent_dispatch": 0,
+            "avoids_unnecessary_dispatch": 3
+          },
+          "namedScoresCount": {
+            "correct_agent_dispatch": 4,
+            "avoids_unnecessary_dispatch": 3
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "error": "The response begins directly with implementing a FastAPI application and does not mention routing to or using any specific agent like fastapi-pro, backend-architect, or backend-security-coder.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "The response begins directly with implementing a FastAPI application and does not mention routing to or using any specific agent like fastapi-pro, backend-architect, or backend-security-coder.",
+          "namedScores": {
+            "correct_agent_dispatch": 0
+          },
+          "tokensUsed": {
+            "total": 574,
+            "prompt": 515,
+            "completion": 59,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
+                "threshold": 0.8,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": false,
+              "score": 0,
+              "reason": "The response begins directly with implementing a FastAPI application and does not mention routing to or using any specific agent like fastapi-pro, backend-architect, or backend-security-coder.",
+              "tokensUsed": {
+                "total": 574,
+                "prompt": 515,
+                "completion": 59,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll build a FastAPI application with JWT authentication and refresh token rotation. This implementation includes secure token handling, refresh token rotation, and proper security practices.\\n\\n## Project Structure\\n```\\njwt-auth-app/\\n├── app/\\n│   ├── __init__.py\\n│   ├── main.py\\n│   ├── auth/\\n│   │   ├── __init__.py\\n│   │   ├── dependencies.py\\n│   │   ├── models.py\\n│   │   ├── schemas.py\\n│   │   └── utils.py\\n│   ├── core/\\n│   │   ├── __init__.py\\n│   │   └── config.py\\n│   └── database.py\\n├── requirements.txt\\n└── .env\\n```\\n\\n## 1. Dependencies (`requirements.txt`)\\n\\n```txt\\nfastapi==0.104.1\\nuvicorn==0.24.0\\npython-jose[cryptography]==3.3.0\\npasslib[bcrypt]==1.7.4\\npython-multipart==0.0.6\\nsqlalchemy==2.0.23\\nalembic==1.12.1\\npydantic-settings==2.1.0\\nredis==5.0.1\\npython-dotenv==1.0.0\\n```\\n\\n## 2. Configuration (`app/core/config.py`)\\n\\n```python\\nfrom\\n</Output>\\n<Rubric>\\nThe response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "1426354b-eb81-42f5-b80d-c6c0d499f7af",
+        "latencyMs": 380,
+        "namedScores": {
+          "correct_agent_dispatch": 0
+        },
+        "prompt": {
+          "raw": "Build a FastAPI application with JWT authentication and refresh token rotation",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll build a FastAPI application with JWT authentication and refresh token rotation. This implementation includes secure token handling, refresh token rotation, and proper security practices.\n\n## Project Structure\n```\njwt-auth-app/\n├── app/\n│   ├── __init__.py\n│   ├── main.py\n│   ├── auth/\n│   │   ├── __init__.py\n│   │   ├── dependencies.py\n│   │   ├── models.py\n│   │   ├── schemas.py\n│   │   └── utils.py\n│   ├── core/\n│   │   ├── __init__.py\n│   │   └── config.py\n│   └── database.py\n├── requirements.txt\n└── .env\n```\n\n## 1. Dependencies (`requirements.txt`)\n\n```txt\nfastapi==0.104.1\nuvicorn==0.24.0\npython-jose[cryptography]==3.3.0\npasslib[bcrypt]==1.7.4\npython-multipart==0.0.6\nsqlalchemy==2.0.23\nalembic==1.12.1\npydantic-settings==2.1.0\nredis==5.0.1\npython-dotenv==1.0.0\n```\n\n## 2. Configuration (`app/core/config.py`)\n\n```python\nfrom",
+          "tokenUsage": {
+            "total": 317,
+            "prompt": 17,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 380,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 df20548013e0e0332dfcda59cfca8e48.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "K6NvMnceR431wJrhkOjPAy_pNwHd9K_gA6DHQ71RrTJCyOZ7sm0X0g==",
+                "x-amz-cf-pop": "IAH50-P4",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "024667e67666000051858009391750c6"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "FastAPI + JWT auth → should mention fastapi-pro or backend-security-coder",
+          "vars": {
+            "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
+              "threshold": 0.8,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 df20548013e0e0332dfcda59cfca8e48.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "K6NvMnceR431wJrhkOjPAy_pNwHd9K_gA6DHQ71RrTJCyOZ7sm0X0g==",
+              "x-amz-cf-pop": "IAH50-P4",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "024667e67666000051858009391750c6"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "correct_agent_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 279,
+            "prompt": 234,
+            "completion": 45,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
+                "threshold": 0.8,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly states 'Routing to fastapi-pro', which matches the requirement of mentioning routing to a specific agent.",
+              "tokensUsed": {
+                "total": 279,
+                "prompt": 234,
+                "completion": 45,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nRouting to fastapi-pro for building a FastAPI application with JWT authentication and refresh token rotation.\\n</Output>\\n<Rubric>\\nThe response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "3a034729-0e4a-4b11-be2a-9ca4cf029cfd",
+        "latencyMs": 392,
+        "namedScores": {
+          "correct_agent_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nBuild a FastAPI application with JWT authentication and refresh token rotation\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Routing to fastapi-pro for building a FastAPI application with JWT authentication and refresh token rotation.",
+          "tokenUsage": {
+            "total": 436,
+            "prompt": 416,
+            "completion": 20,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 392,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "SQUfSCLsXwl_ejXhF6rOpEM3UZkoRGiL3oXLk66vN2WqNAERivOTzA==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "5c7f041a8c215151231e294d7af658ed"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "FastAPI + JWT auth → should mention fastapi-pro or backend-security-coder",
+          "vars": {
+            "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
+              "threshold": 0.8,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "SQUfSCLsXwl_ejXhF6rOpEM3UZkoRGiL3oXLk66vN2WqNAERivOTzA==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "5c7f041a8c215151231e294d7af658ed"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "The response provides Rust code directly without mentioning routing to rust-pro or delegating to a Rust specialist.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "The response provides Rust code directly without mentioning routing to rust-pro or delegating to a Rust specialist.",
+          "namedScores": {
+            "correct_agent_dispatch": 0
+          },
+          "tokensUsed": {
+            "total": 546,
+            "prompt": 504,
+            "completion": 42,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
+                "threshold": 0.7,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": false,
+              "score": 0,
+              "reason": "The response provides Rust code directly without mentioning routing to rust-pro or delegating to a Rust specialist.",
+              "tokensUsed": {
+                "total": 546,
+                "prompt": 504,
+                "completion": 42,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's a comprehensive Rust TCP server using Tokio with connection pooling and graceful shutdown:\\n\\n## Cargo.toml\\n```toml\\n[package]\\nname = \\\"tcp-server\\\"\\nversion = \\\"0.1.0\\\"\\nedition = \\\"2021\\\"\\n\\n[dependencies]\\ntokio = { version = \\\"1.0\\\", features = [\\\"full\\\"] }\\nanyhow = \\\"1.0\\\"\\ntracing = \\\"0.1\\\"\\ntracing-subscriber = \\\"0.3\\\"\\ndashmap = \\\"5.0\\\"\\narc-swap = \\\"1.0\\\"\\nfutures = \\\"0.3\\\"\\n```\\n\\n## Main Server Implementation\\n\\n```rust\\nuse anyhow::{Context, Result};\\nuse arc_swap::ArcSwap;\\nuse dashmap::DashMap;\\nuse futures::future::join_all;\\nuse std::sync::Arc;\\nuse std::time::{Duration, Instant};\\nuse tokio::io::{AsyncReadExt, AsyncWriteExt};\\nuse tokio::net::{TcpListener, TcpStream};\\nuse tokio::signal;\\nuse tokio::sync::{broadcast, mpsc, oneshot, Semaphore};\\nuse tokio::time::{sleep, timeout};\\nuse tracing::{debug, error, info, warn};\\n\\n// Connection pool configuration\\n#[derive(Debug, Clone)]\\npub struct PoolConfig {\\n    pub max_connections: usize,\\n    pub idle_timeout: Duration,\\n    pub connection_timeout: Duration,\\n    pub\\n</Output>\\n<Rubric>\\nThe response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "97a535c5-1822-4d79-9a9c-1541380f7a75",
+        "latencyMs": 556,
+        "namedScores": {
+          "correct_agent_dispatch": 0
+        },
+        "prompt": {
+          "raw": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Here's a comprehensive Rust TCP server using Tokio with connection pooling and graceful shutdown:\n\n## Cargo.toml\n```toml\n[package]\nname = \"tcp-server\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\ntokio = { version = \"1.0\", features = [\"full\"] }\nanyhow = \"1.0\"\ntracing = \"0.1\"\ntracing-subscriber = \"0.3\"\ndashmap = \"5.0\"\narc-swap = \"1.0\"\nfutures = \"0.3\"\n```\n\n## Main Server Implementation\n\n```rust\nuse anyhow::{Context, Result};\nuse arc_swap::ArcSwap;\nuse dashmap::DashMap;\nuse futures::future::join_all;\nuse std::sync::Arc;\nuse std::time::{Duration, Instant};\nuse tokio::io::{AsyncReadExt, AsyncWriteExt};\nuse tokio::net::{TcpListener, TcpStream};\nuse tokio::signal;\nuse tokio::sync::{broadcast, mpsc, oneshot, Semaphore};\nuse tokio::time::{sleep, timeout};\nuse tracing::{debug, error, info, warn};\n\n// Connection pool configuration\n#[derive(Debug, Clone)]\npub struct PoolConfig {\n    pub max_connections: usize,\n    pub idle_timeout: Duration,\n    pub connection_timeout: Duration,\n    pub",
+          "tokenUsage": {
+            "total": 318,
+            "prompt": 18,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 556,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "hTgo8vnQaSW5y77IZAwtizrtbtLiDXuCLv0awDG2sP8yrshX_D6-3g==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "dab1141eb3bf6341a3468a229e1dc0dd"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "Rust TCP server → should route to rust-pro",
+          "vars": {
+            "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
+              "threshold": 0.7,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "hTgo8vnQaSW5y77IZAwtizrtbtLiDXuCLv0awDG2sP8yrshX_D6-3g==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "dab1141eb3bf6341a3468a229e1dc0dd"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "correct_agent_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 290,
+            "prompt": 249,
+            "completion": 41,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
+                "threshold": 0.7,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly states 'Routing to rust-pro' twice, clearly indicating delegation to a specialist rather than writing code directly.",
+              "tokensUsed": {
+                "total": 290,
+                "prompt": 249,
+                "completion": 41,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nRouting to rust-pro for building a Rust TCP server with tokio, connection pooling, and graceful shutdown implementation.\\n\\nRouting to rust-pro for implementing a production-ready Rust TCP server with tokio, connection pooling, and graceful shutdown features.\\n</Output>\\n<Rubric>\\nThe response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "7339e169-103b-42e7-a07d-9d6129a912a5",
+        "latencyMs": 390,
+        "namedScores": {
+          "correct_agent_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nWrite a Rust TCP server using tokio with connection pooling and graceful shutdown\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Routing to rust-pro for building a Rust TCP server with tokio, connection pooling, and graceful shutdown implementation.\n\nRouting to rust-pro for implementing a production-ready Rust TCP server with tokio, connection pooling, and graceful shutdown features.",
+          "tokenUsage": {
+            "total": 463,
+            "prompt": 417,
+            "completion": 46,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 390,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 1872828d3fd83436a195653bd07088ba.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "8_ZgcP8bQKOXpwyurIVds_le6hHEAM9lBCMN3BawTsLJBOJa3x42oA==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "6591d797db712769bf3165f6ee3630b7"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Rust TCP server → should route to rust-pro",
+          "vars": {
+            "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
+              "threshold": 0.7,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:17:53 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 1872828d3fd83436a195653bd07088ba.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "8_ZgcP8bQKOXpwyurIVds_le6hHEAM9lBCMN3BawTsLJBOJa3x42oA==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "6591d797db712769bf3165f6ee3630b7"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "The response provides generic GitOps and ArgoCD setup guidance without mentioning routing to any specific infrastructure agent like kubernetes-architect or deployment-engineer.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "The response provides generic GitOps and ArgoCD setup guidance without mentioning routing to any specific infrastructure agent like kubernetes-architect or deployment-engineer.",
+          "namedScores": {
+            "correct_agent_dispatch": 0
+          },
+          "tokensUsed": {
+            "total": 553,
+            "prompt": 500,
+            "completion": 53,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
+                "threshold": 0.7,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": false,
+              "score": 0,
+              "reason": "The response provides generic GitOps and ArgoCD setup guidance without mentioning routing to any specific infrastructure agent like kubernetes-architect or deployment-engineer.",
+              "tokensUsed": {
+                "total": 553,
+                "prompt": 500,
+                "completion": 53,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll guide you through setting up a GitOps workflow with ArgoCD for multi-environment Kubernetes deployments. This setup follows best practices for managing dev, staging, and production environments.\\n\\n## 1. Repository Structure\\n\\nFirst, organize your Git repository:\\n\\n```\\nmy-app/\\n├── apps/\\n│   ├── base/\\n│   │   ├── deployment.yaml\\n│   │   ├── service.yaml\\n│   │   ├── configmap.yaml\\n│   │   └── kustomization.yaml\\n│   ├── overlays/\\n│   │   ├── dev/\\n│   │   │   ├── kustomization.yaml\\n│   │   │   ├── patch-deployment.yaml\\n│   │   │   └── config-patch.yaml\\n│   │   ├── staging/\\n│   │   │   ├── kustomization.yaml\\n│   │   │   └── patch-deployment.yaml\\n│   │   └── production/\\n│   │       ├── kustomization.yaml\\n│   │       └── patch-deployment.yaml\\n│   └── argo-apps/\\n│       ├── dev-app.yaml\\n│       ├── staging-app.yaml\\n│       └── prod-app.yaml\\n├── infrastructure/\\n│   ├── argocd/\\n│   │   ├── namespace.yaml\\n│   │   └── rbac.yaml\\n│   └── namespaces\\n</Output>\\n<Rubric>\\nThe response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "f0ff6c64-5dfa-4a5f-950e-de1e3fa2f56b",
+        "latencyMs": 404,
+        "namedScores": {
+          "correct_agent_dispatch": 0
+        },
+        "prompt": {
+          "raw": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll guide you through setting up a GitOps workflow with ArgoCD for multi-environment Kubernetes deployments. This setup follows best practices for managing dev, staging, and production environments.\n\n## 1. Repository Structure\n\nFirst, organize your Git repository:\n\n```\nmy-app/\n├── apps/\n│   ├── base/\n│   │   ├── deployment.yaml\n│   │   ├── service.yaml\n│   │   ├── configmap.yaml\n│   │   └── kustomization.yaml\n│   ├── overlays/\n│   │   ├── dev/\n│   │   │   ├── kustomization.yaml\n│   │   │   ├── patch-deployment.yaml\n│   │   │   └── config-patch.yaml\n│   │   ├── staging/\n│   │   │   ├── kustomization.yaml\n│   │   │   └── patch-deployment.yaml\n│   │   └── production/\n│   │       ├── kustomization.yaml\n│   │       └── patch-deployment.yaml\n│   └── argo-apps/\n│       ├── dev-app.yaml\n│       ├── staging-app.yaml\n│       └── prod-app.yaml\n├── infrastructure/\n│   ├── argocd/\n│   │   ├── namespace.yaml\n│   │   └── rbac.yaml\n│   └── namespaces",
+          "tokenUsage": {
+            "total": 320,
+            "prompt": 20,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 404,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:17:59 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 1872828d3fd83436a195653bd07088ba.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "HgEem2RuB4OQ-XdagOeu0yNaLkrU6-elfvEEWnsOVTMRePLVETZSjw==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "245204ad86c6e916399547446163e999"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "K8s GitOps → should route to kubernetes-architect",
+          "vars": {
+            "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
+              "threshold": 0.7,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "vars": {
+          "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:17:59 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 1872828d3fd83436a195653bd07088ba.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "HgEem2RuB4OQ-XdagOeu0yNaLkrU6-elfvEEWnsOVTMRePLVETZSjw==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "245204ad86c6e916399547446163e999"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "correct_agent_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 354,
+            "prompt": 301,
+            "completion": 53,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
+                "threshold": 0.7,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly states 'Routing to kubernetes-architect' twice, which directly matches the rubric's requirement for mentioning routing to a specific infrastructure agent.",
+              "tokensUsed": {
+                "total": 354,
+                "prompt": 301,
+                "completion": 53,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**Routing to kubernetes-architect for implementing a complete GitOps workflow with ArgoCD for multi-environment Kubernetes deployment.**\\n\\nThis task requires:\\n1. Designing a Git repository structure for multi-environment deployments\\n2. Configuring ArgoCD applications and projects\\n3. Setting up Kubernetes manifests for different environments\\n4. Implementing sync policies and automated deployments\\n5. Configuring environment-specific configurations and secrets management\\n\\n**Routing to kubernetes-architect for comprehensive GitOps workflow implementation with ArgoCD.**\\n</Output>\\n<Rubric>\\nThe response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "313067a5-5b29-4b1c-9178-3544cfde53e2",
+        "latencyMs": 328,
+        "namedScores": {
+          "correct_agent_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nSet up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "**Routing to kubernetes-architect for implementing a complete GitOps workflow with ArgoCD for multi-environment Kubernetes deployment.**\n\nThis task requires:\n1. Designing a Git repository structure for multi-environment deployments\n2. Configuring ArgoCD applications and projects\n3. Setting up Kubernetes manifests for different environments\n4. Implementing sync policies and automated deployments\n5. Configuring environment-specific configurations and secrets management\n\n**Routing to kubernetes-architect for comprehensive GitOps workflow implementation with ArgoCD.**",
+          "tokenUsage": {
+            "total": 520,
+            "prompt": 419,
+            "completion": 101,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 328,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:17:58 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "F883cg-XrMr9C_p4IEpD0K7AyCoJ9sD-oNpXkwED6__vkh0qVNkcQQ==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "cefb073154ad54bd2608c5e89d762c9c"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "K8s GitOps → should route to kubernetes-architect",
+          "vars": {
+            "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
+              "threshold": 0.7,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "vars": {
+          "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:17:58 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "F883cg-XrMr9C_p4IEpD0K7AyCoJ9sD-oNpXkwED6__vkh0qVNkcQQ==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "cefb073154ad54bd2608c5e89d762c9c"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "The response does not mention routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet; it provides a general security review template and common vulnerability patterns without specifying a specialized security agent.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "The response does not mention routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet; it provides a general security review template and common vulnerability patterns without specifying a specialized security agent.",
+          "namedScores": {
+            "correct_agent_dispatch": 0
+          },
+          "tokensUsed": {
+            "total": 582,
+            "prompt": 510,
+            "completion": 72,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
+                "threshold": 0.8,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": false,
+              "score": 0,
+              "reason": "The response does not mention routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet; it provides a general security review template and common vulnerability patterns without specifying a specialized security agent.",
+              "tokensUsed": {
+                "total": 582,
+                "prompt": 510,
+                "completion": 72,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll help you review a codebase for OWASP Top 10 vulnerabilities. However, I need to see the actual code to perform a proper security analysis. \\n\\nSince you haven't provided specific code, I'll give you a **template security report structure** and **common vulnerability patterns** to look for in your codebase:\\n\\n## **Security Report Template**\\n\\n### **1. EXECUTIVE SUMMARY**\\n- Scope of review\\n- Methodology used\\n- Overall risk assessment\\n- Critical findings summary\\n\\n### **2. METHODOLOGY**\\n- Static analysis tools used\\n- Manual code review approach\\n- Testing environment details\\n\\n### **3. VULNERABILITY FINDINGS**\\n\\n#### **A1: Injection**\\n**Check for:**\\n```python\\n# BAD - SQL Injection\\nquery = \\\"SELECT * FROM users WHERE username = '\\\" + user_input + \\\"'\\\"\\n\\n# BAD - NoSQL Injection\\ndb.users.find({username: user_input})\\n\\n# BAD - Command Injection\\nos.system(\\\"ping \\\" + user_input)\\n```\\n\\n**Look for:**\\n- Raw SQL queries with string concatenation\\n- eval(), exec(), system() calls with user input\\n- NoSQL queries without input validation\\n- LDAP queries with user input\\n- XML external entities (XXE)\\n\\n#### **A2: Broken Authentication**\\n**Check for:**\\n```python\\n# BAD - Weak password policies\\nif len(password) >= 6:  # Too short\\n\\n# BAD\\n</Output>\\n<Rubric>\\nThe response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "dad094b5-01b0-4a24-b6e8-b814b75ac354",
+        "latencyMs": 333,
+        "namedScores": {
+          "correct_agent_dispatch": 0
+        },
+        "prompt": {
+          "raw": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll help you review a codebase for OWASP Top 10 vulnerabilities. However, I need to see the actual code to perform a proper security analysis. \n\nSince you haven't provided specific code, I'll give you a **template security report structure** and **common vulnerability patterns** to look for in your codebase:\n\n## **Security Report Template**\n\n### **1. EXECUTIVE SUMMARY**\n- Scope of review\n- Methodology used\n- Overall risk assessment\n- Critical findings summary\n\n### **2. METHODOLOGY**\n- Static analysis tools used\n- Manual code review approach\n- Testing environment details\n\n### **3. VULNERABILITY FINDINGS**\n\n#### **A1: Injection**\n**Check for:**\n```python\n# BAD - SQL Injection\nquery = \"SELECT * FROM users WHERE username = '\" + user_input + \"'\"\n\n# BAD - NoSQL Injection\ndb.users.find({username: user_input})\n\n# BAD - Command Injection\nos.system(\"ping \" + user_input)\n```\n\n**Look for:**\n- Raw SQL queries with string concatenation\n- eval(), exec(), system() calls with user input\n- NoSQL queries without input validation\n- LDAP queries with user input\n- XML external entities (XXE)\n\n#### **A2: Broken Authentication**\n**Check for:**\n```python\n# BAD - Weak password policies\nif len(password) >= 6:  # Too short\n\n# BAD",
+          "tokenUsage": {
+            "total": 321,
+            "prompt": 21,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 333,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:07 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "_tCmr6qlGmQ7q0nZ8YNyjlzSkJzkhyTHaeHTKZVRD9ms-C2ffkidBQ==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "4ecb42f56176f678650a047b5554aeb1"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "OWASP audit → should route to security agent",
+          "vars": {
+            "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
+              "threshold": 0.8,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "vars": {
+          "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:07 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "_tCmr6qlGmQ7q0nZ8YNyjlzSkJzkhyTHaeHTKZVRD9ms-C2ffkidBQ==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "4ecb42f56176f678650a047b5554aeb1"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "correct_agent_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 372,
+            "prompt": 318,
+            "completion": 54,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
+                "threshold": 0.8,
+                "metric": "correct_agent_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response explicitly mentions routing to 'security-auditor' and describes it as 'specialized in conducting systematic security reviews', which clearly identifies a security specialization.",
+              "tokensUsed": {
+                "total": 372,
+                "prompt": 318,
+                "completion": 54,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**Routing to security-auditor for OWASP Top 10 security audit of a codebase.**\\n\\nThis task requires a comprehensive security audit to identify OWASP Top 10 vulnerabilities, which involves:\\n- Static code analysis for security flaws\\n- Review of authentication and authorization mechanisms\\n- Analysis of input validation and output encoding\\n- Assessment of dependency security\\n- Identification of security misconfigurations\\n- Evaluation of data protection practices\\n\\nThe security-auditor agent is specialized in conducting systematic security reviews and producing detailed vulnerability reports with remediation guidance.\\n</Output>\\n<Rubric>\\nThe response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "49eb5b89-92f8-461d-b2c7-5c71fd6f8852",
+        "latencyMs": 327,
+        "namedScores": {
+          "correct_agent_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nReview this codebase for OWASP Top 10 vulnerabilities and produce a security report\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "**Routing to security-auditor for OWASP Top 10 security audit of a codebase.**\n\nThis task requires a comprehensive security audit to identify OWASP Top 10 vulnerabilities, which involves:\n- Static code analysis for security flaws\n- Review of authentication and authorization mechanisms\n- Analysis of input validation and output encoding\n- Assessment of dependency security\n- Identification of security misconfigurations\n- Evaluation of data protection practices\n\nThe security-auditor agent is specialized in conducting systematic security reviews and producing detailed vulnerability reports with remediation guidance.",
+          "tokenUsage": {
+            "total": 529,
+            "prompt": 420,
+            "completion": 109,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 327,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:06 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "LAnm9sjH_u9RrEjCVYtt3w_QOTGzrfIZShY859ur3uodX7-F21cM7w==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "66e970127b28132cd674ab654878a133"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "OWASP audit → should route to security agent",
+          "vars": {
+            "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
+              "threshold": 0.8,
+              "metric": "correct_agent_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "vars": {
+          "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:06 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "LAnm9sjH_u9RrEjCVYtt3w_QOTGzrfIZShY859ur3uodX7-F21cM7w==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "66e970127b28132cd674ab654878a133"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "avoids_unnecessary_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 553,
+            "prompt": 507,
+            "completion": 46,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
+                "threshold": 0.8,
+                "metric": "avoids_unnecessary_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response directly explains the SOLID principles without any mention of routing to an agent or suggesting that such routing is necessary.",
+              "tokensUsed": {
+                "total": 553,
+                "prompt": 507,
+                "completion": 46,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe **SOLID** principles are five fundamental design principles in object-oriented programming that help create more maintainable, understandable, and flexible software. Here's what each letter stands for:\\n\\n## **S** - Single Responsibility Principle\\nA class should have only one reason to change, meaning it should have only one job or responsibility.\\n\\n## **O** - Open/Closed Principle\\nSoftware entities (classes, modules, functions) should be **open for extension** but **closed for modification**. You should be able to add new functionality without changing existing code.\\n\\n## **L** - Liskov Substitution Principle\\nObjects of a superclass should be replaceable with objects of its subclasses without breaking the application. If class B is a subclass of class A, we should be able to pass an object of class B to any method that expects an object of class A.\\n\\n## **I** - Interface Segregation Principle\\nClients should not be forced to depend on interfaces they don't use. Instead of one large interface, create smaller, more specific interfaces.\\n\\n## **D** - Dependency Inversion Principle\\nHigh-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details; details should depend on abstractions.\\n\\n## **Origin**\\nThese principles were introduced by **Robert C. Martin** (Uncle Bob) in the early 2000s, though some were based on earlier work by other software engineers. Michael Feathers coined\\n</Output>\\n<Rubric>\\nThe response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "16365cf5-fd40-491a-87f8-57a7cf4da15b",
+        "latencyMs": 332,
+        "namedScores": {
+          "avoids_unnecessary_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nWhat does the SOLID principle stand for?\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "The **SOLID** principles are five fundamental design principles in object-oriented programming that help create more maintainable, understandable, and flexible software. Here's what each letter stands for:\n\n## **S** - Single Responsibility Principle\nA class should have only one reason to change, meaning it should have only one job or responsibility.\n\n## **O** - Open/Closed Principle\nSoftware entities (classes, modules, functions) should be **open for extension** but **closed for modification**. You should be able to add new functionality without changing existing code.\n\n## **L** - Liskov Substitution Principle\nObjects of a superclass should be replaceable with objects of its subclasses without breaking the application. If class B is a subclass of class A, we should be able to pass an object of class B to any method that expects an object of class A.\n\n## **I** - Interface Segregation Principle\nClients should not be forced to depend on interfaces they don't use. Instead of one large interface, create smaller, more specific interfaces.\n\n## **D** - Dependency Inversion Principle\nHigh-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details; details should depend on abstractions.\n\n## **Origin**\nThese principles were introduced by **Robert C. Martin** (Uncle Bob) in the early 2000s, though some were based on earlier work by other software engineers. Michael Feathers coined",
+          "tokenUsage": {
+            "total": 712,
+            "prompt": 412,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 332,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:08 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 df20548013e0e0332dfcda59cfca8e48.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "RHpqCj4DAyJPzmAffYovka5p9Jbu2tAPahCQ-p9USzbmHW3Db6Xf1g==",
+                "x-amz-cf-pop": "IAH50-P4",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "fa686224c32d942d8fefaa0955d04ed1"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Simple question → no agent dispatch needed",
+          "vars": {
+            "user_task": "What does the SOLID principle stand for?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
+              "threshold": 0.8,
+              "metric": "avoids_unnecessary_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "vars": {
+          "user_task": "What does the SOLID principle stand for?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:08 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 df20548013e0e0332dfcda59cfca8e48.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "RHpqCj4DAyJPzmAffYovka5p9Jbu2tAPahCQ-p9USzbmHW3Db6Xf1g==",
+              "x-amz-cf-pop": "IAH50-P4",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "fa686224c32d942d8fefaa0955d04ed1"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "avoids_unnecessary_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 550,
+            "prompt": 507,
+            "completion": 43,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
+                "threshold": 0.8,
+                "metric": "avoids_unnecessary_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response directly explains the SOLID principles without any mention of routing to an agent or other unnecessary complexity.",
+              "tokensUsed": {
+                "total": 550,
+                "prompt": 507,
+                "completion": 43,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**SOLID** is an acronym for five key object-oriented design principles that help make software more understandable, flexible, and maintainable. It was popularized by Robert C. Martin (Uncle Bob).\\n\\nHere’s what each letter stands for:\\n\\n---\\n\\n### **S – Single Responsibility Principle (SRP)**\\n- **A class should have only one reason to change** (i.e., it should have only one job or responsibility).\\n- This keeps classes focused, easier to understand, and less prone to side effects from changes.\\n\\n---\\n\\n### **O – Open/Closed Principle (OCP)**\\n- **Software entities (classes, modules, functions) should be open for extension but closed for modification.**\\n- You should be able to add new functionality without changing existing code, typically through abstraction and polymorphism.\\n\\n---\\n\\n### **L – Liskov Substitution Principle (LSP)**\\n- **Objects of a superclass should be replaceable with objects of its subclasses without breaking the application.**\\n- Subtypes must behave in a way consistent with the base type’s contract.\\n\\n---\\n\\n### **I – Interface Segregation Principle (ISP)**\\n- **Clients should not be forced to depend on interfaces they do not use.**\\n- Instead of one large interface, create smaller, more specific interfaces so that implementing classes only need to be concerned with relevant methods.\\n\\n---\\n\\n### **D – Dependency Inversion Principle (DIP)**\\n- **High-level modules should not depend on low\\n</Output>\\n<Rubric>\\nThe response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "6736434b-bcb6-4134-aa0a-94b54e38158f",
+        "latencyMs": 528,
+        "namedScores": {
+          "avoids_unnecessary_dispatch": 1
+        },
+        "prompt": {
+          "raw": "What does the SOLID principle stand for?",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "**SOLID** is an acronym for five key object-oriented design principles that help make software more understandable, flexible, and maintainable. It was popularized by Robert C. Martin (Uncle Bob).\n\nHere’s what each letter stands for:\n\n---\n\n### **S – Single Responsibility Principle (SRP)**\n- **A class should have only one reason to change** (i.e., it should have only one job or responsibility).\n- This keeps classes focused, easier to understand, and less prone to side effects from changes.\n\n---\n\n### **O – Open/Closed Principle (OCP)**\n- **Software entities (classes, modules, functions) should be open for extension but closed for modification.**\n- You should be able to add new functionality without changing existing code, typically through abstraction and polymorphism.\n\n---\n\n### **L – Liskov Substitution Principle (LSP)**\n- **Objects of a superclass should be replaceable with objects of its subclasses without breaking the application.**\n- Subtypes must behave in a way consistent with the base type’s contract.\n\n---\n\n### **I – Interface Segregation Principle (ISP)**\n- **Clients should not be forced to depend on interfaces they do not use.**\n- Instead of one large interface, create smaller, more specific interfaces so that implementing classes only need to be concerned with relevant methods.\n\n---\n\n### **D – Dependency Inversion Principle (DIP)**\n- **High-level modules should not depend on low",
+          "tokenUsage": {
+            "total": 313,
+            "prompt": 13,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 528,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:14 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 1872828d3fd83436a195653bd07088ba.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "PZfQK2ZnLxJy4HH4e9Cau-xm9tJwWw6WTqr3h0lU5b8xlgiJIgAa1g==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "9cfa76f48d0429aa8fa9148f65aa1109"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Simple question → no agent dispatch needed",
+          "vars": {
+            "user_task": "What does the SOLID principle stand for?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
+              "threshold": 0.8,
+              "metric": "avoids_unnecessary_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "vars": {
+          "user_task": "What does the SOLID principle stand for?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:14 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 1872828d3fd83436a195653bd07088ba.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "PZfQK2ZnLxJy4HH4e9Cau-xm9tJwWw6WTqr3h0lU5b8xlgiJIgAa1g==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "9cfa76f48d0429aa8fa9148f65aa1109"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "avoids_unnecessary_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 419,
+            "prompt": 381,
+            "completion": 38,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
+                "threshold": 0.8,
+                "metric": "avoids_unnecessary_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response directly addresses the print statement with troubleshooting tips and examples, rather than routing to a specialized agent.",
+              "tokensUsed": {
+                "total": 419,
+                "prompt": 381,
+                "completion": 38,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n`print('hello world')` is already correct Python syntax. \\n\\nIf you're seeing an issue, here are the most common fixes:\\n\\n1. **Missing parentheses** (Python 3): Make sure you have parentheses:\\n   ```python\\n   print('hello world')\\n   ```\\n\\n2. **If you want it to run as a script**: Save it in a `.py` file and run with `python filename.py`\\n\\n3. **If you want it in a function**:\\n   ```python\\n   def main():\\n       print('hello world')\\n   \\n   if __name__ == \\\"__main__\\\":\\n       main()\\n   ```\\n\\n4. **If you want to print to stderr**:\\n   ```python\\n   import sys\\n   print('hello world', file=sys.stderr)\\n   ```\\n\\nThe code you provided is syntactically correct and will print \\\"hello world\\\" when executed in Python 3.\\n</Output>\\n<Rubric>\\nThe response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "8534f0bb-1c31-4831-ad25-54ab84c52fe8",
+        "latencyMs": 336,
+        "namedScores": {
+          "avoids_unnecessary_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nFix this: print('hello world')\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "`print('hello world')` is already correct Python syntax. \n\nIf you're seeing an issue, here are the most common fixes:\n\n1. **Missing parentheses** (Python 3): Make sure you have parentheses:\n   ```python\n   print('hello world')\n   ```\n\n2. **If you want it to run as a script**: Save it in a `.py` file and run with `python filename.py`\n\n3. **If you want it in a function**:\n   ```python\n   def main():\n       print('hello world')\n   \n   if __name__ == \"__main__\":\n       main()\n   ```\n\n4. **If you want to print to stderr**:\n   ```python\n   import sys\n   print('hello world', file=sys.stderr)\n   ```\n\nThe code you provided is syntactically correct and will print \"hello world\" when executed in Python 3.",
+          "tokenUsage": {
+            "total": 596,
+            "prompt": 411,
+            "completion": 185,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 336,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:15 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "7Rrm7NgrpV5XjR8oryKb43B95T4geDiK11L5vXBwjojMOC2WxxgAGg==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "fa3763ce6f6391c083b99bec6fd609dd"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "One-line fix → no agent dispatch needed",
+          "vars": {
+            "user_task": "Fix this: print('hello world')"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
+              "threshold": 0.8,
+              "metric": "avoids_unnecessary_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 5,
+        "vars": {
+          "user_task": "Fix this: print('hello world')"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:15 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "7Rrm7NgrpV5XjR8oryKb43B95T4geDiK11L5vXBwjojMOC2WxxgAGg==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "fa3763ce6f6391c083b99bec6fd609dd"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "avoids_unnecessary_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 419,
+            "prompt": 381,
+            "completion": 38,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
+                "threshold": 0.8,
+                "metric": "avoids_unnecessary_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response directly provides corrected code and explanations for a simple print statement without indicating any routing to specialized agents.",
+              "tokensUsed": {
+                "total": 419,
+                "prompt": 381,
+                "completion": 38,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's the corrected version:\\n\\n```python\\nprint('Hello, World!')\\n```\\n\\n**Changes made:**\\n1. **Capitalized \\\"Hello\\\"** - This is the standard convention for the classic \\\"Hello, World!\\\" program\\n2. **Added a comma** - This is the traditional punctuation in the greeting\\n3. **Added an exclamation mark** - This is the standard ending for the phrase\\n\\nHowever, if you just want to fix the syntax (which was already correct), your original code works perfectly fine. The original `print('hello world')` is syntactically valid Python code that will run without errors.\\n\\n**Both versions work:**\\n- `print('hello world')` - will output: `hello world`\\n- `print('Hello, World!')` - will output: `Hello, World!`\\n\\nThe second version just follows the more traditional formatting of the classic programming example.\\n</Output>\\n<Rubric>\\nThe response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "b160742e-3698-4641-910c-d603a0f5d64b",
+        "latencyMs": 334,
+        "namedScores": {
+          "avoids_unnecessary_dispatch": 1
+        },
+        "prompt": {
+          "raw": "Fix this: print('hello world')",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Here's the corrected version:\n\n```python\nprint('Hello, World!')\n```\n\n**Changes made:**\n1. **Capitalized \"Hello\"** - This is the standard convention for the classic \"Hello, World!\" program\n2. **Added a comma** - This is the traditional punctuation in the greeting\n3. **Added an exclamation mark** - This is the standard ending for the phrase\n\nHowever, if you just want to fix the syntax (which was already correct), your original code works perfectly fine. The original `print('hello world')` is syntactically valid Python code that will run without errors.\n\n**Both versions work:**\n- `print('hello world')` - will output: `hello world`\n- `print('Hello, World!')` - will output: `Hello, World!`\n\nThe second version just follows the more traditional formatting of the classic programming example.",
+          "tokenUsage": {
+            "total": 197,
+            "prompt": 12,
+            "completion": 185,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 334,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:22 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 df20548013e0e0332dfcda59cfca8e48.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "FpsT6PI2tAqgZzSIE6gNETjyE4UWVC6JSTCQ0PM4QJjMS-XusPbUfg==",
+                "x-amz-cf-pop": "IAH50-P4",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "9106cd8ef135c593b69e8c3a24770513"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "One-line fix → no agent dispatch needed",
+          "vars": {
+            "user_task": "Fix this: print('hello world')"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
+              "threshold": 0.8,
+              "metric": "avoids_unnecessary_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 5,
+        "vars": {
+          "user_task": "Fix this: print('hello world')"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:22 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 df20548013e0e0332dfcda59cfca8e48.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "FpsT6PI2tAqgZzSIE6gNETjyE4UWVC6JSTCQ0PM4QJjMS-XusPbUfg==",
+              "x-amz-cf-pop": "IAH50-P4",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "9106cd8ef135c593b69e8c3a24770513"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "avoids_unnecessary_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 558,
+            "prompt": 500,
+            "completion": 58,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
+                "threshold": 0.75,
+                "metric": "avoids_unnecessary_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response directly explains async/await concepts without mentioning or routing to 'python-pro' or any other agent, which aligns with the rubric's requirement for a direct explanation without delegation.",
+              "tokensUsed": {
+                "total": 558,
+                "prompt": 500,
+                "completion": 58,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**Async/await in Python** is a concurrency model built on top of **coroutines** and an **event loop**. Here's how it works:\\n\\n## Core Concepts\\n\\n### 1. **Coroutines**\\n- Async functions (`async def`) return **coroutine objects**, not regular values\\n- They can be paused (`await`) and resumed later\\n```python\\nasync def fetch_data():\\n    return \\\"data\\\"\\n\\n# This creates a coroutine object, doesn't execute it\\ncoro = fetch_data()\\n```\\n\\n### 2. **The Event Loop**\\n- The heart of async programming\\n- Manages execution of multiple coroutines\\n- Schedules when paused coroutines should resume\\n```python\\nimport asyncio\\n\\nasync def main():\\n    result = await fetch_data()\\n    print(result)\\n\\n# Event loop runs the coroutine\\nasyncio.run(main())\\n```\\n\\n## How `await` Works\\n\\n### The Pause/Resume Mechanism\\n```python\\nasync def example():\\n    print(\\\"1: Start\\\")\\n    result = await some_async_operation()  # PAUSES here\\n    print(f\\\"3: Got {result}\\\")  # RESUMES here\\n```\\n\\nWhen you `await`:\\n1. The coroutine **pauses** execution\\n2. Control returns to the event loop\\n3. Event loop runs other tasks\\n4. When the awaited operation completes, the coroutine **resumes**\\n\\n## Under the Hood: Gener\\n</Output>\\n<Rubric>\\nThe response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "9ced598e-d52e-4d01-bb4b-8a36bc5dfe02",
+        "latencyMs": 329,
+        "namedScores": {
+          "avoids_unnecessary_dispatch": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"user\",\n    \"content\": \"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\nExplain how async/await works in Python\"\n  }\n]",
+          "label": "with-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "**Async/await in Python** is a concurrency model built on top of **coroutines** and an **event loop**. Here's how it works:\n\n## Core Concepts\n\n### 1. **Coroutines**\n- Async functions (`async def`) return **coroutine objects**, not regular values\n- They can be paused (`await`) and resumed later\n```python\nasync def fetch_data():\n    return \"data\"\n\n# This creates a coroutine object, doesn't execute it\ncoro = fetch_data()\n```\n\n### 2. **The Event Loop**\n- The heart of async programming\n- Manages execution of multiple coroutines\n- Schedules when paused coroutines should resume\n```python\nimport asyncio\n\nasync def main():\n    result = await fetch_data()\n    print(result)\n\n# Event loop runs the coroutine\nasyncio.run(main())\n```\n\n## How `await` Works\n\n### The Pause/Resume Mechanism\n```python\nasync def example():\n    print(\"1: Start\")\n    result = await some_async_operation()  # PAUSES here\n    print(f\"3: Got {result}\")  # RESUMES here\n```\n\nWhen you `await`:\n1. The coroutine **pauses** execution\n2. Control returns to the event loop\n3. Event loop runs other tasks\n4. When the awaited operation completes, the coroutine **resumes**\n\n## Under the Hood: Gener",
+          "tokenUsage": {
+            "total": 711,
+            "prompt": 411,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 329,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:23 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "QQLPEmqd9sPDpN3FdHuObQ0hKbiXQ9qS_l38YHAE_pnkxJ6UGMyt_A==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "07f7c80715513ac7c8882a7d2a756d15"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Explanation request → no agent dispatch needed",
+          "vars": {
+            "user_task": "Explain how async/await works in Python"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
+              "threshold": 0.75,
+              "metric": "avoids_unnecessary_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 6,
+        "vars": {
+          "user_task": "Explain how async/await works in Python"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:23 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "QQLPEmqd9sPDpN3FdHuObQ0hKbiXQ9qS_l38YHAE_pnkxJ6UGMyt_A==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "07f7c80715513ac7c8882a7d2a756d15"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "avoids_unnecessary_dispatch": 1
+          },
+          "tokensUsed": {
+            "total": 548,
+            "prompt": 500,
+            "completion": 48,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
+                "threshold": 0.75,
+                "metric": "avoids_unnecessary_dispatch"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response directly explains async/await concepts and syntax without mentioning or routing to any external agent or service like 'python-pro'.",
+              "tokensUsed": {
+                "total": 548,
+                "prompt": 500,
+                "completion": 48,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n## Async/Await in Python: How It Works\\n\\nAsync/await is Python's implementation of **asynchronous programming** that allows you to write concurrent code that looks synchronous but runs asynchronously.\\n\\n## Core Concepts\\n\\n### 1. **The Event Loop**\\n- The heart of async programming in Python\\n- Manages and distributes execution of different tasks\\n- Runs in a single thread but can handle thousands of concurrent operations\\n- Switches between tasks when they're waiting (I/O operations, sleep, etc.)\\n\\n### 2. **Coroutines**\\n- Special functions defined with `async def`\\n- They can be paused and resumed\\n- Don't run immediately when called - return a coroutine object\\n\\n```python\\nasync def my_coroutine():\\n    return \\\"Hello\\\"\\n```\\n\\n### 3. **Awaitables**\\nThree types of awaitable objects:\\n- **Coroutines** (async functions)\\n- **Tasks** (wrapped coroutines scheduled to run)\\n- **Futures** (low-level awaitable objects)\\n\\n## Basic Syntax\\n\\n```python\\nimport asyncio\\n\\nasync def fetch_data():\\n    print(\\\"Start fetching\\\")\\n    await asyncio.sleep(2)  # Non-blocking sleep\\n    print(\\\"Done fetching\\\")\\n    return {\\\"data\\\": 1}\\n\\nasync def main():\\n    # Calling a coroutine\\n    result = await fetch_data()\\n    print(f\\\"Result: {result}\\\")\\n\\n# Run the event loop\\nasyn\\n</Output>\\n<Rubric>\\nThe response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "54a4ed46-8c6f-4d00-8557-5cb9529888ec",
+        "latencyMs": 466,
+        "namedScores": {
+          "avoids_unnecessary_dispatch": 1
+        },
+        "prompt": {
+          "raw": "Explain how async/await works in Python",
+          "label": "without-routing-directive",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
+        "promptIdx": 1,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "## Async/Await in Python: How It Works\n\nAsync/await is Python's implementation of **asynchronous programming** that allows you to write concurrent code that looks synchronous but runs asynchronously.\n\n## Core Concepts\n\n### 1. **The Event Loop**\n- The heart of async programming in Python\n- Manages and distributes execution of different tasks\n- Runs in a single thread but can handle thousands of concurrent operations\n- Switches between tasks when they're waiting (I/O operations, sleep, etc.)\n\n### 2. **Coroutines**\n- Special functions defined with `async def`\n- They can be paused and resumed\n- Don't run immediately when called - return a coroutine object\n\n```python\nasync def my_coroutine():\n    return \"Hello\"\n```\n\n### 3. **Awaitables**\nThree types of awaitable objects:\n- **Coroutines** (async functions)\n- **Tasks** (wrapped coroutines scheduled to run)\n- **Futures** (low-level awaitable objects)\n\n## Basic Syntax\n\n```python\nimport asyncio\n\nasync def fetch_data():\n    print(\"Start fetching\")\n    await asyncio.sleep(2)  # Non-blocking sleep\n    print(\"Done fetching\")\n    return {\"data\": 1}\n\nasync def main():\n    # Calling a coroutine\n    result = await fetch_data()\n    print(f\"Result: {result}\")\n\n# Run the event loop\nasyn",
+          "tokenUsage": {
+            "total": 312,
+            "prompt": 12,
+            "completion": 300,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 466,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 09:18:26 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "LJo_Uc5sbwBYmvwZRS-Wxoiai2VAaQA0Tz5rNm8VEhcabQFG4A8CjQ==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "8c0d2e5a6578c7594817d89dd83a899f"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Explanation request → no agent dispatch needed",
+          "vars": {
+            "user_task": "Explain how async/await works in Python"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
+              "threshold": 0.75,
+              "metric": "avoids_unnecessary_dispatch"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 6,
+        "vars": {
+          "user_task": "Explain how async/await works in Python"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 09:18:26 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "LJo_Uc5sbwBYmvwZRS-Wxoiai2VAaQA0Tz5rNm8VEhcabQFG4A8CjQ==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "8c0d2e5a6578c7594817d89dd83a899f"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 10,
+      "failures": 4,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 3019,
+        "completion": 3046,
+        "cached": 0,
+        "total": 6065,
+        "numRequests": 14,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 6597,
+          "prompt": 5907,
+          "completion": 690,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 48874,
+      "evaluationDurationMs": 48874
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Eval: agent routing directive from user_prompt_submit.py",
+    "prompts": [
+      {
+        "label": "with-routing-directive",
+        "raw": "[{\"role\":\"user\",\"content\":\"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\n{{user_task}}\"}]"
+      },
+      {
+        "label": "without-routing-directive",
+        "raw": "{{user_task}}"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 300,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "FastAPI + JWT auth → should mention fastapi-pro or backend-security-coder",
+        "vars": {
+          "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
+            "threshold": 0.8,
+            "metric": "correct_agent_dispatch"
+          }
+        ]
+      },
+      {
+        "description": "Rust TCP server → should route to rust-pro",
+        "vars": {
+          "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
+            "threshold": 0.7,
+            "metric": "correct_agent_dispatch"
+          }
+        ]
+      },
+      {
+        "description": "K8s GitOps → should route to kubernetes-architect",
+        "vars": {
+          "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
+            "threshold": 0.7,
+            "metric": "correct_agent_dispatch"
+          }
+        ]
+      },
+      {
+        "description": "OWASP audit → should route to security agent",
+        "vars": {
+          "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
+            "threshold": 0.8,
+            "metric": "correct_agent_dispatch"
+          }
+        ]
+      },
+      {
+        "description": "Simple question → no agent dispatch needed",
+        "vars": {
+          "user_task": "What does the SOLID principle stand for?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
+            "threshold": 0.8,
+            "metric": "avoids_unnecessary_dispatch"
+          }
+        ]
+      },
+      {
+        "description": "One-line fix → no agent dispatch needed",
+        "vars": {
+          "user_task": "Fix this: print('hello world')"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
+            "threshold": 0.8,
+            "metric": "avoids_unnecessary_dispatch"
+          }
+        ]
+      },
+      {
+        "description": "Explanation request → no agent dispatch needed",
+        "vars": {
+          "user_task": "Explain how async/await works in Python"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
+            "threshold": 0.75,
+            "metric": "avoids_unnecessary_dispatch"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/01-agent-routing-directive.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-26T09:18:42.051Z",
+    "evaluationCreatedAt": "2026-03-26T09:17:52.963Z"
+  }
+}

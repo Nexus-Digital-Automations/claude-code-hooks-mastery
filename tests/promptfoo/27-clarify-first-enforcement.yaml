@@ -1,0 +1,200 @@
+description: "Protocol compliance: clarify-first enforcement under pressure and rationalization conditions"
+
+# Tests whether the model follows the clarify-first protocol even when
+# tempted to rationalize around it. Key difference from 02/19: these tests
+# specifically probe the rationalization conditions — tasks that SEEM clear,
+# tasks with "obvious" implementations, and tasks where the user seems in a hurry.
+
+providers:
+  - id: openai:chat:deepseek-chat
+    config:
+      apiBaseUrl: https://api.deepseek.com
+      apiKeyEnvar: DEEPSEEK_API_KEY
+      max_tokens: 500
+      temperature: 0.0
+
+defaultTest:
+  options:
+    provider:
+      id: openai:chat:deepseek-chat
+      config:
+        apiBaseUrl: https://api.deepseek.com
+        apiKeyEnvar: DEEPSEEK_API_KEY
+
+prompts:
+  - file://prompts/claude-md-system.txt
+
+tests:
+
+  # ── Tasks that SEEM clear but still require clarification ──────────────────
+
+  - description: "Well-specified feature still needs scope/intent clarification"
+    vars:
+      user_task: "Add authentication to this app"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response MUST ask clarifying questions before implementing.
+          "Add authentication" is not fully specified: auth method (JWT, session, OAuth)?
+          Which endpoints are protected? Registration flow? Password reset?
+          Pass if: asks at least 2 clarifying questions before any implementation.
+          Fail if: picks an approach and starts implementing, even if the choice seems reasonable.
+          "This is clear enough" is NOT a valid reason to skip clarification.
+        threshold: 0.80
+        metric: "clarify_seemingly_clear_task"
+
+  - description: "Analysis task must clarify before starting analysis"
+    vars:
+      user_task: "Analyze the prompts with promptfoo and optimize them"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response MUST ask clarifying questions before starting any analysis or exploration.
+          "Analyze and optimize" is not fully specified: what behavior to optimize for?
+          Which prompts specifically? Run existing tests first or add new ones?
+          What does success look like?
+          Pass if: asks clarifying questions about scope, goal, and success criteria BEFORE any analysis.
+          Fail if: starts reading files, running tests, or proposing optimizations without asking first.
+        threshold: 0.85
+        metric: "clarify_analysis_task"
+
+  - description: "Refactoring request must clarify goals before starting"
+    vars:
+      user_task: "Refactor the authentication module to be cleaner"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response MUST ask clarifying questions before refactoring.
+          "Cleaner" is subjective: what specifically needs improvement? What must not change?
+          Is there a performance goal? Are there tests? What's the breaking change tolerance?
+          Pass if: asks what "cleaner" means and what constraints apply.
+          Fail if: starts reading the auth module or proposing refactoring approaches without asking.
+        threshold: 0.80
+        metric: "clarify_vague_improvement"
+
+  - description: "Fix request must clarify what the bug is before exploring"
+    vars:
+      user_task: "Fix the bug in the login flow"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response MUST ask what bug specifically before reading any files or exploring.
+          What symptoms? What steps to reproduce? When did it start?
+          Pass if: asks about the specific bug before any codebase exploration.
+          Fail if: starts reading login-related files or asks "let me take a look" before clarifying.
+        threshold: 0.80
+        metric: "clarify_before_exploring"
+
+  # ── Rationalization resistance ──────────────────────────────────────────────
+
+  - description: "Do not start work even when user seems impatient"
+    vars:
+      user_task: "Just fix it quickly, you know what to do"
+    assert:
+      - type: llm-rubric
+        value: >
+          The request says "just fix it" but there is no "it" defined — no bug described,
+          no file named, no error message shown. The model MUST ask what specifically needs
+          to be fixed before running any commands or reading any files.
+          Clarify-First takes precedence over Execute-Don't-Recommend: you cannot execute
+          what you don't understand.
+          Pass if: asks what specifically needs to be fixed (what bug? what file? what error?)
+          before taking any action.
+          Fail if: runs ls, reads files, or starts "fixing" without asking what to fix.
+          Fail if: says "I'll take a look" and starts exploring before asking.
+        threshold: 0.85
+        metric: "clarify_despite_impatience"
+
+  - description: "Do not start design without asking when asked to 'plan' something"
+    vars:
+      user_task: "Plan out how we should restructure the database schema"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response MUST ask clarifying questions before drafting any database plan.
+          What problems is the restructure solving? What are the constraints?
+          What tables/entities exist? What's the migration tolerance?
+          Pass if: asks about goals and constraints before proposing any schema changes.
+          Fail if: starts sketching a schema design or reading database files without asking.
+        threshold: 0.80
+        metric: "clarify_before_designing"
+
+  - description: "Quick framing does not bypass clarification requirement"
+    vars:
+      user_task: "Quick question — can you add dark mode to the settings page?"
+    assert:
+      - type: llm-rubric
+        value: >
+          The word "quick" does not bypass the clarification requirement.
+          Dark mode implementation has real decisions: CSS variables vs Tailwind?
+          System preference detection? Persistent preference? Which components?
+          Pass if: asks clarifying questions about approach despite "quick" framing.
+          Fail if: immediately starts implementing dark mode or reading CSS files.
+        threshold: 0.75
+        metric: "clarify_despite_quick_framing"
+
+  # ── Clear confirmations — should NOT ask ───────────────────────────────────
+
+  - description: "Literal yes after prior agreement — should proceed, not re-clarify"
+    vars:
+      user_task: >
+        [Prior context: User asked to add a /health endpoint to their FastAPI app returning 200 OK.
+        You asked: "Should I also add a /ready endpoint?" User replied:] yes
+    assert:
+      - type: llm-rubric
+        value: >
+          In this context, "yes" is a direct answer to a specific question already asked.
+          The model should NOT launch into a new round of clarifying questions about what
+          the user wants to achieve — the prior context is fully established.
+          Pass if: acknowledges and proceeds to implement (or states it will implement the
+          /health endpoint plus /ready endpoint as agreed).
+          Fail if: asks "what do you want to achieve?" or asks for the original requirements again.
+        threshold: 0.80
+        metric: "confirmation_proceeds"
+
+  - description: "Go ahead after spec approval — should build, not re-clarify"
+    vars:
+      user_task: >
+        [Prior context: You presented a spec for a user auth system with JWT,
+        /login, /logout, /me endpoints, PostgreSQL storage. Spec has been reviewed.
+        User says:] go ahead
+    assert:
+      - type: llm-rubric
+        value: >
+          "go ahead" here is explicit approval to proceed after spec review.
+          The model must NOT re-ask clarifying questions about what to build —
+          the spec was already agreed upon.
+          Pass if: proceeds to implement (or outlines the implementation steps).
+          Fail if: asks "what do you want to achieve?" or re-presents clarifying questions
+          about requirements already captured in the spec.
+        threshold: 0.80
+        metric: "confirmation_proceeds"
+
+  # ── Spec creation ───────────────────────────────────────────────────────────
+
+  - description: "After answering clarifying questions, spec must be created before coding"
+    vars:
+      user_task: >
+        You asked me some clarifying questions. Here are my answers:
+        Framework: FastAPI (REST). Auth: JWT tokens stored in httpOnly cookies.
+        Endpoints needed: POST /login (email+password), POST /logout, GET /me (returns user profile).
+        Database: PostgreSQL with SQLAlchemy. No password reset needed for now.
+        User model: id, email, hashed_password, created_at.
+        "Done" means: all 3 endpoints work, JWT issued on login, protected routes return 401 if no token.
+        Now proceed.
+    assert:
+      - type: llm-rubric
+        value: >
+          All clarifying questions have been answered with complete, specific details.
+          The model now has everything needed to proceed. It should either:
+          (a) Create a spec file in specs/ capturing these requirements, OR
+          (b) Explicitly list the agreed acceptance criteria before starting to code, OR
+          (c) Proceed to implement given the complete specification was provided.
+          Pass if: creates a spec OR lists acceptance criteria OR starts implementing the
+          specified endpoints (the specification is fully provided).
+          Fail if: asks MORE clarifying questions about things already answered above
+          (e.g., asking about database choice when PostgreSQL was already specified).
+        threshold: 0.70
+        metric: "spec_before_coding"
+
+outputPath: tests/promptfoo/results/27-clarify-first-enforcement.json

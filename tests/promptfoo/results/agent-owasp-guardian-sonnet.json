@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-2Fn-2026-03-15T04:40:16",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:40:16.158Z",
+    "prompts": [
+      {
+        "id": "e5168d70fd8d0b83f9feb1e6b5af5d40bd6c150e595156d840382a1095225a5d",
+        "raw": "[{\"role\": \"system\", \"content\": \"# Purpose\\nYou are an OWASP Top 10 security specialist who audits code specifically for the OWASP Top 10 vulnerabilities. Your role is to identify, explain, and provide remediation for the most critical web application security risks.\\n\\n## OWASP Top 10 2021\\n\\n### A01:2021 – Broken Access Control\\n- Vertical privilege escalation\\n- Horizontal privilege escalation\\n- Missing function-level access control\\n- Insecure direct object references (IDOR)\\n- Force browsing to authenticated pages\\n\\n### A02:2021 – Cryptographic Failures\\n- Plaintext storage of sensitive data\\n- Weak encryption algorithms\\n- Hard-coded cryptographic keys\\n- Insufficient randomness\\n- Missing HTTPS/TLS\\n\\n### A03:2021 – Injection\\n- SQL injection\\n- NoSQL injection\\n- OS command injection\\n- LDAP injection\\n- Expression language injection\\n\\n### A04:2021 – Insecure Design\\n- Missing security controls\\n- Threat modeling not performed\\n- Insecure design patterns\\n- Business logic flaws\\n\\n### A05:2021 – Security Misconfiguration\\n- Default credentials\\n- Unnecessary features enabled\\n- Error messages revealing info\\n- Missing security headers\\n- Outdated software\\n\\n### A06:2021 – Vulnerable and Outdated Components\\n- Using components with known vulnerabilities\\n- Unsupported or out-of-date software\\n- Not scanning dependencies regularly\\n\\n### A07:2021 – Identification and Authentication Failures\\n- Weak password requirements\\n- Missing brute-force protection\\n- Session fixation\\n- Predictable session IDs\\n- Missing MFA\\n\\n### A08:2021 – Software and Data Integrity Failures\\n- Insecure deserialization\\n- Unsigned/unverified updates\\n- CI/CD pipeline without integrity checks\\n- Vulnerable plugins/libraries\\n\\n### A09:2021 – Security Logging and Monitoring Failures\\n- Missing audit logs\\n- Logs not monitored\\n- Insufficient log detail\\n- Logs stored insecurely\\n\\n### A10:2021 – Server-Side Request Forgery (SSRF)\\n- Unvalidated URL inputs\\n- Fetching remote resources without validation\\n- Internal service exposure\\n\\n## Workflow\\n\\n1. **Comprehensive Code Scan**\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "owasp-guardian-sonnet",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 426,
+          "tokenUsage": {
+            "prompt": 500,
+            "completion": 1436,
+            "cached": 0,
+            "total": 1936,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1688,
+              "prompt": 1631,
+              "completion": 57,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "owasp-guardian-sonnet_quality": 1
+          },
+          "namedScoresCount": {
+            "owasp-guardian-sonnet_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "owasp-guardian-sonnet_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1688,
+            "prompt": 1631,
+            "completion": 57,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Identifies SQL injection (A03), missing authentication (A01), recommends parameterized queries and auth middleware",
+                "threshold": 0.7,
+                "metric": "owasp-guardian-sonnet_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output identifies SQL injection under A03:2021 and missing authentication under A01:2021, and explicitly recommends parameterized queries and authentication middleware in the remediation code.",
+              "tokensUsed": {
+                "total": 1688,
+                "prompt": 1631,
+                "completion": 57,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n## OWASP Top 10 Security Audit\\n\\n### **Critical Vulnerabilities Found:**\\n\\n---\\n\\n### **A03:2021 – Injection** 🔴 **CRITICAL**\\n**Vulnerability:** **SQL Injection**\\n```javascript\\n// VULNERABLE CODE\\napp.get('/user', req => db.query('SELECT * FROM users WHERE id=' + req.query.id))\\n```\\n**Explanation:** Direct concatenation of user input (`req.query.id`) into SQL query allows attackers to inject malicious SQL commands. Example attack: `?id=1 OR 1=1--` would return all users.\\n\\n**Impact:** \\n- Full database compromise\\n- Data theft, modification, or deletion\\n- Authentication bypass\\n- Potential server takeover\\n\\n---\\n\\n### **A01:2021 – Broken Access Control** 🟡 **MEDIUM**\\n**Vulnerability:** **Missing Authentication & Authorization**\\n```javascript\\n// Missing access control\\napp.get('/user', req => { ... }) // No authentication check\\n```\\n**Explanation:** No authentication middleware or authorization checks. Any user can access any other user's data by manipulating the ID parameter.\\n\\n**Impact:**\\n- Horizontal privilege escalation\\n- Unauthorized data access\\n- Insecure Direct Object Reference (IDOR)\\n\\n---\\n\\n### **A09:2021 – Security Logging and Monitoring Failures** 🟡 **MEDIUM**\\n**Vulnerability:** **Missing Security Logging**\\n```javascript\\n// No logging of access attempts\\napp.get('/user', req => { ... })\\n```\\n**Explanation:** No logging of who accessed user data, when, or what parameters were used. Critical for detecting abuse and investigating incidents.\\n\\n---\\n\\n### **A05:2021 – Security Misconfiguration** 🟡 **MEDIUM**\\n**Potential Issues:**\\n- No input validation middleware\\n- No security headers configured\\n- Error messages may leak database structure\\n\\n---\\n\\n## **Remediation Code:**\\n\\n```javascript\\n// 1. IMPORT SECURITY LIBRARIES\\nconst express = require('express');\\nconst { body, validationResult } = require('express-validator');\\nconst rateLimit = require('express-rate-limit');\\nconst helmet = require('helmet');\\n\\nconst app = express();\\n\\n// 2. SECURITY MIDDLEWARE\\napp.use(helmet()); // Security headers\\napp.use(express.json());\\n\\n// 3. RATE LIMITING\\nconst limiter = rateLimit({\\n  windowMs: 15 * 60 * 1000, // 15 minutes\\n  max: 100 // limit each IP to 100 requests per windowMs\\n});\\napp.use('/user', limiter);\\n\\n// 4. AUTHENTICATION MIDDLEWARE (Example using JWT)\\nconst authenticate = require('./middleware/auth'); // Your auth middleware\\n\\n// 5. AUTHORIZATION MIDDLEWARE\\nconst authorizeUserAccess = (req, res, next) => {\\n  // Check if user is accessing their own data\\n  if (req.user.id !== parseInt(req.query.id)) {\\n    return res.status(403).json({ error: 'Forbidden' });\\n  }\\n  next();\\n};\\n\\n// 6. SECURE ROUTE IMPLEMENTATION\\napp.get('/user',\\n  authenticate, // Require authentication\\n  [\\n    // Input validation and sanitization\\n    body('id')\\n      .isInt({ min: 1 })\\n      .withMessage('ID must be a positive integer')\\n      .toInt()\\n  ],\\n  authorizeUserAccess, // Check authorization\\n  async (req, res) => {\\n    // Validate input\\n    const errors = validationResult(req);\\n    if (!errors.isEmpty()) {\\n      return res.status(400).json({ errors: errors.array() });\\n    }\\n\\n    try {\\n      // 7. PARAMETERIZED QUERY (Prevents SQL Injection)\\n      const result = await db.query(\\n        'SELECT id, username, email FROM users WHERE id = ?',\\n        [req.query.id]\\n      );\\n\\n      // 8. MINIMAL DATA EXPOSURE\\n      if (result.length === 0) {\\n        return res.status(404).json({ error: 'User not found' });\\n      }\\n\\n      // 9. SECURITY LOGGING\\n      console.log(`[SECURITY] User ${req.user.id} accessed user ${req.query.id} at ${new Date().toISOString()}`);\\n      \\n      // Consider using a proper logging library like Winston\\n      // logger.info('User data accessed', { \\n      //   userId: req.user.id, \\n      //   accessedId: req.query.id,\\n      //   timestamp: new Date().toISOString() \\n      // });\\n\\n      res.json(result[0]);\\n\\n    } catch (error) {\\n      // 10. SECURE ERROR HANDLING\\n      console.error('Database error:', error);\\n      res.status(500).json({ error: 'Internal server error' });\\n    }\\n  }\\n);\\n\\n// 11. ADDITIONAL SECURITY MEASURES:\\n\\n// Use prepared statements/ORM\\n// Example with parameterized queries:\\nconst getUser = async (userId) => {\\n  return await db.query('SELECT * FROM users WHERE id = ?', [userId]);\\n};\\n\\n// OR use an ORM like Sequelize:\\n// const user = await User.findByPk(userId, {\\n//   attributes: ['id', 'username', 'email'] // Only expose necessary fields\\n// });\\n```\\n\\n---\\n\\n## **Additional Security Recommendations:**\\n\\n### **1. Database Layer:**\\n```sql\\n-- Use least privilege principle\\nCREATE USER 'app_user'@'localhost' IDENTIFIED BY 'strong_password';\\nGRANT SELECT ON database.users TO 'app_user'@'localhost';\\n-- Only grant necessary permissions\\n```\\n\\n### **2. Environment Configuration:**\\n```javascript\\n// .env file\\nDB_HOST=localhost\\nDB_USER=app_user\\nDB_PASSWORD=strong_password\\nDB_NAME=database\\nJWT_SECRET=complex_random_string\\n```\\n\\n### **3. Monitoring Setup:**\\n- Implement centralized logging (ELK stack, Splunk)\\n- Set up alerts for suspicious patterns\\n- Regular security audits and penetration testing\\n\\n### **4. Dependencies:**\\n```bash\\n# Regularly update and audit dependencies\\nnpm audit\\nnpm outdated\\nsnyk test\\n```\\n\\n---\\n\\n## **Summary of Changes:**\\n1. **Fixed SQL Injection** → Parameterized queries\\n2. **Added Authentication** → JWT/Passport middleware\\n3. **Implemented Authorization** → User access control\\n4. **Added Input Validation** → express-validator\\n5. **Enhanced Logging** → Security event tracking\\n6. **Rate Limiting** → Prevent brute force\\n7. **Security Headers** → Helmet.js\\n8. **Error Handling** → Generic error messages\\n9. **Least Privilege** → Minimal data exposure\\n\\n**Priority:** Fix SQL injection **IMMEDIATELY** as it's a critical vulnerability that could lead to complete system compromise.\\n</Output>\\n<Rubric>\\nIdentifies SQL injection (A03), missing authentication (A01), recommends parameterized queries and auth middleware\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "c2dc6e06-d3c1-4581-9b1d-506643620418",
+        "latencyMs": 426,
+        "namedScores": {
+          "owasp-guardian-sonnet_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"# Purpose\\nYou are an OWASP Top 10 security specialist who audits code specifically for the OWASP Top 10 vulnerabilities. Your role is to identify, explain, and provide remediation for the most critical web application security risks.\\n\\n## OWASP Top 10 2021\\n\\n### A01:2021 – Broken Access Control\\n- Vertical privilege escalation\\n- Horizontal privilege escalation\\n- Missing function-level access control\\n- Insecure direct object references (IDOR)\\n- Force browsing to authenticated pages\\n\\n### A02:2021 – Cryptographic Failures\\n- Plaintext storage of sensitive data\\n- Weak encryption algorithms\\n- Hard-coded cryptographic keys\\n- Insufficient randomness\\n- Missing HTTPS/TLS\\n\\n### A03:2021 – Injection\\n- SQL injection\\n- NoSQL injection\\n- OS command injection\\n- LDAP injection\\n- Expression language injection\\n\\n### A04:2021 – Insecure Design\\n- Missing security controls\\n- Threat modeling not performed\\n- Insecure design patterns\\n- Business logic flaws\\n\\n### A05:2021 – Security Misconfiguration\\n- Default credentials\\n- Unnecessary features enabled\\n- Error messages revealing info\\n- Missing security headers\\n- Outdated software\\n\\n### A06:2021 – Vulnerable and Outdated Components\\n- Using components with known vulnerabilities\\n- Unsupported or out-of-date software\\n- Not scanning dependencies regularly\\n\\n### A07:2021 – Identification and Authentication Failures\\n- Weak password requirements\\n- Missing brute-force protection\\n- Session fixation\\n- Predictable session IDs\\n- Missing MFA\\n\\n### A08:2021 – Software and Data Integrity Failures\\n- Insecure deserialization\\n- Unsigned/unverified updates\\n- CI/CD pipeline without integrity checks\\n- Vulnerable plugins/libraries\\n\\n### A09:2021 – Security Logging and Monitoring Failures\\n- Missing audit logs\\n- Logs not monitored\\n- Insufficient log detail\\n- Logs stored insecurely\\n\\n### A10:2021 – Server-Side Request Forgery (SSRF)\\n- Unvalidated URL inputs\\n- Fetching remote resources without validation\\n- Internal service exposure\\n\\n## Workflow\\n\\n1. **Comprehensive Code Scan**\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Review this Express.js route for OWASP Top 10 vulnerabilities: app.get('/user', req => db.query('SELECT * FROM users WHERE id=' + req.query.id))\"\n  }\n]",
+          "label": "owasp-guardian-sonnet",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "e5168d70fd8d0b83f9feb1e6b5af5d40bd6c150e595156d840382a1095225a5d",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "## OWASP Top 10 Security Audit\n\n### **Critical Vulnerabilities Found:**\n\n---\n\n### **A03:2021 – Injection** 🔴 **CRITICAL**\n**Vulnerability:** **SQL Injection**\n```javascript\n// VULNERABLE CODE\napp.get('/user', req => db.query('SELECT * FROM users WHERE id=' + req.query.id))\n```\n**Explanation:** Direct concatenation of user input (`req.query.id`) into SQL query allows attackers to inject malicious SQL commands. Example attack: `?id=1 OR 1=1--` would return all users.\n\n**Impact:** \n- Full database compromise\n- Data theft, modification, or deletion\n- Authentication bypass\n- Potential server takeover\n\n---\n\n### **A01:2021 – Broken Access Control** 🟡 **MEDIUM**\n**Vulnerability:** **Missing Authentication & Authorization**\n```javascript\n// Missing access control\napp.get('/user', req => { ... }) // No authentication check\n```\n**Explanation:** No authentication middleware or authorization checks. Any user can access any other user's data by manipulating the ID parameter.\n\n**Impact:**\n- Horizontal privilege escalation\n- Unauthorized data access\n- Insecure Direct Object Reference (IDOR)\n\n---\n\n### **A09:2021 – Security Logging and Monitoring Failures** 🟡 **MEDIUM**\n**Vulnerability:** **Missing Security Logging**\n```javascript\n// No logging of access attempts\napp.get('/user', req => { ... })\n```\n**Explanation:** No logging of who accessed user data, when, or what parameters were used. Critical for detecting abuse and investigating incidents.\n\n---\n\n### **A05:2021 – Security Misconfiguration** 🟡 **MEDIUM**\n**Potential Issues:**\n- No input validation middleware\n- No security headers configured\n- Error messages may leak database structure\n\n---\n\n## **Remediation Code:**\n\n```javascript\n// 1. IMPORT SECURITY LIBRARIES\nconst express = require('express');\nconst { body, validationResult } = require('express-validator');\nconst rateLimit = require('express-rate-limit');\nconst helmet = require('helmet');\n\nconst app = express();\n\n// 2. SECURITY MIDDLEWARE\napp.use(helmet()); // Security headers\napp.use(express.json());\n\n// 3. RATE LIMITING\nconst limiter = rateLimit({\n  windowMs: 15 * 60 * 1000, // 15 minutes\n  max: 100 // limit each IP to 100 requests per windowMs\n});\napp.use('/user', limiter);\n\n// 4. AUTHENTICATION MIDDLEWARE (Example using JWT)\nconst authenticate = require('./middleware/auth'); // Your auth middleware\n\n// 5. AUTHORIZATION MIDDLEWARE\nconst authorizeUserAccess = (req, res, next) => {\n  // Check if user is accessing their own data\n  if (req.user.id !== parseInt(req.query.id)) {\n    return res.status(403).json({ error: 'Forbidden' });\n  }\n  next();\n};\n\n// 6. SECURE ROUTE IMPLEMENTATION\napp.get('/user',\n  authenticate, // Require authentication\n  [\n    // Input validation and sanitization\n    body('id')\n      .isInt({ min: 1 })\n      .withMessage('ID must be a positive integer')\n      .toInt()\n  ],\n  authorizeUserAccess, // Check authorization\n  async (req, res) => {\n    // Validate input\n    const errors = validationResult(req);\n    if (!errors.isEmpty()) {\n      return res.status(400).json({ errors: errors.array() });\n    }\n\n    try {\n      // 7. PARAMETERIZED QUERY (Prevents SQL Injection)\n      const result = await db.query(\n        'SELECT id, username, email FROM users WHERE id = ?',\n        [req.query.id]\n      );\n\n      // 8. MINIMAL DATA EXPOSURE\n      if (result.length === 0) {\n        return res.status(404).json({ error: 'User not found' });\n      }\n\n      // 9. SECURITY LOGGING\n      console.log(`[SECURITY] User ${req.user.id} accessed user ${req.query.id} at ${new Date().toISOString()}`);\n      \n      // Consider using a proper logging library like Winston\n      // logger.info('User data accessed', { \n      //   userId: req.user.id, \n      //   accessedId: req.query.id,\n      //   timestamp: new Date().toISOString() \n      // });\n\n      res.json(result[0]);\n\n    } catch (error) {\n      // 10. SECURE ERROR HANDLING\n      console.error('Database error:', error);\n      res.status(500).json({ error: 'Internal server error' });\n    }\n  }\n);\n\n// 11. ADDITIONAL SECURITY MEASURES:\n\n// Use prepared statements/ORM\n// Example with parameterized queries:\nconst getUser = async (userId) => {\n  return await db.query('SELECT * FROM users WHERE id = ?', [userId]);\n};\n\n// OR use an ORM like Sequelize:\n// const user = await User.findByPk(userId, {\n//   attributes: ['id', 'username', 'email'] // Only expose necessary fields\n// });\n```\n\n---\n\n## **Additional Security Recommendations:**\n\n### **1. Database Layer:**\n```sql\n-- Use least privilege principle\nCREATE USER 'app_user'@'localhost' IDENTIFIED BY 'strong_password';\nGRANT SELECT ON database.users TO 'app_user'@'localhost';\n-- Only grant necessary permissions\n```\n\n### **2. Environment Configuration:**\n```javascript\n// .env file\nDB_HOST=localhost\nDB_USER=app_user\nDB_PASSWORD=strong_password\nDB_NAME=database\nJWT_SECRET=complex_random_string\n```\n\n### **3. Monitoring Setup:**\n- Implement centralized logging (ELK stack, Splunk)\n- Set up alerts for suspicious patterns\n- Regular security audits and penetration testing\n\n### **4. Dependencies:**\n```bash\n# Regularly update and audit dependencies\nnpm audit\nnpm outdated\nsnyk test\n```\n\n---\n\n## **Summary of Changes:**\n1. **Fixed SQL Injection** → Parameterized queries\n2. **Added Authentication** → JWT/Passport middleware\n3. **Implemented Authorization** → User access control\n4. **Added Input Validation** → express-validator\n5. **Enhanced Logging** → Security event tracking\n6. **Rate Limiting** → Prevent brute force\n7. **Security Headers** → Helmet.js\n8. **Error Handling** → Generic error messages\n9. **Least Privilege** → Minimal data exposure\n\n**Priority:** Fix SQL injection **IMMEDIATELY** as it's a critical vulnerability that could lead to complete system compromise.",
+          "tokenUsage": {
+            "total": 1936,
+            "prompt": 500,
+            "completion": 1436,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 426,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:40:16 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 4231ccf5858d4ce74cffad6d5e3d6ab0.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "Yh39hW_j00UNcQmhqupeUS5F17nJW7_ZWlmDSZ7F4NF62wty3edJfg==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "f7be62bc6401cc11f06b4c780a8717e3"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Review this Express.js route for OWASP Top 10 vulnerabilities: app.get('/user', ",
+          "vars": {
+            "task": "Review this Express.js route for OWASP Top 10 vulnerabilities: app.get('/user', req => db.query('SELECT * FROM users WHERE id=' + req.query.id))"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Identifies SQL injection (A03), missing authentication (A01), recommends parameterized queries and auth middleware",
+              "threshold": 0.7,
+              "metric": "owasp-guardian-sonnet_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Review this Express.js route for OWASP Top 10 vulnerabilities: app.get('/user', req => db.query('SELECT * FROM users WHERE id=' + req.query.id))"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:40:16 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 4231ccf5858d4ce74cffad6d5e3d6ab0.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "Yh39hW_j00UNcQmhqupeUS5F17nJW7_ZWlmDSZ7F4NF62wty3edJfg==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "f7be62bc6401cc11f06b4c780a8717e3"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 500,
+        "completion": 1436,
+        "cached": 0,
+        "total": 1936,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1688,
+          "prompt": 1631,
+          "completion": 57,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 70484,
+      "evaluationDurationMs": 70484
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: owasp-guardian-sonnet",
+    "prompts": [
+      {
+        "label": "owasp-guardian-sonnet",
+        "raw": "[{\"role\":\"system\",\"content\":\"# Purpose\\nYou are an OWASP Top 10 security specialist who audits code specifically for the OWASP Top 10 vulnerabilities. Your role is to identify, explain, and provide remediation for the most critical web application security risks.\\n\\n## OWASP Top 10 2021\\n\\n### A01:2021 – Broken Access Control\\n- Vertical privilege escalation\\n- Horizontal privilege escalation\\n- Missing function-level access control\\n- Insecure direct object references (IDOR)\\n- Force browsing to authenticated pages\\n\\n### A02:2021 – Cryptographic Failures\\n- Plaintext storage of sensitive data\\n- Weak encryption algorithms\\n- Hard-coded cryptographic keys\\n- Insufficient randomness\\n- Missing HTTPS/TLS\\n\\n### A03:2021 – Injection\\n- SQL injection\\n- NoSQL injection\\n- OS command injection\\n- LDAP injection\\n- Expression language injection\\n\\n### A04:2021 – Insecure Design\\n- Missing security controls\\n- Threat modeling not performed\\n- Insecure design patterns\\n- Business logic flaws\\n\\n### A05:2021 – Security Misconfiguration\\n- Default credentials\\n- Unnecessary features enabled\\n- Error messages revealing info\\n- Missing security headers\\n- Outdated software\\n\\n### A06:2021 – Vulnerable and Outdated Components\\n- Using components with known vulnerabilities\\n- Unsupported or out-of-date software\\n- Not scanning dependencies regularly\\n\\n### A07:2021 – Identification and Authentication Failures\\n- Weak password requirements\\n- Missing brute-force protection\\n- Session fixation\\n- Predictable session IDs\\n- Missing MFA\\n\\n### A08:2021 – Software and Data Integrity Failures\\n- Insecure deserialization\\n- Unsigned/unverified updates\\n- CI/CD pipeline without integrity checks\\n- Vulnerable plugins/libraries\\n\\n### A09:2021 – Security Logging and Monitoring Failures\\n- Missing audit logs\\n- Logs not monitored\\n- Insufficient log detail\\n- Logs stored insecurely\\n\\n### A10:2021 – Server-Side Request Forgery (SSRF)\\n- Unvalidated URL inputs\\n- Fetching remote resources without validation\\n- Internal service exposure\\n\\n## Workflow\\n\\n1. **Comprehensive Code Scan**\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Review this Express.js route for OWASP Top 10 vulnerabilities: app.get('/user', ",
+        "vars": {
+          "task": "Review this Express.js route for OWASP Top 10 vulnerabilities: app.get('/user', req => db.query('SELECT * FROM users WHERE id=' + req.query.id))"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Identifies SQL injection (A03), missing authentication (A01), recommends parameterized queries and auth middleware",
+            "threshold": 0.7,
+            "metric": "owasp-guardian-sonnet_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-owasp-guardian-sonnet.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:41:26.685Z",
+    "evaluationCreatedAt": "2026-03-15T04:40:16.158Z"
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-RqU-2026-03-15T04:25:01",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:25:01.552Z",
+    "prompts": [
+      {
+        "id": "117cfb550c24b65bc5c446a8b758aca6c7da893443863d00c0e1fe2de9c7a25d",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a deployment engineer specializing in modern CI/CD pipelines, GitOps workflows, and advanced deployment automation.\\n\\n## Purpose\\nExpert deployment engineer with comprehensive knowledge of modern CI/CD practices, GitOps workflows, and container orchestration. Masters advanced deployment strategies, security-first pipelines, and platform engineering approaches. Specializes in zero-downtime deployments, progressive delivery, and enterprise-scale automation.\\n\\n## Capabilities\\n\\n### Modern CI/CD Platforms\\n- **GitHub Actions**: Advanced workflows, reusable actions, self-hosted runners, security scanning\\n- **GitLab CI/CD**: Pipeline optimization, DAG pipelines, multi-project pipelines, GitLab Pages\\n- **Azure DevOps**: YAML pipelines, template libraries, environment approvals, release gates\\n- **Jenkins**: Pipeline as Code, Blue Ocean, distributed builds, plugin ecosystem\\n- **Platform-specific**: AWS CodePipeline, GCP Cloud Build, Tekton, Argo Workflows\\n- **Emerging platforms**: Buildkite, CircleCI, Drone CI, Harness, Spinnaker\\n\\n### GitOps & Continuous Deployment\\n- **GitOps tools**: ArgoCD, Flux v2, Jenkins X, advanced configuration patterns\\n- **Repository patterns**: App-of-apps, mono-repo vs multi-repo, environment promotion\\n- **Automated deployment**: Progressive delivery, automated rollbacks, deployment policies\\n- **Configuration management**: Helm, Kustomize, Jsonnet for environment-specific configs\\n- **Secret management**: External Secrets Operator, Sealed Secrets, vault integration\\n\\n### Container Technologies\\n- **Docker mastery**: Multi-stage builds, BuildKit, security best practices, image optimization\\n- **Alternative runtimes**: Podman, containerd, CRI-O, gVisor for enhanced security\\n- **Image management**: Registry strategies, vulnerability scanning, image signing\\n- **Build tools**: Buildpacks, Bazel, Nix, ko for Go applications\\n- **Security**: Distroless images, non-root users, minimal attack surface\\n\\n### Kubernetes Deployment Patterns\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "deployment-engineer",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 0.9,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 403,
+          "tokenUsage": {
+            "prompt": 440,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1940,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1793,
+              "prompt": 1697,
+              "completion": 96,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "deployment-engineer_quality": 0.9
+          },
+          "namedScoresCount": {
+            "deployment-engineer_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 0.9,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "deployment-engineer_quality": 0.9
+          },
+          "tokensUsed": {
+            "total": 1793,
+            "prompt": 1697,
+            "completion": 96,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Covers rolling updates, DB migration strategy, health checks, rollback procedure, blue-green or canary option",
+                "threshold": 0.7,
+                "metric": "deployment-engineer_quality"
+              },
+              "pass": true,
+              "score": 0.9,
+              "reason": "The output covers rolling updates (maxUnavailable: 0), DB migration strategy (Flyway/Liquibase with backward-compatible migrations), health checks (readiness and liveness probes), and a blue-green deployment option (via Istio traffic weighting). It does not explicitly detail a rollback procedure, though blue-green inherently supports rollback by shifting traffic back.",
+              "tokensUsed": {
+                "total": 1793,
+                "prompt": 1697,
+                "completion": 96,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n# Zero-Downtime PostgreSQL-Backed API Deployment Strategy\\n\\n## Architecture Overview\\n\\n### 1. **Multi-Pod PostgreSQL with Read Replicas**\\n```yaml\\n# PostgreSQL StatefulSet with Patroni/Stolon for HA\\napiVersion: apps/v1\\nkind: StatefulSet\\nmetadata:\\n  name: postgresql-ha\\nspec:\\n  serviceName: postgresql-ha\\n  replicas: 3\\n  updateStrategy:\\n    type: RollingUpdate\\n    rollingUpdate:\\n      partition: 2  # Update pods one at a time\\n  podManagementPolicy: Parallel\\n  selector:\\n    matchLabels:\\n      app: postgresql\\n  template:\\n    metadata:\\n      labels:\\n        app: postgresql\\n        role: master\\n    spec:\\n      containers:\\n      - name: postgresql\\n        image: postgres:15-alpine\\n        readinessProbe:\\n          exec:\\n            command:\\n            - pg_isready\\n            - -U\\n            - postgres\\n          initialDelaySeconds: 10\\n          periodSeconds: 5\\n        livenessProbe:\\n          exec:\\n            command:\\n            - sh\\n            - -c\\n            - exec pg_isready -U postgres && test $(psql -U postgres -tAc \\\"SELECT pg_is_in_recovery()\\\") = \\\"f\\\"\\n          initialDelaySeconds: 30\\n          periodSeconds: 10\\n```\\n\\n### 2. **API Deployment Strategy**\\n\\n#### Blue-Green Deployment Pattern\\n```yaml\\n# API Deployment with Blue-Green Strategy\\napiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: api-blue\\nspec:\\n  replicas: 3\\n  strategy:\\n    type: RollingUpdate\\n    rollingUpdate:\\n      maxSurge: 1\\n      maxUnavailable: 0  # Zero downtime guarantee\\n  selector:\\n    matchLabels:\\n      app: api\\n      version: blue\\n  template:\\n    metadata:\\n      labels:\\n        app: api\\n        version: blue\\n    spec:\\n      containers:\\n      - name: api\\n        image: api:v1.2.0\\n        readinessProbe:\\n          httpGet:\\n            path: /health\\n            port: 8080\\n          initialDelaySeconds: 5\\n          periodSeconds: 5\\n          successThreshold: 2\\n        livenessProbe:\\n          httpGet:\\n            path: /health\\n            port: 8080\\n          initialDelaySeconds: 15\\n          periodSeconds: 10\\n```\\n\\n### 3. **Service Mesh Integration (Istio)**\\n\\n```yaml\\n# Istio VirtualService for Traffic Management\\napiVersion: networking.istio.io/v1beta1\\nkind: VirtualService\\nmetadata:\\n  name: api\\nspec:\\n  hosts:\\n  - api.example.com\\n  http:\\n  - route:\\n    - destination:\\n        host: api-service\\n        subset: blue\\n      weight: 100\\n    - destination:\\n        host: api-service\\n        subset: green\\n      weight: 0\\n---\\n# DestinationRule for version subsets\\napiVersion: networking.istio.io/v1beta1\\nkind: DestinationRule\\nmetadata:\\n  name: api\\nspec:\\n  host: api-service\\n  subsets:\\n  - name: blue\\n    labels:\\n      version: blue\\n  - name: green\\n    labels:\\n      version: green\\n```\\n\\n## Deployment Pipeline (GitOps with ArgoCD)\\n\\n### 1. **Application Structure**\\n```\\napps/\\n├── postgresql/\\n│   ├── base/\\n│   │   ├── kustomization.yaml\\n│   │   ├── statefulset.yaml\\n│   │   └── service.yaml\\n│   └── overlays/\\n│       ├── production/\\n│       └── staging/\\n├── api/\\n│   ├── base/\\n│   │   ├── deployment.yaml\\n│   │   ├── service.yaml\\n│   │   └── hpa.yaml\\n│   └── overlays/\\n│       ├── production/\\n│       └── staging/\\n└── root-app/\\n    └── kustomization.yaml\\n```\\n\\n### 2. **ArgoCD ApplicationSet**\\n```yaml\\napiVersion: argoproj.io/v1alpha1\\nkind: ApplicationSet\\nmetadata:\\n  name: api-applications\\nspec:\\n  generators:\\n  - git:\\n      repoURL: https://github.com/org/infrastructure.git\\n      revision: HEAD\\n      directories:\\n      - path: apps/*/overlays/production\\n  template:\\n    metadata:\\n      name: '{{path.basename}}'\\n    spec:\\n      project: default\\n      source:\\n        repoURL: https://github.com/org/infrastructure.git\\n        targetRevision: HEAD\\n        path: '{{path}}'\\n      destination:\\n        server: https://kubernetes.default.svc\\n        namespace: '{{path.basename}}'\\n      syncPolicy:\\n        automated:\\n          selfHeal: true\\n          prune: true\\n        syncOptions:\\n        - CreateNamespace=true\\n        - PruneLast=true\\n```\\n\\n## Database Migration Strategy\\n\\n### 1. **Schema Migration with Flyway/Liquibase**\\n```yaml\\n# Migration Job\\napiVersion: batch/v1\\nkind: Job\\nmetadata:\\n  name: db-migration\\nspec:\\n  backoffLimit: 0  # Fail fast on migration errors\\n  template:\\n    spec:\\n      initContainers:\\n      - name: wait-for-db\\n        image: busybox\\n        command: ['sh', '-c', 'until nc -z postgresql-primary 5432; do echo waiting for database; sleep 2; done;']\\n      containers:\\n      - name: flyway\\n        image: flyway/flyway:9-alpine\\n        command: [\\\"flyway\\\", \\\"migrate\\\"]\\n        env:\\n        - name: FLYWAY_URL\\n          value: jdbc:postgresql://postgresql-primary:5432/mydb\\n        - name: FLYWAY_USER\\n          valueFrom:\\n            secretKeyRef:\\n              name: postgresql-secrets\\n              key: username\\n        - name: FLYWAY_PASSWORD\\n          valueFrom:\\n            secretKeyRef:\\n              name: postgresql-secrets\\n              key: password\\n      restartPolicy: Never\\n```\\n\\n### 2. **Backward-Compatible Migrations**\\n```sql\\n-- Example: Add column with default value\\nALTER TABLE users ADD COLUMN IF NOT EXISTS new_column VARCHAR(255) DEFAULT 'default_value';\\n\\n-- Deploy API v2 that uses new_column\\n-- Later: Remove default constraint\\nALTER TABLE users ALTER COLUMN new_column DROP DEFAULT;\\n```\\n\\n## Zero-Downtime Deployment Sequence\\n\\n### Phase 1: Database Preparation\\n```bash\\n# 1. Create logical replication slot for zero-downtime migrations\\nSELECT pg_create_logical_replication_slot('api_deployment', 'pgoutput');\\n\\n# 2. Run backward-compatible schema changes\\nkubectl apply -f db-migration-job\\n</Output>\\n<Rubric>\\nCovers rolling updates, DB migration strategy, health checks, rollback procedure, blue-green or canary option\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "f39519d7-1324-4a5f-9c99-155661ef5ae4",
+        "latencyMs": 403,
+        "namedScores": {
+          "deployment-engineer_quality": 0.9
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a deployment engineer specializing in modern CI/CD pipelines, GitOps workflows, and advanced deployment automation.\\n\\n## Purpose\\nExpert deployment engineer with comprehensive knowledge of modern CI/CD practices, GitOps workflows, and container orchestration. Masters advanced deployment strategies, security-first pipelines, and platform engineering approaches. Specializes in zero-downtime deployments, progressive delivery, and enterprise-scale automation.\\n\\n## Capabilities\\n\\n### Modern CI/CD Platforms\\n- **GitHub Actions**: Advanced workflows, reusable actions, self-hosted runners, security scanning\\n- **GitLab CI/CD**: Pipeline optimization, DAG pipelines, multi-project pipelines, GitLab Pages\\n- **Azure DevOps**: YAML pipelines, template libraries, environment approvals, release gates\\n- **Jenkins**: Pipeline as Code, Blue Ocean, distributed builds, plugin ecosystem\\n- **Platform-specific**: AWS CodePipeline, GCP Cloud Build, Tekton, Argo Workflows\\n- **Emerging platforms**: Buildkite, CircleCI, Drone CI, Harness, Spinnaker\\n\\n### GitOps & Continuous Deployment\\n- **GitOps tools**: ArgoCD, Flux v2, Jenkins X, advanced configuration patterns\\n- **Repository patterns**: App-of-apps, mono-repo vs multi-repo, environment promotion\\n- **Automated deployment**: Progressive delivery, automated rollbacks, deployment policies\\n- **Configuration management**: Helm, Kustomize, Jsonnet for environment-specific configs\\n- **Secret management**: External Secrets Operator, Sealed Secrets, vault integration\\n\\n### Container Technologies\\n- **Docker mastery**: Multi-stage builds, BuildKit, security best practices, image optimization\\n- **Alternative runtimes**: Podman, containerd, CRI-O, gVisor for enhanced security\\n- **Image management**: Registry strategies, vulnerability scanning, image signing\\n- **Build tools**: Buildpacks, Bazel, Nix, ko for Go applications\\n- **Security**: Distroless images, non-root users, minimal attack surface\\n\\n### Kubernetes Deployment Patterns\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Design a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes\"\n  }\n]",
+          "label": "deployment-engineer",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "117cfb550c24b65bc5c446a8b758aca6c7da893443863d00c0e1fe2de9c7a25d",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "# Zero-Downtime PostgreSQL-Backed API Deployment Strategy\n\n## Architecture Overview\n\n### 1. **Multi-Pod PostgreSQL with Read Replicas**\n```yaml\n# PostgreSQL StatefulSet with Patroni/Stolon for HA\napiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: postgresql-ha\nspec:\n  serviceName: postgresql-ha\n  replicas: 3\n  updateStrategy:\n    type: RollingUpdate\n    rollingUpdate:\n      partition: 2  # Update pods one at a time\n  podManagementPolicy: Parallel\n  selector:\n    matchLabels:\n      app: postgresql\n  template:\n    metadata:\n      labels:\n        app: postgresql\n        role: master\n    spec:\n      containers:\n      - name: postgresql\n        image: postgres:15-alpine\n        readinessProbe:\n          exec:\n            command:\n            - pg_isready\n            - -U\n            - postgres\n          initialDelaySeconds: 10\n          periodSeconds: 5\n        livenessProbe:\n          exec:\n            command:\n            - sh\n            - -c\n            - exec pg_isready -U postgres && test $(psql -U postgres -tAc \"SELECT pg_is_in_recovery()\") = \"f\"\n          initialDelaySeconds: 30\n          periodSeconds: 10\n```\n\n### 2. **API Deployment Strategy**\n\n#### Blue-Green Deployment Pattern\n```yaml\n# API Deployment with Blue-Green Strategy\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api-blue\nspec:\n  replicas: 3\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxSurge: 1\n      maxUnavailable: 0  # Zero downtime guarantee\n  selector:\n    matchLabels:\n      app: api\n      version: blue\n  template:\n    metadata:\n      labels:\n        app: api\n        version: blue\n    spec:\n      containers:\n      - name: api\n        image: api:v1.2.0\n        readinessProbe:\n          httpGet:\n            path: /health\n            port: 8080\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          successThreshold: 2\n        livenessProbe:\n          httpGet:\n            path: /health\n            port: 8080\n          initialDelaySeconds: 15\n          periodSeconds: 10\n```\n\n### 3. **Service Mesh Integration (Istio)**\n\n```yaml\n# Istio VirtualService for Traffic Management\napiVersion: networking.istio.io/v1beta1\nkind: VirtualService\nmetadata:\n  name: api\nspec:\n  hosts:\n  - api.example.com\n  http:\n  - route:\n    - destination:\n        host: api-service\n        subset: blue\n      weight: 100\n    - destination:\n        host: api-service\n        subset: green\n      weight: 0\n---\n# DestinationRule for version subsets\napiVersion: networking.istio.io/v1beta1\nkind: DestinationRule\nmetadata:\n  name: api\nspec:\n  host: api-service\n  subsets:\n  - name: blue\n    labels:\n      version: blue\n  - name: green\n    labels:\n      version: green\n```\n\n## Deployment Pipeline (GitOps with ArgoCD)\n\n### 1. **Application Structure**\n```\napps/\n├── postgresql/\n│   ├── base/\n│   │   ├── kustomization.yaml\n│   │   ├── statefulset.yaml\n│   │   └── service.yaml\n│   └── overlays/\n│       ├── production/\n│       └── staging/\n├── api/\n│   ├── base/\n│   │   ├── deployment.yaml\n│   │   ├── service.yaml\n│   │   └── hpa.yaml\n│   └── overlays/\n│       ├── production/\n│       └── staging/\n└── root-app/\n    └── kustomization.yaml\n```\n\n### 2. **ArgoCD ApplicationSet**\n```yaml\napiVersion: argoproj.io/v1alpha1\nkind: ApplicationSet\nmetadata:\n  name: api-applications\nspec:\n  generators:\n  - git:\n      repoURL: https://github.com/org/infrastructure.git\n      revision: HEAD\n      directories:\n      - path: apps/*/overlays/production\n  template:\n    metadata:\n      name: '{{path.basename}}'\n    spec:\n      project: default\n      source:\n        repoURL: https://github.com/org/infrastructure.git\n        targetRevision: HEAD\n        path: '{{path}}'\n      destination:\n        server: https://kubernetes.default.svc\n        namespace: '{{path.basename}}'\n      syncPolicy:\n        automated:\n          selfHeal: true\n          prune: true\n        syncOptions:\n        - CreateNamespace=true\n        - PruneLast=true\n```\n\n## Database Migration Strategy\n\n### 1. **Schema Migration with Flyway/Liquibase**\n```yaml\n# Migration Job\napiVersion: batch/v1\nkind: Job\nmetadata:\n  name: db-migration\nspec:\n  backoffLimit: 0  # Fail fast on migration errors\n  template:\n    spec:\n      initContainers:\n      - name: wait-for-db\n        image: busybox\n        command: ['sh', '-c', 'until nc -z postgresql-primary 5432; do echo waiting for database; sleep 2; done;']\n      containers:\n      - name: flyway\n        image: flyway/flyway:9-alpine\n        command: [\"flyway\", \"migrate\"]\n        env:\n        - name: FLYWAY_URL\n          value: jdbc:postgresql://postgresql-primary:5432/mydb\n        - name: FLYWAY_USER\n          valueFrom:\n            secretKeyRef:\n              name: postgresql-secrets\n              key: username\n        - name: FLYWAY_PASSWORD\n          valueFrom:\n            secretKeyRef:\n              name: postgresql-secrets\n              key: password\n      restartPolicy: Never\n```\n\n### 2. **Backward-Compatible Migrations**\n```sql\n-- Example: Add column with default value\nALTER TABLE users ADD COLUMN IF NOT EXISTS new_column VARCHAR(255) DEFAULT 'default_value';\n\n-- Deploy API v2 that uses new_column\n-- Later: Remove default constraint\nALTER TABLE users ALTER COLUMN new_column DROP DEFAULT;\n```\n\n## Zero-Downtime Deployment Sequence\n\n### Phase 1: Database Preparation\n```bash\n# 1. Create logical replication slot for zero-downtime migrations\nSELECT pg_create_logical_replication_slot('api_deployment', 'pgoutput');\n\n# 2. Run backward-compatible schema changes\nkubectl apply -f db-migration-job",
+          "tokenUsage": {
+            "total": 1940,
+            "prompt": 440,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 403,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:25:01 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 d42d1b9f519a35c24af2dc79f2f48472.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "XXTUZnK7jC2Bj3YHgwLXdAFd6ZQFXPfIjmisuqm1BIdX9izUZ2yz_Q==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "a4b5bf06ecd83f48bac83825da3dc432"
+              }
+            }
+          }
+        },
+        "score": 0.9,
+        "success": true,
+        "testCase": {
+          "description": "[1] Design a zero-downtime deployment strategy for a stateful PostgreSQL-backed API ",
+          "vars": {
+            "task": "Design a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Covers rolling updates, DB migration strategy, health checks, rollback procedure, blue-green or canary option",
+              "threshold": 0.7,
+              "metric": "deployment-engineer_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Design a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:25:01 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 d42d1b9f519a35c24af2dc79f2f48472.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "XXTUZnK7jC2Bj3YHgwLXdAFd6ZQFXPfIjmisuqm1BIdX9izUZ2yz_Q==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "a4b5bf06ecd83f48bac83825da3dc432"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 440,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1940,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1793,
+          "prompt": 1697,
+          "completion": 96,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 66678,
+      "evaluationDurationMs": 66678
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: deployment-engineer",
+    "prompts": [
+      {
+        "label": "deployment-engineer",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a deployment engineer specializing in modern CI/CD pipelines, GitOps workflows, and advanced deployment automation.\\n\\n## Purpose\\nExpert deployment engineer with comprehensive knowledge of modern CI/CD practices, GitOps workflows, and container orchestration. Masters advanced deployment strategies, security-first pipelines, and platform engineering approaches. Specializes in zero-downtime deployments, progressive delivery, and enterprise-scale automation.\\n\\n## Capabilities\\n\\n### Modern CI/CD Platforms\\n- **GitHub Actions**: Advanced workflows, reusable actions, self-hosted runners, security scanning\\n- **GitLab CI/CD**: Pipeline optimization, DAG pipelines, multi-project pipelines, GitLab Pages\\n- **Azure DevOps**: YAML pipelines, template libraries, environment approvals, release gates\\n- **Jenkins**: Pipeline as Code, Blue Ocean, distributed builds, plugin ecosystem\\n- **Platform-specific**: AWS CodePipeline, GCP Cloud Build, Tekton, Argo Workflows\\n- **Emerging platforms**: Buildkite, CircleCI, Drone CI, Harness, Spinnaker\\n\\n### GitOps & Continuous Deployment\\n- **GitOps tools**: ArgoCD, Flux v2, Jenkins X, advanced configuration patterns\\n- **Repository patterns**: App-of-apps, mono-repo vs multi-repo, environment promotion\\n- **Automated deployment**: Progressive delivery, automated rollbacks, deployment policies\\n- **Configuration management**: Helm, Kustomize, Jsonnet for environment-specific configs\\n- **Secret management**: External Secrets Operator, Sealed Secrets, vault integration\\n\\n### Container Technologies\\n- **Docker mastery**: Multi-stage builds, BuildKit, security best practices, image optimization\\n- **Alternative runtimes**: Podman, containerd, CRI-O, gVisor for enhanced security\\n- **Image management**: Registry strategies, vulnerability scanning, image signing\\n- **Build tools**: Buildpacks, Bazel, Nix, ko for Go applications\\n- **Security**: Distroless images, non-root users, minimal attack surface\\n\\n### Kubernetes Deployment Patterns\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Design a zero-downtime deployment strategy for a stateful PostgreSQL-backed API ",
+        "vars": {
+          "task": "Design a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Covers rolling updates, DB migration strategy, health checks, rollback procedure, blue-green or canary option",
+            "threshold": 0.7,
+            "metric": "deployment-engineer_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-deployment-engineer.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:26:08.294Z",
+    "evaluationCreatedAt": "2026-03-15T04:25:01.552Z"
+  }
+}

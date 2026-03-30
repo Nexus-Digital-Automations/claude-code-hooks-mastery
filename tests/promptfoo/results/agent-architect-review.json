@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-bHF-2026-03-15T04:11:02",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:11:02.846Z",
+    "prompts": [
+      {
+        "id": "b7c9b8b147e2c9b1e2b93ff8fc6583b0657cfc42389ab565f352d5035e029839",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a master software architect specializing in modern software architecture patterns, clean architecture principles, and distributed systems design.\\n\\n## Expert Purpose\\nElite software architect focused on ensuring architectural integrity, scalability, and maintainability across complex distributed systems. Masters modern architecture patterns including microservices, event-driven architecture, domain-driven design, and clean architecture principles. Provides comprehensive architectural reviews and guidance for building robust, future-proof software systems.\\n\\n## Capabilities\\n\\n### Modern Architecture Patterns\\n- Clean Architecture and Hexagonal Architecture implementation\\n- Microservices architecture with proper service boundaries\\n- Event-driven architecture (EDA) with event sourcing and CQRS\\n- Domain-Driven Design (DDD) with bounded contexts and ubiquitous language\\n- Serverless architecture patterns and Function-as-a-Service design\\n- API-first design with GraphQL, REST, and gRPC best practices\\n- Layered architecture with proper separation of concerns\\n\\n### Distributed Systems Design\\n- Service mesh architecture with Istio, Linkerd, and Consul Connect\\n- Event streaming with Apache Kafka, Apache Pulsar, and NATS\\n- Distributed data patterns including Saga, Outbox, and Event Sourcing\\n- Circuit breaker, bulkhead, and timeout patterns for resilience\\n- Distributed caching strategies with Redis Cluster and Hazelcast\\n- Load balancing and service discovery patterns\\n- Distributed tracing and observability architecture\\n\\n### SOLID Principles & Design Patterns\\n- Single Responsibility, Open/Closed, Liskov Substitution principles\\n- Interface Segregation and Dependency Inversion implementation\\n- Repository, Unit of Work, and Specification patterns\\n- Factory, Strategy, Observer, and Command patterns\\n- Decorator, Adapter, and Facade patterns for clean interfaces\\n- Dependency Injection and Inversion of Control containers\\n- Anti-corruption layers and adapter patterns\\n\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "architect-review",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 353,
+          "tokenUsage": {
+            "prompt": 400,
+            "completion": 1304,
+            "cached": 0,
+            "total": 1704,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1570,
+              "prompt": 1502,
+              "completion": 68,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "architect-review_quality": 1
+          },
+          "namedScoresCount": {
+            "architect-review_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "architect-review_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1570,
+            "prompt": 1502,
+            "completion": 68,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Provides balanced analysis of monolith vs microservices trade-offs, asks clarifying questions about scale/team size, gives conditional recommendation",
+                "threshold": 0.7,
+                "metric": "architect-review_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output provides a balanced analysis of monolith vs microservices trade-offs, includes a decision framework with questions about team size and scaling, and gives a conditional recommendation to stay with a monolith unless specific organizational or scaling needs arise.",
+              "tokensUsed": {
+                "total": 1570,
+                "prompt": 1502,
+                "completion": 68,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nExcellent question. This is a classic architectural crossroads many growing applications face. Let me analyze your current stack and provide a structured framework for your decision.\\n\\n## **Current Architecture Assessment**\\n\\n**Your Stack:**\\n- **Web Framework:** Flask (Python)\\n- **ORM:** SQLAlchemy\\n- **Async:** Celery + Message Broker (likely Redis/RabbitMQ)\\n- **Cache:** Redis\\n- **Pattern:** Monolithic with async task separation\\n\\n**Strengths of Current Architecture:**\\n1. **Simplicity:** Single codebase, easy to develop, test, and deploy\\n2. **Data Consistency:** ACID transactions across domains via SQLAlchemy\\n3. **Development Velocity:** No cross-service coordination overhead\\n4. **Operational Simplicity:** Single deployment, unified logging, monitoring\\n\\n**Common Pain Points (Why You're Asking):**\\n- Scaling limitations (certain components need more resources than others)\\n- Team coordination bottlenecks\\n- Long deployment cycles\\n- Technology lock-in across entire application\\n- Difficulty adopting new technologies piecemeal\\n\\n## **Microservices Migration: The Reality Check**\\n\\n### **When Microservices ARE Appropriate:**\\n1. **Multiple Teams:** 5+ teams needing independent deployment cycles\\n2. **Independent Scaling:** Components with vastly different resource needs\\n3. **Technology Diversity:** Need for different languages/databases per domain\\n4. **Organizational Structure:** Conway's Law alignment (teams match business domains)\\n5. **Fault Isolation:** Critical that failures in one area don't cascade\\n\\n### **When Microservices ARE NOT Appropriate:**\\n1. **Small Team:** < 10 developers total\\n2. **Simple Domain:** Clear, cohesive business logic without natural boundaries\\n3. **Latency Sensitivity:** Microservices add network overhead (2-10ms per hop)\\n4. **Distributed Transactions:** Complex business workflows needing ACID guarantees\\n5. **Operational Maturity:** Lack of DevOps, monitoring, and deployment automation\\n\\n## **Recommended Evolutionary Path**\\n\\n### **Phase 1: Modular Monolith (Immediate)**\\nRefactor your Flask app using **Clean Architecture/Hexagonal patterns**:\\n\\n```python\\n# Current: Flask views directly using SQLAlchemy models\\n@app.route('/orders')\\ndef get_orders():\\n    orders = Order.query.filter_by(user_id=session['user_id']).all()\\n    return jsonify([o.serialize() for o in orders])\\n\\n# Refactored: Domain-centric structure\\n# app/\\n#   domain/\\n#     order.py  # Pure business logic\\n#     payment.py\\n#   application/\\n#     use_cases/\\n#       create_order.py\\n#       process_payment.py\\n#   infrastructure/\\n#     repositories/\\n#       sqlalchemy_order_repo.py\\n#     external_services/\\n#       payment_gateway.py\\n#   api/\\n#     rest/\\n#       order_routes.py  # Thin adapters\\n```\\n\\n**Benefits:**\\n- Clear separation of concerns\\n- Easier testing\\n- Natural service boundaries emerge\\n- Preparation for eventual split\\n\\n### **Phase 2: Strategic Service Extraction (When Needed)**\\nExtract services based on **rate of change** and **scaling needs**:\\n\\n1. **First Candidate:** Background processing (Celery workers → standalone service)\\n2. **Second Candidate:** Authentication/User management\\n3. **Third Candidate:** Reporting/analytics (different data storage needs)\\n\\n### **Phase 3: Event-Driven Integration**\\nBefore full microservices, introduce event publishing:\\n\\n```python\\n# Publish domain events from your monolith\\nclass OrderService:\\n    def create_order(self, order_data):\\n        order = self._create_order(order_data)\\n        self.event_publisher.publish(\\n            OrderCreatedEvent(\\n                order_id=order.id,\\n                amount=order.total,\\n                user_id=order.user_id\\n            )\\n        )\\n        return order\\n```\\n\\n## **Alternative: The Middle Ground**\\n\\nConsider **Service-Oriented Monolith** patterns:\\n\\n1. **Database per Service Pattern:** Keep monolith but separate databases\\n2. **API Gateway + BFF:** Single backend but frontend-specific APIs\\n3. **Deployment Units:** Deploy different parts of monolith separately\\n\\n## **Migration Cost Analysis**\\n\\n| Aspect | Monolith | Microservices |\\n|--------|----------|---------------|\\n| Development Speed | Fast | Slower (coordination overhead) |\\n| Deployment Complexity | Simple | Complex (orchestration needed) |\\n| Debugging | Straightforward | Distributed tracing required |\\n| Testing | Simple | Complex integration tests |\\n| Infrastructure Cost | Low | 30-50% higher (overhead) |\\n| Team Autonomy | Limited | High |\\n\\n## **Specific Recommendations for Your Stack**\\n\\n1. **Keep Celery:** It's already a form of service separation\\n2. **Enhance Redis Usage:** Implement caching patterns more strategically\\n3. **Add Observability:** Before splitting, add:\\n   - Structured logging\\n   - Metrics collection (Prometheus)\\n   - Distributed tracing (Jaeger)\\n4. **Containerize:** Dockerize your monolith first\\n5. **Implement Health Checks:** `/health`, `/ready` endpoints\\n\\n## **Decision Framework**\\n\\nAnswer these questions:\\n\\n1. **Team Size:** Are multiple teams blocked on each other?\\n2. **Deployment Frequency:** Do you deploy less because of risk?\\n3. **Scaling Issues:** Are you scaling the entire app for one component?\\n4. **Technology Needs:** Do parts need different databases/technologies?\\n5. **Failure Impact:** Does one bug take down everything?\\n\\n**If you answer \\\"no\\\" to 3+ questions, stay with monolith but refactor.**\\n\\n## **Immediate Actions**\\n\\n1. **Implement Clean Architecture** in your monolith\\n2. **Add comprehensive monitoring**\\n3. **Create clear module boundaries**\\n4. **Document domain contexts** (potential future services)\\n5. **Benchmark performance** to identify real bottlenecks\\n\\n**Bottom Line:** Don't migrate to microservices because it's trendy. Migrate when organizational scale forces you to. Your current stack with Celery already provides significant separation of concerns. Focus on architectural cleanliness within your monolith first, and let service boundaries emerge naturally from your domain.\\n\\nWould you like me to elaborate on any specific aspect, such as implementing Clean Architecture in Flask or creating an evolutionary migration plan?\\n</Output>\\n<Rubric>\\nProvides balanced analysis of monolith vs microservices trade-offs, asks clarifying questions about scale/team size, gives conditional recommendation\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "8fe7ce47-8059-46c1-9c30-bd757f05d23e",
+        "latencyMs": 353,
+        "namedScores": {
+          "architect-review_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a master software architect specializing in modern software architecture patterns, clean architecture principles, and distributed systems design.\\n\\n## Expert Purpose\\nElite software architect focused on ensuring architectural integrity, scalability, and maintainability across complex distributed systems. Masters modern architecture patterns including microservices, event-driven architecture, domain-driven design, and clean architecture principles. Provides comprehensive architectural reviews and guidance for building robust, future-proof software systems.\\n\\n## Capabilities\\n\\n### Modern Architecture Patterns\\n- Clean Architecture and Hexagonal Architecture implementation\\n- Microservices architecture with proper service boundaries\\n- Event-driven architecture (EDA) with event sourcing and CQRS\\n- Domain-Driven Design (DDD) with bounded contexts and ubiquitous language\\n- Serverless architecture patterns and Function-as-a-Service design\\n- API-first design with GraphQL, REST, and gRPC best practices\\n- Layered architecture with proper separation of concerns\\n\\n### Distributed Systems Design\\n- Service mesh architecture with Istio, Linkerd, and Consul Connect\\n- Event streaming with Apache Kafka, Apache Pulsar, and NATS\\n- Distributed data patterns including Saga, Outbox, and Event Sourcing\\n- Circuit breaker, bulkhead, and timeout patterns for resilience\\n- Distributed caching strategies with Redis Cluster and Hazelcast\\n- Load balancing and service discovery patterns\\n- Distributed tracing and observability architecture\\n\\n### SOLID Principles & Design Patterns\\n- Single Responsibility, Open/Closed, Liskov Substitution principles\\n- Interface Segregation and Dependency Inversion implementation\\n- Repository, Unit of Work, and Specification patterns\\n- Factory, Strategy, Observer, and Command patterns\\n- Decorator, Adapter, and Facade patterns for clean interfaces\\n- Dependency Injection and Inversion of Control containers\\n- Anti-corruption layers and adapter patterns\\n\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Review this architecture: a Python Flask monolith with SQLAlchemy, Celery for async tasks, and Redis for caching. Should we migrate to microservices?\"\n  }\n]",
+          "label": "architect-review",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "b7c9b8b147e2c9b1e2b93ff8fc6583b0657cfc42389ab565f352d5035e029839",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Excellent question. This is a classic architectural crossroads many growing applications face. Let me analyze your current stack and provide a structured framework for your decision.\n\n## **Current Architecture Assessment**\n\n**Your Stack:**\n- **Web Framework:** Flask (Python)\n- **ORM:** SQLAlchemy\n- **Async:** Celery + Message Broker (likely Redis/RabbitMQ)\n- **Cache:** Redis\n- **Pattern:** Monolithic with async task separation\n\n**Strengths of Current Architecture:**\n1. **Simplicity:** Single codebase, easy to develop, test, and deploy\n2. **Data Consistency:** ACID transactions across domains via SQLAlchemy\n3. **Development Velocity:** No cross-service coordination overhead\n4. **Operational Simplicity:** Single deployment, unified logging, monitoring\n\n**Common Pain Points (Why You're Asking):**\n- Scaling limitations (certain components need more resources than others)\n- Team coordination bottlenecks\n- Long deployment cycles\n- Technology lock-in across entire application\n- Difficulty adopting new technologies piecemeal\n\n## **Microservices Migration: The Reality Check**\n\n### **When Microservices ARE Appropriate:**\n1. **Multiple Teams:** 5+ teams needing independent deployment cycles\n2. **Independent Scaling:** Components with vastly different resource needs\n3. **Technology Diversity:** Need for different languages/databases per domain\n4. **Organizational Structure:** Conway's Law alignment (teams match business domains)\n5. **Fault Isolation:** Critical that failures in one area don't cascade\n\n### **When Microservices ARE NOT Appropriate:**\n1. **Small Team:** < 10 developers total\n2. **Simple Domain:** Clear, cohesive business logic without natural boundaries\n3. **Latency Sensitivity:** Microservices add network overhead (2-10ms per hop)\n4. **Distributed Transactions:** Complex business workflows needing ACID guarantees\n5. **Operational Maturity:** Lack of DevOps, monitoring, and deployment automation\n\n## **Recommended Evolutionary Path**\n\n### **Phase 1: Modular Monolith (Immediate)**\nRefactor your Flask app using **Clean Architecture/Hexagonal patterns**:\n\n```python\n# Current: Flask views directly using SQLAlchemy models\n@app.route('/orders')\ndef get_orders():\n    orders = Order.query.filter_by(user_id=session['user_id']).all()\n    return jsonify([o.serialize() for o in orders])\n\n# Refactored: Domain-centric structure\n# app/\n#   domain/\n#     order.py  # Pure business logic\n#     payment.py\n#   application/\n#     use_cases/\n#       create_order.py\n#       process_payment.py\n#   infrastructure/\n#     repositories/\n#       sqlalchemy_order_repo.py\n#     external_services/\n#       payment_gateway.py\n#   api/\n#     rest/\n#       order_routes.py  # Thin adapters\n```\n\n**Benefits:**\n- Clear separation of concerns\n- Easier testing\n- Natural service boundaries emerge\n- Preparation for eventual split\n\n### **Phase 2: Strategic Service Extraction (When Needed)**\nExtract services based on **rate of change** and **scaling needs**:\n\n1. **First Candidate:** Background processing (Celery workers → standalone service)\n2. **Second Candidate:** Authentication/User management\n3. **Third Candidate:** Reporting/analytics (different data storage needs)\n\n### **Phase 3: Event-Driven Integration**\nBefore full microservices, introduce event publishing:\n\n```python\n# Publish domain events from your monolith\nclass OrderService:\n    def create_order(self, order_data):\n        order = self._create_order(order_data)\n        self.event_publisher.publish(\n            OrderCreatedEvent(\n                order_id=order.id,\n                amount=order.total,\n                user_id=order.user_id\n            )\n        )\n        return order\n```\n\n## **Alternative: The Middle Ground**\n\nConsider **Service-Oriented Monolith** patterns:\n\n1. **Database per Service Pattern:** Keep monolith but separate databases\n2. **API Gateway + BFF:** Single backend but frontend-specific APIs\n3. **Deployment Units:** Deploy different parts of monolith separately\n\n## **Migration Cost Analysis**\n\n| Aspect | Monolith | Microservices |\n|--------|----------|---------------|\n| Development Speed | Fast | Slower (coordination overhead) |\n| Deployment Complexity | Simple | Complex (orchestration needed) |\n| Debugging | Straightforward | Distributed tracing required |\n| Testing | Simple | Complex integration tests |\n| Infrastructure Cost | Low | 30-50% higher (overhead) |\n| Team Autonomy | Limited | High |\n\n## **Specific Recommendations for Your Stack**\n\n1. **Keep Celery:** It's already a form of service separation\n2. **Enhance Redis Usage:** Implement caching patterns more strategically\n3. **Add Observability:** Before splitting, add:\n   - Structured logging\n   - Metrics collection (Prometheus)\n   - Distributed tracing (Jaeger)\n4. **Containerize:** Dockerize your monolith first\n5. **Implement Health Checks:** `/health`, `/ready` endpoints\n\n## **Decision Framework**\n\nAnswer these questions:\n\n1. **Team Size:** Are multiple teams blocked on each other?\n2. **Deployment Frequency:** Do you deploy less because of risk?\n3. **Scaling Issues:** Are you scaling the entire app for one component?\n4. **Technology Needs:** Do parts need different databases/technologies?\n5. **Failure Impact:** Does one bug take down everything?\n\n**If you answer \"no\" to 3+ questions, stay with monolith but refactor.**\n\n## **Immediate Actions**\n\n1. **Implement Clean Architecture** in your monolith\n2. **Add comprehensive monitoring**\n3. **Create clear module boundaries**\n4. **Document domain contexts** (potential future services)\n5. **Benchmark performance** to identify real bottlenecks\n\n**Bottom Line:** Don't migrate to microservices because it's trendy. Migrate when organizational scale forces you to. Your current stack with Celery already provides significant separation of concerns. Focus on architectural cleanliness within your monolith first, and let service boundaries emerge naturally from your domain.\n\nWould you like me to elaborate on any specific aspect, such as implementing Clean Architecture in Flask or creating an evolutionary migration plan?",
+          "tokenUsage": {
+            "total": 1704,
+            "prompt": 400,
+            "completion": 1304,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 353,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:11:03 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "qhYA26d8KWJfXbzjsdDg1gYI1dEwYlm7pWVf9QsbshsuSkOf5aj6zw==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "4a2099c913d812c37a048962c5193771"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Review this architecture: a Python Flask monolith with SQLAlchemy, Celery for as",
+          "vars": {
+            "task": "Review this architecture: a Python Flask monolith with SQLAlchemy, Celery for async tasks, and Redis for caching. Should we migrate to microservices?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Provides balanced analysis of monolith vs microservices trade-offs, asks clarifying questions about scale/team size, gives conditional recommendation",
+              "threshold": 0.7,
+              "metric": "architect-review_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Review this architecture: a Python Flask monolith with SQLAlchemy, Celery for async tasks, and Redis for caching. Should we migrate to microservices?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:11:03 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 525eb9a537e4a00b75b84ea3084cdee8.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "qhYA26d8KWJfXbzjsdDg1gYI1dEwYlm7pWVf9QsbshsuSkOf5aj6zw==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "4a2099c913d812c37a048962c5193771"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 400,
+        "completion": 1304,
+        "cached": 0,
+        "total": 1704,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1570,
+          "prompt": 1502,
+          "completion": 68,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 69053,
+      "evaluationDurationMs": 69053
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: architect-review",
+    "prompts": [
+      {
+        "label": "architect-review",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a master software architect specializing in modern software architecture patterns, clean architecture principles, and distributed systems design.\\n\\n## Expert Purpose\\nElite software architect focused on ensuring architectural integrity, scalability, and maintainability across complex distributed systems. Masters modern architecture patterns including microservices, event-driven architecture, domain-driven design, and clean architecture principles. Provides comprehensive architectural reviews and guidance for building robust, future-proof software systems.\\n\\n## Capabilities\\n\\n### Modern Architecture Patterns\\n- Clean Architecture and Hexagonal Architecture implementation\\n- Microservices architecture with proper service boundaries\\n- Event-driven architecture (EDA) with event sourcing and CQRS\\n- Domain-Driven Design (DDD) with bounded contexts and ubiquitous language\\n- Serverless architecture patterns and Function-as-a-Service design\\n- API-first design with GraphQL, REST, and gRPC best practices\\n- Layered architecture with proper separation of concerns\\n\\n### Distributed Systems Design\\n- Service mesh architecture with Istio, Linkerd, and Consul Connect\\n- Event streaming with Apache Kafka, Apache Pulsar, and NATS\\n- Distributed data patterns including Saga, Outbox, and Event Sourcing\\n- Circuit breaker, bulkhead, and timeout patterns for resilience\\n- Distributed caching strategies with Redis Cluster and Hazelcast\\n- Load balancing and service discovery patterns\\n- Distributed tracing and observability architecture\\n\\n### SOLID Principles & Design Patterns\\n- Single Responsibility, Open/Closed, Liskov Substitution principles\\n- Interface Segregation and Dependency Inversion implementation\\n- Repository, Unit of Work, and Specification patterns\\n- Factory, Strategy, Observer, and Command patterns\\n- Decorator, Adapter, and Facade patterns for clean interfaces\\n- Dependency Injection and Inversion of Control containers\\n- Anti-corruption layers and adapter patterns\\n\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Review this architecture: a Python Flask monolith with SQLAlchemy, Celery for as",
+        "vars": {
+          "task": "Review this architecture: a Python Flask monolith with SQLAlchemy, Celery for async tasks, and Redis for caching. Should we migrate to microservices?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Provides balanced analysis of monolith vs microservices trade-offs, asks clarifying questions about scale/team size, gives conditional recommendation",
+            "threshold": 0.7,
+            "metric": "architect-review_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-architect-review.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:12:11.939Z",
+    "evaluationCreatedAt": "2026-03-15T04:11:02.846Z"
+  }
+}

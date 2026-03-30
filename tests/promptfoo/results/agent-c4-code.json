@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-xjR-2026-03-15T04:17:26",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:17:26.213Z",
+    "prompts": [
+      {
+        "id": "a5388718092d8dea9d7bdb4d860da365388e8d705a04006a5ca6fec259cdf3b0",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a C4 Code-level documentation specialist focused on creating comprehensive, accurate code-level documentation following the C4 model.\\n\\n## Purpose\\nExpert in analyzing code directories and creating detailed C4 Code-level documentation. Masters code analysis, function signature extraction, dependency mapping, and structured documentation following C4 model principles. Creates documentation that serves as the foundation for Component, Container, and Context level documentation.\\n\\n## Core Philosophy\\nDocument code at the most granular level with complete accuracy. Every function, class, module, and dependency should be captured. Code-level documentation forms the foundation for all higher-level C4 diagrams and must be thorough and precise.\\n\\n## Capabilities\\n\\n### Code Analysis\\n- **Directory structure analysis**: Understand code organization, module boundaries, and file relationships\\n- **Function signature extraction**: Capture complete function/method signatures with parameters, return types, and type hints\\n- **Class and module analysis**: Document class hierarchies, interfaces, abstract classes, and module exports\\n- **Dependency mapping**: Identify imports, external dependencies, and internal code dependencies\\n- **Code patterns recognition**: Identify design patterns, architectural patterns, and code organization patterns\\n- **Language-agnostic analysis**: Works with Python, JavaScript/TypeScript, Java, Go, Rust, C#, Ruby, and other languages\\n\\n### C4 Code-Level Documentation\\n- **Code element identification**: Functions, classes, modules, packages, namespaces\\n- **Relationship mapping**: Dependencies between code elements, call graphs, data flows\\n- **Technology identification**: Programming languages, frameworks, libraries used\\n- **Purpose documentation**: What each code element does, its responsibilities, and its role\\n- **Interface documentation**: Public APIs, function signatures, method contracts\\n- **Data structure documentation**: Types, schemas, models, DTOs\\n\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "c4-code",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 403,
+          "tokenUsage": {
+            "prompt": 387,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1887,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1767,
+              "prompt": 1694,
+              "completion": 73,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "c4-code_quality": 1
+          },
+          "namedScoresCount": {
+            "c4-code_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "c4-code_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1767,
+            "prompt": 1694,
+            "completion": 73,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Documents code structure at function/class level, shows dependencies and relationships between components, organized and readable",
+                "threshold": 0.6,
+                "metric": "c4-code_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output provides detailed documentation of code structure at both class and function levels, clearly shows dependencies between components (e.g., SecurityManager using settings from config, models using SQLAlchemy), and is organized into sections with clear headings and code blocks for readability.",
+              "tokensUsed": {
+                "total": 1767,
+                "prompt": 1694,
+                "completion": 73,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n# C4 Code-Level Documentation: FastAPI Authentication Module with JWT\\n\\n## 1. Directory Structure Analysis\\n\\n```\\nauth/\\n├── __init__.py              # Module exports and version\\n├── dependencies.py          # FastAPI dependencies for authentication\\n├── models.py               # Pydantic models and database models\\n├── schemas.py              # Data schemas and validation models\\n├── security.py             # JWT token handling and password utilities\\n├── routes.py               # Authentication API endpoints\\n├── config.py               # Configuration and settings\\n└── exceptions.py           # Custom authentication exceptions\\n```\\n\\n## 2. Code Element Documentation\\n\\n### 2.1 Configuration Module (`config.py`)\\n\\n```python\\n# config.py\\nfrom pydantic_settings import BaseSettings\\nfrom typing import Optional\\n\\nclass Settings(BaseSettings):\\n    \\\"\\\"\\\"Application settings with environment variable loading\\\"\\\"\\\"\\n    \\n    # JWT Configuration\\n    SECRET_KEY: str\\n    ALGORITHM: str = \\\"HS256\\\"\\n    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30\\n    REFRESH_TOKEN_EXPIRE_DAYS: int = 7\\n    \\n    # Database Configuration\\n    DATABASE_URL: Optional[str] = None\\n    \\n    # Security Configuration\\n    BCRYPT_ROUNDS: int = 12\\n    \\n    class Config:\\n        env_file = \\\".env\\\"\\n        case_sensitive = True\\n\\nsettings = Settings()\\n```\\n\\n**Code Elements:**\\n- **Class**: `Settings` - Configuration management using Pydantic\\n- **Attributes**: JWT, database, and security settings\\n- **Method**: `Config` inner class - Pydantic configuration\\n- **Instance**: `settings` - Global settings instance\\n\\n### 2.2 Security Module (`security.py`)\\n\\n```python\\n# security.py\\nfrom datetime import datetime, timedelta\\nfrom typing import Dict, Any, Optional\\nfrom jose import JWTError, jwt\\nfrom passlib.context import CryptContext\\nfrom .config import settings\\n\\nclass SecurityManager:\\n    \\\"\\\"\\\"Manages JWT token creation, validation, and password hashing\\\"\\\"\\\"\\n    \\n    def __init__(self):\\n        self.pwd_context = CryptContext(schemes=[\\\"bcrypt\\\"], deprecated=\\\"auto\\\")\\n        self.secret_key = settings.SECRET_KEY\\n        self.algorithm = settings.ALGORITHM\\n    \\n    def verify_password(self, plain_password: str, hashed_password: str) -> bool:\\n        \\\"\\\"\\\"Verify plain password against hashed password\\\"\\\"\\\"\\n        return self.pwd_context.verify(plain_password, hashed_password)\\n    \\n    def get_password_hash(self, password: str) -> str:\\n        \\\"\\\"\\\"Generate bcrypt hash for password\\\"\\\"\\\"\\n        return self.pwd_context.hash(password)\\n    \\n    def create_access_token(\\n        self, \\n        data: Dict[str, Any], \\n        expires_delta: Optional[timedelta] = None\\n    ) -> str:\\n        \\\"\\\"\\\"Create JWT access token with expiration\\\"\\\"\\\"\\n        to_encode = data.copy()\\n        if expires_delta:\\n            expire = datetime.utcnow() + expires_delta\\n        else:\\n            expire = datetime.utcnow() + timedelta(\\n                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES\\n            )\\n        to_encode.update({\\\"exp\\\": expire, \\\"type\\\": \\\"access\\\"})\\n        return jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)\\n    \\n    def create_refresh_token(\\n        self, \\n        data: Dict[str, Any], \\n        expires_delta: Optional[timedelta] = None\\n    ) -> str:\\n        \\\"\\\"\\\"Create JWT refresh token with longer expiration\\\"\\\"\\\"\\n        to_encode = data.copy()\\n        if expires_delta:\\n            expire = datetime.utcnow() + expires_delta\\n        else:\\n            expire = datetime.utcnow() + timedelta(\\n                days=settings.REFRESH_TOKEN_EXPIRE_DAYS\\n            )\\n        to_encode.update({\\\"exp\\\": expire, \\\"type\\\": \\\"refresh\\\"})\\n        return jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)\\n    \\n    def decode_token(self, token: str) -> Dict[str, Any]:\\n        \\\"\\\"\\\"Decode and validate JWT token\\\"\\\"\\\"\\n        try:\\n            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])\\n            return payload\\n        except JWTError:\\n            raise ValueError(\\\"Invalid token\\\")\\n\\nsecurity_manager = SecurityManager()\\n```\\n\\n**Code Elements:**\\n- **Class**: `SecurityManager` - Central security operations manager\\n- **Methods**:\\n  - `verify_password()`: Password verification\\n  - `get_password_hash()`: Password hashing\\n  - `create_access_token()`: JWT access token generation\\n  - `create_refresh_token()`: JWT refresh token generation\\n  - `decode_token()`: Token validation and decoding\\n- **Dependencies**: `jose.jwt`, `passlib.context.CryptContext`\\n- **Instance**: `security_manager` - Singleton security manager\\n\\n### 2.3 Models Module (`models.py`)\\n\\n```python\\n# models.py\\nfrom sqlalchemy import Column, Integer, String, Boolean, DateTime\\nfrom sqlalchemy.ext.declarative import declarative_base\\nfrom datetime import datetime\\n\\nBase = declarative_base()\\n\\nclass User(Base):\\n    \\\"\\\"\\\"Database model for user accounts\\\"\\\"\\\"\\n    \\n    __tablename__ = \\\"users\\\"\\n    \\n    id = Column(Integer, primary_key=True, index=True)\\n    email = Column(String, unique=True, index=True, nullable=False)\\n    username = Column(String, unique=True, index=True, nullable=False)\\n    hashed_password = Column(String, nullable=False)\\n    is_active = Column(Boolean, default=True)\\n    is_verified = Column(Boolean, default=False)\\n    is_superuser = Column(Boolean, default=False)\\n    created_at = Column(DateTime, default=datetime.utcnow)\\n    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)\\n    \\n    def __repr__(self) -> str:\\n        return f\\\"<User(id={self.id}, email={self.email}, username={self.username})>\\\"\\n\\nclass RefreshToken(Base):\\n    \\\"\\\"\\\"Database model for refresh token tracking\\\"\\\"\\\"\\n    \\n    __tablename__ = \\\"refresh_tokens\\\"\\n    \\n    id = Column(Integer, primary_key=True, index=True)\\n    token = Column(String, unique=True, index=True, nullable=False)\\n    user_id = Column(Integer, nullable=False)\\n    expires_at = Column(DateTime, nullable=False)\\n    is_revoked = Column(Boolean, default=False)\\n    created_at = Column(DateTime, default=datetime.utcnow)\\n```\\n\\n**Code Elements:**\\n- **Base Class**: `Base` - SQLAlchemy declarative base\\n- **Class**: `User` - User account model with authentication fields\\n- **Attributes**: User fields including authentication and status flags\\n- **Class**: `RefreshToken` - Refresh token tracking model\\n- **Relationships**: Implicit user-token relationship via `user_id`\\n\\n### 2.4 Schemas Module (`schemas.py`)\\n\\n```python\\n# schemas.py\\nfrom pyd\\n</Output>\\n<Rubric>\\nDocuments code structure at function/class level, shows dependencies and relationships between components, organized and readable\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "ab3ea4f0-53e6-4ec5-bd8d-4d038eadd878",
+        "latencyMs": 403,
+        "namedScores": {
+          "c4-code_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a C4 Code-level documentation specialist focused on creating comprehensive, accurate code-level documentation following the C4 model.\\n\\n## Purpose\\nExpert in analyzing code directories and creating detailed C4 Code-level documentation. Masters code analysis, function signature extraction, dependency mapping, and structured documentation following C4 model principles. Creates documentation that serves as the foundation for Component, Container, and Context level documentation.\\n\\n## Core Philosophy\\nDocument code at the most granular level with complete accuracy. Every function, class, module, and dependency should be captured. Code-level documentation forms the foundation for all higher-level C4 diagrams and must be thorough and precise.\\n\\n## Capabilities\\n\\n### Code Analysis\\n- **Directory structure analysis**: Understand code organization, module boundaries, and file relationships\\n- **Function signature extraction**: Capture complete function/method signatures with parameters, return types, and type hints\\n- **Class and module analysis**: Document class hierarchies, interfaces, abstract classes, and module exports\\n- **Dependency mapping**: Identify imports, external dependencies, and internal code dependencies\\n- **Code patterns recognition**: Identify design patterns, architectural patterns, and code organization patterns\\n- **Language-agnostic analysis**: Works with Python, JavaScript/TypeScript, Java, Go, Rust, C#, Ruby, and other languages\\n\\n### C4 Code-Level Documentation\\n- **Code element identification**: Functions, classes, modules, packages, namespaces\\n- **Relationship mapping**: Dependencies between code elements, call graphs, data flows\\n- **Technology identification**: Programming languages, frameworks, libraries used\\n- **Purpose documentation**: What each code element does, its responsibilities, and its role\\n- **Interface documentation**: Public APIs, function signatures, method contracts\\n- **Data structure documentation**: Types, schemas, models, DTOs\\n\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Generate C4 Code-level documentation for a Python FastAPI authentication module with JWT handling\"\n  }\n]",
+          "label": "c4-code",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "a5388718092d8dea9d7bdb4d860da365388e8d705a04006a5ca6fec259cdf3b0",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "# C4 Code-Level Documentation: FastAPI Authentication Module with JWT\n\n## 1. Directory Structure Analysis\n\n```\nauth/\n├── __init__.py              # Module exports and version\n├── dependencies.py          # FastAPI dependencies for authentication\n├── models.py               # Pydantic models and database models\n├── schemas.py              # Data schemas and validation models\n├── security.py             # JWT token handling and password utilities\n├── routes.py               # Authentication API endpoints\n├── config.py               # Configuration and settings\n└── exceptions.py           # Custom authentication exceptions\n```\n\n## 2. Code Element Documentation\n\n### 2.1 Configuration Module (`config.py`)\n\n```python\n# config.py\nfrom pydantic_settings import BaseSettings\nfrom typing import Optional\n\nclass Settings(BaseSettings):\n    \"\"\"Application settings with environment variable loading\"\"\"\n    \n    # JWT Configuration\n    SECRET_KEY: str\n    ALGORITHM: str = \"HS256\"\n    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30\n    REFRESH_TOKEN_EXPIRE_DAYS: int = 7\n    \n    # Database Configuration\n    DATABASE_URL: Optional[str] = None\n    \n    # Security Configuration\n    BCRYPT_ROUNDS: int = 12\n    \n    class Config:\n        env_file = \".env\"\n        case_sensitive = True\n\nsettings = Settings()\n```\n\n**Code Elements:**\n- **Class**: `Settings` - Configuration management using Pydantic\n- **Attributes**: JWT, database, and security settings\n- **Method**: `Config` inner class - Pydantic configuration\n- **Instance**: `settings` - Global settings instance\n\n### 2.2 Security Module (`security.py`)\n\n```python\n# security.py\nfrom datetime import datetime, timedelta\nfrom typing import Dict, Any, Optional\nfrom jose import JWTError, jwt\nfrom passlib.context import CryptContext\nfrom .config import settings\n\nclass SecurityManager:\n    \"\"\"Manages JWT token creation, validation, and password hashing\"\"\"\n    \n    def __init__(self):\n        self.pwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\n        self.secret_key = settings.SECRET_KEY\n        self.algorithm = settings.ALGORITHM\n    \n    def verify_password(self, plain_password: str, hashed_password: str) -> bool:\n        \"\"\"Verify plain password against hashed password\"\"\"\n        return self.pwd_context.verify(plain_password, hashed_password)\n    \n    def get_password_hash(self, password: str) -> str:\n        \"\"\"Generate bcrypt hash for password\"\"\"\n        return self.pwd_context.hash(password)\n    \n    def create_access_token(\n        self, \n        data: Dict[str, Any], \n        expires_delta: Optional[timedelta] = None\n    ) -> str:\n        \"\"\"Create JWT access token with expiration\"\"\"\n        to_encode = data.copy()\n        if expires_delta:\n            expire = datetime.utcnow() + expires_delta\n        else:\n            expire = datetime.utcnow() + timedelta(\n                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES\n            )\n        to_encode.update({\"exp\": expire, \"type\": \"access\"})\n        return jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)\n    \n    def create_refresh_token(\n        self, \n        data: Dict[str, Any], \n        expires_delta: Optional[timedelta] = None\n    ) -> str:\n        \"\"\"Create JWT refresh token with longer expiration\"\"\"\n        to_encode = data.copy()\n        if expires_delta:\n            expire = datetime.utcnow() + expires_delta\n        else:\n            expire = datetime.utcnow() + timedelta(\n                days=settings.REFRESH_TOKEN_EXPIRE_DAYS\n            )\n        to_encode.update({\"exp\": expire, \"type\": \"refresh\"})\n        return jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)\n    \n    def decode_token(self, token: str) -> Dict[str, Any]:\n        \"\"\"Decode and validate JWT token\"\"\"\n        try:\n            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])\n            return payload\n        except JWTError:\n            raise ValueError(\"Invalid token\")\n\nsecurity_manager = SecurityManager()\n```\n\n**Code Elements:**\n- **Class**: `SecurityManager` - Central security operations manager\n- **Methods**:\n  - `verify_password()`: Password verification\n  - `get_password_hash()`: Password hashing\n  - `create_access_token()`: JWT access token generation\n  - `create_refresh_token()`: JWT refresh token generation\n  - `decode_token()`: Token validation and decoding\n- **Dependencies**: `jose.jwt`, `passlib.context.CryptContext`\n- **Instance**: `security_manager` - Singleton security manager\n\n### 2.3 Models Module (`models.py`)\n\n```python\n# models.py\nfrom sqlalchemy import Column, Integer, String, Boolean, DateTime\nfrom sqlalchemy.ext.declarative import declarative_base\nfrom datetime import datetime\n\nBase = declarative_base()\n\nclass User(Base):\n    \"\"\"Database model for user accounts\"\"\"\n    \n    __tablename__ = \"users\"\n    \n    id = Column(Integer, primary_key=True, index=True)\n    email = Column(String, unique=True, index=True, nullable=False)\n    username = Column(String, unique=True, index=True, nullable=False)\n    hashed_password = Column(String, nullable=False)\n    is_active = Column(Boolean, default=True)\n    is_verified = Column(Boolean, default=False)\n    is_superuser = Column(Boolean, default=False)\n    created_at = Column(DateTime, default=datetime.utcnow)\n    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)\n    \n    def __repr__(self) -> str:\n        return f\"<User(id={self.id}, email={self.email}, username={self.username})>\"\n\nclass RefreshToken(Base):\n    \"\"\"Database model for refresh token tracking\"\"\"\n    \n    __tablename__ = \"refresh_tokens\"\n    \n    id = Column(Integer, primary_key=True, index=True)\n    token = Column(String, unique=True, index=True, nullable=False)\n    user_id = Column(Integer, nullable=False)\n    expires_at = Column(DateTime, nullable=False)\n    is_revoked = Column(Boolean, default=False)\n    created_at = Column(DateTime, default=datetime.utcnow)\n```\n\n**Code Elements:**\n- **Base Class**: `Base` - SQLAlchemy declarative base\n- **Class**: `User` - User account model with authentication fields\n- **Attributes**: User fields including authentication and status flags\n- **Class**: `RefreshToken` - Refresh token tracking model\n- **Relationships**: Implicit user-token relationship via `user_id`\n\n### 2.4 Schemas Module (`schemas.py`)\n\n```python\n# schemas.py\nfrom pyd",
+          "tokenUsage": {
+            "total": 1887,
+            "prompt": 387,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 403,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:17:26 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 caafc03067a3b56299391de5835582d0.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "eufbBNV6ngS5MqtSDJncyFwrDURXjg5aSX48gLuiQ1vOTl0IOd95jQ==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "5b0922c2d1b153fd837d0ac7149fa751"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Generate C4 Code-level documentation for a Python FastAPI authentication module ",
+          "vars": {
+            "task": "Generate C4 Code-level documentation for a Python FastAPI authentication module with JWT handling"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Documents code structure at function/class level, shows dependencies and relationships between components, organized and readable",
+              "threshold": 0.6,
+              "metric": "c4-code_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Generate C4 Code-level documentation for a Python FastAPI authentication module with JWT handling"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:17:26 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 caafc03067a3b56299391de5835582d0.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "eufbBNV6ngS5MqtSDJncyFwrDURXjg5aSX48gLuiQ1vOTl0IOd95jQ==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "5b0922c2d1b153fd837d0ac7149fa751"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 387,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1887,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1767,
+          "prompt": 1694,
+          "completion": 73,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 72445,
+      "evaluationDurationMs": 72445
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: c4-code",
+    "prompts": [
+      {
+        "label": "c4-code",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a C4 Code-level documentation specialist focused on creating comprehensive, accurate code-level documentation following the C4 model.\\n\\n## Purpose\\nExpert in analyzing code directories and creating detailed C4 Code-level documentation. Masters code analysis, function signature extraction, dependency mapping, and structured documentation following C4 model principles. Creates documentation that serves as the foundation for Component, Container, and Context level documentation.\\n\\n## Core Philosophy\\nDocument code at the most granular level with complete accuracy. Every function, class, module, and dependency should be captured. Code-level documentation forms the foundation for all higher-level C4 diagrams and must be thorough and precise.\\n\\n## Capabilities\\n\\n### Code Analysis\\n- **Directory structure analysis**: Understand code organization, module boundaries, and file relationships\\n- **Function signature extraction**: Capture complete function/method signatures with parameters, return types, and type hints\\n- **Class and module analysis**: Document class hierarchies, interfaces, abstract classes, and module exports\\n- **Dependency mapping**: Identify imports, external dependencies, and internal code dependencies\\n- **Code patterns recognition**: Identify design patterns, architectural patterns, and code organization patterns\\n- **Language-agnostic analysis**: Works with Python, JavaScript/TypeScript, Java, Go, Rust, C#, Ruby, and other languages\\n\\n### C4 Code-Level Documentation\\n- **Code element identification**: Functions, classes, modules, packages, namespaces\\n- **Relationship mapping**: Dependencies between code elements, call graphs, data flows\\n- **Technology identification**: Programming languages, frameworks, libraries used\\n- **Purpose documentation**: What each code element does, its responsibilities, and its role\\n- **Interface documentation**: Public APIs, function signatures, method contracts\\n- **Data structure documentation**: Types, schemas, models, DTOs\\n\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Generate C4 Code-level documentation for a Python FastAPI authentication module ",
+        "vars": {
+          "task": "Generate C4 Code-level documentation for a Python FastAPI authentication module with JWT handling"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Documents code structure at function/class level, shows dependencies and relationships between components, organized and readable",
+            "threshold": 0.6,
+            "metric": "c4-code_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-c4-code.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:18:38.706Z",
+    "evaluationCreatedAt": "2026-03-15T04:17:26.213Z"
+  }
+}

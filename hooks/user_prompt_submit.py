@@ -817,22 +817,113 @@ def inject_ambiguity_prompt(prompt):
     if prompt_lower.startswith('/') or prompt_lower.startswith('@'):
         return None
 
-    return """BEFORE STARTING — ask clarifying questions to understand exactly what the user wants:
+    return """PROTOCOL CHECKPOINT — YOU MAY NOT START WORK UNTIL THIS IS COMPLETE:
 
-SKIP THIS if the prompt is a follow-up answer, confirmation, or a single targeted fix with no ambiguity.
+STEP 1 — CLARIFY FIRST (your first response must be clarifying questions, nothing else):
 
-OTHERWISE — ask ALL clarifying questions in ONE message before writing any code:
-• For EACH question, present 2-3 options with one marked (recommended)
-• Format: **Option A** (recommended) | **Option B** | **Option C**
-• Cover: scope, approach, edge cases, what "done" looks like
-• Example: "**Error handling**: Return error codes (recommended) | Throw exceptions | Log and continue"
+Ask the user in ONE message:
+• What do you want to achieve? (their goal, in their words — not your interpretation)
+• What does "done" look like? (specific, testable — how will you verify success?)
+• Anything that must NOT change, or constraints to respect?
+• If multiple valid approaches exist: present 2-3 options, mark one (recommended)
+  Format: **Option A** (recommended) | **Option B** | **Option C**
 
-Wait for the user's answers before starting implementation.
+YOU ARE PERMITTED TO SKIP STEP 1 ONLY IF:
+• The user said a literal confirmation: "yes" / "ok" / "go ahead" / "approved" / "do it" / "proceed" / "sure"
+• The user is directly answering clarifying questions you asked earlier this session
 
-THEN — execute autonomously:
+THESE ARE NOT VALID REASONS TO SKIP:
+✗ "This task seems clear to me" — that is a rationalization
+✗ "I understand the intent" — you haven't confirmed it
+✗ "Let me just start and ask if they want changes" — you will build the wrong thing
+✗ Starting to read files or explore before asking — work has started before clarification
+
+STEP 2 — CREATE A SPEC (after getting answers, before any code):
+• Write specs/<descriptive-name>.md with what the user wants in their words
+• Include specific, testable acceptance criteria for every requirement
+• Present the spec to the user and wait for their explicit approval
+
+STEP 3 — EXECUTE AUTONOMOUSLY (only after spec is approved):
 • Never ask "should I proceed?" or "want me to continue?" — just do it.
 • Errors = fix immediately, don't ask.
 • Actions within your capability = execute them, don't say "I recommend you run X"."""
+
+
+def _build_spec_context(cwd, prompt):
+    """Inject spec-awareness context based on whether specs exist for this project.
+
+    If specs/ exists with active specs: remind Claude to read them before starting.
+    If no specs exist and the task is substantial: direct Claude to create one.
+    Returns context string or None.
+    """
+    specs_dir = Path(cwd) / "specs"
+
+    # Skip for trivial prompts
+    prompt_lower = prompt.lower().strip()
+    trivial = ['ok', 'yes', 'no', 'continue', 'thanks', 'got it', 'sounds good',
+               'perfect', 'great', 'nice', 'cool', 'done', 'good', 'fine',
+               'sure', 'proceed', 'go ahead', 'do it', 'approved', 'lgtm']
+    if prompt_lower in trivial or len(prompt_lower) < 15:
+        return None
+
+    # Skip slash commands
+    if prompt_lower.startswith('/') or prompt_lower.startswith('@'):
+        return None
+
+    if specs_dir.is_dir():
+        # Scan for active specs
+        active_specs = []
+        try:
+            for spec_file in sorted(specs_dir.glob("*.md")):
+                try:
+                    content = spec_file.read_text(errors='replace')
+                    if content.startswith("---"):
+                        parts = content.split("---", 2)
+                        if len(parts) >= 3:
+                            fm = parts[1]
+                            status = ""
+                            title = ""
+                            for line in fm.split("\n"):
+                                line = line.strip()
+                                if line.startswith("status:"):
+                                    status = line[7:].strip()
+                                elif line.startswith("title:"):
+                                    title = line[6:].strip().strip("'\"")
+                            if status in ("active", "in-progress", "planning"):
+                                # Count criteria
+                                body = parts[2]
+                                unchecked = body.count("- [ ]")
+                                checked = body.count("- [x]")
+                                total = unchecked + checked
+                                progress = f" ({checked}/{total} criteria done)" if total > 0 else ""
+                                active_specs.append(f"  • {spec_file.name}: {title} [{status}]{progress}")
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+        if active_specs:
+            return (
+                "ACTIVE SPECS FOUND — Read these BEFORE writing any code:\n"
+                + "\n".join(active_specs) + "\n"
+                "Check: does your current task relate to any of these specs?\n"
+                "If yes: follow the spec's requirements and acceptance criteria.\n"
+                "If no: create a NEW spec for this task before coding."
+            )
+
+    # No specs directory or no active specs — check if task is substantial enough to need one
+    category, is_trackable = categorize_prompt(prompt)
+    if is_trackable and category in ('feature', 'bug', 'request'):
+        return (
+            "NO SPEC EXISTS for this project. Before writing any code:\n"
+            "1. Clarify requirements with the user (ask questions, present options)\n"
+            "2. Create a spec file in specs/ capturing what was agreed\n"
+            "3. Get user approval on the spec\n"
+            "4. THEN start implementation\n"
+            "The spec prevents missed requirements and incomplete work."
+        )
+
+    return None
 
 
 def validate_prompt(prompt):
@@ -957,6 +1048,14 @@ def main():
 
         if ambiguity_context:
             context_parts.append(ambiguity_context)
+
+        # Inject spec-awareness context (active specs or "create a spec" directive)
+        try:
+            spec_context = _build_spec_context(cwd, prompt)
+            if spec_context:
+                context_parts.append(spec_context)
+        except Exception:
+            pass  # Graceful degradation
 
         # Add plugin suggestions from New Tools marketplace
         try:

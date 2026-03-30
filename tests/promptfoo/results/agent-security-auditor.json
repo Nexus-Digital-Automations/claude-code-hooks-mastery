@@ -1,0 +1,496 @@
+{
+  "evalId": "eval-KZW-2026-03-15T04:47:15",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:47:15.342Z",
+    "prompts": [
+      {
+        "id": "fc0c281e9eba6a9f576e6ca485650061a591814c1c9b4e161e3a4504bb0f1445",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a security auditor specializing in DevSecOps, application security, and comprehensive cybersecurity practices.\\n\\n## Purpose\\nExpert security auditor with comprehensive knowledge of modern cybersecurity practices, DevSecOps methodologies, and compliance frameworks. Masters vulnerability assessment, threat modeling, secure coding practices, and security automation. Specializes in building security into development pipelines and creating resilient, compliant systems.\\n\\n## Capabilities\\n\\n### DevSecOps & Security Automation\\n- **Security pipeline integration**: SAST, DAST, IAST, dependency scanning in CI/CD\\n- **Shift-left security**: Early vulnerability detection, secure coding practices, developer training\\n- **Security as Code**: Policy as Code with OPA, security infrastructure automation\\n- **Container security**: Image scanning, runtime security, Kubernetes security policies\\n- **Supply chain security**: SLSA framework, software bill of materials (SBOM), dependency management\\n- **Secrets management**: HashiCorp Vault, cloud secret managers, secret rotation automation\\n\\n### Modern Authentication & Authorization\\n- **Identity protocols**: OAuth 2.0/2.1, OpenID Connect, SAML 2.0, WebAuthn, FIDO2\\n- **JWT security**: Proper implementation, key management, token validation, security best practices\\n- **Zero-trust architecture**: Identity-based access, continuous verification, principle of least privilege\\n- **Multi-factor authentication**: TOTP, hardware tokens, biometric authentication, risk-based auth\\n- **Authorization patterns**: RBAC, ABAC, ReBAC, policy engines, fine-grained permissions\\n- **API security**: OAuth scopes, API keys, rate limiting, threat protection\\n\\n### OWASP & Vulnerability Management\\n- **OWASP Top 10 (2021)**: Broken access control, cryptographic failures, injection, insecure design\\n- **OWASP ASVS**: Application Security Verification Standard, security requirements\\n- **OWASP SAMM**: Software Assurance Maturity Model, security maturity assessment\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "security-auditor",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 2,
+          "testPassCount": 2,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 2,
+          "assertFailCount": 0,
+          "totalLatencyMs": 878,
+          "tokenUsage": {
+            "prompt": 874,
+            "completion": 1900,
+            "cached": 0,
+            "total": 2774,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 2390,
+              "prompt": 2290,
+              "completion": 100,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "security-auditor_quality": 2
+          },
+          "namedScoresCount": {
+            "security-auditor_quality": 2
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "security-auditor_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1436,
+            "prompt": 1388,
+            "completion": 48,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Identifies SQL injection, missing password hashing, recommends parameterized queries and bcrypt/argon2",
+                "threshold": 0.8,
+                "metric": "security-auditor_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output identifies SQL injection vulnerabilities, notes missing password hashing, and recommends parameterized queries and bcrypt for secure password handling.",
+              "tokensUsed": {
+                "total": 1436,
+                "prompt": 1388,
+                "completion": 48,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**CRITICAL SECURITY VULNERABILITIES IDENTIFIED**\\n\\n## 🔴 **Immediate Critical Issues**\\n\\n### **1. SQL Injection (CWE-89, OWASP A03:2021)**\\n```python\\n# VULNERABLE CODE:\\nf'SELECT * FROM users WHERE username={user} AND password={pwd}'\\n\\n# EXPLOIT EXAMPLE:\\n# user = \\\"admin' --\\\"\\n# pwd = \\\"anything\\\"\\n# Result: SELECT * FROM users WHERE username='admin' --' AND password='anything'\\n# This logs in as admin without password\\n```\\n\\n### **2. Plain Text Password Storage (CWE-256, OWASP A02:2021)**\\n- Passwords stored/compared in plain text\\n- No hashing or salting\\n\\n### **3. No Input Validation**\\n- No sanitization of `user` or `pwd` parameters\\n- Allows arbitrary SQL injection payloads\\n\\n### **4. Excessive Information Disclosure**\\n- Returns entire user record including potentially sensitive data\\n- No principle of least privilege\\n\\n## 🛡️ **Secure Implementation**\\n\\n```python\\nimport bcrypt\\nimport sqlite3\\nfrom typing import Optional, Tuple\\n\\ndef secure_login(username: str, password: str) -> Optional[dict]:\\n    \\\"\\\"\\\"\\n    Secure login implementation with parameterized queries and password hashing\\n    \\\"\\\"\\\"\\n    \\n    # Input validation\\n    if not username or not password:\\n        return None\\n    \\n    # Sanitize input (basic example)\\n    username = username.strip()\\n    \\n    try:\\n        # Use parameterized queries to prevent SQL injection\\n        conn = sqlite3.connect('database.db')\\n        cursor = conn.cursor()\\n        \\n        # Query with parameterized statement\\n        cursor.execute(\\n            \\\"SELECT id, username, password_hash, salt, failed_attempts, locked_until FROM users WHERE username = ?\\\",\\n            (username,)\\n        )\\n        \\n        user_record = cursor.fetchone()\\n        \\n        if not user_record:\\n            # Log failed attempt (with rate limiting)\\n            log_failed_attempt(username)\\n            return None\\n        \\n        # Unpack record\\n        user_id, db_username, stored_hash, salt, failed_attempts, locked_until = user_record\\n        \\n        # Check if account is locked\\n        if locked_until and datetime.now() < datetime.fromisoformat(locked_until):\\n            return {\\\"error\\\": \\\"Account temporarily locked\\\"}\\n        \\n        # Verify password using secure hashing\\n        if not verify_password(password, stored_hash, salt):\\n            # Increment failed attempts\\n            increment_failed_attempts(username)\\n            \\n            # Lock account after too many failures\\n            if failed_attempts + 1 >= MAX_FAILED_ATTEMPTS:\\n                lock_account(username)\\n            \\n            return None\\n        \\n        # Reset failed attempts on successful login\\n        reset_failed_attempts(username)\\n        \\n        # Generate secure session token\\n        session_token = generate_secure_token(user_id)\\n        \\n        # Return minimal user info\\n        return {\\n            \\\"user_id\\\": user_id,\\n            \\\"username\\\": db_username,\\n            \\\"session_token\\\": session_token,\\n            \\\"expires_in\\\": SESSION_TIMEOUT\\n        }\\n        \\n    except Exception as e:\\n        # Log error without exposing details\\n        log_security_event(\\\"login_error\\\", username)\\n        return None\\n    finally:\\n        conn.close()\\n\\ndef verify_password(plain_password: str, stored_hash: str, salt: str) -> bool:\\n    \\\"\\\"\\\"Verify password using bcrypt\\\"\\\"\\\"\\n    # Use constant-time comparison to prevent timing attacks\\n    return bcrypt.checkpw(\\n        plain_password.encode('utf-8'),\\n        stored_hash.encode('utf-8')\\n    )\\n\\ndef generate_secure_token(user_id: int) -> str:\\n    \\\"\\\"\\\"Generate JWT or secure session token\\\"\\\"\\\"\\n    payload = {\\n        \\\"sub\\\": user_id,\\n        \\\"iat\\\": datetime.utcnow(),\\n        \\\"exp\\\": datetime.utcnow() + timedelta(minutes=SESSION_TIMEOUT),\\n        \\\"jti\\\": secrets.token_urlsafe(32)  # Unique token ID\\n    }\\n    \\n    return jwt.encode(\\n        payload,\\n        SECRET_KEY,\\n        algorithm=\\\"HS256\\\"\\n    )\\n```\\n\\n## 📋 **Security Requirements Checklist**\\n\\n### **Authentication Security**\\n- [ ] Use parameterized queries/prepared statements\\n- [ ] Implement password hashing (bcrypt/Argon2)\\n- [ ] Add rate limiting for failed attempts\\n- [ ] Implement account lockout after N failures\\n- [ ] Use constant-time password comparison\\n- [ ] Generate secure session tokens (JWT with expiration)\\n- [ ] Implement proper session management\\n\\n### **Additional Recommendations**\\n1. **Multi-Factor Authentication**: Implement TOTP or WebAuthn\\n2. **Password Policy**: Enforce complexity requirements\\n3. **Security Headers**: Set HSTS, CSP, X-Frame-Options\\n4. **Logging**: Audit all authentication attempts\\n5. **Monitoring**: Alert on suspicious patterns\\n\\n### **OWASP Compliance**\\n- ✅ A01: Broken Access Control (implement proper auth)\\n- ✅ A02: Cryptographic Failures (use proper hashing)\\n- ✅ A03: Injection (parameterized queries)\\n- ✅ A07: Identification & Authentication Failures\\n\\n## 🚨 **Immediate Actions Required**\\n1. **Never** concatenate SQL queries with user input\\n2. **Always** hash passwords with salt (bcrypt recommended)\\n3. **Implement** proper error handling without information leakage\\n4. **Add** rate limiting and account lockout mechanisms\\n5. **Use** secure session management with expiration\\n\\n**Severity**: Critical - This code is vulnerable to complete system compromise via SQL injection and exposes all user credentials in plain text.\\n</Output>\\n<Rubric>\\nIdentifies SQL injection, missing password hashing, recommends parameterized queries and bcrypt/argon2\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "bb585a50-f900-4e2b-8d28-28a6c06e7dab",
+        "latencyMs": 428,
+        "namedScores": {
+          "security-auditor_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a security auditor specializing in DevSecOps, application security, and comprehensive cybersecurity practices.\\n\\n## Purpose\\nExpert security auditor with comprehensive knowledge of modern cybersecurity practices, DevSecOps methodologies, and compliance frameworks. Masters vulnerability assessment, threat modeling, secure coding practices, and security automation. Specializes in building security into development pipelines and creating resilient, compliant systems.\\n\\n## Capabilities\\n\\n### DevSecOps & Security Automation\\n- **Security pipeline integration**: SAST, DAST, IAST, dependency scanning in CI/CD\\n- **Shift-left security**: Early vulnerability detection, secure coding practices, developer training\\n- **Security as Code**: Policy as Code with OPA, security infrastructure automation\\n- **Container security**: Image scanning, runtime security, Kubernetes security policies\\n- **Supply chain security**: SLSA framework, software bill of materials (SBOM), dependency management\\n- **Secrets management**: HashiCorp Vault, cloud secret managers, secret rotation automation\\n\\n### Modern Authentication & Authorization\\n- **Identity protocols**: OAuth 2.0/2.1, OpenID Connect, SAML 2.0, WebAuthn, FIDO2\\n- **JWT security**: Proper implementation, key management, token validation, security best practices\\n- **Zero-trust architecture**: Identity-based access, continuous verification, principle of least privilege\\n- **Multi-factor authentication**: TOTP, hardware tokens, biometric authentication, risk-based auth\\n- **Authorization patterns**: RBAC, ABAC, ReBAC, policy engines, fine-grained permissions\\n- **API security**: OAuth scopes, API keys, rate limiting, threat protection\\n\\n### OWASP & Vulnerability Management\\n- **OWASP Top 10 (2021)**: Broken access control, cryptographic failures, injection, insecure design\\n- **OWASP ASVS**: Application Security Verification Standard, security requirements\\n- **OWASP SAMM**: Software Assurance Maturity Model, security maturity assessment\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Review this authentication code for security vulnerabilities: `def login(user, pwd): return db.query(f'SELECT * FROM users WHERE username={user} AND password={pwd}')`\"\n  }\n]",
+          "label": "security-auditor",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "fc0c281e9eba6a9f576e6ca485650061a591814c1c9b4e161e3a4504bb0f1445",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "**CRITICAL SECURITY VULNERABILITIES IDENTIFIED**\n\n## 🔴 **Immediate Critical Issues**\n\n### **1. SQL Injection (CWE-89, OWASP A03:2021)**\n```python\n# VULNERABLE CODE:\nf'SELECT * FROM users WHERE username={user} AND password={pwd}'\n\n# EXPLOIT EXAMPLE:\n# user = \"admin' --\"\n# pwd = \"anything\"\n# Result: SELECT * FROM users WHERE username='admin' --' AND password='anything'\n# This logs in as admin without password\n```\n\n### **2. Plain Text Password Storage (CWE-256, OWASP A02:2021)**\n- Passwords stored/compared in plain text\n- No hashing or salting\n\n### **3. No Input Validation**\n- No sanitization of `user` or `pwd` parameters\n- Allows arbitrary SQL injection payloads\n\n### **4. Excessive Information Disclosure**\n- Returns entire user record including potentially sensitive data\n- No principle of least privilege\n\n## 🛡️ **Secure Implementation**\n\n```python\nimport bcrypt\nimport sqlite3\nfrom typing import Optional, Tuple\n\ndef secure_login(username: str, password: str) -> Optional[dict]:\n    \"\"\"\n    Secure login implementation with parameterized queries and password hashing\n    \"\"\"\n    \n    # Input validation\n    if not username or not password:\n        return None\n    \n    # Sanitize input (basic example)\n    username = username.strip()\n    \n    try:\n        # Use parameterized queries to prevent SQL injection\n        conn = sqlite3.connect('database.db')\n        cursor = conn.cursor()\n        \n        # Query with parameterized statement\n        cursor.execute(\n            \"SELECT id, username, password_hash, salt, failed_attempts, locked_until FROM users WHERE username = ?\",\n            (username,)\n        )\n        \n        user_record = cursor.fetchone()\n        \n        if not user_record:\n            # Log failed attempt (with rate limiting)\n            log_failed_attempt(username)\n            return None\n        \n        # Unpack record\n        user_id, db_username, stored_hash, salt, failed_attempts, locked_until = user_record\n        \n        # Check if account is locked\n        if locked_until and datetime.now() < datetime.fromisoformat(locked_until):\n            return {\"error\": \"Account temporarily locked\"}\n        \n        # Verify password using secure hashing\n        if not verify_password(password, stored_hash, salt):\n            # Increment failed attempts\n            increment_failed_attempts(username)\n            \n            # Lock account after too many failures\n            if failed_attempts + 1 >= MAX_FAILED_ATTEMPTS:\n                lock_account(username)\n            \n            return None\n        \n        # Reset failed attempts on successful login\n        reset_failed_attempts(username)\n        \n        # Generate secure session token\n        session_token = generate_secure_token(user_id)\n        \n        # Return minimal user info\n        return {\n            \"user_id\": user_id,\n            \"username\": db_username,\n            \"session_token\": session_token,\n            \"expires_in\": SESSION_TIMEOUT\n        }\n        \n    except Exception as e:\n        # Log error without exposing details\n        log_security_event(\"login_error\", username)\n        return None\n    finally:\n        conn.close()\n\ndef verify_password(plain_password: str, stored_hash: str, salt: str) -> bool:\n    \"\"\"Verify password using bcrypt\"\"\"\n    # Use constant-time comparison to prevent timing attacks\n    return bcrypt.checkpw(\n        plain_password.encode('utf-8'),\n        stored_hash.encode('utf-8')\n    )\n\ndef generate_secure_token(user_id: int) -> str:\n    \"\"\"Generate JWT or secure session token\"\"\"\n    payload = {\n        \"sub\": user_id,\n        \"iat\": datetime.utcnow(),\n        \"exp\": datetime.utcnow() + timedelta(minutes=SESSION_TIMEOUT),\n        \"jti\": secrets.token_urlsafe(32)  # Unique token ID\n    }\n    \n    return jwt.encode(\n        payload,\n        SECRET_KEY,\n        algorithm=\"HS256\"\n    )\n```\n\n## 📋 **Security Requirements Checklist**\n\n### **Authentication Security**\n- [ ] Use parameterized queries/prepared statements\n- [ ] Implement password hashing (bcrypt/Argon2)\n- [ ] Add rate limiting for failed attempts\n- [ ] Implement account lockout after N failures\n- [ ] Use constant-time password comparison\n- [ ] Generate secure session tokens (JWT with expiration)\n- [ ] Implement proper session management\n\n### **Additional Recommendations**\n1. **Multi-Factor Authentication**: Implement TOTP or WebAuthn\n2. **Password Policy**: Enforce complexity requirements\n3. **Security Headers**: Set HSTS, CSP, X-Frame-Options\n4. **Logging**: Audit all authentication attempts\n5. **Monitoring**: Alert on suspicious patterns\n\n### **OWASP Compliance**\n- ✅ A01: Broken Access Control (implement proper auth)\n- ✅ A02: Cryptographic Failures (use proper hashing)\n- ✅ A03: Injection (parameterized queries)\n- ✅ A07: Identification & Authentication Failures\n\n## 🚨 **Immediate Actions Required**\n1. **Never** concatenate SQL queries with user input\n2. **Always** hash passwords with salt (bcrypt recommended)\n3. **Implement** proper error handling without information leakage\n4. **Add** rate limiting and account lockout mechanisms\n5. **Use** secure session management with expiration\n\n**Severity**: Critical - This code is vulnerable to complete system compromise via SQL injection and exposes all user credentials in plain text.",
+          "tokenUsage": {
+            "total": 1640,
+            "prompt": 446,
+            "completion": 1194,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 428,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:47:15 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 b48cb373004b56311fd93d8df486d4c0.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "wRY8VLCz6EiC_SEtnooINOSJ3XkQZ4DgVDKy_-Yx5oL7iuMkJdcJlA==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "626cb69363272491c6c891162b276c80"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Review this authentication code for security vulnerabilities: `def login(user, p",
+          "vars": {
+            "task": "Review this authentication code for security vulnerabilities: `def login(user, pwd): return db.query(f'SELECT * FROM users WHERE username={user} AND password={pwd}')`"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Identifies SQL injection, missing password hashing, recommends parameterized queries and bcrypt/argon2",
+              "threshold": 0.8,
+              "metric": "security-auditor_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Review this authentication code for security vulnerabilities: `def login(user, pwd): return db.query(f'SELECT * FROM users WHERE username={user} AND password={pwd}')`"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:47:15 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 b48cb373004b56311fd93d8df486d4c0.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "wRY8VLCz6EiC_SEtnooINOSJ3XkQZ4DgVDKy_-Yx5oL7iuMkJdcJlA==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "626cb69363272491c6c891162b276c80"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "security-auditor_quality": 1
+          },
+          "tokensUsed": {
+            "total": 954,
+            "prompt": 902,
+            "completion": 52,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Mentions authentication/authorization, input validation, rate limiting, proper TLS, and data encryption at rest",
+                "threshold": 0.7,
+                "metric": "security-auditor_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly covers authentication/authorization, input validation, rate limiting, TLS, and data encryption at rest as part of the top security issues.",
+              "tokensUsed": {
+                "total": 954,
+                "prompt": 902,
+                "completion": 52,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nWhen reviewing a REST API that handles sensitive data, focus on these **top 3 critical security issues**:\\n\\n---\\n\\n### **1. Authentication & Authorization Flaws**\\n- **Broken Object Level Authorization (BOLA/IDOR)**: Verify that users can only access resources they own (e.g., `/api/users/{id}` doesn’t allow access to other users’ data).\\n- **Missing or Weak Authentication**: Ensure robust authentication (OAuth 2.1, JWT with strong signing, short-lived tokens) and **never** rely on client-side validation.\\n- **Excessive Privileges**: Check role-based access control (RBAC) or attribute-based access control (ABAC) to enforce least privilege.\\n\\n**Quick Checks**:\\n  - Test parameter tampering (e.g., change `user_id` in requests).\\n  - Validate token issuance and revocation flows.\\n  - Review authorization logic in business layers, not just UI.\\n\\n---\\n\\n### **2. Insecure Data Handling & Cryptographic Failures**\\n- **Lack of Encryption in Transit/At Rest**: Ensure TLS 1.2+ (prefer TLS 1.3) and encryption for sensitive data at rest (e.g., AES-256-GCM).\\n- **Sensitive Data Exposure**: Confirm no unnecessary sensitive data (PII, tokens, keys) is logged, cached, or returned in responses.\\n- **Weak Cryptographic Practices**: Validate proper key management, avoidance of deprecated algorithms (e.g., SHA-1, RC4), and use of authenticated encryption.\\n\\n**Quick Checks**:\\n  - Inspect HTTP headers for missing `Strict-Transport-Security`.\\n  - Search for hardcoded secrets in code/repos.\\n  - Verify data masking in logs/error messages.\\n\\n---\\n\\n### **3. Injection & Input Validation Gaps**\\n- **SQL/NoSQL Injection**: Ensure parameterized queries or ORM usage; never concatenate user input into queries.\\n- **Unrestricted Resource Consumption**: Check rate limiting and payload size limits to prevent DoS attacks (e.g., massive JSON payloads).\\n- **Insecure Deserialization**: Validate input schemas (e.g., JSON Schema) and avoid parsing untrusted data directly into objects.\\n\\n**Quick Checks**:\\n  - Fuzz endpoints with malformed inputs (SQL snippets, oversized payloads).\\n  - Review API contracts for strict validation (OpenAPI/Swagger).\\n  - Test file uploads for malicious content.\\n\\n---\\n\\n### **Bonus: Critical Supporting Checks**\\n- **Security Misconfiguration**: Review exposed debug endpoints, default credentials, or verbose error messages.\\n- **Insufficient Logging & Monitoring**: Ensure audit trails for sensitive operations and real-time alerting on anomalies.\\n- **Dependency Vulnerabilities**: Scan for known vulnerabilities in third-party libraries (e.g., OWASP Dependency-Check).\\n\\n**Immediate Action Items**:\\n1. Implement mandatory authentication/authorization middleware.\\n2. Enforce encryption everywhere (TLS, at-rest encryption).\\n3. Adopt a zero-trust mindset—validate all inputs, limit all outputs.\\n\\n**Tools to Assist**:\\n- **SAST/DAST**: OWASP ZAP, Burp Suite, Semgrep.\\n- **API Security**: 42Crunch, Escape, Salt Security.\\n- **Monitoring**: ELK Stack with security plugins, WAF (ModSecurity).\\n\\nBy prioritizing these areas, you’ll address ~80% of critical risks in sensitive-data APIs.\\n</Output>\\n<Rubric>\\nMentions authentication/authorization, input validation, rate limiting, proper TLS, and data encryption at rest\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "db5b6e0b-ab7e-45cb-9502-17809ba318e1",
+        "latencyMs": 450,
+        "namedScores": {
+          "security-auditor_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a security auditor specializing in DevSecOps, application security, and comprehensive cybersecurity practices.\\n\\n## Purpose\\nExpert security auditor with comprehensive knowledge of modern cybersecurity practices, DevSecOps methodologies, and compliance frameworks. Masters vulnerability assessment, threat modeling, secure coding practices, and security automation. Specializes in building security into development pipelines and creating resilient, compliant systems.\\n\\n## Capabilities\\n\\n### DevSecOps & Security Automation\\n- **Security pipeline integration**: SAST, DAST, IAST, dependency scanning in CI/CD\\n- **Shift-left security**: Early vulnerability detection, secure coding practices, developer training\\n- **Security as Code**: Policy as Code with OPA, security infrastructure automation\\n- **Container security**: Image scanning, runtime security, Kubernetes security policies\\n- **Supply chain security**: SLSA framework, software bill of materials (SBOM), dependency management\\n- **Secrets management**: HashiCorp Vault, cloud secret managers, secret rotation automation\\n\\n### Modern Authentication & Authorization\\n- **Identity protocols**: OAuth 2.0/2.1, OpenID Connect, SAML 2.0, WebAuthn, FIDO2\\n- **JWT security**: Proper implementation, key management, token validation, security best practices\\n- **Zero-trust architecture**: Identity-based access, continuous verification, principle of least privilege\\n- **Multi-factor authentication**: TOTP, hardware tokens, biometric authentication, risk-based auth\\n- **Authorization patterns**: RBAC, ABAC, ReBAC, policy engines, fine-grained permissions\\n- **API security**: OAuth scopes, API keys, rate limiting, threat protection\\n\\n### OWASP & Vulnerability Management\\n- **OWASP Top 10 (2021)**: Broken access control, cryptographic failures, injection, insecure design\\n- **OWASP ASVS**: Application Security Verification Standard, security requirements\\n- **OWASP SAMM**: Software Assurance Maturity Model, security maturity assessment\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"What are the top 3 security issues to check when reviewing a REST API that handles sensitive data?\"\n  }\n]",
+          "label": "security-auditor",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "fc0c281e9eba6a9f576e6ca485650061a591814c1c9b4e161e3a4504bb0f1445",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "When reviewing a REST API that handles sensitive data, focus on these **top 3 critical security issues**:\n\n---\n\n### **1. Authentication & Authorization Flaws**\n- **Broken Object Level Authorization (BOLA/IDOR)**: Verify that users can only access resources they own (e.g., `/api/users/{id}` doesn’t allow access to other users’ data).\n- **Missing or Weak Authentication**: Ensure robust authentication (OAuth 2.1, JWT with strong signing, short-lived tokens) and **never** rely on client-side validation.\n- **Excessive Privileges**: Check role-based access control (RBAC) or attribute-based access control (ABAC) to enforce least privilege.\n\n**Quick Checks**:\n  - Test parameter tampering (e.g., change `user_id` in requests).\n  - Validate token issuance and revocation flows.\n  - Review authorization logic in business layers, not just UI.\n\n---\n\n### **2. Insecure Data Handling & Cryptographic Failures**\n- **Lack of Encryption in Transit/At Rest**: Ensure TLS 1.2+ (prefer TLS 1.3) and encryption for sensitive data at rest (e.g., AES-256-GCM).\n- **Sensitive Data Exposure**: Confirm no unnecessary sensitive data (PII, tokens, keys) is logged, cached, or returned in responses.\n- **Weak Cryptographic Practices**: Validate proper key management, avoidance of deprecated algorithms (e.g., SHA-1, RC4), and use of authenticated encryption.\n\n**Quick Checks**:\n  - Inspect HTTP headers for missing `Strict-Transport-Security`.\n  - Search for hardcoded secrets in code/repos.\n  - Verify data masking in logs/error messages.\n\n---\n\n### **3. Injection & Input Validation Gaps**\n- **SQL/NoSQL Injection**: Ensure parameterized queries or ORM usage; never concatenate user input into queries.\n- **Unrestricted Resource Consumption**: Check rate limiting and payload size limits to prevent DoS attacks (e.g., massive JSON payloads).\n- **Insecure Deserialization**: Validate input schemas (e.g., JSON Schema) and avoid parsing untrusted data directly into objects.\n\n**Quick Checks**:\n  - Fuzz endpoints with malformed inputs (SQL snippets, oversized payloads).\n  - Review API contracts for strict validation (OpenAPI/Swagger).\n  - Test file uploads for malicious content.\n\n---\n\n### **Bonus: Critical Supporting Checks**\n- **Security Misconfiguration**: Review exposed debug endpoints, default credentials, or verbose error messages.\n- **Insufficient Logging & Monitoring**: Ensure audit trails for sensitive operations and real-time alerting on anomalies.\n- **Dependency Vulnerabilities**: Scan for known vulnerabilities in third-party libraries (e.g., OWASP Dependency-Check).\n\n**Immediate Action Items**:\n1. Implement mandatory authentication/authorization middleware.\n2. Enforce encryption everywhere (TLS, at-rest encryption).\n3. Adopt a zero-trust mindset—validate all inputs, limit all outputs.\n\n**Tools to Assist**:\n- **SAST/DAST**: OWASP ZAP, Burp Suite, Semgrep.\n- **API Security**: 42Crunch, Escape, Salt Security.\n- **Monitoring**: ELK Stack with security plugins, WAF (ModSecurity).\n\nBy prioritizing these areas, you’ll address ~80% of critical risks in sensitive-data APIs.",
+          "tokenUsage": {
+            "total": 1134,
+            "prompt": 428,
+            "completion": 706,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 450,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:47:15 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 23359298cbb245c9b8a3a6289fd7f548.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "B8J1ILP9I40926RlF3FKlISKHjkXOzEWjQpldbvLXcrv7kIejFHjdA==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "10bf24339f7c3d4093e31f74b1e7c7da"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[2] What are the top 3 security issues to check when reviewing a REST API that handl",
+          "vars": {
+            "task": "What are the top 3 security issues to check when reviewing a REST API that handles sensitive data?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Mentions authentication/authorization, input validation, rate limiting, proper TLS, and data encryption at rest",
+              "threshold": 0.7,
+              "metric": "security-auditor_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "task": "What are the top 3 security issues to check when reviewing a REST API that handles sensitive data?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:47:15 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 23359298cbb245c9b8a3a6289fd7f548.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "B8J1ILP9I40926RlF3FKlISKHjkXOzEWjQpldbvLXcrv7kIejFHjdA==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "10bf24339f7c3d4093e31f74b1e7c7da"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 2,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 874,
+        "completion": 1900,
+        "cached": 0,
+        "total": 2774,
+        "numRequests": 2,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 2390,
+          "prompt": 2290,
+          "completion": 100,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 56141,
+      "evaluationDurationMs": 56141
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: security-auditor",
+    "prompts": [
+      {
+        "label": "security-auditor",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a security auditor specializing in DevSecOps, application security, and comprehensive cybersecurity practices.\\n\\n## Purpose\\nExpert security auditor with comprehensive knowledge of modern cybersecurity practices, DevSecOps methodologies, and compliance frameworks. Masters vulnerability assessment, threat modeling, secure coding practices, and security automation. Specializes in building security into development pipelines and creating resilient, compliant systems.\\n\\n## Capabilities\\n\\n### DevSecOps & Security Automation\\n- **Security pipeline integration**: SAST, DAST, IAST, dependency scanning in CI/CD\\n- **Shift-left security**: Early vulnerability detection, secure coding practices, developer training\\n- **Security as Code**: Policy as Code with OPA, security infrastructure automation\\n- **Container security**: Image scanning, runtime security, Kubernetes security policies\\n- **Supply chain security**: SLSA framework, software bill of materials (SBOM), dependency management\\n- **Secrets management**: HashiCorp Vault, cloud secret managers, secret rotation automation\\n\\n### Modern Authentication & Authorization\\n- **Identity protocols**: OAuth 2.0/2.1, OpenID Connect, SAML 2.0, WebAuthn, FIDO2\\n- **JWT security**: Proper implementation, key management, token validation, security best practices\\n- **Zero-trust architecture**: Identity-based access, continuous verification, principle of least privilege\\n- **Multi-factor authentication**: TOTP, hardware tokens, biometric authentication, risk-based auth\\n- **Authorization patterns**: RBAC, ABAC, ReBAC, policy engines, fine-grained permissions\\n- **API security**: OAuth scopes, API keys, rate limiting, threat protection\\n\\n### OWASP & Vulnerability Management\\n- **OWASP Top 10 (2021)**: Broken access control, cryptographic failures, injection, insecure design\\n- **OWASP ASVS**: Application Security Verification Standard, security requirements\\n- **OWASP SAMM**: Software Assurance Maturity Model, security maturity assessment\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Review this authentication code for security vulnerabilities: `def login(user, p",
+        "vars": {
+          "task": "Review this authentication code for security vulnerabilities: `def login(user, pwd): return db.query(f'SELECT * FROM users WHERE username={user} AND password={pwd}')`"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Identifies SQL injection, missing password hashing, recommends parameterized queries and bcrypt/argon2",
+            "threshold": 0.8,
+            "metric": "security-auditor_quality"
+          }
+        ]
+      },
+      {
+        "description": "[2] What are the top 3 security issues to check when reviewing a REST API that handl",
+        "vars": {
+          "task": "What are the top 3 security issues to check when reviewing a REST API that handles sensitive data?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Mentions authentication/authorization, input validation, rate limiting, proper TLS, and data encryption at rest",
+            "threshold": 0.7,
+            "metric": "security-auditor_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-security-auditor.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:48:11.566Z",
+    "evaluationCreatedAt": "2026-03-15T04:47:15.342Z"
+  }
+}

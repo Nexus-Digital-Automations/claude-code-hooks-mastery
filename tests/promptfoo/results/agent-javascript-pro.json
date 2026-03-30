@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-TxV-2026-03-15T04:35:22",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:35:22.173Z",
+    "prompts": [
+      {
+        "id": "ffca85616afda83002029cabd70a4ad245739d9b76ce4232942d230a4c57c07c",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a JavaScript expert specializing in modern JS and async programming.\\n\\n## Focus Areas\\n\\n- ES6+ features (destructuring, modules, classes)\\n- Async patterns (promises, async/await, generators)\\n- Event loop and microtask queue understanding\\n- Node.js APIs and performance optimization\\n- Browser APIs and cross-browser compatibility\\n- TypeScript migration and type safety\\n\\n## Approach\\n\\n1. Prefer async/await over promise chains\\n2. Use functional patterns where appropriate\\n3. Handle errors at appropriate boundaries\\n4. Avoid callback hell with modern patterns\\n5. Consider bundle size for browser code\\n\\n## Output\\n\\n- Modern JavaScript with proper error handling\\n- Async code with race condition prevention\\n- Module structure with clean exports\\n- Jest tests with async test patterns\\n- Performance profiling results\\n- Polyfill strategy for browser compatibility\\n\\nSupport both Node.js and browser environments. Include JSDoc comments.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "javascript-pro",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 519,
+          "tokenUsage": {
+            "prompt": 209,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1709,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1755,
+              "prompt": 1697,
+              "completion": 58,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "javascript-pro_quality": 1
+          },
+          "namedScoresCount": {
+            "javascript-pro_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "javascript-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1755,
+            "prompt": 1697,
+            "completion": 58,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc",
+                "threshold": 0.7,
+                "metric": "javascript-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The code uses ES6+ class syntax with private fields, handles edge cases like abort signals and listener errors, includes cleanup with WeakMap and removeAllListeners, and has comprehensive JSDoc annotations.",
+              "tokensUsed": {
+                "total": 1755,
+                "prompt": 1697,
+                "completion": 58,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n```javascript\\n/**\\n * A modern, memory-safe event emitter with TypeScript-compatible JSDoc\\n * @template T - Event map type where keys are event names and values are listener signatures\\n */\\nclass EventEmitter {\\n  /**\\n   * @private\\n   * @type {Map<keyof T, Set<Function>>}\\n   */\\n  #listeners = new Map();\\n\\n  /**\\n   * @private\\n   * @type {Map<Function, { event: keyof T, listener: Function, once: boolean }>}\\n   */\\n  #listenerMetadata = new WeakMap();\\n\\n  /**\\n   * Subscribe to an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {(data: T[K]) => void} listener - Callback function\\n   * @param {Object} [options] - Listener options\\n   * @param {boolean} [options.once=false] - Fire listener only once\\n   * @param {AbortSignal} [options.signal] - AbortSignal to automatically remove listener\\n   * @returns {() => void} Unsubscribe function\\n   */\\n  on(event, listener, options = {}) {\\n    const { once = false, signal } = options;\\n\\n    if (!this.#listeners.has(event)) {\\n      this.#listeners.set(event, new Set());\\n    }\\n\\n    const listenerSet = this.#listeners.get(event);\\n    \\n    // Wrap the listener for once functionality\\n    const wrappedListener = once ? (...args) => {\\n      listener(...args);\\n      this.off(event, wrappedListener);\\n    } : listener;\\n\\n    listenerSet.add(wrappedListener);\\n    \\n    // Store metadata for cleanup\\n    this.#listenerMetadata.set(wrappedListener, { event, listener, once });\\n    \\n    // Handle AbortSignal cleanup\\n    if (signal) {\\n      if (signal.aborted) {\\n        this.off(event, wrappedListener);\\n      } else {\\n        const abortHandler = () => {\\n          this.off(event, wrappedListener);\\n          signal.removeEventListener('abort', abortHandler);\\n        };\\n        signal.addEventListener('abort', abortHandler);\\n      }\\n    }\\n\\n    // Return unsubscribe function\\n    return () => this.off(event, wrappedListener);\\n  }\\n\\n  /**\\n   * Subscribe to an event once\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {(data: T[K]) => void} listener - Callback function\\n   * @returns {() => void} Unsubscribe function\\n   */\\n  once(event, listener) {\\n    return this.on(event, listener, { once: true });\\n  }\\n\\n  /**\\n   * Remove event listener\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {(data: T[K]) => void} listener - Listener to remove\\n   * @returns {boolean} True if listener was removed\\n   */\\n  off(event, listener) {\\n    const listenerSet = this.#listeners.get(event);\\n    if (!listenerSet) return false;\\n\\n    // Find the wrapped listener if it exists\\n    let listenerToRemove = listener;\\n    for (const wrappedListener of listenerSet) {\\n      const metadata = this.#listenerMetadata.get(wrappedListener);\\n      if (metadata && metadata.listener === listener) {\\n        listenerToRemove = wrappedListener;\\n        break;\\n      }\\n    }\\n\\n    const removed = listenerSet.delete(listenerToRemove);\\n    this.#listenerMetadata.delete(listenerToRemove);\\n\\n    // Clean up empty sets\\n    if (listenerSet.size === 0) {\\n      this.#listeners.delete(event);\\n    }\\n\\n    return removed;\\n  }\\n\\n  /**\\n   * Emit an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @param {T[K]} data - Event data\\n   * @returns {Promise<void[]>} Promise that resolves when all listeners have been called\\n   */\\n  async emit(event, data) {\\n    const listenerSet = this.#listeners.get(event);\\n    if (!listenerSet) return Promise.resolve([]);\\n\\n    // Create a snapshot to prevent issues if listeners are added/removed during emission\\n    const listeners = Array.from(listenerSet);\\n    \\n    // Execute listeners asynchronously but in order\\n    const promises = listeners.map(async (listener) => {\\n      try {\\n        await listener(data);\\n      } catch (error) {\\n        // Emit error event but don't throw from emit()\\n        this.#emitError('listener_error', { event, error, listener });\\n      }\\n    });\\n\\n    return Promise.all(promises);\\n  }\\n\\n  /**\\n   * @private\\n   * Emit error events\\n   * @param {string} event - Error event name\\n   * @param {any} errorData - Error data\\n   */\\n  #emitError(event, errorData) {\\n    // Use setTimeout to avoid recursion issues\\n    setTimeout(() => {\\n      const errorListeners = this.#listeners.get(event);\\n      if (errorListeners) {\\n        errorListeners.forEach(listener => {\\n          try {\\n            listener(errorData);\\n          } catch {\\n            // Prevent infinite error loops\\n          }\\n        });\\n      }\\n    }, 0);\\n  }\\n\\n  /**\\n   * Remove all listeners for an event or all events\\n   * @param {keyof T} [event] - Event name (optional, removes all if not specified)\\n   */\\n  removeAllListeners(event) {\\n    if (event) {\\n      const listenerSet = this.#listeners.get(event);\\n      if (listenerSet) {\\n        listenerSet.forEach(listener => {\\n          this.#listenerMetadata.delete(listener);\\n        });\\n        listenerSet.clear();\\n        this.#listeners.delete(event);\\n      }\\n    } else {\\n      // Clear all listeners\\n      this.#listeners.forEach(listenerSet => {\\n        listenerSet.forEach(listener => {\\n          this.#listenerMetadata.delete(listener);\\n        });\\n        listenerSet.clear();\\n      });\\n      this.#listeners.clear();\\n    }\\n  }\\n\\n  /**\\n   * Get all registered event names\\n   * @returns {Array<keyof T>} Array of event names\\n   */\\n  eventNames() {\\n    return Array.from(this.#listeners.keys());\\n  }\\n\\n  /**\\n   * Get listener count for an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @returns {number} Number of listeners\\n   */\\n  listenerCount(event) {\\n    const listenerSet = this.#listeners.get(event);\\n    return listenerSet ? listenerSet.size : 0;\\n  }\\n\\n  /**\\n   * Get all listeners for an event\\n   * @template {keyof T} K\\n   * @param {K} event - Event name\\n   * @returns {Array<Function>} Array of listeners\\n   */\\n  listeners(event) {\\n    const listenerSet = this.#listeners.get(event);\\n    if (!listener\\n</Output>\\n<Rubric>\\nUses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "530f43c8-31f9-4697-9519-b28e70e1cd04",
+        "latencyMs": 519,
+        "namedScores": {
+          "javascript-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a JavaScript expert specializing in modern JS and async programming.\\n\\n## Focus Areas\\n\\n- ES6+ features (destructuring, modules, classes)\\n- Async patterns (promises, async/await, generators)\\n- Event loop and microtask queue understanding\\n- Node.js APIs and performance optimization\\n- Browser APIs and cross-browser compatibility\\n- TypeScript migration and type safety\\n\\n## Approach\\n\\n1. Prefer async/await over promise chains\\n2. Use functional patterns where appropriate\\n3. Handle errors at appropriate boundaries\\n4. Avoid callback hell with modern patterns\\n5. Consider bundle size for browser code\\n\\n## Output\\n\\n- Modern JavaScript with proper error handling\\n- Async code with race condition prevention\\n- Module structure with clean exports\\n- Jest tests with async test patterns\\n- Performance profiling results\\n- Polyfill strategy for browser compatibility\\n\\nSupport both Node.js and browser environments. Include JSDoc comments.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a JavaScript event emitter class with proper memory leak prevention and TypeScript-compatible JSDoc\"\n  }\n]",
+          "label": "javascript-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "ffca85616afda83002029cabd70a4ad245739d9b76ce4232942d230a4c57c07c",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "```javascript\n/**\n * A modern, memory-safe event emitter with TypeScript-compatible JSDoc\n * @template T - Event map type where keys are event names and values are listener signatures\n */\nclass EventEmitter {\n  /**\n   * @private\n   * @type {Map<keyof T, Set<Function>>}\n   */\n  #listeners = new Map();\n\n  /**\n   * @private\n   * @type {Map<Function, { event: keyof T, listener: Function, once: boolean }>}\n   */\n  #listenerMetadata = new WeakMap();\n\n  /**\n   * Subscribe to an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {(data: T[K]) => void} listener - Callback function\n   * @param {Object} [options] - Listener options\n   * @param {boolean} [options.once=false] - Fire listener only once\n   * @param {AbortSignal} [options.signal] - AbortSignal to automatically remove listener\n   * @returns {() => void} Unsubscribe function\n   */\n  on(event, listener, options = {}) {\n    const { once = false, signal } = options;\n\n    if (!this.#listeners.has(event)) {\n      this.#listeners.set(event, new Set());\n    }\n\n    const listenerSet = this.#listeners.get(event);\n    \n    // Wrap the listener for once functionality\n    const wrappedListener = once ? (...args) => {\n      listener(...args);\n      this.off(event, wrappedListener);\n    } : listener;\n\n    listenerSet.add(wrappedListener);\n    \n    // Store metadata for cleanup\n    this.#listenerMetadata.set(wrappedListener, { event, listener, once });\n    \n    // Handle AbortSignal cleanup\n    if (signal) {\n      if (signal.aborted) {\n        this.off(event, wrappedListener);\n      } else {\n        const abortHandler = () => {\n          this.off(event, wrappedListener);\n          signal.removeEventListener('abort', abortHandler);\n        };\n        signal.addEventListener('abort', abortHandler);\n      }\n    }\n\n    // Return unsubscribe function\n    return () => this.off(event, wrappedListener);\n  }\n\n  /**\n   * Subscribe to an event once\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {(data: T[K]) => void} listener - Callback function\n   * @returns {() => void} Unsubscribe function\n   */\n  once(event, listener) {\n    return this.on(event, listener, { once: true });\n  }\n\n  /**\n   * Remove event listener\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {(data: T[K]) => void} listener - Listener to remove\n   * @returns {boolean} True if listener was removed\n   */\n  off(event, listener) {\n    const listenerSet = this.#listeners.get(event);\n    if (!listenerSet) return false;\n\n    // Find the wrapped listener if it exists\n    let listenerToRemove = listener;\n    for (const wrappedListener of listenerSet) {\n      const metadata = this.#listenerMetadata.get(wrappedListener);\n      if (metadata && metadata.listener === listener) {\n        listenerToRemove = wrappedListener;\n        break;\n      }\n    }\n\n    const removed = listenerSet.delete(listenerToRemove);\n    this.#listenerMetadata.delete(listenerToRemove);\n\n    // Clean up empty sets\n    if (listenerSet.size === 0) {\n      this.#listeners.delete(event);\n    }\n\n    return removed;\n  }\n\n  /**\n   * Emit an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @param {T[K]} data - Event data\n   * @returns {Promise<void[]>} Promise that resolves when all listeners have been called\n   */\n  async emit(event, data) {\n    const listenerSet = this.#listeners.get(event);\n    if (!listenerSet) return Promise.resolve([]);\n\n    // Create a snapshot to prevent issues if listeners are added/removed during emission\n    const listeners = Array.from(listenerSet);\n    \n    // Execute listeners asynchronously but in order\n    const promises = listeners.map(async (listener) => {\n      try {\n        await listener(data);\n      } catch (error) {\n        // Emit error event but don't throw from emit()\n        this.#emitError('listener_error', { event, error, listener });\n      }\n    });\n\n    return Promise.all(promises);\n  }\n\n  /**\n   * @private\n   * Emit error events\n   * @param {string} event - Error event name\n   * @param {any} errorData - Error data\n   */\n  #emitError(event, errorData) {\n    // Use setTimeout to avoid recursion issues\n    setTimeout(() => {\n      const errorListeners = this.#listeners.get(event);\n      if (errorListeners) {\n        errorListeners.forEach(listener => {\n          try {\n            listener(errorData);\n          } catch {\n            // Prevent infinite error loops\n          }\n        });\n      }\n    }, 0);\n  }\n\n  /**\n   * Remove all listeners for an event or all events\n   * @param {keyof T} [event] - Event name (optional, removes all if not specified)\n   */\n  removeAllListeners(event) {\n    if (event) {\n      const listenerSet = this.#listeners.get(event);\n      if (listenerSet) {\n        listenerSet.forEach(listener => {\n          this.#listenerMetadata.delete(listener);\n        });\n        listenerSet.clear();\n        this.#listeners.delete(event);\n      }\n    } else {\n      // Clear all listeners\n      this.#listeners.forEach(listenerSet => {\n        listenerSet.forEach(listener => {\n          this.#listenerMetadata.delete(listener);\n        });\n        listenerSet.clear();\n      });\n      this.#listeners.clear();\n    }\n  }\n\n  /**\n   * Get all registered event names\n   * @returns {Array<keyof T>} Array of event names\n   */\n  eventNames() {\n    return Array.from(this.#listeners.keys());\n  }\n\n  /**\n   * Get listener count for an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @returns {number} Number of listeners\n   */\n  listenerCount(event) {\n    const listenerSet = this.#listeners.get(event);\n    return listenerSet ? listenerSet.size : 0;\n  }\n\n  /**\n   * Get all listeners for an event\n   * @template {keyof T} K\n   * @param {K} event - Event name\n   * @returns {Array<Function>} Array of listeners\n   */\n  listeners(event) {\n    const listenerSet = this.#listeners.get(event);\n    if (!listener",
+          "tokenUsage": {
+            "total": 1709,
+            "prompt": 209,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 519,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:35:22 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 11d825a89ac50a951a8bdfb68424db20.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "iPNqzuQGC0pm8J0lfFkcIvtm8l5oMKXimV18VuRLr4fvbLWy2Ax5wg==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "493b522a6c482e4691976f5c7efd137c"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Write a JavaScript event emitter class with proper memory leak prevention and Ty",
+          "vars": {
+            "task": "Write a JavaScript event emitter class with proper memory leak prevention and TypeScript-compatible JSDoc"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc",
+              "threshold": 0.7,
+              "metric": "javascript-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Write a JavaScript event emitter class with proper memory leak prevention and TypeScript-compatible JSDoc"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:35:22 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 11d825a89ac50a951a8bdfb68424db20.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "iPNqzuQGC0pm8J0lfFkcIvtm8l5oMKXimV18VuRLr4fvbLWy2Ax5wg==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "493b522a6c482e4691976f5c7efd137c"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 209,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1709,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1755,
+          "prompt": 1697,
+          "completion": 58,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 70373,
+      "evaluationDurationMs": 70373
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: javascript-pro",
+    "prompts": [
+      {
+        "label": "javascript-pro",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a JavaScript expert specializing in modern JS and async programming.\\n\\n## Focus Areas\\n\\n- ES6+ features (destructuring, modules, classes)\\n- Async patterns (promises, async/await, generators)\\n- Event loop and microtask queue understanding\\n- Node.js APIs and performance optimization\\n- Browser APIs and cross-browser compatibility\\n- TypeScript migration and type safety\\n\\n## Approach\\n\\n1. Prefer async/await over promise chains\\n2. Use functional patterns where appropriate\\n3. Handle errors at appropriate boundaries\\n4. Avoid callback hell with modern patterns\\n5. Consider bundle size for browser code\\n\\n## Output\\n\\n- Modern JavaScript with proper error handling\\n- Async code with race condition prevention\\n- Module structure with clean exports\\n- Jest tests with async test patterns\\n- Performance profiling results\\n- Polyfill strategy for browser compatibility\\n\\nSupport both Node.js and browser environments. Include JSDoc comments.\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Write a JavaScript event emitter class with proper memory leak prevention and Ty",
+        "vars": {
+          "task": "Write a JavaScript event emitter class with proper memory leak prevention and TypeScript-compatible JSDoc"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc",
+            "threshold": 0.7,
+            "metric": "javascript-pro_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-javascript-pro.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:36:32.584Z",
+    "evaluationCreatedAt": "2026-03-15T04:35:22.173Z"
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-l4E-2026-03-15T04:09:45",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:09:45.934Z",
+    "prompts": [
+      {
+        "id": "cb524c197cd490424b051737454296035087abbd43cb7c77074063d3de9a6ddc",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are an AI engineer specializing in production-grade LLM applications, generative AI systems, and intelligent agent architectures.\\n\\n## Purpose\\nExpert AI engineer specializing in LLM application development, RAG systems, and AI agent architectures. Masters both traditional and cutting-edge generative AI patterns, with deep knowledge of the modern AI stack including vector databases, embedding models, agent frameworks, and multimodal AI systems.\\n\\n## Capabilities\\n\\n### LLM Integration & Model Management\\n- OpenAI GPT-4o/4o-mini, o1-preview, o1-mini with function calling and structured outputs\\n- Anthropic Claude 4.5 Sonnet/Haiku, Claude 4.1 Opus with tool use and computer use\\n- Open-source models: Llama 3.1/3.2, Mixtral 8x7B/8x22B, Qwen 2.5, DeepSeek-V2\\n- Local deployment with Ollama, vLLM, TGI (Text Generation Inference)\\n- Model serving with TorchServe, MLflow, BentoML for production deployment\\n- Multi-model orchestration and model routing strategies\\n- Cost optimization through model selection and caching strategies\\n\\n### Advanced RAG Systems\\n- Production RAG architectures with multi-stage retrieval pipelines\\n- Vector databases: Pinecone, Qdrant, Weaviate, Chroma, Milvus, pgvector\\n- Embedding models: OpenAI text-embedding-3-large/small, Cohere embed-v3, BGE-large\\n- Chunking strategies: semantic, recursive, sliding window, and document-structure aware\\n- Hybrid search combining vector similarity and keyword matching (BM25)\\n- Reranking with Cohere rerank-3, BGE reranker, or cross-encoder models\\n- Query understanding with query expansion, decomposition, and routing\\n- Context compression and relevance filtering for token optimization\\n- Advanced RAG patterns: GraphRAG, HyDE, RAG-Fusion, self-RAG\\n\\n### Agent Frameworks & Orchestration\\n- LangChain/LangGraph for complex agent workflows and state management\\n- LlamaIndex for data-centric AI applications and advanced retrieval\\n- CrewAI for multi-agent collaboration and specialized agent roles\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "ai-engineer",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 384,
+          "tokenUsage": {
+            "prompt": 484,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1984,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1770,
+              "prompt": 1702,
+              "completion": 68,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "ai-engineer_quality": 1
+          },
+          "namedScoresCount": {
+            "ai-engineer_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "ai-engineer_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1770,
+            "prompt": 1702,
+            "completion": 68,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Mentions at least 3 of: embedding model, vector store, chunking, retrieval strategy, prompt engineering. Shows practical implementation knowledge",
+                "threshold": 0.6,
+                "metric": "ai-engineer_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output mentions chunking (via DocumentProcessor and RecursiveCharacterTextSplitter), embedding model (embeddings field in DocumentChunk), and vector store (implied by chromadb in requirements), demonstrating practical implementation knowledge.",
+              "tokensUsed": {
+                "total": 1770,
+                "prompt": 1702,
+                "completion": 68,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll build a comprehensive RAG pipeline for querying internal documentation. Here's a production-ready solution with multiple components:\\n\\n## 1. **Core Architecture**\\n\\n```python\\n# requirements.txt\\n\\\"\\\"\\\"\\nopenai>=1.0.0\\nlangchain>=0.1.0\\nlangchain-community>=0.0.10\\nchromadb>=0.4.22\\nsentence-transformers>=2.2.2\\npypdf>=3.17.0\\npython-docx>=1.1.0\\nunstructured>=0.10.30\\nfastapi>=0.104.0\\nuvicorn>=0.24.0\\npydantic>=2.5.0\\ncohere>=5.0.0\\nrank-bm25>=0.2.2\\n\\\"\\\"\\\"\\n```\\n\\n## 2. **Document Processing Pipeline**\\n\\n```python\\n# document_processor.py\\nimport os\\nfrom typing import List, Dict, Any, Optional\\nfrom pathlib import Path\\nfrom dataclasses import dataclass\\nimport hashlib\\n\\nfrom langchain.text_splitter import (\\n    RecursiveCharacterTextSplitter,\\n    MarkdownHeaderTextSplitter,\\n    Language\\n)\\nfrom langchain_community.document_loaders import (\\n    PyPDFLoader,\\n    Docx2txtLoader,\\n    TextLoader,\\n    UnstructuredMarkdownLoader,\\n    CSVLoader,\\n    UnstructuredExcelLoader\\n)\\nfrom unstructured.partition.auto import partition\\n\\n@dataclass\\nclass DocumentChunk:\\n    \\\"\\\"\\\"Enhanced document chunk with metadata\\\"\\\"\\\"\\n    content: str\\n    metadata: Dict[str, Any]\\n    chunk_id: str\\n    embeddings: Optional[List[float]] = None\\n    score: Optional[float] = None\\n\\nclass DocumentProcessor:\\n    \\\"\\\"\\\"Handles document loading, splitting, and preprocessing\\\"\\\"\\\"\\n    \\n    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):\\n        self.chunk_size = chunk_size\\n        self.chunk_overlap = chunk_overlap\\n        \\n        # File type to loader mapping\\n        self.loader_mapping = {\\n            '.pdf': self._load_pdf,\\n            '.docx': self._load_docx,\\n            '.txt': self._load_text,\\n            '.md': self._load_markdown,\\n            '.csv': self._load_csv,\\n            '.xlsx': self._load_excel,\\n            '.pptx': self._load_presentation,\\n        }\\n    \\n    def process_directory(self, directory_path: str) -> List[DocumentChunk]:\\n        \\\"\\\"\\\"Process all documents in a directory\\\"\\\"\\\"\\n        all_chunks = []\\n        \\n        for file_path in Path(directory_path).rglob('*'):\\n            if file_path.suffix.lower() in self.loader_mapping:\\n                print(f\\\"Processing: {file_path}\\\")\\n                chunks = self.process_file(str(file_path))\\n                all_chunks.extend(chunks)\\n        \\n        return all_chunks\\n    \\n    def process_file(self, file_path: str) -> List[DocumentChunk]:\\n        \\\"\\\"\\\"Process a single file\\\"\\\"\\\"\\n        suffix = Path(file_path).suffix.lower()\\n        \\n        if suffix not in self.loader_mapping:\\n            raise ValueError(f\\\"Unsupported file type: {suffix}\\\")\\n        \\n        # Load document\\n        loader_func = self.loader_mapping[suffix]\\n        documents = loader_func(file_path)\\n        \\n        # Split into chunks\\n        chunks = self._split_documents(documents, file_path)\\n        \\n        return chunks\\n    \\n    def _load_pdf(self, file_path: str):\\n        \\\"\\\"\\\"Load PDF with enhanced metadata extraction\\\"\\\"\\\"\\n        elements = partition(filename=file_path, strategy=\\\"hi_res\\\")\\n        \\n        documents = []\\n        for element in elements:\\n            doc = {\\n                \\\"page_content\\\": str(element),\\n                \\\"metadata\\\": {\\n                    \\\"source\\\": file_path,\\n                    \\\"page\\\": element.metadata.page_number if hasattr(element.metadata, 'page_number') else None,\\n                    \\\"element_type\\\": element.category,\\n                    \\\"file_type\\\": \\\"pdf\\\"\\n                }\\n            }\\n            documents.append(doc)\\n        \\n        return documents\\n    \\n    def _load_markdown(self, file_path: str):\\n        \\\"\\\"\\\"Load markdown with header preservation\\\"\\\"\\\"\\n        # Use markdown header splitter for better structure\\n        with open(file_path, 'r', encoding='utf-8') as f:\\n            markdown_text = f.read()\\n        \\n        headers_to_split_on = [\\n            (\\\"#\\\", \\\"Header 1\\\"),\\n            (\\\"##\\\", \\\"Header 2\\\"),\\n            (\\\"###\\\", \\\"Header 3\\\"),\\n        ]\\n        \\n        markdown_splitter = MarkdownHeaderTextSplitter(\\n            headers_to_split_on=headers_to_split_on\\n        )\\n        \\n        splits = markdown_splitter.split_text(markdown_text)\\n        \\n        documents = []\\n        for split in splits:\\n            doc = {\\n                \\\"page_content\\\": split.page_content,\\n                \\\"metadata\\\": {\\n                    **split.metadata,\\n                    \\\"source\\\": file_path,\\n                    \\\"file_type\\\": \\\"markdown\\\"\\n                }\\n            }\\n            documents.append(doc)\\n        \\n        return documents\\n    \\n    def _load_text(self, file_path: str):\\n        \\\"\\\"\\\"Load plain text files\\\"\\\"\\\"\\n        with open(file_path, 'r', encoding='utf-8') as f:\\n            content = f.read()\\n        \\n        return [{\\n            \\\"page_content\\\": content,\\n            \\\"metadata\\\": {\\n                \\\"source\\\": file_path,\\n                \\\"file_type\\\": \\\"text\\\"\\n            }\\n        }]\\n    \\n    def _load_docx(self, file_path: str):\\n        \\\"\\\"\\\"Load Word documents\\\"\\\"\\\"\\n        loader = Docx2txtLoader(file_path)\\n        return loader.load()\\n    \\n    def _load_csv(self, file_path: str):\\n        \\\"\\\"\\\"Load CSV files\\\"\\\"\\\"\\n        loader = CSVLoader(file_path)\\n        return loader.load()\\n    \\n    def _load_excel(self, file_path: str):\\n        \\\"\\\"\\\"Load Excel files\\\"\\\"\\\"\\n        loader = UnstructuredExcelLoader(file_path, mode=\\\"elements\\\")\\n        return loader.load()\\n    \\n    def _load_presentation(self, file_path: str):\\n        \\\"\\\"\\\"Load PowerPoint presentations\\\"\\\"\\\"\\n        elements = partition(filename=file_path)\\n        \\n        documents = []\\n        for element in elements:\\n            doc = {\\n                \\\"page_content\\\": str(element),\\n                \\\"metadata\\\": {\\n                    \\\"source\\\": file_path,\\n                    \\\"element_type\\\": element.category,\\n                    \\\"file_type\\\": \\\"presentation\\\"\\n                }\\n            }\\n            documents.append(doc)\\n        \\n        return documents\\n    \\n    def _split_documents(self, documents: List[Dict], file_path: str) -> List[DocumentChunk]:\\n        \\\"\\\"\\\"Split documents into chunks with smart strategies\\\"\\\"\\\"\\n        all_chunks = []\\n        \\n        for doc in documents:\\n            content = doc[\\\"page_content\\\"]\\n            metadata = doc[\\\"metadata\\\"]\\n            \\n            # Choose splitter based on content type\\n            if metadata.get(\\\"file_type\\\") == \\\"markdown\\\":\\n                # Already split by headers\\n                chunk_content = content\\n            else:\\n                # Use recursive text splitter\\n                text_splitter = RecursiveCharacterTextSplitter(\\n                    chunk_size=self.chunk_size,\\n                    chunk_overlap=self.chunk_overlap,\\n                    length_function=len,\\n                    separators=[\\\"\\\\n\\\\n\\\",\\n</Output>\\n<Rubric>\\nMentions at least 3 of: embedding model, vector store, chunking, retrieval strategy, prompt engineering. Shows practical implementation knowledge\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "8dacad57-468a-45b9-b26e-0df9fd3eb067",
+        "latencyMs": 384,
+        "namedScores": {
+          "ai-engineer_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are an AI engineer specializing in production-grade LLM applications, generative AI systems, and intelligent agent architectures.\\n\\n## Purpose\\nExpert AI engineer specializing in LLM application development, RAG systems, and AI agent architectures. Masters both traditional and cutting-edge generative AI patterns, with deep knowledge of the modern AI stack including vector databases, embedding models, agent frameworks, and multimodal AI systems.\\n\\n## Capabilities\\n\\n### LLM Integration & Model Management\\n- OpenAI GPT-4o/4o-mini, o1-preview, o1-mini with function calling and structured outputs\\n- Anthropic Claude 4.5 Sonnet/Haiku, Claude 4.1 Opus with tool use and computer use\\n- Open-source models: Llama 3.1/3.2, Mixtral 8x7B/8x22B, Qwen 2.5, DeepSeek-V2\\n- Local deployment with Ollama, vLLM, TGI (Text Generation Inference)\\n- Model serving with TorchServe, MLflow, BentoML for production deployment\\n- Multi-model orchestration and model routing strategies\\n- Cost optimization through model selection and caching strategies\\n\\n### Advanced RAG Systems\\n- Production RAG architectures with multi-stage retrieval pipelines\\n- Vector databases: Pinecone, Qdrant, Weaviate, Chroma, Milvus, pgvector\\n- Embedding models: OpenAI text-embedding-3-large/small, Cohere embed-v3, BGE-large\\n- Chunking strategies: semantic, recursive, sliding window, and document-structure aware\\n- Hybrid search combining vector similarity and keyword matching (BM25)\\n- Reranking with Cohere rerank-3, BGE reranker, or cross-encoder models\\n- Query understanding with query expansion, decomposition, and routing\\n- Context compression and relevance filtering for token optimization\\n- Advanced RAG patterns: GraphRAG, HyDE, RAG-Fusion, self-RAG\\n\\n### Agent Frameworks & Orchestration\\n- LangChain/LangGraph for complex agent workflows and state management\\n- LlamaIndex for data-centric AI applications and advanced retrieval\\n- CrewAI for multi-agent collaboration and specialized agent roles\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Build a RAG (Retrieval Augmented Generation) pipeline for querying internal documentation\"\n  }\n]",
+          "label": "ai-engineer",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "cb524c197cd490424b051737454296035087abbd43cb7c77074063d3de9a6ddc",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll build a comprehensive RAG pipeline for querying internal documentation. Here's a production-ready solution with multiple components:\n\n## 1. **Core Architecture**\n\n```python\n# requirements.txt\n\"\"\"\nopenai>=1.0.0\nlangchain>=0.1.0\nlangchain-community>=0.0.10\nchromadb>=0.4.22\nsentence-transformers>=2.2.2\npypdf>=3.17.0\npython-docx>=1.1.0\nunstructured>=0.10.30\nfastapi>=0.104.0\nuvicorn>=0.24.0\npydantic>=2.5.0\ncohere>=5.0.0\nrank-bm25>=0.2.2\n\"\"\"\n```\n\n## 2. **Document Processing Pipeline**\n\n```python\n# document_processor.py\nimport os\nfrom typing import List, Dict, Any, Optional\nfrom pathlib import Path\nfrom dataclasses import dataclass\nimport hashlib\n\nfrom langchain.text_splitter import (\n    RecursiveCharacterTextSplitter,\n    MarkdownHeaderTextSplitter,\n    Language\n)\nfrom langchain_community.document_loaders import (\n    PyPDFLoader,\n    Docx2txtLoader,\n    TextLoader,\n    UnstructuredMarkdownLoader,\n    CSVLoader,\n    UnstructuredExcelLoader\n)\nfrom unstructured.partition.auto import partition\n\n@dataclass\nclass DocumentChunk:\n    \"\"\"Enhanced document chunk with metadata\"\"\"\n    content: str\n    metadata: Dict[str, Any]\n    chunk_id: str\n    embeddings: Optional[List[float]] = None\n    score: Optional[float] = None\n\nclass DocumentProcessor:\n    \"\"\"Handles document loading, splitting, and preprocessing\"\"\"\n    \n    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):\n        self.chunk_size = chunk_size\n        self.chunk_overlap = chunk_overlap\n        \n        # File type to loader mapping\n        self.loader_mapping = {\n            '.pdf': self._load_pdf,\n            '.docx': self._load_docx,\n            '.txt': self._load_text,\n            '.md': self._load_markdown,\n            '.csv': self._load_csv,\n            '.xlsx': self._load_excel,\n            '.pptx': self._load_presentation,\n        }\n    \n    def process_directory(self, directory_path: str) -> List[DocumentChunk]:\n        \"\"\"Process all documents in a directory\"\"\"\n        all_chunks = []\n        \n        for file_path in Path(directory_path).rglob('*'):\n            if file_path.suffix.lower() in self.loader_mapping:\n                print(f\"Processing: {file_path}\")\n                chunks = self.process_file(str(file_path))\n                all_chunks.extend(chunks)\n        \n        return all_chunks\n    \n    def process_file(self, file_path: str) -> List[DocumentChunk]:\n        \"\"\"Process a single file\"\"\"\n        suffix = Path(file_path).suffix.lower()\n        \n        if suffix not in self.loader_mapping:\n            raise ValueError(f\"Unsupported file type: {suffix}\")\n        \n        # Load document\n        loader_func = self.loader_mapping[suffix]\n        documents = loader_func(file_path)\n        \n        # Split into chunks\n        chunks = self._split_documents(documents, file_path)\n        \n        return chunks\n    \n    def _load_pdf(self, file_path: str):\n        \"\"\"Load PDF with enhanced metadata extraction\"\"\"\n        elements = partition(filename=file_path, strategy=\"hi_res\")\n        \n        documents = []\n        for element in elements:\n            doc = {\n                \"page_content\": str(element),\n                \"metadata\": {\n                    \"source\": file_path,\n                    \"page\": element.metadata.page_number if hasattr(element.metadata, 'page_number') else None,\n                    \"element_type\": element.category,\n                    \"file_type\": \"pdf\"\n                }\n            }\n            documents.append(doc)\n        \n        return documents\n    \n    def _load_markdown(self, file_path: str):\n        \"\"\"Load markdown with header preservation\"\"\"\n        # Use markdown header splitter for better structure\n        with open(file_path, 'r', encoding='utf-8') as f:\n            markdown_text = f.read()\n        \n        headers_to_split_on = [\n            (\"#\", \"Header 1\"),\n            (\"##\", \"Header 2\"),\n            (\"###\", \"Header 3\"),\n        ]\n        \n        markdown_splitter = MarkdownHeaderTextSplitter(\n            headers_to_split_on=headers_to_split_on\n        )\n        \n        splits = markdown_splitter.split_text(markdown_text)\n        \n        documents = []\n        for split in splits:\n            doc = {\n                \"page_content\": split.page_content,\n                \"metadata\": {\n                    **split.metadata,\n                    \"source\": file_path,\n                    \"file_type\": \"markdown\"\n                }\n            }\n            documents.append(doc)\n        \n        return documents\n    \n    def _load_text(self, file_path: str):\n        \"\"\"Load plain text files\"\"\"\n        with open(file_path, 'r', encoding='utf-8') as f:\n            content = f.read()\n        \n        return [{\n            \"page_content\": content,\n            \"metadata\": {\n                \"source\": file_path,\n                \"file_type\": \"text\"\n            }\n        }]\n    \n    def _load_docx(self, file_path: str):\n        \"\"\"Load Word documents\"\"\"\n        loader = Docx2txtLoader(file_path)\n        return loader.load()\n    \n    def _load_csv(self, file_path: str):\n        \"\"\"Load CSV files\"\"\"\n        loader = CSVLoader(file_path)\n        return loader.load()\n    \n    def _load_excel(self, file_path: str):\n        \"\"\"Load Excel files\"\"\"\n        loader = UnstructuredExcelLoader(file_path, mode=\"elements\")\n        return loader.load()\n    \n    def _load_presentation(self, file_path: str):\n        \"\"\"Load PowerPoint presentations\"\"\"\n        elements = partition(filename=file_path)\n        \n        documents = []\n        for element in elements:\n            doc = {\n                \"page_content\": str(element),\n                \"metadata\": {\n                    \"source\": file_path,\n                    \"element_type\": element.category,\n                    \"file_type\": \"presentation\"\n                }\n            }\n            documents.append(doc)\n        \n        return documents\n    \n    def _split_documents(self, documents: List[Dict], file_path: str) -> List[DocumentChunk]:\n        \"\"\"Split documents into chunks with smart strategies\"\"\"\n        all_chunks = []\n        \n        for doc in documents:\n            content = doc[\"page_content\"]\n            metadata = doc[\"metadata\"]\n            \n            # Choose splitter based on content type\n            if metadata.get(\"file_type\") == \"markdown\":\n                # Already split by headers\n                chunk_content = content\n            else:\n                # Use recursive text splitter\n                text_splitter = RecursiveCharacterTextSplitter(\n                    chunk_size=self.chunk_size,\n                    chunk_overlap=self.chunk_overlap,\n                    length_function=len,\n                    separators=[\"\\n\\n\",",
+          "tokenUsage": {
+            "total": 1984,
+            "prompt": 484,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 384,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:09:46 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 64ffb72f0e843370ffa49342c875f9fc.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "LmPU6CRnW1MvBd3_tFFeoBClSFEIsbwTGVGvETgphrHBWFIw-QbRGw==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "6c4e299312556778e39796379cce3361"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Build a RAG (Retrieval Augmented Generation) pipeline for querying internal docu",
+          "vars": {
+            "task": "Build a RAG (Retrieval Augmented Generation) pipeline for querying internal documentation"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Mentions at least 3 of: embedding model, vector store, chunking, retrieval strategy, prompt engineering. Shows practical implementation knowledge",
+              "threshold": 0.6,
+              "metric": "ai-engineer_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Build a RAG (Retrieval Augmented Generation) pipeline for querying internal documentation"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:09:46 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 64ffb72f0e843370ffa49342c875f9fc.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "LmPU6CRnW1MvBd3_tFFeoBClSFEIsbwTGVGvETgphrHBWFIw-QbRGw==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "6c4e299312556778e39796379cce3361"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 484,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1984,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1770,
+          "prompt": 1702,
+          "completion": 68,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 74105,
+      "evaluationDurationMs": 74105
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: ai-engineer",
+    "prompts": [
+      {
+        "label": "ai-engineer",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are an AI engineer specializing in production-grade LLM applications, generative AI systems, and intelligent agent architectures.\\n\\n## Purpose\\nExpert AI engineer specializing in LLM application development, RAG systems, and AI agent architectures. Masters both traditional and cutting-edge generative AI patterns, with deep knowledge of the modern AI stack including vector databases, embedding models, agent frameworks, and multimodal AI systems.\\n\\n## Capabilities\\n\\n### LLM Integration & Model Management\\n- OpenAI GPT-4o/4o-mini, o1-preview, o1-mini with function calling and structured outputs\\n- Anthropic Claude 4.5 Sonnet/Haiku, Claude 4.1 Opus with tool use and computer use\\n- Open-source models: Llama 3.1/3.2, Mixtral 8x7B/8x22B, Qwen 2.5, DeepSeek-V2\\n- Local deployment with Ollama, vLLM, TGI (Text Generation Inference)\\n- Model serving with TorchServe, MLflow, BentoML for production deployment\\n- Multi-model orchestration and model routing strategies\\n- Cost optimization through model selection and caching strategies\\n\\n### Advanced RAG Systems\\n- Production RAG architectures with multi-stage retrieval pipelines\\n- Vector databases: Pinecone, Qdrant, Weaviate, Chroma, Milvus, pgvector\\n- Embedding models: OpenAI text-embedding-3-large/small, Cohere embed-v3, BGE-large\\n- Chunking strategies: semantic, recursive, sliding window, and document-structure aware\\n- Hybrid search combining vector similarity and keyword matching (BM25)\\n- Reranking with Cohere rerank-3, BGE reranker, or cross-encoder models\\n- Query understanding with query expansion, decomposition, and routing\\n- Context compression and relevance filtering for token optimization\\n- Advanced RAG patterns: GraphRAG, HyDE, RAG-Fusion, self-RAG\\n\\n### Agent Frameworks & Orchestration\\n- LangChain/LangGraph for complex agent workflows and state management\\n- LlamaIndex for data-centric AI applications and advanced retrieval\\n- CrewAI for multi-agent collaboration and specialized agent roles\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Build a RAG (Retrieval Augmented Generation) pipeline for querying internal docu",
+        "vars": {
+          "task": "Build a RAG (Retrieval Augmented Generation) pipeline for querying internal documentation"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Mentions at least 3 of: embedding model, vector store, chunking, retrieval strategy, prompt engineering. Shows practical implementation knowledge",
+            "threshold": 0.6,
+            "metric": "ai-engineer_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-ai-engineer.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:11:00.081Z",
+    "evaluationCreatedAt": "2026-03-15T04:09:45.934Z"
+  }
+}

@@ -1,0 +1,496 @@
+{
+  "evalId": "eval-yjK-2026-03-15T04:54:45",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:54:45.520Z",
+    "prompts": [
+      {
+        "id": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a TypeScript expert specializing in advanced typing and enterprise-grade development.\\n\\n## Focus Areas\\n- Advanced type systems (generics, conditional types, mapped types)\\n- Strict TypeScript configuration and compiler options\\n- Type inference optimization and utility types\\n- Decorators and metadata programming\\n- Module systems and namespace organization\\n- Integration with modern frameworks (React, Node.js, Express)\\n\\n## Approach\\n1. Leverage strict type checking with appropriate compiler flags\\n2. Use generics and utility types for maximum type safety\\n3. Prefer type inference over explicit annotations when clear\\n4. Design robust interfaces and abstract classes\\n5. Implement proper error boundaries with typed exceptions\\n6. Optimize build times with incremental compilation\\n\\n## Output\\n- Strongly-typed TypeScript with comprehensive interfaces\\n- Generic functions and classes with proper constraints\\n- Custom utility types and advanced type manipulations\\n- Jest/Vitest tests with proper type assertions\\n- TSConfig optimization for project requirements\\n- Type declaration files (.d.ts) for external libraries\\n\\nSupport both strict and gradual typing approaches. Include comprehensive TSDoc comments and maintain compatibility with latest TypeScript versions.\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "typescript-pro",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 2,
+          "testPassCount": 2,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 2,
+          "assertFailCount": 0,
+          "totalLatencyMs": 1120,
+          "tokenUsage": {
+            "prompt": 500,
+            "completion": 3000,
+            "cached": 0,
+            "total": 3500,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 3511,
+              "prompt": 3388,
+              "completion": 123,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "typescript-pro_quality": 2
+          },
+          "namedScoresCount": {
+            "typescript-pro_quality": 2
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "typescript-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1756,
+            "prompt": 1694,
+            "completion": 62,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Response demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly",
+                "threshold": 0.7,
+                "metric": "typescript-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The response includes multiple sophisticated DeepPartial implementations with proper generic constraints, handles edge cases like arrays and built-in types, provides comprehensive examples, and demonstrates advanced TypeScript knowledge through utility functions and type guards.",
+              "tokensUsed": {
+                "total": 1756,
+                "prompt": 1694,
+                "completion": 62,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's a comprehensive TypeScript generic utility type that makes all nested object properties optional:\\n\\n```typescript\\n/**\\n * Recursively makes all properties of an object (including nested objects) optional\\n * @typeParam T - The type to transform\\n * @example\\n * ```typescript\\n * type User = {\\n *   id: number;\\n *   name: string;\\n *   address: {\\n *     street: string;\\n *     city: string;\\n *     country: {\\n *       code: string;\\n *       name: string;\\n *     };\\n *   };\\n *   preferences: {\\n *     theme: 'light' | 'dark';\\n *     notifications: boolean;\\n *   };\\n * };\\n * \\n * type PartialUser = DeepPartial<User>;\\n * // Equivalent to:\\n * // {\\n * //   id?: number;\\n * //   name?: string;\\n * //   address?: {\\n * //     street?: string;\\n * //     city?: string;\\n * //     country?: {\\n * //       code?: string;\\n * //       name?: string;\\n * //     };\\n * //   };\\n * //   preferences?: {\\n * //     theme?: 'light' | 'dark';\\n * //     notifications?: boolean;\\n * //   };\\n * // }\\n * ```\\n */\\nexport type DeepPartial<T> = T extends object\\n  ? {\\n      [P in keyof T]?: T[P] extends Array<infer U>\\n        ? Array<DeepPartial<U>>\\n        : T[P] extends ReadonlyArray<infer U>\\n        ? ReadonlyArray<DeepPartial<U>>\\n        : DeepPartial<T[P]>;\\n    }\\n  : T;\\n\\n/**\\n * Alternative implementation with better handling for built-in types\\n * This version preserves Date, RegExp, Map, Set, and other built-in types\\n */\\nexport type DeepPartialPreserveBuiltins<T> = T extends\\n  | Date\\n  | RegExp\\n  | Function\\n  | Map<any, any>\\n  | Set<any>\\n  | WeakMap<any, any>\\n  | WeakSet<any>\\n  | Promise<any>\\n  ? T\\n  : T extends Array<infer U>\\n  ? Array<DeepPartialPreserveBuiltins<U>>\\n  : T extends ReadonlyArray<infer U>\\n  ? ReadonlyArray<DeepPartialPreserveBuiltins<U>>\\n  : T extends object\\n  ? {\\n      [P in keyof T]?: DeepPartialPreserveBuiltins<T[P]>;\\n    }\\n  : T;\\n\\n/**\\n * Strict version that only works with plain objects and arrays\\n * This is useful when you want to ensure you're only dealing with serializable data\\n */\\nexport type DeepPartialStrict<T> = T extends\\n  | string\\n  | number\\n  | boolean\\n  | symbol\\n  | bigint\\n  | null\\n  | undefined\\n  ? T\\n  : T extends Array<infer U>\\n  ? Array<DeepPartialStrict<U>>\\n  : T extends ReadonlyArray<infer U>\\n  ? ReadonlyArray<DeepPartialStrict<U>>\\n  : T extends object\\n  ? {\\n      [P in keyof T]?: DeepPartialStrict<T[P]>;\\n    }\\n  : never;\\n\\n/**\\n * Utility type that makes properties optional but preserves required properties for specific keys\\n * @typeParam T - The base type\\n * @typeParam K - Keys that should remain required\\n */\\nexport type DeepPartialExcept<T, K extends keyof T> = DeepPartial<T> &\\n  Pick<T, K>;\\n\\n/**\\n * Example usage and tests\\n */\\n\\n// Example types\\ninterface Address {\\n  street: string;\\n  city: string;\\n  country: {\\n    code: string;\\n    name: string;\\n  };\\n  coordinates: [number, number];\\n}\\n\\ninterface User {\\n  id: number;\\n  name: string;\\n  email: string;\\n  address: Address;\\n  tags: string[];\\n  metadata: Record<string, any>;\\n  createdAt: Date;\\n  updatedAt: Date;\\n}\\n\\n// Test the DeepPartial type\\ntype PartialUser = DeepPartial<User>;\\n\\n// Valid assignments\\nconst validPartialUser: PartialUser = {\\n  name: 'John', // Optional property\\n  address: {\\n    city: 'New York', // Nested optional property\\n    country: {\\n      code: 'US', // Deep nested optional property\\n    },\\n  },\\n  tags: ['developer'], // Array with optional elements\\n  createdAt: new Date(), // Date preserved as is\\n};\\n\\n// Test with arrays containing objects\\ninterface Task {\\n  id: number;\\n  title: string;\\n  subtasks: Array<{\\n    id: number;\\n    description: string;\\n  }>;\\n}\\n\\ntype PartialTask = DeepPartial<Task>;\\n\\nconst partialTask: PartialTask = {\\n  title: 'Work',\\n  subtasks: [\\n    { id: 1 }, // description is optional\\n    { description: 'Meeting' }, // id is optional\\n  ],\\n};\\n\\n// Test with built-in types preservation\\ntype UserWithBuiltins = DeepPartialPreserveBuiltins<User>;\\n\\nconst userWithBuiltins: UserWithBuiltins = {\\n  name: 'Alice',\\n  createdAt: new Date(), // Date is preserved, not made optional internally\\n  address: {\\n    city: 'London',\\n  },\\n};\\n\\n// Test the DeepPartialExcept utility\\ntype UserProfileUpdate = DeepPartialExcept<User, 'id'>;\\n\\nconst userUpdate: UserProfileUpdate = {\\n  id: 123, // Required\\n  name: 'Updated Name', // Optional\\n  // email is optional\\n  address: {\\n    city: 'Updated City', // Optional\\n    // street is optional\\n  },\\n};\\n\\n// Type guard to check if an object is a valid partial update\\nfunction isValidPartialUpdate<T extends object>(\\n  obj: unknown,\\n  requiredKeys: Array<keyof T>\\n): obj is DeepPartial<T> {\\n  if (typeof obj !== 'object' || obj === null) {\\n    return false;\\n  }\\n\\n  // Check that all required keys are present\\n  for (const key of requiredKeys) {\\n    if (!(key in obj)) {\\n      return false;\\n    }\\n  }\\n\\n  return true;\\n}\\n\\n// Utility function to merge partial updates\\nfunction mergePartialUpdate<T extends object>(\\n  base: T,\\n  update: DeepPartial<T>\\n): T {\\n  const result = { ...base };\\n\\n  for (const key in update) {\\n    if (update[key] !== undefined) {\\n      const baseValue = base[key];\\n      const updateValue = update[key];\\n\\n      if (\\n        typeof baseValue === 'object' &&\\n        baseValue !== null &&\\n        typeof updateValue === 'object' &&\\n        updateValue !== null &&\\n        !(baseValue instanceof Date) &&\\n        !(updateValue instanceof Date)\\n      ) {\\n        // Recursively merge nested objects\\n        result[key as keyof T] = mergePartialUpdate(\\n          baseValue as any,\\n          updateValue as any\\n        ) as any;\\n      } else {\\n        result[key as keyof T] = updateValue as any;\\n      }\\n    }\\n  }\\n\\n  return result;\\n}\\n\\n// Example usage of merge function\\nconst baseUser: User\\n</Output>\\n<Rubric>\\nResponse demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "5eb1ee66-4f7a-48f8-976a-e77546992ba9",
+        "latencyMs": 560,
+        "namedScores": {
+          "typescript-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a TypeScript expert specializing in advanced typing and enterprise-grade development.\\n\\n## Focus Areas\\n- Advanced type systems (generics, conditional types, mapped types)\\n- Strict TypeScript configuration and compiler options\\n- Type inference optimization and utility types\\n- Decorators and metadata programming\\n- Module systems and namespace organization\\n- Integration with modern frameworks (React, Node.js, Express)\\n\\n## Approach\\n1. Leverage strict type checking with appropriate compiler flags\\n2. Use generics and utility types for maximum type safety\\n3. Prefer type inference over explicit annotations when clear\\n4. Design robust interfaces and abstract classes\\n5. Implement proper error boundaries with typed exceptions\\n6. Optimize build times with incremental compilation\\n\\n## Output\\n- Strongly-typed TypeScript with comprehensive interfaces\\n- Generic functions and classes with proper constraints\\n- Custom utility types and advanced type manipulations\\n- Jest/Vitest tests with proper type assertions\\n- TSConfig optimization for project requirements\\n- Type declaration files (.d.ts) for external libraries\\n\\nSupport both strict and gradual typing approaches. Include comprehensive TSDoc comments and maintain compatibility with latest TypeScript versions.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Create a TypeScript generic utility type that makes all nested object properties optional\"\n  }\n]",
+          "label": "typescript-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Here's a comprehensive TypeScript generic utility type that makes all nested object properties optional:\n\n```typescript\n/**\n * Recursively makes all properties of an object (including nested objects) optional\n * @typeParam T - The type to transform\n * @example\n * ```typescript\n * type User = {\n *   id: number;\n *   name: string;\n *   address: {\n *     street: string;\n *     city: string;\n *     country: {\n *       code: string;\n *       name: string;\n *     };\n *   };\n *   preferences: {\n *     theme: 'light' | 'dark';\n *     notifications: boolean;\n *   };\n * };\n * \n * type PartialUser = DeepPartial<User>;\n * // Equivalent to:\n * // {\n * //   id?: number;\n * //   name?: string;\n * //   address?: {\n * //     street?: string;\n * //     city?: string;\n * //     country?: {\n * //       code?: string;\n * //       name?: string;\n * //     };\n * //   };\n * //   preferences?: {\n * //     theme?: 'light' | 'dark';\n * //     notifications?: boolean;\n * //   };\n * // }\n * ```\n */\nexport type DeepPartial<T> = T extends object\n  ? {\n      [P in keyof T]?: T[P] extends Array<infer U>\n        ? Array<DeepPartial<U>>\n        : T[P] extends ReadonlyArray<infer U>\n        ? ReadonlyArray<DeepPartial<U>>\n        : DeepPartial<T[P]>;\n    }\n  : T;\n\n/**\n * Alternative implementation with better handling for built-in types\n * This version preserves Date, RegExp, Map, Set, and other built-in types\n */\nexport type DeepPartialPreserveBuiltins<T> = T extends\n  | Date\n  | RegExp\n  | Function\n  | Map<any, any>\n  | Set<any>\n  | WeakMap<any, any>\n  | WeakSet<any>\n  | Promise<any>\n  ? T\n  : T extends Array<infer U>\n  ? Array<DeepPartialPreserveBuiltins<U>>\n  : T extends ReadonlyArray<infer U>\n  ? ReadonlyArray<DeepPartialPreserveBuiltins<U>>\n  : T extends object\n  ? {\n      [P in keyof T]?: DeepPartialPreserveBuiltins<T[P]>;\n    }\n  : T;\n\n/**\n * Strict version that only works with plain objects and arrays\n * This is useful when you want to ensure you're only dealing with serializable data\n */\nexport type DeepPartialStrict<T> = T extends\n  | string\n  | number\n  | boolean\n  | symbol\n  | bigint\n  | null\n  | undefined\n  ? T\n  : T extends Array<infer U>\n  ? Array<DeepPartialStrict<U>>\n  : T extends ReadonlyArray<infer U>\n  ? ReadonlyArray<DeepPartialStrict<U>>\n  : T extends object\n  ? {\n      [P in keyof T]?: DeepPartialStrict<T[P]>;\n    }\n  : never;\n\n/**\n * Utility type that makes properties optional but preserves required properties for specific keys\n * @typeParam T - The base type\n * @typeParam K - Keys that should remain required\n */\nexport type DeepPartialExcept<T, K extends keyof T> = DeepPartial<T> &\n  Pick<T, K>;\n\n/**\n * Example usage and tests\n */\n\n// Example types\ninterface Address {\n  street: string;\n  city: string;\n  country: {\n    code: string;\n    name: string;\n  };\n  coordinates: [number, number];\n}\n\ninterface User {\n  id: number;\n  name: string;\n  email: string;\n  address: Address;\n  tags: string[];\n  metadata: Record<string, any>;\n  createdAt: Date;\n  updatedAt: Date;\n}\n\n// Test the DeepPartial type\ntype PartialUser = DeepPartial<User>;\n\n// Valid assignments\nconst validPartialUser: PartialUser = {\n  name: 'John', // Optional property\n  address: {\n    city: 'New York', // Nested optional property\n    country: {\n      code: 'US', // Deep nested optional property\n    },\n  },\n  tags: ['developer'], // Array with optional elements\n  createdAt: new Date(), // Date preserved as is\n};\n\n// Test with arrays containing objects\ninterface Task {\n  id: number;\n  title: string;\n  subtasks: Array<{\n    id: number;\n    description: string;\n  }>;\n}\n\ntype PartialTask = DeepPartial<Task>;\n\nconst partialTask: PartialTask = {\n  title: 'Work',\n  subtasks: [\n    { id: 1 }, // description is optional\n    { description: 'Meeting' }, // id is optional\n  ],\n};\n\n// Test with built-in types preservation\ntype UserWithBuiltins = DeepPartialPreserveBuiltins<User>;\n\nconst userWithBuiltins: UserWithBuiltins = {\n  name: 'Alice',\n  createdAt: new Date(), // Date is preserved, not made optional internally\n  address: {\n    city: 'London',\n  },\n};\n\n// Test the DeepPartialExcept utility\ntype UserProfileUpdate = DeepPartialExcept<User, 'id'>;\n\nconst userUpdate: UserProfileUpdate = {\n  id: 123, // Required\n  name: 'Updated Name', // Optional\n  // email is optional\n  address: {\n    city: 'Updated City', // Optional\n    // street is optional\n  },\n};\n\n// Type guard to check if an object is a valid partial update\nfunction isValidPartialUpdate<T extends object>(\n  obj: unknown,\n  requiredKeys: Array<keyof T>\n): obj is DeepPartial<T> {\n  if (typeof obj !== 'object' || obj === null) {\n    return false;\n  }\n\n  // Check that all required keys are present\n  for (const key of requiredKeys) {\n    if (!(key in obj)) {\n      return false;\n    }\n  }\n\n  return true;\n}\n\n// Utility function to merge partial updates\nfunction mergePartialUpdate<T extends object>(\n  base: T,\n  update: DeepPartial<T>\n): T {\n  const result = { ...base };\n\n  for (const key in update) {\n    if (update[key] !== undefined) {\n      const baseValue = base[key];\n      const updateValue = update[key];\n\n      if (\n        typeof baseValue === 'object' &&\n        baseValue !== null &&\n        typeof updateValue === 'object' &&\n        updateValue !== null &&\n        !(baseValue instanceof Date) &&\n        !(updateValue instanceof Date)\n      ) {\n        // Recursively merge nested objects\n        result[key as keyof T] = mergePartialUpdate(\n          baseValue as any,\n          updateValue as any\n        ) as any;\n      } else {\n        result[key as keyof T] = updateValue as any;\n      }\n    }\n  }\n\n  return result;\n}\n\n// Example usage of merge function\nconst baseUser: User",
+          "tokenUsage": {
+            "total": 1750,
+            "prompt": 250,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 560,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:54:45 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 4922693003ba820cda0974a02523e512.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "IocsWmgaVznFzpRWW5mg656CbecSHGpTcn2T7pUFWsxWDlu8tiTSZA==",
+                "x-amz-cf-pop": "IAH50-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "1d6cd77257cb904404dc7620b547f95d"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Create a TypeScript generic utility type that makes all nested object properties",
+          "vars": {
+            "task": "Create a TypeScript generic utility type that makes all nested object properties optional"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Response demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly",
+              "threshold": 0.7,
+              "metric": "typescript-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Create a TypeScript generic utility type that makes all nested object properties optional"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:54:45 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 4922693003ba820cda0974a02523e512.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "IocsWmgaVznFzpRWW5mg656CbecSHGpTcn2T7pUFWsxWDlu8tiTSZA==",
+              "x-amz-cf-pop": "IAH50-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "1d6cd77257cb904404dc7620b547f95d"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "typescript-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1755,
+            "prompt": 1694,
+            "completion": 61,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible",
+                "threshold": 0.7,
+                "metric": "typescript-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The decorator uses proper TypeScript decorator syntax with typed MethodDecorator return, correctly accesses descriptor.value, and maintains type safety with generics, making it compatible with TypeScript strict mode.",
+              "tokensUsed": {
+                "total": 1755,
+                "prompt": 1694,
+                "completion": 61,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive TypeScript decorator for method memoization with TTL (Time To Live) support, featuring advanced typing and enterprise-grade patterns.\\n\\n```typescript\\n// memoization.decorator.ts\\n\\n/**\\n * Memoization configuration options\\n */\\nexport interface MemoizationOptions<TArgs extends any[] = any[], TReturn = any> {\\n  /**\\n   * Time To Live in milliseconds\\n   * @default Infinity (no expiration)\\n   */\\n  ttl?: number;\\n  \\n  /**\\n   * Custom cache key generator\\n   * @param args - Method arguments\\n   * @returns Cache key string\\n   */\\n  keyResolver?: (...args: TArgs) => string;\\n  \\n  /**\\n   * Custom cache implementation\\n   * @default new Map()\\n   */\\n  cache?: Map<string, CacheEntry<TReturn>>;\\n  \\n  /**\\n   * Whether to use WeakMap for cache (prevents memory leaks)\\n   * @default false\\n   */\\n  useWeakMap?: boolean;\\n}\\n\\n/**\\n * Cache entry with expiration timestamp\\n */\\ninterface CacheEntry<T> {\\n  value: T;\\n  expiresAt: number | null;\\n}\\n\\n/**\\n * Memoization decorator factory with TTL support\\n * @param options - Memoization configuration\\n * @returns Method decorator\\n */\\nexport function memoize<TArgs extends any[], TReturn>(\\n  options: MemoizationOptions<TArgs, TReturn> = {}\\n): MethodDecorator {\\n  const {\\n    ttl = Infinity,\\n    keyResolver = defaultKeyResolver,\\n    cache: externalCache,\\n    useWeakMap = false,\\n  } = options;\\n\\n  return function <T>(\\n    target: Object,\\n    propertyKey: string | symbol,\\n    descriptor: TypedPropertyDescriptor<(...args: TArgs) => TReturn>\\n  ): TypedPropertyDescriptor<(...args: TArgs) => TReturn> | void {\\n    if (!descriptor.value) {\\n      return descriptor;\\n    }\\n\\n    const originalMethod = descriptor.value;\\n    const methodName = String(propertyKey);\\n\\n    // Create appropriate cache based on configuration\\n    let cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>;\\n    \\n    if (useWeakMap) {\\n      cache = new WeakMap<object, CacheEntry<TReturn>>();\\n    } else {\\n      cache = externalCache || new Map<string, CacheEntry<TReturn>>();\\n    }\\n\\n    descriptor.value = function (...args: TArgs): TReturn {\\n      const cacheKey = useWeakMap \\n        ? this \\n        : keyResolver(...args);\\n\\n      // Check cache\\n      const cachedEntry = (cache as any).get(cacheKey);\\n      \\n      if (cachedEntry) {\\n        const now = Date.now();\\n        \\n        // Check if entry is still valid\\n        if (cachedEntry.expiresAt === null || cachedEntry.expiresAt > now) {\\n          console.debug(`[Memoize] Cache hit for ${methodName}`);\\n          return cachedEntry.value;\\n        }\\n        \\n        // Entry expired, remove it\\n        console.debug(`[Memoize] Cache expired for ${methodName}`);\\n        (cache as any).delete(cacheKey);\\n      }\\n\\n      // Cache miss or expired, execute original method\\n      console.debug(`[Memoize] Cache miss for ${methodName}`);\\n      const result = originalMethod.apply(this, args);\\n      \\n      // Calculate expiration time\\n      const expiresAt = ttl === Infinity ? null : Date.now() + ttl;\\n      \\n      // Store in cache\\n      const entry: CacheEntry<TReturn> = { value: result, expiresAt };\\n      (cache as any).set(cacheKey, entry);\\n\\n      return result;\\n    };\\n\\n    // Add cache management methods to the instance\\n    addCacheManagementMethods(target, propertyKey, cache, useWeakMap);\\n\\n    return descriptor;\\n  };\\n}\\n\\n/**\\n * Default cache key resolver using JSON.stringify\\n * Handles circular references and special cases\\n */\\nfunction defaultKeyResolver<TArgs extends any[]>(...args: TArgs): string {\\n  try {\\n    return JSON.stringify(args, (key, value) => {\\n      // Handle special cases\\n      if (typeof value === 'function') {\\n        return `[Function: ${value.name || 'anonymous'}]`;\\n      }\\n      if (value instanceof RegExp) {\\n        return value.toString();\\n      }\\n      if (value instanceof Date) {\\n        return value.toISOString();\\n      }\\n      if (value instanceof Map) {\\n        return `[Map ${JSON.stringify(Array.from(value.entries()))}]`;\\n      }\\n      if (value instanceof Set) {\\n        return `[Set ${JSON.stringify(Array.from(value))}]`;\\n      }\\n      return value;\\n    });\\n  } catch (error) {\\n    // Fallback for circular references or unserializable objects\\n    return args.map(arg => {\\n      if (arg === null) return 'null';\\n      if (arg === undefined) return 'undefined';\\n      if (typeof arg === 'object') {\\n        return `[Object ${Object.prototype.toString.call(arg)}]`;\\n      }\\n      return String(arg);\\n    }).join('|');\\n  }\\n}\\n\\n/**\\n * Add cache management methods to the class instance\\n */\\nfunction addCacheManagementMethods<TArgs extends any[], TReturn>(\\n  target: Object,\\n  propertyKey: string | symbol,\\n  cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>,\\n  useWeakMap: boolean\\n): void {\\n  const methodName = String(propertyKey);\\n  const cacheKey = `__memoize_cache_${methodName}`;\\n  \\n  // Store cache reference on the prototype\\n  Object.defineProperty(target, cacheKey, {\\n    value: cache,\\n    writable: false,\\n    enumerable: false,\\n    configurable: true,\\n  });\\n\\n  // Add clearCache method\\n  const clearMethodName = `clear${methodName.charAt(0).toUpperCase() + methodName.slice(1)}Cache`;\\n  Object.defineProperty(target, clearMethodName, {\\n    value: function() {\\n      const instanceCache = (this as any)[cacheKey];\\n      if (instanceCache) {\\n        if (useWeakMap) {\\n          // WeakMap doesn't have clear() in all environments\\n          // We'll create a new one\\n          (this as any)[cacheKey] = new WeakMap<object, CacheEntry<TReturn>>();\\n        } else {\\n          (instanceCache as Map<string, CacheEntry<TReturn>>).clear();\\n        }\\n        console.debug(`[Memoize] Cache cleared for ${methodName}`);\\n      }\\n    },\\n    writable: false,\\n    enumerable: false,\\n    configurable: true,\\n  });\\n\\n  // Add getCacheStats method\\n  const statsMethodName = `get${methodName.charAt(0).toUpperCase() + methodName.slice(1)}CacheStats`;\\n  Object.defineProperty(target, statsMethodName, {\\n    value: function() {\\n      const instanceCache = (this as any)[cacheKey];\\n      if (!instanceCache) {\\n        return { size: 0, entries\\n</Output>\\n<Rubric>\\nUses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "2bb3cfe9-1d96-4900-872e-57911a89727a",
+        "latencyMs": 560,
+        "namedScores": {
+          "typescript-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a TypeScript expert specializing in advanced typing and enterprise-grade development.\\n\\n## Focus Areas\\n- Advanced type systems (generics, conditional types, mapped types)\\n- Strict TypeScript configuration and compiler options\\n- Type inference optimization and utility types\\n- Decorators and metadata programming\\n- Module systems and namespace organization\\n- Integration with modern frameworks (React, Node.js, Express)\\n\\n## Approach\\n1. Leverage strict type checking with appropriate compiler flags\\n2. Use generics and utility types for maximum type safety\\n3. Prefer type inference over explicit annotations when clear\\n4. Design robust interfaces and abstract classes\\n5. Implement proper error boundaries with typed exceptions\\n6. Optimize build times with incremental compilation\\n\\n## Output\\n- Strongly-typed TypeScript with comprehensive interfaces\\n- Generic functions and classes with proper constraints\\n- Custom utility types and advanced type manipulations\\n- Jest/Vitest tests with proper type assertions\\n- TSConfig optimization for project requirements\\n- Type declaration files (.d.ts) for external libraries\\n\\nSupport both strict and gradual typing approaches. Include comprehensive TSDoc comments and maintain compatibility with latest TypeScript versions.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a TypeScript decorator for method memoization with TTL support\"\n  }\n]",
+          "label": "typescript-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a comprehensive TypeScript decorator for method memoization with TTL (Time To Live) support, featuring advanced typing and enterprise-grade patterns.\n\n```typescript\n// memoization.decorator.ts\n\n/**\n * Memoization configuration options\n */\nexport interface MemoizationOptions<TArgs extends any[] = any[], TReturn = any> {\n  /**\n   * Time To Live in milliseconds\n   * @default Infinity (no expiration)\n   */\n  ttl?: number;\n  \n  /**\n   * Custom cache key generator\n   * @param args - Method arguments\n   * @returns Cache key string\n   */\n  keyResolver?: (...args: TArgs) => string;\n  \n  /**\n   * Custom cache implementation\n   * @default new Map()\n   */\n  cache?: Map<string, CacheEntry<TReturn>>;\n  \n  /**\n   * Whether to use WeakMap for cache (prevents memory leaks)\n   * @default false\n   */\n  useWeakMap?: boolean;\n}\n\n/**\n * Cache entry with expiration timestamp\n */\ninterface CacheEntry<T> {\n  value: T;\n  expiresAt: number | null;\n}\n\n/**\n * Memoization decorator factory with TTL support\n * @param options - Memoization configuration\n * @returns Method decorator\n */\nexport function memoize<TArgs extends any[], TReturn>(\n  options: MemoizationOptions<TArgs, TReturn> = {}\n): MethodDecorator {\n  const {\n    ttl = Infinity,\n    keyResolver = defaultKeyResolver,\n    cache: externalCache,\n    useWeakMap = false,\n  } = options;\n\n  return function <T>(\n    target: Object,\n    propertyKey: string | symbol,\n    descriptor: TypedPropertyDescriptor<(...args: TArgs) => TReturn>\n  ): TypedPropertyDescriptor<(...args: TArgs) => TReturn> | void {\n    if (!descriptor.value) {\n      return descriptor;\n    }\n\n    const originalMethod = descriptor.value;\n    const methodName = String(propertyKey);\n\n    // Create appropriate cache based on configuration\n    let cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>;\n    \n    if (useWeakMap) {\n      cache = new WeakMap<object, CacheEntry<TReturn>>();\n    } else {\n      cache = externalCache || new Map<string, CacheEntry<TReturn>>();\n    }\n\n    descriptor.value = function (...args: TArgs): TReturn {\n      const cacheKey = useWeakMap \n        ? this \n        : keyResolver(...args);\n\n      // Check cache\n      const cachedEntry = (cache as any).get(cacheKey);\n      \n      if (cachedEntry) {\n        const now = Date.now();\n        \n        // Check if entry is still valid\n        if (cachedEntry.expiresAt === null || cachedEntry.expiresAt > now) {\n          console.debug(`[Memoize] Cache hit for ${methodName}`);\n          return cachedEntry.value;\n        }\n        \n        // Entry expired, remove it\n        console.debug(`[Memoize] Cache expired for ${methodName}`);\n        (cache as any).delete(cacheKey);\n      }\n\n      // Cache miss or expired, execute original method\n      console.debug(`[Memoize] Cache miss for ${methodName}`);\n      const result = originalMethod.apply(this, args);\n      \n      // Calculate expiration time\n      const expiresAt = ttl === Infinity ? null : Date.now() + ttl;\n      \n      // Store in cache\n      const entry: CacheEntry<TReturn> = { value: result, expiresAt };\n      (cache as any).set(cacheKey, entry);\n\n      return result;\n    };\n\n    // Add cache management methods to the instance\n    addCacheManagementMethods(target, propertyKey, cache, useWeakMap);\n\n    return descriptor;\n  };\n}\n\n/**\n * Default cache key resolver using JSON.stringify\n * Handles circular references and special cases\n */\nfunction defaultKeyResolver<TArgs extends any[]>(...args: TArgs): string {\n  try {\n    return JSON.stringify(args, (key, value) => {\n      // Handle special cases\n      if (typeof value === 'function') {\n        return `[Function: ${value.name || 'anonymous'}]`;\n      }\n      if (value instanceof RegExp) {\n        return value.toString();\n      }\n      if (value instanceof Date) {\n        return value.toISOString();\n      }\n      if (value instanceof Map) {\n        return `[Map ${JSON.stringify(Array.from(value.entries()))}]`;\n      }\n      if (value instanceof Set) {\n        return `[Set ${JSON.stringify(Array.from(value))}]`;\n      }\n      return value;\n    });\n  } catch (error) {\n    // Fallback for circular references or unserializable objects\n    return args.map(arg => {\n      if (arg === null) return 'null';\n      if (arg === undefined) return 'undefined';\n      if (typeof arg === 'object') {\n        return `[Object ${Object.prototype.toString.call(arg)}]`;\n      }\n      return String(arg);\n    }).join('|');\n  }\n}\n\n/**\n * Add cache management methods to the class instance\n */\nfunction addCacheManagementMethods<TArgs extends any[], TReturn>(\n  target: Object,\n  propertyKey: string | symbol,\n  cache: Map<string, CacheEntry<TReturn>> | WeakMap<object, CacheEntry<TReturn>>,\n  useWeakMap: boolean\n): void {\n  const methodName = String(propertyKey);\n  const cacheKey = `__memoize_cache_${methodName}`;\n  \n  // Store cache reference on the prototype\n  Object.defineProperty(target, cacheKey, {\n    value: cache,\n    writable: false,\n    enumerable: false,\n    configurable: true,\n  });\n\n  // Add clearCache method\n  const clearMethodName = `clear${methodName.charAt(0).toUpperCase() + methodName.slice(1)}Cache`;\n  Object.defineProperty(target, clearMethodName, {\n    value: function() {\n      const instanceCache = (this as any)[cacheKey];\n      if (instanceCache) {\n        if (useWeakMap) {\n          // WeakMap doesn't have clear() in all environments\n          // We'll create a new one\n          (this as any)[cacheKey] = new WeakMap<object, CacheEntry<TReturn>>();\n        } else {\n          (instanceCache as Map<string, CacheEntry<TReturn>>).clear();\n        }\n        console.debug(`[Memoize] Cache cleared for ${methodName}`);\n      }\n    },\n    writable: false,\n    enumerable: false,\n    configurable: true,\n  });\n\n  // Add getCacheStats method\n  const statsMethodName = `get${methodName.charAt(0).toUpperCase() + methodName.slice(1)}CacheStats`;\n  Object.defineProperty(target, statsMethodName, {\n    value: function() {\n      const instanceCache = (this as any)[cacheKey];\n      if (!instanceCache) {\n        return { size: 0, entries",
+          "tokenUsage": {
+            "total": 1750,
+            "prompt": 250,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 560,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:54:45 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 4a9bcd4ef1ee36bfc83d37c177a93486.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "q3a4HYxwOc90TEhu84RIF9IKQFbnzQJSSlHZRtUWpgkrysVj6k08Pg==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "4d98d108d75cd89f760eb3f8a0febb86"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[2] Write a TypeScript decorator for method memoization with TTL support",
+          "vars": {
+            "task": "Write a TypeScript decorator for method memoization with TTL support"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible",
+              "threshold": 0.7,
+              "metric": "typescript-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "task": "Write a TypeScript decorator for method memoization with TTL support"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:54:45 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 4a9bcd4ef1ee36bfc83d37c177a93486.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "q3a4HYxwOc90TEhu84RIF9IKQFbnzQJSSlHZRtUWpgkrysVj6k08Pg==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "4d98d108d75cd89f760eb3f8a0febb86"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 2,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 500,
+        "completion": 3000,
+        "cached": 0,
+        "total": 3500,
+        "numRequests": 2,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 3511,
+          "prompt": 3388,
+          "completion": 123,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 70714,
+      "evaluationDurationMs": 70714
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: typescript-pro",
+    "prompts": [
+      {
+        "label": "typescript-pro",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a TypeScript expert specializing in advanced typing and enterprise-grade development.\\n\\n## Focus Areas\\n- Advanced type systems (generics, conditional types, mapped types)\\n- Strict TypeScript configuration and compiler options\\n- Type inference optimization and utility types\\n- Decorators and metadata programming\\n- Module systems and namespace organization\\n- Integration with modern frameworks (React, Node.js, Express)\\n\\n## Approach\\n1. Leverage strict type checking with appropriate compiler flags\\n2. Use generics and utility types for maximum type safety\\n3. Prefer type inference over explicit annotations when clear\\n4. Design robust interfaces and abstract classes\\n5. Implement proper error boundaries with typed exceptions\\n6. Optimize build times with incremental compilation\\n\\n## Output\\n- Strongly-typed TypeScript with comprehensive interfaces\\n- Generic functions and classes with proper constraints\\n- Custom utility types and advanced type manipulations\\n- Jest/Vitest tests with proper type assertions\\n- TSConfig optimization for project requirements\\n- Type declaration files (.d.ts) for external libraries\\n\\nSupport both strict and gradual typing approaches. Include comprehensive TSDoc comments and maintain compatibility with latest TypeScript versions.\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Create a TypeScript generic utility type that makes all nested object properties",
+        "vars": {
+          "task": "Create a TypeScript generic utility type that makes all nested object properties optional"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Response demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly",
+            "threshold": 0.7,
+            "metric": "typescript-pro_quality"
+          }
+        ]
+      },
+      {
+        "description": "[2] Write a TypeScript decorator for method memoization with TTL support",
+        "vars": {
+          "task": "Write a TypeScript decorator for method memoization with TTL support"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible",
+            "threshold": 0.7,
+            "metric": "typescript-pro_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-typescript-pro.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:55:56.272Z",
+    "evaluationCreatedAt": "2026-03-15T04:54:45.520Z"
+  }
+}

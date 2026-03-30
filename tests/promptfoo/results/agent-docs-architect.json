@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-8jn-2026-03-15T04:27:24",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:27:24.420Z",
+    "prompts": [
+      {
+        "id": "63ba53c8d56d49ba8a359323953ab57597b6c3cdbfd00e86ba2fe7bbf58072f9",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a technical documentation architect specializing in creating comprehensive, long-form documentation that captures both the what and the why of complex systems.\\n\\n## Core Competencies\\n\\n1. **Codebase Analysis**: Deep understanding of code structure, patterns, and architectural decisions\\n2. **Technical Writing**: Clear, precise explanations suitable for various technical audiences\\n3. **System Thinking**: Ability to see and document the big picture while explaining details\\n4. **Documentation Architecture**: Organizing complex information into digestible, navigable structures\\n5. **Visual Communication**: Creating and describing architectural diagrams and flowcharts\\n\\n## Documentation Process\\n\\n1. **Discovery Phase**\\n   - Analyze codebase structure and dependencies\\n   - Identify key components and their relationships\\n   - Extract design patterns and architectural decisions\\n   - Map data flows and integration points\\n\\n2. **Structuring Phase**\\n   - Create logical chapter/section hierarchy\\n   - Design progressive disclosure of complexity\\n   - Plan diagrams and visual aids\\n   - Establish consistent terminology\\n\\n3. **Writing Phase**\\n   - Start with executive summary and overview\\n   - Progress from high-level architecture to implementation details\\n   - Include rationale for design decisions\\n   - Add code examples with thorough explanations\\n\\n## Output Characteristics\\n\\n- **Length**: Comprehensive documents (10-100+ pages)\\n- **Depth**: From bird's-eye view to implementation specifics\\n- **Style**: Technical but accessible, with progressive complexity\\n- **Format**: Structured with chapters, sections, and cross-references\\n- **Visuals**: Architectural diagrams, sequence diagrams, and flowcharts (described in detail)\\n\\n## Key Sections to Include\\n\\n1. **Executive Summary**: One-page overview for stakeholders\\n2. **Architecture Overview**: System boundaries, key components, and interactions\\n3. **Design Decisions**: Rationale behind architectural choices\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "docs-architect",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 563,
+          "tokenUsage": {
+            "prompt": 394,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1894,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1778,
+              "prompt": 1702,
+              "completion": 76,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "docs-architect_quality": 1
+          },
+          "namedScoresCount": {
+            "docs-architect_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "docs-architect_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1778,
+            "prompt": 1702,
+            "completion": 76,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Covers documentation structure with clear sections (tutorials, how-tos, reference), considers audience/user journey, addresses organization and navigation",
+                "threshold": 0.6,
+                "metric": "docs-architect_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output details a comprehensive documentation architecture with clear sections (Getting Started, Tutorials, How-To Guides, Reference, Explanations, Community), explicitly defines target audiences and their user journeys, and includes a navigation strategy with skill-based, role-based, and task-based pathways.",
+              "tokensUsed": {
+                "total": 1778,
+                "prompt": 1702,
+                "completion": 76,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n# Documentation Architecture for Large Open-Source Project\\n\\n## 1. Executive Summary\\n\\n### 1.1 Documentation Vision\\nA comprehensive, multi-layered documentation ecosystem that serves diverse audiences from first-time users to core contributors. The architecture follows progressive disclosure principles, enabling users to find appropriate information at their current skill level while providing clear pathways to deeper understanding.\\n\\n### 1.2 Target Audiences\\n- **New Users**: Getting started, basic concepts, first use cases\\n- **Developers**: API integration, customization, troubleshooting\\n- **Contributors**: Codebase understanding, development workflow, contribution guidelines\\n- **Maintainers**: Architecture decisions, release processes, governance\\n\\n## 2. Documentation Structure\\n\\n### 2.1 Primary Documentation Categories\\n\\n```\\nDocumentation Hierarchy\\n├── GETTING STARTED (Entry Point)\\n│   ├── Quick Start\\n│   ├── Installation Guides\\n│   └── First Project Tutorial\\n│\\n├── TUTORIALS (Learning Path)\\n│   ├── Beginner Track\\n│   ├── Intermediate Track\\n│   └── Advanced Track\\n│\\n├── HOW-TO GUIDES (Task-Oriented)\\n│   ├── Common Tasks\\n│   ├── Integration Guides\\n│   └── Best Practices\\n│\\n├── REFERENCE (Lookup)\\n│   ├── API Documentation\\n│   ├── Configuration Reference\\n│   └── CLI Reference\\n│\\n├── EXPLANATIONS (Understanding)\\n│   ├── Architecture Overview\\n│   ├── Design Decisions\\n│   └── Core Concepts\\n│\\n└── COMMUNITY (Collaboration)\\n    ├── Contribution Guide\\n    ├── Development Setup\\n    └── Governance Model\\n```\\n\\n### 2.2 Navigation Strategy\\n\\n**Primary Navigation:**\\n- Skill-based pathways (Beginner → Intermediate → Advanced)\\n- Role-based pathways (User → Developer → Contributor)\\n- Task-based pathways (Install → Configure → Extend)\\n\\n**Cross-References:**\\n- Tutorials link to relevant API references\\n- How-to guides reference underlying concepts\\n- Reference docs include practical examples\\n\\n## 3. Detailed Section Architecture\\n\\n### 3.1 Getting Started Section\\n```\\nGetting Started/\\n├── index.md (Landing page with pathway selection)\\n├── installation/\\n│   ├── overview.md (Comparison of installation methods)\\n│   ├── docker.md\\n│   ├── source.md\\n│   └── package-managers.md\\n├── quick-start/\\n│   ├── 5-minute-tutorial.md\\n│   └── hello-world.md\\n└── concepts/\\n    ├── core-concepts.md (High-level overview)\\n    └── glossary.md (Terminology definitions)\\n```\\n\\n### 3.2 Tutorials Section\\n```\\nTutorials/\\n├── beginner/\\n│   ├── building-first-app/\\n│   │   ├── part-1-setup.md\\n│   │   ├── part-2-basic-features.md\\n│   │   └── part-3-deployment.md\\n│   └── understanding-data-flow/\\n├── intermediate/\\n│   ├── custom-components/\\n│   ├── advanced-configuration/\\n│   └── performance-optimization/\\n└── advanced/\\n    ├── plugin-development/\\n    ├── testing-strategies/\\n    └── scaling-production/\\n```\\n\\n### 3.3 How-To Guides\\n```\\nHow-To/\\n├── common-tasks/\\n│   ├── debugging.md\\n│   ├── logging.md\\n│   └── monitoring.md\\n├── integrations/\\n│   ├── database/\\n│   ├── authentication/\\n│   └── third-party-services/\\n└── best-practices/\\n    ├── security.md\\n    ├── performance.md\\n    └── maintainability.md\\n```\\n\\n### 3.4 Reference Documentation\\n```\\nReference/\\n├── api/\\n│   ├── rest-api/\\n│   │   ├── overview.md\\n│   │   ├── authentication.md\\n│   │   └── endpoints/\\n│   │       ├── users.md\\n│   │       ├── resources.md\\n│   │       └── admin.md\\n│   ├── sdk/\\n│   │   ├── javascript/\\n│   │   ├── python/\\n│   │   └── go/\\n│   └── webhooks.md\\n├── configuration/\\n│   ├── config-reference.md\\n│   ├── environment-variables.md\\n│   └── deployment-options.md\\n└── cli/\\n    ├── command-reference.md\\n    ├── common-workflows.md\\n    └── scripting-guide.md\\n```\\n\\n### 3.5 Explanations (Understanding)\\n```\\nExplanations/\\n├── architecture/\\n│   ├── system-overview.md\\n│   ├── component-diagram.md\\n│   ├── data-flow.md\\n│   └── design-decisions.md\\n├── concepts/\\n│   ├── core-principles.md\\n│   ├── patterns.md\\n│   └── trade-offs.md\\n└── internals/\\n    ├── plugin-system.md\\n    ├── event-system.md\\n    └── caching-strategy.md\\n```\\n\\n### 3.6 Community & Contribution\\n```\\nCommunity/\\n├── contributing/\\n│   ├── code-of-conduct.md\\n│   ├── getting-started.md\\n│   ├── pull-requests.md\\n│   └── issue-triage.md\\n├── development/\\n│   ├── setup.md\\n│   ├── testing.md\\n│   └── releasing.md\\n└── governance/\\n    ├── maintainers.md\\n    ├── decision-making.md\\n    └── roadmap.md\\n```\\n\\n## 4. Documentation Features & Components\\n\\n### 4.1 Interactive Elements\\n- **Live Code Examples**: Editable examples with runnable code\\n- **API Explorer**: Interactive API documentation with try-it functionality\\n- **Configuration Generator**: Tool to generate configuration files\\n- **Search**: Full-text search across all documentation\\n\\n### 4.2 Versioning Strategy\\n```\\ndocs/\\n├── latest/ (Symlink to current stable)\\n├── v1.0/\\n├── v2.0/\\n└── next/ (Development version)\\n```\\n\\n### 4.3 Quality Assurance\\n- **Link Checking**: Automated validation of internal/external links\\n- **Example Validation**: Automated testing of code examples\\n- **Broken Build Prevention**: Documentation builds as part of CI/CD\\n- **Review Process**: Required reviews for documentation changes\\n\\n## 5. Implementation Details\\n\\n### 5.1 Technology Stack\\n- **Static Site Generator**: Docusaurus, MkDocs, or Hugo\\n- **API Documentation**: OpenAPI/Swagger for REST, TypeDoc/JSDoc for SDKs\\n- **Diagram Generation**: Mermaid.js for embedded diagrams\\n- **Search**: Algolia or local search implementation\\n- **Hosting**: GitHub Pages, Netlify, or dedicated documentation platform\\n\\n### 5.2 Content Guidelines\\n- **Tone**: Friendly but professional, inclusive language\\n- **Code Examples**: Complete, runnable examples with explanations\\n- **Progressive Disclosure**: Start simple, add\\n</Output>\\n<Rubric>\\nCovers documentation structure with clear sections (tutorials, how-tos, reference), considers audience/user journey, addresses organization and navigation\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "0910cfe8-fc8e-4c93-a098-f19aa979aee0",
+        "latencyMs": 563,
+        "namedScores": {
+          "docs-architect_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a technical documentation architect specializing in creating comprehensive, long-form documentation that captures both the what and the why of complex systems.\\n\\n## Core Competencies\\n\\n1. **Codebase Analysis**: Deep understanding of code structure, patterns, and architectural decisions\\n2. **Technical Writing**: Clear, precise explanations suitable for various technical audiences\\n3. **System Thinking**: Ability to see and document the big picture while explaining details\\n4. **Documentation Architecture**: Organizing complex information into digestible, navigable structures\\n5. **Visual Communication**: Creating and describing architectural diagrams and flowcharts\\n\\n## Documentation Process\\n\\n1. **Discovery Phase**\\n   - Analyze codebase structure and dependencies\\n   - Identify key components and their relationships\\n   - Extract design patterns and architectural decisions\\n   - Map data flows and integration points\\n\\n2. **Structuring Phase**\\n   - Create logical chapter/section hierarchy\\n   - Design progressive disclosure of complexity\\n   - Plan diagrams and visual aids\\n   - Establish consistent terminology\\n\\n3. **Writing Phase**\\n   - Start with executive summary and overview\\n   - Progress from high-level architecture to implementation details\\n   - Include rationale for design decisions\\n   - Add code examples with thorough explanations\\n\\n## Output Characteristics\\n\\n- **Length**: Comprehensive documents (10-100+ pages)\\n- **Depth**: From bird's-eye view to implementation specifics\\n- **Style**: Technical but accessible, with progressive complexity\\n- **Format**: Structured with chapters, sections, and cross-references\\n- **Visuals**: Architectural diagrams, sequence diagrams, and flowcharts (described in detail)\\n\\n## Key Sections to Include\\n\\n1. **Executive Summary**: One-page overview for stakeholders\\n2. **Architecture Overview**: System boundaries, key components, and interactions\\n3. **Design Decisions**: Rationale behind architectural choices\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Create a documentation architecture for a large open-source project with API docs, tutorials, and reference guides\"\n  }\n]",
+          "label": "docs-architect",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "63ba53c8d56d49ba8a359323953ab57597b6c3cdbfd00e86ba2fe7bbf58072f9",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "# Documentation Architecture for Large Open-Source Project\n\n## 1. Executive Summary\n\n### 1.1 Documentation Vision\nA comprehensive, multi-layered documentation ecosystem that serves diverse audiences from first-time users to core contributors. The architecture follows progressive disclosure principles, enabling users to find appropriate information at their current skill level while providing clear pathways to deeper understanding.\n\n### 1.2 Target Audiences\n- **New Users**: Getting started, basic concepts, first use cases\n- **Developers**: API integration, customization, troubleshooting\n- **Contributors**: Codebase understanding, development workflow, contribution guidelines\n- **Maintainers**: Architecture decisions, release processes, governance\n\n## 2. Documentation Structure\n\n### 2.1 Primary Documentation Categories\n\n```\nDocumentation Hierarchy\n├── GETTING STARTED (Entry Point)\n│   ├── Quick Start\n│   ├── Installation Guides\n│   └── First Project Tutorial\n│\n├── TUTORIALS (Learning Path)\n│   ├── Beginner Track\n│   ├── Intermediate Track\n│   └── Advanced Track\n│\n├── HOW-TO GUIDES (Task-Oriented)\n│   ├── Common Tasks\n│   ├── Integration Guides\n│   └── Best Practices\n│\n├── REFERENCE (Lookup)\n│   ├── API Documentation\n│   ├── Configuration Reference\n│   └── CLI Reference\n│\n├── EXPLANATIONS (Understanding)\n│   ├── Architecture Overview\n│   ├── Design Decisions\n│   └── Core Concepts\n│\n└── COMMUNITY (Collaboration)\n    ├── Contribution Guide\n    ├── Development Setup\n    └── Governance Model\n```\n\n### 2.2 Navigation Strategy\n\n**Primary Navigation:**\n- Skill-based pathways (Beginner → Intermediate → Advanced)\n- Role-based pathways (User → Developer → Contributor)\n- Task-based pathways (Install → Configure → Extend)\n\n**Cross-References:**\n- Tutorials link to relevant API references\n- How-to guides reference underlying concepts\n- Reference docs include practical examples\n\n## 3. Detailed Section Architecture\n\n### 3.1 Getting Started Section\n```\nGetting Started/\n├── index.md (Landing page with pathway selection)\n├── installation/\n│   ├── overview.md (Comparison of installation methods)\n│   ├── docker.md\n│   ├── source.md\n│   └── package-managers.md\n├── quick-start/\n│   ├── 5-minute-tutorial.md\n│   └── hello-world.md\n└── concepts/\n    ├── core-concepts.md (High-level overview)\n    └── glossary.md (Terminology definitions)\n```\n\n### 3.2 Tutorials Section\n```\nTutorials/\n├── beginner/\n│   ├── building-first-app/\n│   │   ├── part-1-setup.md\n│   │   ├── part-2-basic-features.md\n│   │   └── part-3-deployment.md\n│   └── understanding-data-flow/\n├── intermediate/\n│   ├── custom-components/\n│   ├── advanced-configuration/\n│   └── performance-optimization/\n└── advanced/\n    ├── plugin-development/\n    ├── testing-strategies/\n    └── scaling-production/\n```\n\n### 3.3 How-To Guides\n```\nHow-To/\n├── common-tasks/\n│   ├── debugging.md\n│   ├── logging.md\n│   └── monitoring.md\n├── integrations/\n│   ├── database/\n│   ├── authentication/\n│   └── third-party-services/\n└── best-practices/\n    ├── security.md\n    ├── performance.md\n    └── maintainability.md\n```\n\n### 3.4 Reference Documentation\n```\nReference/\n├── api/\n│   ├── rest-api/\n│   │   ├── overview.md\n│   │   ├── authentication.md\n│   │   └── endpoints/\n│   │       ├── users.md\n│   │       ├── resources.md\n│   │       └── admin.md\n│   ├── sdk/\n│   │   ├── javascript/\n│   │   ├── python/\n│   │   └── go/\n│   └── webhooks.md\n├── configuration/\n│   ├── config-reference.md\n│   ├── environment-variables.md\n│   └── deployment-options.md\n└── cli/\n    ├── command-reference.md\n    ├── common-workflows.md\n    └── scripting-guide.md\n```\n\n### 3.5 Explanations (Understanding)\n```\nExplanations/\n├── architecture/\n│   ├── system-overview.md\n│   ├── component-diagram.md\n│   ├── data-flow.md\n│   └── design-decisions.md\n├── concepts/\n│   ├── core-principles.md\n│   ├── patterns.md\n│   └── trade-offs.md\n└── internals/\n    ├── plugin-system.md\n    ├── event-system.md\n    └── caching-strategy.md\n```\n\n### 3.6 Community & Contribution\n```\nCommunity/\n├── contributing/\n│   ├── code-of-conduct.md\n│   ├── getting-started.md\n│   ├── pull-requests.md\n│   └── issue-triage.md\n├── development/\n│   ├── setup.md\n│   ├── testing.md\n│   └── releasing.md\n└── governance/\n    ├── maintainers.md\n    ├── decision-making.md\n    └── roadmap.md\n```\n\n## 4. Documentation Features & Components\n\n### 4.1 Interactive Elements\n- **Live Code Examples**: Editable examples with runnable code\n- **API Explorer**: Interactive API documentation with try-it functionality\n- **Configuration Generator**: Tool to generate configuration files\n- **Search**: Full-text search across all documentation\n\n### 4.2 Versioning Strategy\n```\ndocs/\n├── latest/ (Symlink to current stable)\n├── v1.0/\n├── v2.0/\n└── next/ (Development version)\n```\n\n### 4.3 Quality Assurance\n- **Link Checking**: Automated validation of internal/external links\n- **Example Validation**: Automated testing of code examples\n- **Broken Build Prevention**: Documentation builds as part of CI/CD\n- **Review Process**: Required reviews for documentation changes\n\n## 5. Implementation Details\n\n### 5.1 Technology Stack\n- **Static Site Generator**: Docusaurus, MkDocs, or Hugo\n- **API Documentation**: OpenAPI/Swagger for REST, TypeDoc/JSDoc for SDKs\n- **Diagram Generation**: Mermaid.js for embedded diagrams\n- **Search**: Algolia or local search implementation\n- **Hosting**: GitHub Pages, Netlify, or dedicated documentation platform\n\n### 5.2 Content Guidelines\n- **Tone**: Friendly but professional, inclusive language\n- **Code Examples**: Complete, runnable examples with explanations\n- **Progressive Disclosure**: Start simple, add",
+          "tokenUsage": {
+            "total": 1894,
+            "prompt": 394,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 563,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:27:24 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 86b94a07b1b9f7ca282a22c972535506.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "GL9A-ViWGeuH3faQZxsgyHArpMicgC-wb8G9dMlBENxLi7jmu5RCJg==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "cd683311fbdd2d2fe378892b9abbfa13"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Create a documentation architecture for a large open-source project with API doc",
+          "vars": {
+            "task": "Create a documentation architecture for a large open-source project with API docs, tutorials, and reference guides"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Covers documentation structure with clear sections (tutorials, how-tos, reference), considers audience/user journey, addresses organization and navigation",
+              "threshold": 0.6,
+              "metric": "docs-architect_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Create a documentation architecture for a large open-source project with API docs, tutorials, and reference guides"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:27:24 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 86b94a07b1b9f7ca282a22c972535506.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "GL9A-ViWGeuH3faQZxsgyHArpMicgC-wb8G9dMlBENxLi7jmu5RCJg==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "cd683311fbdd2d2fe378892b9abbfa13"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 394,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1894,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1778,
+          "prompt": 1702,
+          "completion": 76,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 66577,
+      "evaluationDurationMs": 66577
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: docs-architect",
+    "prompts": [
+      {
+        "label": "docs-architect",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a technical documentation architect specializing in creating comprehensive, long-form documentation that captures both the what and the why of complex systems.\\n\\n## Core Competencies\\n\\n1. **Codebase Analysis**: Deep understanding of code structure, patterns, and architectural decisions\\n2. **Technical Writing**: Clear, precise explanations suitable for various technical audiences\\n3. **System Thinking**: Ability to see and document the big picture while explaining details\\n4. **Documentation Architecture**: Organizing complex information into digestible, navigable structures\\n5. **Visual Communication**: Creating and describing architectural diagrams and flowcharts\\n\\n## Documentation Process\\n\\n1. **Discovery Phase**\\n   - Analyze codebase structure and dependencies\\n   - Identify key components and their relationships\\n   - Extract design patterns and architectural decisions\\n   - Map data flows and integration points\\n\\n2. **Structuring Phase**\\n   - Create logical chapter/section hierarchy\\n   - Design progressive disclosure of complexity\\n   - Plan diagrams and visual aids\\n   - Establish consistent terminology\\n\\n3. **Writing Phase**\\n   - Start with executive summary and overview\\n   - Progress from high-level architecture to implementation details\\n   - Include rationale for design decisions\\n   - Add code examples with thorough explanations\\n\\n## Output Characteristics\\n\\n- **Length**: Comprehensive documents (10-100+ pages)\\n- **Depth**: From bird's-eye view to implementation specifics\\n- **Style**: Technical but accessible, with progressive complexity\\n- **Format**: Structured with chapters, sections, and cross-references\\n- **Visuals**: Architectural diagrams, sequence diagrams, and flowcharts (described in detail)\\n\\n## Key Sections to Include\\n\\n1. **Executive Summary**: One-page overview for stakeholders\\n2. **Architecture Overview**: System boundaries, key components, and interactions\\n3. **Design Decisions**: Rationale behind architectural choices\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Create a documentation architecture for a large open-source project with API doc",
+        "vars": {
+          "task": "Create a documentation architecture for a large open-source project with API docs, tutorials, and reference guides"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Covers documentation structure with clear sections (tutorials, how-tos, reference), considers audience/user journey, addresses organization and navigation",
+            "threshold": 0.6,
+            "metric": "docs-architect_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-docs-architect.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:28:31.051Z",
+    "evaluationCreatedAt": "2026-03-15T04:27:24.420Z"
+  }
+}

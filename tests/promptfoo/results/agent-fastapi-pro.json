@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-sVw-2026-03-15T04:28:33",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:28:33.134Z",
+    "prompts": [
+      {
+        "id": "df89ba1145468fc26252ef3e72a42394e2efed427dee8bd580a5726e4edac299",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a FastAPI expert specializing in high-performance, async-first API development with modern Python patterns.\\n\\n## Purpose\\nExpert FastAPI developer specializing in high-performance, async-first API development. Masters modern Python web development with FastAPI, focusing on production-ready microservices, scalable architectures, and cutting-edge async patterns.\\n\\n## Capabilities\\n\\n### Core FastAPI Expertise\\n- FastAPI 0.100+ features including Annotated types and modern dependency injection\\n- Async/await patterns for high-concurrency applications\\n- Pydantic V2 for data validation and serialization\\n- Automatic OpenAPI/Swagger documentation generation\\n- WebSocket support for real-time communication\\n- Background tasks with BackgroundTasks and task queues\\n- File uploads and streaming responses\\n- Custom middleware and request/response interceptors\\n\\n### Data Management & ORM\\n- SQLAlchemy 2.0+ with async support (asyncpg, aiomysql)\\n- Alembic for database migrations\\n- Repository pattern and unit of work implementations\\n- Database connection pooling and session management\\n- MongoDB integration with Motor and Beanie\\n- Redis for caching and session storage\\n- Query optimization and N+1 query prevention\\n- Transaction management and rollback strategies\\n\\n### API Design & Architecture\\n- RESTful API design principles\\n- GraphQL integration with Strawberry or Graphene\\n- Microservices architecture patterns\\n- API versioning strategies\\n- Rate limiting and throttling\\n- Circuit breaker pattern implementation\\n- Event-driven architecture with message queues\\n- CQRS and Event Sourcing patterns\\n\\n### Authentication & Security\\n- OAuth2 with JWT tokens (python-jose, pyjwt)\\n- Social authentication (Google, GitHub, etc.)\\n- API key authentication\\n- Role-based access control (RBAC)\\n- Permission-based authorization\\n- CORS configuration and security headers\\n- Input sanitization and SQL injection prevention\\n- Rate limiting per user/IP\\n\\n### Testing & Quality Assurance\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "fastapi-pro",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 358,
+          "tokenUsage": {
+            "prompt": 421,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1921,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1799,
+              "prompt": 1700,
+              "completion": 99,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "fastapi-pro_quality": 1
+          },
+          "namedScoresCount": {
+            "fastapi-pro_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "fastapi-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1799,
+            "prompt": 1700,
+            "completion": 99,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses FastAPI's Depends() for auth, Pydantic models for validation, BackgroundTasks, proper HTTP status codes",
+                "threshold": 0.7,
+                "metric": "fastapi-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output uses FastAPI's Depends() for authentication (get_current_user, get_current_active_user), Pydantic models (UserCreate, UserResponse, Token, DataProcessingRequest, etc.) for validation, includes BackgroundTasks import and a background task function, and uses proper HTTP status codes (status.HTTP_401_UNAUTHORIZED, status_code=400).",
+              "tokensUsed": {
+                "total": 1799,
+                "prompt": 1700,
+                "completion": 99,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a comprehensive FastAPI endpoint with JWT authentication, Pydantic validation, and background task processing. This example will include user registration, login, and a protected endpoint that processes data asynchronously.\\n\\n```python\\n# main.py\\nfrom datetime import datetime, timedelta\\nfrom typing import Annotated, Optional\\nfrom contextlib import asynccontextmanager\\n\\nfrom fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks\\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\\nfrom fastapi.middleware.cors import CORSMiddleware\\nfrom pydantic import BaseModel, EmailStr, Field, validator\\nfrom jose import JWTError, jwt\\nfrom passlib.context import CryptContext\\nimport asyncio\\nimport logging\\n\\n# Configuration\\nSECRET_KEY = \\\"your-secret-key-here-change-in-production\\\"\\nALGORITHM = \\\"HS256\\\"\\nACCESS_TOKEN_EXPIRE_MINUTES = 30\\n\\n# Database models (simulated - in production use SQLAlchemy, etc.)\\nclass UserInDB:\\n    def __init__(self, username: str, email: str, hashed_password: str, full_name: str = None):\\n        self.username = username\\n        self.email = email\\n        self.hashed_password = hashed_password\\n        self.full_name = full_name\\n        self.disabled = False\\n\\n# Simulated database\\nfake_users_db = {\\n    \\\"johndoe\\\": UserInDB(\\n        username=\\\"johndoe\\\",\\n        email=\\\"john@example.com\\\",\\n        hashed_password=\\\"$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW\\\",  # \\\"secret\\\"\\n        full_name=\\\"John Doe\\\"\\n    )\\n}\\n\\n# Pydantic models for request/response validation\\nclass UserCreate(BaseModel):\\n    username: str = Field(..., min_length=3, max_length=50, regex=\\\"^[a-zA-Z0-9_]+$\\\")\\n    email: EmailStr\\n    password: str = Field(..., min_length=8)\\n    full_name: Optional[str] = Field(None, max_length=100)\\n    \\n    @validator('password')\\n    def validate_password(cls, v):\\n        if not any(char.isdigit() for char in v):\\n            raise ValueError('Password must contain at least one digit')\\n        if not any(char.isupper() for char in v):\\n            raise ValueError('Password must contain at least one uppercase letter')\\n        return v\\n\\nclass UserResponse(BaseModel):\\n    username: str\\n    email: str\\n    full_name: Optional[str]\\n    \\n    class Config:\\n        from_attributes = True\\n\\nclass Token(BaseModel):\\n    access_token: str\\n    token_type: str\\n\\nclass TokenData(BaseModel):\\n    username: Optional[str] = None\\n\\nclass DataProcessingRequest(BaseModel):\\n    data: list[float] = Field(..., min_items=1, max_items=1000)\\n    process_type: str = Field(..., regex=\\\"^(sum|average|max|min)$\\\")\\n    priority: int = Field(1, ge=1, le=10)\\n    \\n    @validator('data')\\n    def validate_data(cls, v):\\n        if any(x <= 0 for x in v):\\n            raise ValueError('All data values must be positive')\\n        return v\\n\\nclass ProcessingResult(BaseModel):\\n    task_id: str\\n    status: str\\n    result: Optional[float] = None\\n    message: Optional[str] = None\\n    processed_at: datetime\\n\\n# Security setup\\npwd_context = CryptContext(schemes=[\\\"bcrypt\\\"], deprecated=\\\"auto\\\")\\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\\\"token\\\")\\n\\n# Background task queue\\nprocessing_queue = {}\\nprocessing_lock = asyncio.Lock()\\n\\n# Setup logging\\nlogging.basicConfig(level=logging.INFO)\\nlogger = logging.getLogger(__name__)\\n\\n@asynccontextmanager\\nasync def lifespan(app: FastAPI):\\n    # Startup\\n    logger.info(\\\"Starting up FastAPI application\\\")\\n    yield\\n    # Shutdown\\n    logger.info(\\\"Shutting down FastAPI application\\\")\\n    processing_queue.clear()\\n\\napp = FastAPI(\\n    title=\\\"FastAPI JWT Auth with Background Tasks\\\",\\n    description=\\\"Example API with JWT authentication and background processing\\\",\\n    version=\\\"1.0.0\\\",\\n    lifespan=lifespan\\n)\\n\\n# CORS middleware\\napp.add_middleware(\\n    CORSMiddleware,\\n    allow_origins=[\\\"http://localhost:3000\\\", \\\"http://localhost:8000\\\"],\\n    allow_credentials=True,\\n    allow_methods=[\\\"*\\\"],\\n    allow_headers=[\\\"*\\\"],\\n)\\n\\n# Utility functions\\ndef verify_password(plain_password, hashed_password):\\n    return pwd_context.verify(plain_password, hashed_password)\\n\\ndef get_password_hash(password):\\n    return pwd_context.hash(password)\\n\\ndef get_user(db, username: str):\\n    if username in db:\\n        user_dict = db[username]\\n        return user_dict\\n    return None\\n\\ndef authenticate_user(fake_db, username: str, password: str):\\n    user = get_user(fake_db, username)\\n    if not user:\\n        return False\\n    if not verify_password(password, user.hashed_password):\\n        return False\\n    return user\\n\\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None):\\n    to_encode = data.copy()\\n    if expires_delta:\\n        expire = datetime.utcnow() + expires_delta\\n    else:\\n        expire = datetime.utcnow() + timedelta(minutes=15)\\n    to_encode.update({\\\"exp\\\": expire})\\n    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)\\n    return encoded_jwt\\n\\nasync def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):\\n    credentials_exception = HTTPException(\\n        status_code=status.HTTP_401_UNAUTHORIZED,\\n        detail=\\\"Could not validate credentials\\\",\\n        headers={\\\"WWW-Authenticate\\\": \\\"Bearer\\\"},\\n    )\\n    try:\\n        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\\n        username: str = payload.get(\\\"sub\\\")\\n        if username is None:\\n            raise credentials_exception\\n        token_data = TokenData(username=username)\\n    except JWTError:\\n        raise credentials_exception\\n    user = get_user(fake_users_db, username=token_data.username)\\n    if user is None:\\n        raise credentials_exception\\n    return user\\n\\nasync def get_current_active_user(\\n    current_user: Annotated[UserInDB, Depends(get_current_user)]\\n):\\n    if current_user.disabled:\\n        raise HTTPException(status_code=400, detail=\\\"Inactive user\\\")\\n    return current_user\\n\\n# Background task processing function\\nasync def process_data_background(task_id: str, data: list[float], process_type: str, priority: int):\\n    \\\"\\\"\\\"Background task to process\\n</Output>\\n<Rubric>\\nUses FastAPI's Depends() for auth, Pydantic models for validation, BackgroundTasks, proper HTTP status codes\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "3d24bdd9-468d-46c2-8f70-2ad168dfd841",
+        "latencyMs": 358,
+        "namedScores": {
+          "fastapi-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a FastAPI expert specializing in high-performance, async-first API development with modern Python patterns.\\n\\n## Purpose\\nExpert FastAPI developer specializing in high-performance, async-first API development. Masters modern Python web development with FastAPI, focusing on production-ready microservices, scalable architectures, and cutting-edge async patterns.\\n\\n## Capabilities\\n\\n### Core FastAPI Expertise\\n- FastAPI 0.100+ features including Annotated types and modern dependency injection\\n- Async/await patterns for high-concurrency applications\\n- Pydantic V2 for data validation and serialization\\n- Automatic OpenAPI/Swagger documentation generation\\n- WebSocket support for real-time communication\\n- Background tasks with BackgroundTasks and task queues\\n- File uploads and streaming responses\\n- Custom middleware and request/response interceptors\\n\\n### Data Management & ORM\\n- SQLAlchemy 2.0+ with async support (asyncpg, aiomysql)\\n- Alembic for database migrations\\n- Repository pattern and unit of work implementations\\n- Database connection pooling and session management\\n- MongoDB integration with Motor and Beanie\\n- Redis for caching and session storage\\n- Query optimization and N+1 query prevention\\n- Transaction management and rollback strategies\\n\\n### API Design & Architecture\\n- RESTful API design principles\\n- GraphQL integration with Strawberry or Graphene\\n- Microservices architecture patterns\\n- API versioning strategies\\n- Rate limiting and throttling\\n- Circuit breaker pattern implementation\\n- Event-driven architecture with message queues\\n- CQRS and Event Sourcing patterns\\n\\n### Authentication & Security\\n- OAuth2 with JWT tokens (python-jose, pyjwt)\\n- Social authentication (Google, GitHub, etc.)\\n- API key authentication\\n- Role-based access control (RBAC)\\n- Permission-based authorization\\n- CORS configuration and security headers\\n- Input sanitization and SQL injection prevention\\n- Rate limiting per user/IP\\n\\n### Testing & Quality Assurance\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Create a FastAPI endpoint with JWT authentication, request validation, and background tasks\"\n  }\n]",
+          "label": "fastapi-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "df89ba1145468fc26252ef3e72a42394e2efed427dee8bd580a5726e4edac299",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a comprehensive FastAPI endpoint with JWT authentication, Pydantic validation, and background task processing. This example will include user registration, login, and a protected endpoint that processes data asynchronously.\n\n```python\n# main.py\nfrom datetime import datetime, timedelta\nfrom typing import Annotated, Optional\nfrom contextlib import asynccontextmanager\n\nfrom fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\nfrom fastapi.middleware.cors import CORSMiddleware\nfrom pydantic import BaseModel, EmailStr, Field, validator\nfrom jose import JWTError, jwt\nfrom passlib.context import CryptContext\nimport asyncio\nimport logging\n\n# Configuration\nSECRET_KEY = \"your-secret-key-here-change-in-production\"\nALGORITHM = \"HS256\"\nACCESS_TOKEN_EXPIRE_MINUTES = 30\n\n# Database models (simulated - in production use SQLAlchemy, etc.)\nclass UserInDB:\n    def __init__(self, username: str, email: str, hashed_password: str, full_name: str = None):\n        self.username = username\n        self.email = email\n        self.hashed_password = hashed_password\n        self.full_name = full_name\n        self.disabled = False\n\n# Simulated database\nfake_users_db = {\n    \"johndoe\": UserInDB(\n        username=\"johndoe\",\n        email=\"john@example.com\",\n        hashed_password=\"$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW\",  # \"secret\"\n        full_name=\"John Doe\"\n    )\n}\n\n# Pydantic models for request/response validation\nclass UserCreate(BaseModel):\n    username: str = Field(..., min_length=3, max_length=50, regex=\"^[a-zA-Z0-9_]+$\")\n    email: EmailStr\n    password: str = Field(..., min_length=8)\n    full_name: Optional[str] = Field(None, max_length=100)\n    \n    @validator('password')\n    def validate_password(cls, v):\n        if not any(char.isdigit() for char in v):\n            raise ValueError('Password must contain at least one digit')\n        if not any(char.isupper() for char in v):\n            raise ValueError('Password must contain at least one uppercase letter')\n        return v\n\nclass UserResponse(BaseModel):\n    username: str\n    email: str\n    full_name: Optional[str]\n    \n    class Config:\n        from_attributes = True\n\nclass Token(BaseModel):\n    access_token: str\n    token_type: str\n\nclass TokenData(BaseModel):\n    username: Optional[str] = None\n\nclass DataProcessingRequest(BaseModel):\n    data: list[float] = Field(..., min_items=1, max_items=1000)\n    process_type: str = Field(..., regex=\"^(sum|average|max|min)$\")\n    priority: int = Field(1, ge=1, le=10)\n    \n    @validator('data')\n    def validate_data(cls, v):\n        if any(x <= 0 for x in v):\n            raise ValueError('All data values must be positive')\n        return v\n\nclass ProcessingResult(BaseModel):\n    task_id: str\n    status: str\n    result: Optional[float] = None\n    message: Optional[str] = None\n    processed_at: datetime\n\n# Security setup\npwd_context = CryptContext(schemes=[\"bcrypt\"], deprecated=\"auto\")\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\"token\")\n\n# Background task queue\nprocessing_queue = {}\nprocessing_lock = asyncio.Lock()\n\n# Setup logging\nlogging.basicConfig(level=logging.INFO)\nlogger = logging.getLogger(__name__)\n\n@asynccontextmanager\nasync def lifespan(app: FastAPI):\n    # Startup\n    logger.info(\"Starting up FastAPI application\")\n    yield\n    # Shutdown\n    logger.info(\"Shutting down FastAPI application\")\n    processing_queue.clear()\n\napp = FastAPI(\n    title=\"FastAPI JWT Auth with Background Tasks\",\n    description=\"Example API with JWT authentication and background processing\",\n    version=\"1.0.0\",\n    lifespan=lifespan\n)\n\n# CORS middleware\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"http://localhost:3000\", \"http://localhost:8000\"],\n    allow_credentials=True,\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n\n# Utility functions\ndef verify_password(plain_password, hashed_password):\n    return pwd_context.verify(plain_password, hashed_password)\n\ndef get_password_hash(password):\n    return pwd_context.hash(password)\n\ndef get_user(db, username: str):\n    if username in db:\n        user_dict = db[username]\n        return user_dict\n    return None\n\ndef authenticate_user(fake_db, username: str, password: str):\n    user = get_user(fake_db, username)\n    if not user:\n        return False\n    if not verify_password(password, user.hashed_password):\n        return False\n    return user\n\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None):\n    to_encode = data.copy()\n    if expires_delta:\n        expire = datetime.utcnow() + expires_delta\n    else:\n        expire = datetime.utcnow() + timedelta(minutes=15)\n    to_encode.update({\"exp\": expire})\n    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)\n    return encoded_jwt\n\nasync def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):\n    credentials_exception = HTTPException(\n        status_code=status.HTTP_401_UNAUTHORIZED,\n        detail=\"Could not validate credentials\",\n        headers={\"WWW-Authenticate\": \"Bearer\"},\n    )\n    try:\n        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\n        username: str = payload.get(\"sub\")\n        if username is None:\n            raise credentials_exception\n        token_data = TokenData(username=username)\n    except JWTError:\n        raise credentials_exception\n    user = get_user(fake_users_db, username=token_data.username)\n    if user is None:\n        raise credentials_exception\n    return user\n\nasync def get_current_active_user(\n    current_user: Annotated[UserInDB, Depends(get_current_user)]\n):\n    if current_user.disabled:\n        raise HTTPException(status_code=400, detail=\"Inactive user\")\n    return current_user\n\n# Background task processing function\nasync def process_data_background(task_id: str, data: list[float], process_type: str, priority: int):\n    \"\"\"Background task to process",
+          "tokenUsage": {
+            "total": 1921,
+            "prompt": 421,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 358,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:28:33 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 dbf64cf447eef75d893e3715b4ae26ca.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "vawIy46v-KxhI5v0kCkO2RHc4N5fpAIeaM0JIm6FJHCcWEjIc113pA==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "6901d92f37723a84b62b16c3aef349a3"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Create a FastAPI endpoint with JWT authentication, request validation, and backg",
+          "vars": {
+            "task": "Create a FastAPI endpoint with JWT authentication, request validation, and background tasks"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses FastAPI's Depends() for auth, Pydantic models for validation, BackgroundTasks, proper HTTP status codes",
+              "threshold": 0.7,
+              "metric": "fastapi-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Create a FastAPI endpoint with JWT authentication, request validation, and background tasks"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:28:33 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 dbf64cf447eef75d893e3715b4ae26ca.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "vawIy46v-KxhI5v0kCkO2RHc4N5fpAIeaM0JIm6FJHCcWEjIc113pA==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "6901d92f37723a84b62b16c3aef349a3"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 421,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1921,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1799,
+          "prompt": 1700,
+          "completion": 99,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 66501,
+      "evaluationDurationMs": 66501
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: fastapi-pro",
+    "prompts": [
+      {
+        "label": "fastapi-pro",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a FastAPI expert specializing in high-performance, async-first API development with modern Python patterns.\\n\\n## Purpose\\nExpert FastAPI developer specializing in high-performance, async-first API development. Masters modern Python web development with FastAPI, focusing on production-ready microservices, scalable architectures, and cutting-edge async patterns.\\n\\n## Capabilities\\n\\n### Core FastAPI Expertise\\n- FastAPI 0.100+ features including Annotated types and modern dependency injection\\n- Async/await patterns for high-concurrency applications\\n- Pydantic V2 for data validation and serialization\\n- Automatic OpenAPI/Swagger documentation generation\\n- WebSocket support for real-time communication\\n- Background tasks with BackgroundTasks and task queues\\n- File uploads and streaming responses\\n- Custom middleware and request/response interceptors\\n\\n### Data Management & ORM\\n- SQLAlchemy 2.0+ with async support (asyncpg, aiomysql)\\n- Alembic for database migrations\\n- Repository pattern and unit of work implementations\\n- Database connection pooling and session management\\n- MongoDB integration with Motor and Beanie\\n- Redis for caching and session storage\\n- Query optimization and N+1 query prevention\\n- Transaction management and rollback strategies\\n\\n### API Design & Architecture\\n- RESTful API design principles\\n- GraphQL integration with Strawberry or Graphene\\n- Microservices architecture patterns\\n- API versioning strategies\\n- Rate limiting and throttling\\n- Circuit breaker pattern implementation\\n- Event-driven architecture with message queues\\n- CQRS and Event Sourcing patterns\\n\\n### Authentication & Security\\n- OAuth2 with JWT tokens (python-jose, pyjwt)\\n- Social authentication (Google, GitHub, etc.)\\n- API key authentication\\n- Role-based access control (RBAC)\\n- Permission-based authorization\\n- CORS configuration and security headers\\n- Input sanitization and SQL injection prevention\\n- Rate limiting per user/IP\\n\\n### Testing & Quality Assurance\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Create a FastAPI endpoint with JWT authentication, request validation, and backg",
+        "vars": {
+          "task": "Create a FastAPI endpoint with JWT authentication, request validation, and background tasks"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses FastAPI's Depends() for auth, Pydantic models for validation, BackgroundTasks, proper HTTP status codes",
+            "threshold": 0.7,
+            "metric": "fastapi-pro_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-fastapi-pro.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:29:39.664Z",
+    "evaluationCreatedAt": "2026-03-15T04:28:33.134Z"
+  }
+}

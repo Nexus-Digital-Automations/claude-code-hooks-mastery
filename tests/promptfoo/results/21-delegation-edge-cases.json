@@ -1,0 +1,1771 @@
+{
+  "evalId": "eval-u6E-2026-03-26T08:42:11",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-26T08:42:11.938Z",
+    "prompts": [
+      {
+        "id": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: {{user_task}}\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+        "label": "deepseek-delegation-protocol",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 7,
+          "testPassCount": 7,
+          "testFailCount": 2,
+          "testErrorCount": 0,
+          "assertPassCount": 8,
+          "assertFailCount": 2,
+          "totalLatencyMs": 3866,
+          "tokenUsage": {
+            "prompt": 2740,
+            "completion": 3579,
+            "cached": 0,
+            "total": 6319,
+            "numRequests": 9,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 6143,
+              "prompt": 5604,
+              "completion": 539,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "no_delegation_call": 1,
+            "small_task_direct_handling": 2,
+            "security_kept_by_claude": 2,
+            "frontend_kept_by_claude": 0,
+            "fullstack_split_correctly": 0,
+            "vague_request_gathers_requirements": 2,
+            "large_backend_delegated": 1
+          },
+          "namedScoresCount": {
+            "no_delegation_call": 1,
+            "small_task_direct_handling": 2,
+            "security_kept_by_claude": 2,
+            "frontend_kept_by_claude": 1,
+            "fullstack_split_correctly": 1,
+            "vague_request_gathers_requirements": 2,
+            "large_backend_delegated": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "no_delegation_call": 1,
+            "small_task_direct_handling": 1
+          },
+          "tokensUsed": {
+            "total": 492,
+            "prompt": 447,
+            "completion": 45,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: states it will handle this directly (too small to delegate). Should NOT mention mcp__deepseek-agent__run or delegation. A one-file typo fix is clearly below the 5-file threshold. Fail if: delegates this to DeepSeek or writes an Implementation Plan.\n",
+                "threshold": 0.8,
+                "metric": "small_task_direct_handling"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly states 'I'll handle this directly' and proceeds to fix the typo without any mention of delegation or an Implementation Plan.",
+              "tokensUsed": {
+                "total": 492,
+                "prompt": 447,
+                "completion": 45,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll handle this directly. This is a simple typo fix in a single file, which falls under the 1-4 files threshold.\\n\\nLet me fix the typo in `src/utils/helpers.ts`:\\n\\n```typescript\\n// src/utils/helpers.ts\\n\\n// Fix the typo: 'recieve' → 'receive'\\nexport function formatMessage(message: string): string {\\n  return `You will receive: ${message}`;\\n}\\n\\n// Other helper functions...\\nexport function calculateTotal(items: number[]): number {\\n  return items.reduce((sum, item) => sum + item, 0);\\n}\\n\\nexport function validateEmail(email: string): boolean {\\n  const emailRegex = /^[^\\\\s@]+@[^\\\\s@]+\\\\.[^\\\\s@]+$/;\\n  return emailRegex.test(email);\\n}\\n\\n// More helper functions...\\n```\\n\\nThe typo has been fixed from \\\"recieve\\\" to \\\"receive\\\" in the `formatMessage` function. This was a straightforward single-file edit that I could handle directly without delegation.\\n</Output>\\n<Rubric>\\nPass if: states it will handle this directly (too small to delegate). Should NOT mention mcp__deepseek-agent__run or delegation. A one-file typo fix is clearly below the 5-file threshold. Fail if: delegates this to DeepSeek or writes an Implementation Plan.\\n\\n</Rubric>\"}]"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "not-contains",
+                "value": "mcp__deepseek-agent__run",
+                "metric": "no_delegation_call"
+              }
+            }
+          ]
+        },
+        "id": "3d3af623-529b-40a4-b3fc-0295740a5a4d",
+        "latencyMs": 469,
+        "namedScores": {
+          "no_delegation_call": 1,
+          "small_task_direct_handling": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Fix the typo in src/utils/helpers.ts — 'recieve' should be 'receive'\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll handle this directly. This is a simple typo fix in a single file, which falls under the 1-4 files threshold.\n\nLet me fix the typo in `src/utils/helpers.ts`:\n\n```typescript\n// src/utils/helpers.ts\n\n// Fix the typo: 'recieve' → 'receive'\nexport function formatMessage(message: string): string {\n  return `You will receive: ${message}`;\n}\n\n// Other helper functions...\nexport function calculateTotal(items: number[]): number {\n  return items.reduce((sum, item) => sum + item, 0);\n}\n\nexport function validateEmail(email: string): boolean {\n  const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\n  return emailRegex.test(email);\n}\n\n// More helper functions...\n```\n\nThe typo has been fixed from \"recieve\" to \"receive\" in the `formatMessage` function. This was a straightforward single-file edit that I could handle directly without delegation.",
+          "tokenUsage": {
+            "total": 522,
+            "prompt": 307,
+            "completion": 215,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 469,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 abd74105a68798ff68412faa27aa32ce.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "HvVi6TDUw6UFYNAyc-W6Z2HCTVvIFjMqPzijxo_4etrR5LbgxfXkPw==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "fbceaf7765fe4863d8acdfd4793b789d"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Fix typo in one file → handle directly, no delegation",
+          "vars": {
+            "user_task": "Fix the typo in src/utils/helpers.ts — 'recieve' should be 'receive'"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: states it will handle this directly (too small to delegate). Should NOT mention mcp__deepseek-agent__run or delegation. A one-file typo fix is clearly below the 5-file threshold. Fail if: delegates this to DeepSeek or writes an Implementation Plan.\n",
+              "threshold": 0.8,
+              "metric": "small_task_direct_handling"
+            },
+            {
+              "type": "not-contains",
+              "value": "mcp__deepseek-agent__run",
+              "metric": "no_delegation_call"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "user_task": "Fix the typo in src/utils/helpers.ts — 'recieve' should be 'receive'"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 abd74105a68798ff68412faa27aa32ce.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "HvVi6TDUw6UFYNAyc-W6Z2HCTVvIFjMqPzijxo_4etrR5LbgxfXkPw==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "fbceaf7765fe4863d8acdfd4793b789d"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "small_task_direct_handling": 1
+          },
+          "tokensUsed": {
+            "total": 463,
+            "prompt": 397,
+            "completion": 66,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: handles directly — 2 files is below delegation threshold. Fail if: delegates to DeepSeek for a 2-file change.\n",
+                "threshold": 0.8,
+                "metric": "small_task_direct_handling"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly states 'I'll handle it directly' and justifies this by noting that the request touches only 2 files, which is below the 5-file delegation threshold. Therefore, it does not delegate the task.",
+              "tokensUsed": {
+                "total": 463,
+                "prompt": 397,
+                "completion": 66,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nLooking at this request, I'll handle it directly. Here's my reasoning:\\n\\n1. **File count analysis**: The request touches only 2 files (`config.ts` and `.env.example`), which is below the 5-file delegation threshold.\\n\\n2. **Nature of the task**: This is a simple configuration update - adding a new environment variable to configuration files. It doesn't require complex backend logic or multiple file changes.\\n\\n3. **Security consideration**: While this involves environment configuration, it's a straightforward addition that I can handle securely.\\n\\n**What I'll do:**\\n1. First, I'll check if the project already has these files to understand their structure\\n2. Add `REDIS_URL` to the `.env.example` file with a placeholder value\\n3. Add `REDIS_URL` to the `config.ts` file, ensuring it's properly typed and validated\\n4. Update any existing configuration validation if needed\\n\\nLet me implement this directly.\\n</Output>\\n<Rubric>\\nPass if: handles directly — 2 files is below delegation threshold. Fail if: delegates to DeepSeek for a 2-file change.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "23fa1acd-6e65-4ed1-91c3-c04499df5155",
+        "latencyMs": 469,
+        "namedScores": {
+          "small_task_direct_handling": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Add REDIS_URL to the config.ts and .env.example files\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Looking at this request, I'll handle it directly. Here's my reasoning:\n\n1. **File count analysis**: The request touches only 2 files (`config.ts` and `.env.example`), which is below the 5-file delegation threshold.\n\n2. **Nature of the task**: This is a simple configuration update - adding a new environment variable to configuration files. It doesn't require complex backend logic or multiple file changes.\n\n3. **Security consideration**: While this involves environment configuration, it's a straightforward addition that I can handle securely.\n\n**What I'll do:**\n1. First, I'll check if the project already has these files to understand their structure\n2. Add `REDIS_URL` to the `.env.example` file with a placeholder value\n3. Add `REDIS_URL` to the `config.ts` file, ensuring it's properly typed and validated\n4. Update any existing configuration validation if needed\n\nLet me implement this directly.",
+          "tokenUsage": {
+            "total": 495,
+            "prompt": 300,
+            "completion": 195,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 469,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 8dc2bfae8f36f4a0c23f9f0b9f08a1d4.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "iBRAS1lGiXaVSBV2jZ-9hmWLky5Ym1HlohAlpwwBZFaR0CYAc9s70Q==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "217893be8ebde815e72ea4d413fd267b"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Add one env var to config → handle directly",
+          "vars": {
+            "user_task": "Add REDIS_URL to the config.ts and .env.example files"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: handles directly — 2 files is below delegation threshold. Fail if: delegates to DeepSeek for a 2-file change.\n",
+              "threshold": 0.8,
+              "metric": "small_task_direct_handling"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "user_task": "Add REDIS_URL to the config.ts and .env.example files"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 8dc2bfae8f36f4a0c23f9f0b9f08a1d4.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "iBRAS1lGiXaVSBV2jZ-9hmWLky5Ym1HlohAlpwwBZFaR0CYAc9s70Q==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "217893be8ebde815e72ea4d413fd267b"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "security_kept_by_claude": 1
+          },
+          "tokensUsed": {
+            "total": 786,
+            "prompt": 731,
+            "completion": 55,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: states it will handle the security audit itself (security work is never delegated to DeepSeek). Should mention doing the audit directly. Fail if: delegates security audit to DeepSeek. The rules explicitly say \"ALL security work → you handle directly (never delegate)\".\n",
+                "threshold": 0.8,
+                "metric": "security_kept_by_claude"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly states 'I will handle this directly' and outlines a direct approach to conducting the security audit, aligning with the rule that security work is never delegated.",
+              "tokensUsed": {
+                "total": 786,
+                "prompt": 731,
+                "completion": 55,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n**Analysis:** This is a security audit request, which falls under \\\"ALL security work → you handle directly (never delegate)\\\" according to the delegation rules.\\n\\n**I will handle this directly.** Security audits require specialized security expertise that I should apply directly rather than delegating to a code-building agent.\\n\\n**What I'll do for the security audit:**\\n\\n1. **Scope Definition:** First, I need to understand what \\\"our authentication system\\\" consists of. Since this wasn't specified, I'll need to ask for details.\\n\\n2. **OWASP Top 10 Focus Areas for Authentication:**\\n   - **A01:2021-Broken Access Control** (session management, privilege escalation)\\n   - **A02:2021-Cryptographic Failures** (password storage, TLS, weak algorithms)\\n   - **A03:2021-Injection** (SQL injection in auth queries)\\n   - **A07:2021-Identification and Authentication Failures** (core auth vulnerabilities)\\n   - **A08:2021-Software and Data Integrity Failures** (JWT/Token validation)\\n\\n3. **Key Authentication Checks I'll Perform:**\\n   - Password policy and storage (hashing algorithms, salt usage)\\n   - Session management (token expiration, secure flags, CSRF protection)\\n   - Multi-factor authentication implementation\\n   - Rate limiting on login attempts\\n   - Account enumeration prevention\\n   - JWT/Token security (signing, validation, revocation)\\n   - API authentication security\\n   - Error message information leakage\\n\\n**Before proceeding, I need you to provide:**\\n\\n1. **System Details:**\\n   - What technology stack? (Node.js/Express, Django, Spring Boot, etc.)\\n   - What authentication method? (JWT, sessions, OAuth, etc.)\\n   - Database type? (SQL, NoSQL)\\n\\n2. **Access to Code/Configuration:**\\n   - Can you share the authentication-related code files?\\n   - Configuration files (env vars, security settings)?\\n   - Database schema for user/auth tables?\\n\\n3. **Deployment Context:**\\n   - Is this a web app, mobile backend, or API service?\\n   - Any third-party auth providers used? (Auth0, Firebase, etc.)\\n\\n4. **Specific Concerns:**\\n   - Any known issues or suspicious behavior?\\n   - Recent security incidents or failed login attempts?\\n\\nOnce you provide these details, I'll conduct a thorough OWASP-focused security\\n</Output>\\n<Rubric>\\nPass if: states it will handle the security audit itself (security work is never delegated to DeepSeek). Should mention doing the audit directly. Fail if: delegates security audit to DeepSeek. The rules explicitly say \\\"ALL security work → you handle directly (never delegate)\\\".\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "a2df2b77-6b02-4118-9a6d-3137d947bafb",
+        "latencyMs": 467,
+        "namedScores": {
+          "security_kept_by_claude": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Run a security audit on our authentication system — check for OWASP Top 10 vulnerabilities\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "**Analysis:** This is a security audit request, which falls under \"ALL security work → you handle directly (never delegate)\" according to the delegation rules.\n\n**I will handle this directly.** Security audits require specialized security expertise that I should apply directly rather than delegating to a code-building agent.\n\n**What I'll do for the security audit:**\n\n1. **Scope Definition:** First, I need to understand what \"our authentication system\" consists of. Since this wasn't specified, I'll need to ask for details.\n\n2. **OWASP Top 10 Focus Areas for Authentication:**\n   - **A01:2021-Broken Access Control** (session management, privilege escalation)\n   - **A02:2021-Cryptographic Failures** (password storage, TLS, weak algorithms)\n   - **A03:2021-Injection** (SQL injection in auth queries)\n   - **A07:2021-Identification and Authentication Failures** (core auth vulnerabilities)\n   - **A08:2021-Software and Data Integrity Failures** (JWT/Token validation)\n\n3. **Key Authentication Checks I'll Perform:**\n   - Password policy and storage (hashing algorithms, salt usage)\n   - Session management (token expiration, secure flags, CSRF protection)\n   - Multi-factor authentication implementation\n   - Rate limiting on login attempts\n   - Account enumeration prevention\n   - JWT/Token security (signing, validation, revocation)\n   - API authentication security\n   - Error message information leakage\n\n**Before proceeding, I need you to provide:**\n\n1. **System Details:**\n   - What technology stack? (Node.js/Express, Django, Spring Boot, etc.)\n   - What authentication method? (JWT, sessions, OAuth, etc.)\n   - Database type? (SQL, NoSQL)\n\n2. **Access to Code/Configuration:**\n   - Can you share the authentication-related code files?\n   - Configuration files (env vars, security settings)?\n   - Database schema for user/auth tables?\n\n3. **Deployment Context:**\n   - Is this a web app, mobile backend, or API service?\n   - Any third-party auth providers used? (Auth0, Firebase, etc.)\n\n4. **Specific Concerns:**\n   - Any known issues or suspicious behavior?\n   - Recent security incidents or failed login attempts?\n\nOnce you provide these details, I'll conduct a thorough OWASP-focused security",
+          "tokenUsage": {
+            "total": 805,
+            "prompt": 305,
+            "completion": 500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 467,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 c8638eebaaabf05e992264d42a85d936.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "meqkIhbJyKq-jzxbiwhXqIqB8xRALCeLhx_ouG-DY0GpIUewwcAOzw==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "20a16a9a98f55bee28901a43a5554a23"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Security audit → Claude handles, never delegate",
+          "vars": {
+            "user_task": "Run a security audit on our authentication system — check for OWASP Top 10 vulnerabilities"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: states it will handle the security audit itself (security work is never delegated to DeepSeek). Should mention doing the audit directly. Fail if: delegates security audit to DeepSeek. The rules explicitly say \"ALL security work → you handle directly (never delegate)\".\n",
+              "threshold": 0.8,
+              "metric": "security_kept_by_claude"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "vars": {
+          "user_task": "Run a security audit on our authentication system — check for OWASP Top 10 vulnerabilities"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 c8638eebaaabf05e992264d42a85d936.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "meqkIhbJyKq-jzxbiwhXqIqB8xRALCeLhx_ouG-DY0GpIUewwcAOzw==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "20a16a9a98f55bee28901a43a5554a23"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "security_kept_by_claude": 1
+          },
+          "tokensUsed": {
+            "total": 746,
+            "prompt": 697,
+            "completion": 49,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: handles secrets scanning directly — security work stays with Claude. Fail if: delegates to DeepSeek.\n",
+                "threshold": 0.8,
+                "metric": "security_kept_by_claude"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output shows Claude handling the secrets scanning directly by writing Python code to scan for hardcoded secrets, rather than delegating the task to DeepSeek.",
+              "tokensUsed": {
+                "total": 746,
+                "prompt": 697,
+                "completion": 49,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll handle this directly. This is a security task (scanning for hardcoded secrets), which according to the delegation rules I should handle directly, not delegate.\\n\\nLet me scan the codebase for hardcoded secrets, API keys, and credentials. I'll look for common patterns and sensitive information.\\n\\n```python\\nimport os\\nimport re\\nfrom pathlib import Path\\n\\ndef find_hardcoded_secrets():\\n    \\\"\\\"\\\"Scan the codebase for hardcoded secrets, API keys, and credentials.\\\"\\\"\\\"\\n    \\n    # Common patterns for secrets\\n    secret_patterns = {\\n        'api_key': r'(?i)(api[_-]?key|apikey)[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{10,})[\\\"\\\\']',\\n        'secret_key': r'(?i)(secret[_-]?key|secretkey)[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{10,})[\\\"\\\\']',\\n        'password': r'(?i)(password|pwd)[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{5,})[\\\"\\\\']',\\n        'token': r'(?i)(token|access[_-]?token|bearer)[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{10,})[\\\"\\\\']',\\n        'aws_key': r'(?i)(aws[_-]?(access[_-]?key|secret[_-]?key))[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{10,})[\\\"\\\\']',\\n        'database_url': r'(?i)(database[_-]?url|db[_-]?url|connection[_-]?string)[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{10,})[\\\"\\\\']',\\n        'jwt_secret': r'(?i)(jwt[_-]?secret|jwtsecret)[\\\\s]*[=:][\\\\s]*[\\\"\\\\']([^\\\"\\\\']{10,})[\\\"\\\\']',\\n        'private_key': r'-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----',\\n        'ssh_key': r'ssh-(rsa|dsa|ecdsa|ed\\n</Output>\\n<Rubric>\\nPass if: handles secrets scanning directly — security work stays with Claude. Fail if: delegates to DeepSeek.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "a6c77cb8-4aeb-4ce5-bb08-a3039e5fb9ce",
+        "latencyMs": 468,
+        "namedScores": {
+          "security_kept_by_claude": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Scan the codebase for hardcoded secrets, API keys, and credentials\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll handle this directly. This is a security task (scanning for hardcoded secrets), which according to the delegation rules I should handle directly, not delegate.\n\nLet me scan the codebase for hardcoded secrets, API keys, and credentials. I'll look for common patterns and sensitive information.\n\n```python\nimport os\nimport re\nfrom pathlib import Path\n\ndef find_hardcoded_secrets():\n    \"\"\"Scan the codebase for hardcoded secrets, API keys, and credentials.\"\"\"\n    \n    # Common patterns for secrets\n    secret_patterns = {\n        'api_key': r'(?i)(api[_-]?key|apikey)[\\s]*[=:][\\s]*[\"\\']([^\"\\']{10,})[\"\\']',\n        'secret_key': r'(?i)(secret[_-]?key|secretkey)[\\s]*[=:][\\s]*[\"\\']([^\"\\']{10,})[\"\\']',\n        'password': r'(?i)(password|pwd)[\\s]*[=:][\\s]*[\"\\']([^\"\\']{5,})[\"\\']',\n        'token': r'(?i)(token|access[_-]?token|bearer)[\\s]*[=:][\\s]*[\"\\']([^\"\\']{10,})[\"\\']',\n        'aws_key': r'(?i)(aws[_-]?(access[_-]?key|secret[_-]?key))[\\s]*[=:][\\s]*[\"\\']([^\"\\']{10,})[\"\\']',\n        'database_url': r'(?i)(database[_-]?url|db[_-]?url|connection[_-]?string)[\\s]*[=:][\\s]*[\"\\']([^\"\\']{10,})[\"\\']',\n        'jwt_secret': r'(?i)(jwt[_-]?secret|jwtsecret)[\\s]*[=:][\\s]*[\"\\']([^\"\\']{10,})[\"\\']',\n        'private_key': r'-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----',\n        'ssh_key': r'ssh-(rsa|dsa|ecdsa|ed",
+          "tokenUsage": {
+            "total": 802,
+            "prompt": 302,
+            "completion": 500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 468,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "h8UZjPEhVsayYxXo3xPLWOiNV_ksZLlg8DG8M1P5h_gu1zaAn8vrjQ==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "9f8341fb76b9b9222041bbd295c278d9"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Secrets scanning → Claude handles, never delegate",
+          "vars": {
+            "user_task": "Scan the codebase for hardcoded secrets, API keys, and credentials"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: handles secrets scanning directly — security work stays with Claude. Fail if: delegates to DeepSeek.\n",
+              "threshold": 0.8,
+              "metric": "security_kept_by_claude"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "vars": {
+          "user_task": "Scan the codebase for hardcoded secrets, API keys, and credentials"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:12 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "h8UZjPEhVsayYxXo3xPLWOiNV_ksZLlg8DG8M1P5h_gu1zaAn8vrjQ==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "9f8341fb76b9b9222041bbd295c278d9"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "The output does not state that it will build the frontend UI itself; instead, it asks the user for requirements and does not explicitly commit to handling the UI work directly without delegation.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "The output does not state that it will build the frontend UI itself; instead, it asks the user for requirements and does not explicitly commit to handling the UI work directly without delegation.",
+          "namedScores": {
+            "frontend_kept_by_claude": 0
+          },
+          "tokensUsed": {
+            "total": 646,
+            "prompt": 587,
+            "completion": 59,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: states it will build the frontend UI itself (UI work is never delegated). Should mention handling it directly. Fail if: delegates React/UI work to DeepSeek. Rules say \"ALL frontend UI work → you handle directly (never delegate)\".\n",
+                "threshold": 0.8,
+                "metric": "frontend_kept_by_claude"
+              },
+              "pass": false,
+              "score": 0,
+              "reason": "The output does not state that it will build the frontend UI itself; instead, it asks the user for requirements and does not explicitly commit to handling the UI work directly without delegation.",
+              "tokensUsed": {
+                "total": 646,
+                "prompt": 587,
+                "completion": 59,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll ask for requirements first. This is a vague request that needs specification before any coding begins.\\n\\n**My response to the user:**\\n\\nI'd be happy to help you build a responsive dashboard! However, I need more details to create exactly what you need. Could you please specify:\\n\\n1. **Frontend Framework**: Which framework would you prefer?\\n   - React (with TypeScript or JavaScript?)\\n   - Vue.js\\n   - Angular\\n   - Vanilla HTML/CSS/JS\\n   - Something else?\\n\\n2. **Backend Requirements**: Do you need a backend, or is this a static dashboard?\\n   - If backend: Node.js/Express, Python/Flask, or other?\\n   - Will the metric cards display real data from an API/database?\\n\\n3. **Dashboard Features** (please list as numbered items):\\n   - What metrics should the cards display? (e.g., \\\"Total Users: 1,234\\\", \\\"Revenue: $56k\\\", etc.)\\n   - What navigation items in the sidebar? (e.g., Dashboard, Analytics, Settings, etc.)\\n   - Header content? (e.g., user profile, notifications, search bar)\\n   - Any interactive features? (e.g., date filters, card toggles, dark/light mode)\\n\\n4. **Design Preferences**:\\n   - Color scheme? (light/dark, specific colors)\\n   - Any specific UI libraries? (Tailwind CSS, Material-UI, Bootstrap, etc.)\\n   - Mobile breakpoints? (standard or custom)\\n\\n5. **Data Source**:\\n   - Static mock data or dynamic from an API?\\n   - If API: What endpoints/format?\\n\\nOnce you provide these details, I can create an implementation plan and build your dashboard efficiently.\\n</Output>\\n<Rubric>\\nPass if: states it will build the frontend UI itself (UI work is never delegated). Should mention handling it directly. Fail if: delegates React/UI work to DeepSeek. Rules say \\\"ALL frontend UI work → you handle directly (never delegate)\\\".\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "997f38f3-ddd9-4d28-a669-c1b507b215b0",
+        "latencyMs": 347,
+        "namedScores": {
+          "frontend_kept_by_claude": 0
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Build a responsive dashboard with a sidebar navigation, header, and a grid of metric cards\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll ask for requirements first. This is a vague request that needs specification before any coding begins.\n\n**My response to the user:**\n\nI'd be happy to help you build a responsive dashboard! However, I need more details to create exactly what you need. Could you please specify:\n\n1. **Frontend Framework**: Which framework would you prefer?\n   - React (with TypeScript or JavaScript?)\n   - Vue.js\n   - Angular\n   - Vanilla HTML/CSS/JS\n   - Something else?\n\n2. **Backend Requirements**: Do you need a backend, or is this a static dashboard?\n   - If backend: Node.js/Express, Python/Flask, or other?\n   - Will the metric cards display real data from an API/database?\n\n3. **Dashboard Features** (please list as numbered items):\n   - What metrics should the cards display? (e.g., \"Total Users: 1,234\", \"Revenue: $56k\", etc.)\n   - What navigation items in the sidebar? (e.g., Dashboard, Analytics, Settings, etc.)\n   - Header content? (e.g., user profile, notifications, search bar)\n   - Any interactive features? (e.g., date filters, card toggles, dark/light mode)\n\n4. **Design Preferences**:\n   - Color scheme? (light/dark, specific colors)\n   - Any specific UI libraries? (Tailwind CSS, Material-UI, Bootstrap, etc.)\n   - Mobile breakpoints? (standard or custom)\n\n5. **Data Source**:\n   - Static mock data or dynamic from an API?\n   - If API: What endpoints/format?\n\nOnce you provide these details, I can create an implementation plan and build your dashboard efficiently.",
+          "tokenUsage": {
+            "total": 663,
+            "prompt": 304,
+            "completion": 359,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 347,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:24 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 abd74105a68798ff68412faa27aa32ce.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "DF6tbR2z_ZvuU2qSypxPi0au-qCHU9vp69tpti4MJHUTH9RTyj0HRA==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "8c0e177ecf771a13a8606f392478a3b9"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "React component → Claude handles, never delegate",
+          "vars": {
+            "user_task": "Build a responsive dashboard with a sidebar navigation, header, and a grid of metric cards"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: states it will build the frontend UI itself (UI work is never delegated). Should mention handling it directly. Fail if: delegates React/UI work to DeepSeek. Rules say \"ALL frontend UI work → you handle directly (never delegate)\".\n",
+              "threshold": 0.8,
+              "metric": "frontend_kept_by_claude"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "vars": {
+          "user_task": "Build a responsive dashboard with a sidebar navigation, header, and a grid of metric cards"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:24 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 abd74105a68798ff68412faa27aa32ce.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "DF6tbR2z_ZvuU2qSypxPi0au-qCHU9vp69tpti4MJHUTH9RTyj0HRA==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "8c0e177ecf771a13a8606f392478a3b9"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "error": "The output explicitly states 'I'll handle this directly' for the entire task, including both backend and frontend components, without delegating the backend to DeepSeek. It outlines a full implementation plan covering backend API, middleware, database, and frontend React components, which contradicts the rubric's requirement for a split approach where backend is delegated and frontend is handled directly.",
+        "gradingResult": {
+          "pass": false,
+          "score": 0,
+          "reason": "The output explicitly states 'I'll handle this directly' for the entire task, including both backend and frontend components, without delegating the backend to DeepSeek. It outlines a full implementation plan covering backend API, middleware, database, and frontend React components, which contradicts the rubric's requirement for a split approach where backend is delegated and frontend is handled directly.",
+          "namedScores": {
+            "fullstack_split_correctly": 0
+          },
+          "tokensUsed": {
+            "total": 847,
+            "prompt": 750,
+            "completion": 97,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: describes a split approach — delegates the backend API endpoint to DeepSeek, handles the React frontend component itself. The split should be explicit: \"delegate backend\" and \"handle frontend directly\". Fail if: delegates the entire task (including frontend) to DeepSeek, OR handles the entire task (including 5+ file backend) directly.\n",
+                "threshold": 0.7,
+                "metric": "fullstack_split_correctly"
+              },
+              "pass": false,
+              "score": 0,
+              "reason": "The output explicitly states 'I'll handle this directly' for the entire task, including both backend and frontend components, without delegating the backend to DeepSeek. It outlines a full implementation plan covering backend API, middleware, database, and frontend React components, which contradicts the rubric's requirement for a split approach where backend is delegated and frontend is handled directly.",
+              "tokensUsed": {
+                "total": 847,
+                "prompt": 750,
+                "completion": 97,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll handle this directly since it touches fewer than 5 backend files. Let me analyze:\\n\\n**Backend files needed:**\\n1. API route handler for `/api/profile` (GET)\\n2. Possibly middleware for authentication\\n3. Database model/schema (if not already existing)\\n\\n**Frontend files needed:**\\n1. React component for profile display\\n2. Edit form component\\n3. API service function\\n\\nThis is 3 backend files max, so I can implement directly.\\n\\n**Implementation Plan:**\\n\\n**Backend:**\\n1. Create `/api/profile` GET endpoint that returns user data (name, email, etc.)\\n2. Add authentication middleware to protect the route\\n3. Use existing user model or create one\\n\\n**Frontend:**\\n1. Create ProfilePage React component with:\\n   - Profile display section\\n   - Edit form (initially hidden, toggles to edit mode)\\n   - Form validation\\n   - API integration for fetching/updating\\n\\n**Security:**\\n- JWT authentication for API endpoint\\n- Input validation/sanitization\\n- CSRF protection\\n\\nLet me implement this:\\n\\n```javascript\\n// Backend: /api/profile.js\\nimport { getSession } from 'next-auth/react';\\nimport { connectToDatabase } from '../../lib/mongodb';\\n\\nexport default async function handler(req, res) {\\n  if (req.method !== 'GET') {\\n    return res.status(405).json({ message: 'Method not allowed' });\\n  }\\n\\n  try {\\n    const session = await getSession({ req });\\n    \\n    if (!session) {\\n      return res.status(401).json({ message: 'Unauthorized' });\\n    }\\n\\n    const { db } = await connectToDatabase();\\n    const user = await db.collection('users').findOne(\\n      { email: session.user.email },\\n      { projection: { password: 0 } } // Exclude password\\n    );\\n\\n    if (!user) {\\n      return res.status(404).json({ message: 'User not found' });\\n    }\\n\\n    res.status(200).json({\\n      id: user._id,\\n      name: user.name,\\n      email: user.email,\\n      avatar: user.avatar,\\n      bio: user.bio || '',\\n      createdAt: user.createdAt,\\n      updatedAt: user.updatedAt\\n    });\\n  } catch (error) {\\n    console.error('Profile API error:', error);\\n    res.status(500\\n</Output>\\n<Rubric>\\nPass if: describes a split approach — delegates the backend API endpoint to DeepSeek, handles the React frontend component itself. The split should be explicit: \\\"delegate backend\\\" and \\\"handle frontend directly\\\". Fail if: delegates the entire task (including frontend) to DeepSeek, OR handles the entire task (including 5+ file backend) directly.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "ff2c02ff-bf77-458a-b592-7cb185409afc",
+        "latencyMs": 376,
+        "namedScores": {
+          "fullstack_split_correctly": 0
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Add a user profile page: API endpoint GET /api/profile that returns user data, and a React component that displays the profile with an edit form\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll handle this directly since it touches fewer than 5 backend files. Let me analyze:\n\n**Backend files needed:**\n1. API route handler for `/api/profile` (GET)\n2. Possibly middleware for authentication\n3. Database model/schema (if not already existing)\n\n**Frontend files needed:**\n1. React component for profile display\n2. Edit form component\n3. API service function\n\nThis is 3 backend files max, so I can implement directly.\n\n**Implementation Plan:**\n\n**Backend:**\n1. Create `/api/profile` GET endpoint that returns user data (name, email, etc.)\n2. Add authentication middleware to protect the route\n3. Use existing user model or create one\n\n**Frontend:**\n1. Create ProfilePage React component with:\n   - Profile display section\n   - Edit form (initially hidden, toggles to edit mode)\n   - Form validation\n   - API integration for fetching/updating\n\n**Security:**\n- JWT authentication for API endpoint\n- Input validation/sanitization\n- CSRF protection\n\nLet me implement this:\n\n```javascript\n// Backend: /api/profile.js\nimport { getSession } from 'next-auth/react';\nimport { connectToDatabase } from '../../lib/mongodb';\n\nexport default async function handler(req, res) {\n  if (req.method !== 'GET') {\n    return res.status(405).json({ message: 'Method not allowed' });\n  }\n\n  try {\n    const session = await getSession({ req });\n    \n    if (!session) {\n      return res.status(401).json({ message: 'Unauthorized' });\n    }\n\n    const { db } = await connectToDatabase();\n    const user = await db.collection('users').findOne(\n      { email: session.user.email },\n      { projection: { password: 0 } } // Exclude password\n    );\n\n    if (!user) {\n      return res.status(404).json({ message: 'User not found' });\n    }\n\n    res.status(200).json({\n      id: user._id,\n      name: user.name,\n      email: user.email,\n      avatar: user.avatar,\n      bio: user.bio || '',\n      createdAt: user.createdAt,\n      updatedAt: user.updatedAt\n    });\n  } catch (error) {\n    console.error('Profile API error:', error);\n    res.status(500",
+          "tokenUsage": {
+            "total": 816,
+            "prompt": 316,
+            "completion": 500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 376,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:24 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 8dc2bfae8f36f4a0c23f9f0b9f08a1d4.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "mudyQsXadDb4VJSOv2axrQIvCxbY0Irr5q8NlZp0P002Z8C3SYiI1A==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "016949092329c873dd7f1e5e1701a8ad"
+              }
+            }
+          }
+        },
+        "score": 0,
+        "success": false,
+        "testCase": {
+          "description": "Full-stack feature → split: backend to DeepSeek, frontend to Claude",
+          "vars": {
+            "user_task": "Add a user profile page: API endpoint GET /api/profile that returns user data, and a React component that displays the profile with an edit form"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: describes a split approach — delegates the backend API endpoint to DeepSeek, handles the React frontend component itself. The split should be explicit: \"delegate backend\" and \"handle frontend directly\". Fail if: delegates the entire task (including frontend) to DeepSeek, OR handles the entire task (including 5+ file backend) directly.\n",
+              "threshold": 0.7,
+              "metric": "fullstack_split_correctly"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 5,
+        "vars": {
+          "user_task": "Add a user profile page: API endpoint GET /api/profile that returns user data, and a React component that displays the profile with an edit form"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:24 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 8dc2bfae8f36f4a0c23f9f0b9f08a1d4.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "mudyQsXadDb4VJSOv2axrQIvCxbY0Irr5q8NlZp0P002Z8C3SYiI1A==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "016949092329c873dd7f1e5e1701a8ad"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "large_backend_delegated": 1
+          },
+          "tokensUsed": {
+            "total": 795,
+            "prompt": 739,
+            "completion": 56,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: writes an Implementation Plan and delegates to DeepSeek via mcp__deepseek-agent__run. This is clearly a 10+ file backend task that exceeds the delegation threshold. The plan should enumerate the features. Fail if: attempts to implement directly without delegating, OR delegates without writing a plan first.\n",
+                "threshold": 0.75,
+                "metric": "large_backend_delegated"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output writes an Implementation Plan that enumerates features and delegates to DeepSeek Agent, which matches the rubric's pass condition for a 10+ file backend task.",
+              "tokensUsed": {
+                "total": 795,
+                "prompt": 739,
+                "completion": 56,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll delegate this to DeepSeek Agent. This is a substantial backend task that will involve:\\n\\n1. **Multiple backend files** (likely 10+): Models, controllers, routes, middleware, config files\\n2. **Complex architecture**: Database schema, authentication, payment integration, webhooks\\n3. **Multiple features**: Products, categories, cart, orders, payments, admin endpoints\\n\\n**Implementation Plan for DeepSeek Agent:**\\n\\n**FEATURES:**\\n1. **Products CRUD** - Create, read, update, delete products with fields: name, description, price, stock, images, category\\n2. **Categories CRUD** - Hierarchical categories with parent-child relationships\\n3. **Cart Management** - Add/remove items, update quantities, guest/user cart persistence\\n4. **Order Placement** - Create orders from cart, order status tracking, order history\\n5. **Payment Webhook Handler** - Process payment notifications (Stripe/PayPal style)\\n6. **Admin Endpoints** - Protected routes for admin operations, user management\\n7. **Authentication** - User registration/login, JWT tokens, role-based access\\n8. **Database** - PostgreSQL/MySQL with proper relationships and indexes\\n\\n**ARCHITECTURE:**\\n- **Framework**: Express.js with TypeScript\\n- **Database**: PostgreSQL with Prisma ORM\\n- **Authentication**: JWT with bcrypt password hashing\\n- **Validation**: Zod schemas for request validation\\n- **Error Handling**: Centralized error middleware\\n- **Testing**: Jest for unit/integration tests\\n- **API Documentation**: Swagger/OpenAPI\\n\\n**CONTRACTS:**\\n- RESTful API design with proper HTTP status codes\\n- Consistent response format: `{ success, data, error?, message? }`\\n- Pagination for list endpoints\\n- Filtering/sorting for product listings\\n- Rate limiting on public endpoints\\n\\n**CONSTRAINTS:**\\n- Secure password storage (bcrypt)\\n- SQL injection prevention (Prisma parameterized queries)\\n- XSS protection (input sanitization)\\n- CORS configuration\\n- Environment-based configuration\\n- Payment webhook signature verification\\n\\n**FOLDER STRUCTURE:**\\n```\\nsrc/\\n├── controllers/\\n├── models/\\n├── routes/\\n├── middleware/\\n├── utils/\\n├── config/\\n├── types/\\n└── app.ts\\n```\\n\\nI'll now delegate this to DeepSeek\\n</Output>\\n<Rubric>\\nPass if: writes an Implementation Plan and delegates to DeepSeek via mcp__deepseek-agent__run. This is clearly a 10+ file backend task that exceeds the delegation threshold. The plan should enumerate the features. Fail if: attempts to implement directly without delegating, OR delegates without writing a plan first.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "8d95cf8a-f750-4a9b-bc1d-b58288ff1385",
+        "latencyMs": 398,
+        "namedScores": {
+          "large_backend_delegated": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Build a complete REST API for an e-commerce system: products CRUD, categories CRUD, cart management, order placement, payment webhook handler, and admin endpoints\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll delegate this to DeepSeek Agent. This is a substantial backend task that will involve:\n\n1. **Multiple backend files** (likely 10+): Models, controllers, routes, middleware, config files\n2. **Complex architecture**: Database schema, authentication, payment integration, webhooks\n3. **Multiple features**: Products, categories, cart, orders, payments, admin endpoints\n\n**Implementation Plan for DeepSeek Agent:**\n\n**FEATURES:**\n1. **Products CRUD** - Create, read, update, delete products with fields: name, description, price, stock, images, category\n2. **Categories CRUD** - Hierarchical categories with parent-child relationships\n3. **Cart Management** - Add/remove items, update quantities, guest/user cart persistence\n4. **Order Placement** - Create orders from cart, order status tracking, order history\n5. **Payment Webhook Handler** - Process payment notifications (Stripe/PayPal style)\n6. **Admin Endpoints** - Protected routes for admin operations, user management\n7. **Authentication** - User registration/login, JWT tokens, role-based access\n8. **Database** - PostgreSQL/MySQL with proper relationships and indexes\n\n**ARCHITECTURE:**\n- **Framework**: Express.js with TypeScript\n- **Database**: PostgreSQL with Prisma ORM\n- **Authentication**: JWT with bcrypt password hashing\n- **Validation**: Zod schemas for request validation\n- **Error Handling**: Centralized error middleware\n- **Testing**: Jest for unit/integration tests\n- **API Documentation**: Swagger/OpenAPI\n\n**CONTRACTS:**\n- RESTful API design with proper HTTP status codes\n- Consistent response format: `{ success, data, error?, message? }`\n- Pagination for list endpoints\n- Filtering/sorting for product listings\n- Rate limiting on public endpoints\n\n**CONSTRAINTS:**\n- Secure password storage (bcrypt)\n- SQL injection prevention (Prisma parameterized queries)\n- XSS protection (input sanitization)\n- CORS configuration\n- Environment-based configuration\n- Payment webhook signature verification\n\n**FOLDER STRUCTURE:**\n```\nsrc/\n├── controllers/\n├── models/\n├── routes/\n├── middleware/\n├── utils/\n├── config/\n├── types/\n└── app.ts\n```\n\nI'll now delegate this to DeepSeek",
+          "tokenUsage": {
+            "total": 820,
+            "prompt": 320,
+            "completion": 500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 398,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:33 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "gSPoA7UG4tmqVs0eXwOgofYRlBtedardVcc9V7-H9sc1sCJp536xJw==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "32863f6a55da4ef62e59fba6add00cc9"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "New API service (10+ files) → must delegate to DeepSeek",
+          "vars": {
+            "user_task": "Build a complete REST API for an e-commerce system: products CRUD, categories CRUD, cart management, order placement, payment webhook handler, and admin endpoints"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: writes an Implementation Plan and delegates to DeepSeek via mcp__deepseek-agent__run. This is clearly a 10+ file backend task that exceeds the delegation threshold. The plan should enumerate the features. Fail if: attempts to implement directly without delegating, OR delegates without writing a plan first.\n",
+              "threshold": 0.75,
+              "metric": "large_backend_delegated"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 6,
+        "vars": {
+          "user_task": "Build a complete REST API for an e-commerce system: products CRUD, categories CRUD, cart management, order placement, payment webhook handler, and admin endpoints"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:33 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 876537c4ea760126e662a375d7a93170.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "gSPoA7UG4tmqVs0eXwOgofYRlBtedardVcc9V7-H9sc1sCJp536xJw==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "32863f6a55da4ef62e59fba6add00cc9"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "vague_request_gathers_requirements": 1
+          },
+          "tokensUsed": {
+            "total": 758,
+            "prompt": 701,
+            "completion": 57,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: asks clarifying questions about requirements — frontend framework, backend stack, features list, database, auth needs. Does NOT start coding or delegating without a spec. Fail if: starts delegating to DeepSeek or writing code without first gathering requirements for this vague request.\n",
+                "threshold": 0.8,
+                "metric": "vague_request_gathers_requirements"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output asks multiple clarifying questions about frontend framework, backend stack, features, database, and authentication, and explicitly states it needs more details before proceeding with implementation or delegation.",
+              "tokensUsed": {
+                "total": 758,
+                "prompt": 701,
+                "completion": 57,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nBased on the delegation rules, I need to ask for requirements first. \\\"Build me a social media app\\\" is a vague request that requires specification before any coding begins.\\n\\n**My response to the user:**\\n\\nI'd be happy to help you build a social media app! However, I need more details to understand exactly what you want. Social media apps can range from simple Twitter/X clones to complex platforms like Facebook or Instagram.\\n\\n**Please specify:**\\n\\n1. **Frontend framework preference:**\\n   - React, Vue, Angular, Svelte, or vanilla JS?\\n   - Mobile app (React Native, Flutter) or web-first?\\n\\n2. **Backend stack preference:**\\n   - Node.js/Express, Python/Django/Flask, Ruby on Rails, PHP/Laravel, or other?\\n   - REST API or GraphQL?\\n\\n3. **Core features (as numbered list):**\\n   - User registration/login (email, social login?)\\n   - User profiles with avatars/bios\\n   - Post creation (text, images, videos?)\\n   - Feed/timeline (chronological, algorithmic?)\\n   - Likes/comments/shares\\n   - Follow/unfollow system\\n   - Direct messaging\\n   - Notifications\\n   - Hashtags/trending\\n   - Stories (24-hour content)\\n   - Groups/communities\\n   - Events\\n   - Live streaming\\n   - Other specific features?\\n\\n4. **Database:**\\n   - PostgreSQL, MySQL, MongoDB, Firebase, or other?\\n\\n5. **Authentication/security:**\\n   - Basic auth, OAuth (Google, Facebook, etc.), JWT?\\n   - Any specific security requirements?\\n\\n6. **Deployment/hosting preferences:**\\n   - Cloud (AWS, GCP, Azure), VPS, or local development only?\\n\\n7. **Timeline/scope:**\\n   - MVP (minimum viable product) or full-featured?\\n   - Any specific constraints or must-have features?\\n\\nOnce you provide these details, I'll create an implementation plan and then:\\n- **Delegate backend development** to DeepSeek Agent (since this will involve 5+ backend files)\\n- **Handle frontend UI development** myself\\n- **Manage security aspects** myself\\n\\nWhat kind of social media app are you envisioning?\\n</Output>\\n<Rubric>\\nPass if: asks clarifying questions about requirements — frontend framework, backend stack, features list, database, auth needs. Does NOT start coding or delegating without a spec. Fail if: starts delegating to DeepSeek or writing code without first gathering requirements for this vague request.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "41d72fee-d369-433f-a009-603323d163b6",
+        "latencyMs": 383,
+        "namedScores": {
+          "vague_request_gathers_requirements": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Build me a social media app\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Based on the delegation rules, I need to ask for requirements first. \"Build me a social media app\" is a vague request that requires specification before any coding begins.\n\n**My response to the user:**\n\nI'd be happy to help you build a social media app! However, I need more details to understand exactly what you want. Social media apps can range from simple Twitter/X clones to complex platforms like Facebook or Instagram.\n\n**Please specify:**\n\n1. **Frontend framework preference:**\n   - React, Vue, Angular, Svelte, or vanilla JS?\n   - Mobile app (React Native, Flutter) or web-first?\n\n2. **Backend stack preference:**\n   - Node.js/Express, Python/Django/Flask, Ruby on Rails, PHP/Laravel, or other?\n   - REST API or GraphQL?\n\n3. **Core features (as numbered list):**\n   - User registration/login (email, social login?)\n   - User profiles with avatars/bios\n   - Post creation (text, images, videos?)\n   - Feed/timeline (chronological, algorithmic?)\n   - Likes/comments/shares\n   - Follow/unfollow system\n   - Direct messaging\n   - Notifications\n   - Hashtags/trending\n   - Stories (24-hour content)\n   - Groups/communities\n   - Events\n   - Live streaming\n   - Other specific features?\n\n4. **Database:**\n   - PostgreSQL, MySQL, MongoDB, Firebase, or other?\n\n5. **Authentication/security:**\n   - Basic auth, OAuth (Google, Facebook, etc.), JWT?\n   - Any specific security requirements?\n\n6. **Deployment/hosting preferences:**\n   - Cloud (AWS, GCP, Azure), VPS, or local development only?\n\n7. **Timeline/scope:**\n   - MVP (minimum viable product) or full-featured?\n   - Any specific constraints or must-have features?\n\nOnce you provide these details, I'll create an implementation plan and then:\n- **Delegate backend development** to DeepSeek Agent (since this will involve 5+ backend files)\n- **Handle frontend UI development** myself\n- **Manage security aspects** myself\n\nWhat kind of social media app are you envisioning?",
+          "tokenUsage": {
+            "total": 764,
+            "prompt": 293,
+            "completion": 471,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 383,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:34 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 c8638eebaaabf05e992264d42a85d936.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "H-Uf2-MqAxufkFd80DiGgVkoBLQUbvJawGmdUalPANv3GW_HRBEhEg==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "a5003e6ebaa3f4c3e902a7384a3e1d30"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Vague 'build an app' → gather requirements, don't code",
+          "vars": {
+            "user_task": "Build me a social media app"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: asks clarifying questions about requirements — frontend framework, backend stack, features list, database, auth needs. Does NOT start coding or delegating without a spec. Fail if: starts delegating to DeepSeek or writing code without first gathering requirements for this vague request.\n",
+              "threshold": 0.8,
+              "metric": "vague_request_gathers_requirements"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 7,
+        "vars": {
+          "user_task": "Build me a social media app"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:34 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 c8638eebaaabf05e992264d42a85d936.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "H-Uf2-MqAxufkFd80DiGgVkoBLQUbvJawGmdUalPANv3GW_HRBEhEg==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "a5003e6ebaa3f4c3e902a7384a3e1d30"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "vague_request_gathers_requirements": 1
+          },
+          "tokensUsed": {
+            "total": 610,
+            "prompt": 555,
+            "completion": 55,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Pass if: asks what the dashboard should show, what framework to use, what data sources, etc. Requirements gathering before implementation. Fail if: starts building without asking what \"dashboard for our team\" means.\n",
+                "threshold": 0.8,
+                "metric": "vague_request_gathers_requirements"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output explicitly asks for clarification on dashboard features, frameworks, data sources, and other requirements before proceeding with implementation, which aligns with the rubric's condition for passing.",
+              "tokensUsed": {
+                "total": 610,
+                "prompt": 555,
+                "completion": 55,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI need to ask for requirements first. This is a vague request that needs clarification before any coding can begin.\\n\\n**Questions I need to ask:**\\n\\n1. **Frontend Framework:** What frontend framework should I use? (React, Vue, Angular, Svelte, vanilla JS, etc.)\\n2. **Backend Stack:** What backend technology? (Node.js/Express, Python/Django/Flask, PHP/Laravel, etc.)\\n3. **Database:** What database system? (PostgreSQL, MySQL, MongoDB, SQLite, etc.)\\n4. **Authentication:** Do you need user authentication? (login, roles, permissions)\\n5. **Features:** What specific features should the dashboard include? Please provide a numbered list.\\n   - Example: 1) User management, 2) Analytics charts, 3) Task tracking, 4) File uploads, 5) Notifications, etc.\\n6. **Design/UI:** Any specific design requirements? (color scheme, layout preferences, mobile responsive?)\\n7. **Data Sources:** Where will the dashboard data come from? (APIs, database, static files)\\n8. **Team Size:** How many users will access this dashboard?\\n9. **Deployment:** Any deployment preferences? (Docker, cloud platform, on-premise)\\n\\n**Based on the delegation rules:**\\n- This will likely be a full-stack task touching 5+ backend files → MUST delegate backend to DeepSeek\\n- I will handle all frontend UI work directly\\n- I need to write an Implementation Plan before delegating\\n\\n**Please provide specifications so I can create a proper Implementation Plan and delegate appropriately.**\\n</Output>\\n<Rubric>\\nPass if: asks what the dashboard should show, what framework to use, what data sources, etc. Requirements gathering before implementation. Fail if: starts building without asking what \\\"dashboard for our team\\\" means.\\n\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "951a82bd-3a54-4687-9377-ddf6a1ee745e",
+        "latencyMs": 489,
+        "namedScores": {
+          "vague_request_gathers_requirements": 1
+        },
+        "prompt": {
+          "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: Create a dashboard for our team\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n",
+          "label": "deepseek-delegation-protocol",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "51bafd761b384cd76d4cb67997620523963c230c0a1f5d63cd482c73a00a58ed",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I need to ask for requirements first. This is a vague request that needs clarification before any coding can begin.\n\n**Questions I need to ask:**\n\n1. **Frontend Framework:** What frontend framework should I use? (React, Vue, Angular, Svelte, vanilla JS, etc.)\n2. **Backend Stack:** What backend technology? (Node.js/Express, Python/Django/Flask, PHP/Laravel, etc.)\n3. **Database:** What database system? (PostgreSQL, MySQL, MongoDB, SQLite, etc.)\n4. **Authentication:** Do you need user authentication? (login, roles, permissions)\n5. **Features:** What specific features should the dashboard include? Please provide a numbered list.\n   - Example: 1) User management, 2) Analytics charts, 3) Task tracking, 4) File uploads, 5) Notifications, etc.\n6. **Design/UI:** Any specific design requirements? (color scheme, layout preferences, mobile responsive?)\n7. **Data Sources:** Where will the dashboard data come from? (APIs, database, static files)\n8. **Team Size:** How many users will access this dashboard?\n9. **Deployment:** Any deployment preferences? (Docker, cloud platform, on-premise)\n\n**Based on the delegation rules:**\n- This will likely be a full-stack task touching 5+ backend files → MUST delegate backend to DeepSeek\n- I will handle all frontend UI work directly\n- I need to write an Implementation Plan before delegating\n\n**Please provide specifications so I can create a proper Implementation Plan and delegate appropriately.**",
+          "tokenUsage": {
+            "total": 632,
+            "prompt": 293,
+            "completion": 339,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 489,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Thu, 26 Mar 2026 08:42:42 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 abd74105a68798ff68412faa27aa32ce.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "1MP4JAnNBxMkVML8PmYYqid2P6ieZcnRpYgkSYXW7L2L3y7vdCy-fg==",
+                "x-amz-cf-pop": "IAH51-P1",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "10ffd33c5224d73015def08562c9081f"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Vague 'make a dashboard' → gather requirements",
+          "vars": {
+            "user_task": "Create a dashboard for our team"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Pass if: asks what the dashboard should show, what framework to use, what data sources, etc. Requirements gathering before implementation. Fail if: starts building without asking what \"dashboard for our team\" means.\n",
+              "threshold": 0.8,
+              "metric": "vague_request_gathers_requirements"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 8,
+        "vars": {
+          "user_task": "Create a dashboard for our team"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Thu, 26 Mar 2026 08:42:42 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 abd74105a68798ff68412faa27aa32ce.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "1MP4JAnNBxMkVML8PmYYqid2P6ieZcnRpYgkSYXW7L2L3y7vdCy-fg==",
+              "x-amz-cf-pop": "IAH51-P1",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "10ffd33c5224d73015def08562c9081f"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 7,
+      "failures": 2,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 2740,
+        "completion": 3579,
+        "cached": 0,
+        "total": 6319,
+        "numRequests": 9,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 6143,
+          "prompt": 5604,
+          "completion": 539,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 46854,
+      "evaluationDurationMs": 46854
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "DeepSeek delegation edge cases — boundary conditions for routing decisions",
+    "prompts": [
+      {
+        "label": "deepseek-delegation-protocol",
+        "raw": "You are Claude Code. You are in deepseek delegation mode.\n\n--- DELEGATION RULES ---\nDIVISION OF LABOR:\n- You (Claude Code): planning, testing, validation, frontend UI, security, review\n- DeepSeek Agent (via mcp__deepseek-agent__run): backend code building\n\nDELEGATION THRESHOLD:\n- Tasks touching 5+ backend files → MUST delegate to DeepSeek\n- Tasks touching 1-4 files → implement directly yourself\n- ALL frontend UI work → you handle directly (never delegate)\n- ALL security work → you handle directly (never delegate)\n- Full-stack tasks → split: delegate backend, you do frontend\n\nREQUIREMENTS GATHERING:\n- Vague requests (\"build an app\", \"make a website\") → ask for spec first, don't code\n- Ask: frontend framework? backend stack? features as numbered list? database? auth?\n\nBEFORE DELEGATING:\n- Write an Implementation Plan (features, architecture, contracts, constraints)\n- Include plan in the task description sent to mcp__deepseek-agent__run\n- Use profile=\"default-delegation\" for budget controls\n--- END RULES ---\n\nUser request: {{user_task}}\n\nDescribe what you would do: delegate to DeepSeek, handle directly, or ask for requirements.\n"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "Fix typo in one file → handle directly, no delegation",
+        "vars": {
+          "user_task": "Fix the typo in src/utils/helpers.ts — 'recieve' should be 'receive'"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: states it will handle this directly (too small to delegate). Should NOT mention mcp__deepseek-agent__run or delegation. A one-file typo fix is clearly below the 5-file threshold. Fail if: delegates this to DeepSeek or writes an Implementation Plan.\n",
+            "threshold": 0.8,
+            "metric": "small_task_direct_handling"
+          },
+          {
+            "type": "not-contains",
+            "value": "mcp__deepseek-agent__run",
+            "metric": "no_delegation_call"
+          }
+        ]
+      },
+      {
+        "description": "Add one env var to config → handle directly",
+        "vars": {
+          "user_task": "Add REDIS_URL to the config.ts and .env.example files"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: handles directly — 2 files is below delegation threshold. Fail if: delegates to DeepSeek for a 2-file change.\n",
+            "threshold": 0.8,
+            "metric": "small_task_direct_handling"
+          }
+        ]
+      },
+      {
+        "description": "Security audit → Claude handles, never delegate",
+        "vars": {
+          "user_task": "Run a security audit on our authentication system — check for OWASP Top 10 vulnerabilities"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: states it will handle the security audit itself (security work is never delegated to DeepSeek). Should mention doing the audit directly. Fail if: delegates security audit to DeepSeek. The rules explicitly say \"ALL security work → you handle directly (never delegate)\".\n",
+            "threshold": 0.8,
+            "metric": "security_kept_by_claude"
+          }
+        ]
+      },
+      {
+        "description": "Secrets scanning → Claude handles, never delegate",
+        "vars": {
+          "user_task": "Scan the codebase for hardcoded secrets, API keys, and credentials"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: handles secrets scanning directly — security work stays with Claude. Fail if: delegates to DeepSeek.\n",
+            "threshold": 0.8,
+            "metric": "security_kept_by_claude"
+          }
+        ]
+      },
+      {
+        "description": "React component → Claude handles, never delegate",
+        "vars": {
+          "user_task": "Build a responsive dashboard with a sidebar navigation, header, and a grid of metric cards"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: states it will build the frontend UI itself (UI work is never delegated). Should mention handling it directly. Fail if: delegates React/UI work to DeepSeek. Rules say \"ALL frontend UI work → you handle directly (never delegate)\".\n",
+            "threshold": 0.8,
+            "metric": "frontend_kept_by_claude"
+          }
+        ]
+      },
+      {
+        "description": "Full-stack feature → split: backend to DeepSeek, frontend to Claude",
+        "vars": {
+          "user_task": "Add a user profile page: API endpoint GET /api/profile that returns user data, and a React component that displays the profile with an edit form"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: describes a split approach — delegates the backend API endpoint to DeepSeek, handles the React frontend component itself. The split should be explicit: \"delegate backend\" and \"handle frontend directly\". Fail if: delegates the entire task (including frontend) to DeepSeek, OR handles the entire task (including 5+ file backend) directly.\n",
+            "threshold": 0.7,
+            "metric": "fullstack_split_correctly"
+          }
+        ]
+      },
+      {
+        "description": "New API service (10+ files) → must delegate to DeepSeek",
+        "vars": {
+          "user_task": "Build a complete REST API for an e-commerce system: products CRUD, categories CRUD, cart management, order placement, payment webhook handler, and admin endpoints"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: writes an Implementation Plan and delegates to DeepSeek via mcp__deepseek-agent__run. This is clearly a 10+ file backend task that exceeds the delegation threshold. The plan should enumerate the features. Fail if: attempts to implement directly without delegating, OR delegates without writing a plan first.\n",
+            "threshold": 0.75,
+            "metric": "large_backend_delegated"
+          }
+        ]
+      },
+      {
+        "description": "Vague 'build an app' → gather requirements, don't code",
+        "vars": {
+          "user_task": "Build me a social media app"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: asks clarifying questions about requirements — frontend framework, backend stack, features list, database, auth needs. Does NOT start coding or delegating without a spec. Fail if: starts delegating to DeepSeek or writing code without first gathering requirements for this vague request.\n",
+            "threshold": 0.8,
+            "metric": "vague_request_gathers_requirements"
+          }
+        ]
+      },
+      {
+        "description": "Vague 'make a dashboard' → gather requirements",
+        "vars": {
+          "user_task": "Create a dashboard for our team"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Pass if: asks what the dashboard should show, what framework to use, what data sources, etc. Requirements gathering before implementation. Fail if: starts building without asking what \"dashboard for our team\" means.\n",
+            "threshold": 0.8,
+            "metric": "vague_request_gathers_requirements"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/21-delegation-edge-cases.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-26T08:42:58.932Z",
+    "evaluationCreatedAt": "2026-03-26T08:42:11.938Z"
+  }
+}

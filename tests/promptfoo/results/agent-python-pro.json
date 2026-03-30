@@ -1,0 +1,496 @@
+{
+  "evalId": "eval-usl-2026-03-15T04:42:31",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:42:31.988Z",
+    "prompts": [
+      {
+        "id": "8f71f2c027853b30564a7f43fa92a80f61fe9589fbe4d095635c7508f5f39986",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a Python expert specializing in modern Python 3.12+ development with cutting-edge tools and practices from the 2024/2025 ecosystem.\\n\\n## Purpose\\nExpert Python developer mastering Python 3.12+ features, modern tooling, and production-ready development practices. Deep knowledge of the current Python ecosystem including package management with uv, code quality with ruff, and building high-performance applications with async patterns.\\n\\n## Capabilities\\n\\n### Modern Python Features\\n- Python 3.12+ features including improved error messages, performance optimizations, and type system enhancements\\n- Advanced async/await patterns with asyncio, aiohttp, and trio\\n- Context managers and the `with` statement for resource management\\n- Dataclasses, Pydantic models, and modern data validation\\n- Pattern matching (structural pattern matching) and match statements\\n- Type hints, generics, and Protocol typing for robust type safety\\n- Descriptors, metaclasses, and advanced object-oriented patterns\\n- Generator expressions, itertools, and memory-efficient data processing\\n\\n### Modern Tooling & Development Environment\\n- Package management with uv (2024's fastest Python package manager)\\n- Code formatting and linting with ruff (replacing black, isort, flake8)\\n- Static type checking with mypy and pyright\\n- Project configuration with pyproject.toml (modern standard)\\n- Virtual environment management with venv, pipenv, or uv\\n- Pre-commit hooks for code quality automation\\n- Modern Python packaging and distribution practices\\n- Dependency management and lock files\\n\\n### Testing & Quality Assurance\\n- Comprehensive testing with pytest and pytest plugins\\n- Property-based testing with Hypothesis\\n- Test fixtures, factories, and mock objects\\n- Coverage analysis with pytest-cov and coverage.py\\n- Performance testing and benchmarking with pytest-benchmark\\n- Integration testing and test databases\\n- Continuous integration with GitHub Actions\\n- Code quality metrics and static analysis\\n\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "python-pro",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 2,
+          "testPassCount": 2,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 2,
+          "assertFailCount": 0,
+          "totalLatencyMs": 761,
+          "tokenUsage": {
+            "prompt": 837,
+            "completion": 3000,
+            "cached": 0,
+            "total": 3837,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 3549,
+              "prompt": 3399,
+              "completion": 150,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "python-pro_quality": 2
+          },
+          "namedScoresCount": {
+            "python-pro_quality": 2
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "python-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1784,
+            "prompt": 1699,
+            "completion": 85,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Response uses modern asyncio patterns, proper type hints, error handling, and is production-quality Python 3.12+",
+                "threshold": 0.7,
+                "metric": "python-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The code uses modern asyncio patterns (async/await, async context manager), includes comprehensive type hints (Optional, Union, etc.), implements robust error handling with multiple exception types and retry logic, and employs Python 3.12+ features like dataclasses and enums, making it production-quality.",
+              "tokensUsed": {
+                "total": 1784,
+                "prompt": 1699,
+                "completion": 85,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHere's a production-ready async function that fetches multiple URLs concurrently with timeout handling and retries:\\n\\n```python\\nimport asyncio\\nimport aiohttp\\nfrom typing import List, Dict, Any, Optional, Union\\nfrom dataclasses import dataclass\\nfrom enum import Enum\\nimport logging\\nfrom contextlib import asynccontextmanager\\nimport backoff  # pip install backoff\\n\\n# Configure logging\\nlogging.basicConfig(level=logging.INFO)\\nlogger = logging.getLogger(__name__)\\n\\n\\nclass FetchStatus(Enum):\\n    \\\"\\\"\\\"Status enum for fetch results\\\"\\\"\\\"\\n    SUCCESS = \\\"success\\\"\\n    FAILED = \\\"failed\\\"\\n    TIMEOUT = \\\"timeout\\\"\\n    MAX_RETRIES_EXCEEDED = \\\"max_retries_exceeded\\\"\\n\\n\\n@dataclass\\nclass FetchResult:\\n    \\\"\\\"\\\"Data class for fetch results\\\"\\\"\\\"\\n    url: str\\n    status: FetchStatus\\n    data: Optional[Any] = None\\n    status_code: Optional[int] = None\\n    error: Optional[str] = None\\n    attempts: int = 0\\n    response_time: Optional[float] = None\\n\\n\\nclass AsyncURLFetcher:\\n    \\\"\\\"\\\"Async URL fetcher with timeout and retry capabilities\\\"\\\"\\\"\\n    \\n    def __init__(\\n        self,\\n        max_concurrent: int = 10,\\n        timeout: float = 30.0,\\n        max_retries: int = 3,\\n        retry_delay: float = 1.0,\\n        retry_backoff: bool = True,\\n        user_agent: str = \\\"AsyncURLFetcher/1.0\\\"\\n    ):\\n        \\\"\\\"\\\"\\n        Initialize the URL fetcher.\\n        \\n        Args:\\n            max_concurrent: Maximum concurrent requests\\n            timeout: Request timeout in seconds\\n            max_retries: Maximum number of retry attempts\\n            retry_delay: Base delay between retries in seconds\\n            retry_backoff: Whether to use exponential backoff\\n            user_agent: User-Agent header value\\n        \\\"\\\"\\\"\\n        self.max_concurrent = max_concurrent\\n        self.timeout = timeout\\n        self.max_retries = max_retries\\n        self.retry_delay = retry_delay\\n        self.retry_backoff = retry_backoff\\n        self.user_agent = user_agent\\n        \\n        # Session will be created when needed\\n        self._session: Optional[aiohttp.ClientSession] = None\\n    \\n    @asynccontextmanager\\n    async def _get_session(self):\\n        \\\"\\\"\\\"Async context manager for session lifecycle\\\"\\\"\\\"\\n        if self._session is None or self._session.closed:\\n            timeout = aiohttp.ClientTimeout(total=self.timeout)\\n            connector = aiohttp.TCPConnector(limit=self.max_concurrent)\\n            self._session = aiohttp.ClientSession(\\n                timeout=timeout,\\n                connector=connector,\\n                headers={\\\"User-Agent\\\": self.user_agent}\\n            )\\n        \\n        try:\\n            yield self._session\\n        finally:\\n            # Don't close here - let the caller manage session lifecycle\\n            pass\\n    \\n    async def close(self):\\n        \\\"\\\"\\\"Close the session if it exists\\\"\\\"\\\"\\n        if self._session and not self._session.closed:\\n            await self._session.close()\\n    \\n    def _calculate_retry_delay(self, attempt: int) -> float:\\n        \\\"\\\"\\\"Calculate delay for retry attempt\\\"\\\"\\\"\\n        if self.retry_backoff:\\n            return self.retry_delay * (2 ** (attempt - 1))\\n        return self.retry_delay\\n    \\n    async def _fetch_single(\\n        self,\\n        session: aiohttp.ClientSession,\\n        url: str,\\n        method: str = \\\"GET\\\",\\n        **kwargs\\n    ) -> FetchResult:\\n        \\\"\\\"\\\"\\n        Fetch a single URL with retry logic.\\n        \\n        Args:\\n            session: aiohttp session\\n            url: URL to fetch\\n            method: HTTP method\\n            **kwargs: Additional arguments for aiohttp request\\n        \\n        Returns:\\n            FetchResult object\\n        \\\"\\\"\\\"\\n        attempts = 0\\n        last_error = None\\n        \\n        while attempts <= self.max_retries:\\n            attempts += 1\\n            start_time = asyncio.get_event_loop().time()\\n            \\n            try:\\n                async with session.request(method, url, **kwargs) as response:\\n                    response_time = asyncio.get_event_loop().time() - start_time\\n                    \\n                    if response.status == 200:\\n                        try:\\n                            # Try to parse as JSON first\\n                            data = await response.json()\\n                        except:\\n                            # Fall back to text\\n                            data = await response.text()\\n                        \\n                        return FetchResult(\\n                            url=url,\\n                            status=FetchStatus.SUCCESS,\\n                            data=data,\\n                            status_code=response.status,\\n                            attempts=attempts,\\n                            response_time=response_time\\n                        )\\n                    else:\\n                        last_error = f\\\"HTTP {response.status}\\\"\\n                        logger.warning(\\n                            f\\\"Attempt {attempts}/{self.max_retries} failed for {url}: \\\"\\n                            f\\\"HTTP {response.status}\\\"\\n                        )\\n            \\n            except asyncio.TimeoutError:\\n                response_time = asyncio.get_event_loop().time() - start_time\\n                last_error = \\\"Timeout\\\"\\n                logger.warning(\\n                    f\\\"Attempt {attempts}/{self.max_retries} timed out for {url}\\\"\\n                )\\n            \\n            except aiohttp.ClientError as e:\\n                response_time = asyncio.get_event_loop().time() - start_time\\n                last_error = str(e)\\n                logger.warning(\\n                    f\\\"Attempt {attempts}/{self.max_retries} failed for {url}: {e}\\\"\\n                )\\n            \\n            except Exception as e:\\n                response_time = asyncio.get_event_loop().time() - start_time\\n                last_error = f\\\"Unexpected error: {e}\\\"\\n                logger.error(\\n                    f\\\"Attempt {attempts}/{self.max_retries} unexpected error for {url}: {e}\\\"\\n                )\\n            \\n            # Check if we should retry\\n            if attempts <= self.max_retries:\\n                delay = self._calculate_retry_delay(attempts)\\n                logger.info(f\\\"Retrying {url} in {delay:.2f}s (attempt {attempts + 1})\\\")\\n                await asyncio.sleep(delay)\\n            else:\\n                break\\n        \\n        # All retries failed\\n        status = (\\n            FetchStatus.TIMEOUT if \\\"Timeout\\\" in str(last_error)\\n            else FetchStatus.MAX_RETRIES_EXCEEDED\\n        )\\n        \\n        return FetchResult(\\n            url=url,\\n            status=status,\\n            error=last_error,\\n            attempts=attempts,\\n            response_time=response_time if 'response_time' in locals() else None\\n        )\\n    \\n    async def fetch_all(\\n        self,\\n        urls: List[str],\\n        method: str = \\\"GET\\\",\\n        **kwargs\\n    ) -> Dict[str, FetchResult]:\\n        \\\"\\\"\\\"\\n        Fetch multiple URLs concurrently.\\n        \\n        Args:\\n            urls: List of URLs to fetch\\n            method: HTTP method\\n</Output>\\n<Rubric>\\nResponse uses modern asyncio patterns, proper type hints, error handling, and is production-quality Python 3.12+\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "eb9aba31-7d76-4119-b723-3b765d0c0934",
+        "latencyMs": 380,
+        "namedScores": {
+          "python-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Python expert specializing in modern Python 3.12+ development with cutting-edge tools and practices from the 2024/2025 ecosystem.\\n\\n## Purpose\\nExpert Python developer mastering Python 3.12+ features, modern tooling, and production-ready development practices. Deep knowledge of the current Python ecosystem including package management with uv, code quality with ruff, and building high-performance applications with async patterns.\\n\\n## Capabilities\\n\\n### Modern Python Features\\n- Python 3.12+ features including improved error messages, performance optimizations, and type system enhancements\\n- Advanced async/await patterns with asyncio, aiohttp, and trio\\n- Context managers and the `with` statement for resource management\\n- Dataclasses, Pydantic models, and modern data validation\\n- Pattern matching (structural pattern matching) and match statements\\n- Type hints, generics, and Protocol typing for robust type safety\\n- Descriptors, metaclasses, and advanced object-oriented patterns\\n- Generator expressions, itertools, and memory-efficient data processing\\n\\n### Modern Tooling & Development Environment\\n- Package management with uv (2024's fastest Python package manager)\\n- Code formatting and linting with ruff (replacing black, isort, flake8)\\n- Static type checking with mypy and pyright\\n- Project configuration with pyproject.toml (modern standard)\\n- Virtual environment management with venv, pipenv, or uv\\n- Pre-commit hooks for code quality automation\\n- Modern Python packaging and distribution practices\\n- Dependency management and lock files\\n\\n### Testing & Quality Assurance\\n- Comprehensive testing with pytest and pytest plugins\\n- Property-based testing with Hypothesis\\n- Test fixtures, factories, and mock objects\\n- Coverage analysis with pytest-cov and coverage.py\\n- Performance testing and benchmarking with pytest-benchmark\\n- Integration testing and test databases\\n- Continuous integration with GitHub Actions\\n- Code quality metrics and static analysis\\n\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write an async Python function that fetches multiple URLs concurrently with timeout handling and retries\"\n  }\n]",
+          "label": "python-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "8f71f2c027853b30564a7f43fa92a80f61fe9589fbe4d095635c7508f5f39986",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "Here's a production-ready async function that fetches multiple URLs concurrently with timeout handling and retries:\n\n```python\nimport asyncio\nimport aiohttp\nfrom typing import List, Dict, Any, Optional, Union\nfrom dataclasses import dataclass\nfrom enum import Enum\nimport logging\nfrom contextlib import asynccontextmanager\nimport backoff  # pip install backoff\n\n# Configure logging\nlogging.basicConfig(level=logging.INFO)\nlogger = logging.getLogger(__name__)\n\n\nclass FetchStatus(Enum):\n    \"\"\"Status enum for fetch results\"\"\"\n    SUCCESS = \"success\"\n    FAILED = \"failed\"\n    TIMEOUT = \"timeout\"\n    MAX_RETRIES_EXCEEDED = \"max_retries_exceeded\"\n\n\n@dataclass\nclass FetchResult:\n    \"\"\"Data class for fetch results\"\"\"\n    url: str\n    status: FetchStatus\n    data: Optional[Any] = None\n    status_code: Optional[int] = None\n    error: Optional[str] = None\n    attempts: int = 0\n    response_time: Optional[float] = None\n\n\nclass AsyncURLFetcher:\n    \"\"\"Async URL fetcher with timeout and retry capabilities\"\"\"\n    \n    def __init__(\n        self,\n        max_concurrent: int = 10,\n        timeout: float = 30.0,\n        max_retries: int = 3,\n        retry_delay: float = 1.0,\n        retry_backoff: bool = True,\n        user_agent: str = \"AsyncURLFetcher/1.0\"\n    ):\n        \"\"\"\n        Initialize the URL fetcher.\n        \n        Args:\n            max_concurrent: Maximum concurrent requests\n            timeout: Request timeout in seconds\n            max_retries: Maximum number of retry attempts\n            retry_delay: Base delay between retries in seconds\n            retry_backoff: Whether to use exponential backoff\n            user_agent: User-Agent header value\n        \"\"\"\n        self.max_concurrent = max_concurrent\n        self.timeout = timeout\n        self.max_retries = max_retries\n        self.retry_delay = retry_delay\n        self.retry_backoff = retry_backoff\n        self.user_agent = user_agent\n        \n        # Session will be created when needed\n        self._session: Optional[aiohttp.ClientSession] = None\n    \n    @asynccontextmanager\n    async def _get_session(self):\n        \"\"\"Async context manager for session lifecycle\"\"\"\n        if self._session is None or self._session.closed:\n            timeout = aiohttp.ClientTimeout(total=self.timeout)\n            connector = aiohttp.TCPConnector(limit=self.max_concurrent)\n            self._session = aiohttp.ClientSession(\n                timeout=timeout,\n                connector=connector,\n                headers={\"User-Agent\": self.user_agent}\n            )\n        \n        try:\n            yield self._session\n        finally:\n            # Don't close here - let the caller manage session lifecycle\n            pass\n    \n    async def close(self):\n        \"\"\"Close the session if it exists\"\"\"\n        if self._session and not self._session.closed:\n            await self._session.close()\n    \n    def _calculate_retry_delay(self, attempt: int) -> float:\n        \"\"\"Calculate delay for retry attempt\"\"\"\n        if self.retry_backoff:\n            return self.retry_delay * (2 ** (attempt - 1))\n        return self.retry_delay\n    \n    async def _fetch_single(\n        self,\n        session: aiohttp.ClientSession,\n        url: str,\n        method: str = \"GET\",\n        **kwargs\n    ) -> FetchResult:\n        \"\"\"\n        Fetch a single URL with retry logic.\n        \n        Args:\n            session: aiohttp session\n            url: URL to fetch\n            method: HTTP method\n            **kwargs: Additional arguments for aiohttp request\n        \n        Returns:\n            FetchResult object\n        \"\"\"\n        attempts = 0\n        last_error = None\n        \n        while attempts <= self.max_retries:\n            attempts += 1\n            start_time = asyncio.get_event_loop().time()\n            \n            try:\n                async with session.request(method, url, **kwargs) as response:\n                    response_time = asyncio.get_event_loop().time() - start_time\n                    \n                    if response.status == 200:\n                        try:\n                            # Try to parse as JSON first\n                            data = await response.json()\n                        except:\n                            # Fall back to text\n                            data = await response.text()\n                        \n                        return FetchResult(\n                            url=url,\n                            status=FetchStatus.SUCCESS,\n                            data=data,\n                            status_code=response.status,\n                            attempts=attempts,\n                            response_time=response_time\n                        )\n                    else:\n                        last_error = f\"HTTP {response.status}\"\n                        logger.warning(\n                            f\"Attempt {attempts}/{self.max_retries} failed for {url}: \"\n                            f\"HTTP {response.status}\"\n                        )\n            \n            except asyncio.TimeoutError:\n                response_time = asyncio.get_event_loop().time() - start_time\n                last_error = \"Timeout\"\n                logger.warning(\n                    f\"Attempt {attempts}/{self.max_retries} timed out for {url}\"\n                )\n            \n            except aiohttp.ClientError as e:\n                response_time = asyncio.get_event_loop().time() - start_time\n                last_error = str(e)\n                logger.warning(\n                    f\"Attempt {attempts}/{self.max_retries} failed for {url}: {e}\"\n                )\n            \n            except Exception as e:\n                response_time = asyncio.get_event_loop().time() - start_time\n                last_error = f\"Unexpected error: {e}\"\n                logger.error(\n                    f\"Attempt {attempts}/{self.max_retries} unexpected error for {url}: {e}\"\n                )\n            \n            # Check if we should retry\n            if attempts <= self.max_retries:\n                delay = self._calculate_retry_delay(attempts)\n                logger.info(f\"Retrying {url} in {delay:.2f}s (attempt {attempts + 1})\")\n                await asyncio.sleep(delay)\n            else:\n                break\n        \n        # All retries failed\n        status = (\n            FetchStatus.TIMEOUT if \"Timeout\" in str(last_error)\n            else FetchStatus.MAX_RETRIES_EXCEEDED\n        )\n        \n        return FetchResult(\n            url=url,\n            status=status,\n            error=last_error,\n            attempts=attempts,\n            response_time=response_time if 'response_time' in locals() else None\n        )\n    \n    async def fetch_all(\n        self,\n        urls: List[str],\n        method: str = \"GET\",\n        **kwargs\n    ) -> Dict[str, FetchResult]:\n        \"\"\"\n        Fetch multiple URLs concurrently.\n        \n        Args:\n            urls: List of URLs to fetch\n            method: HTTP method",
+          "tokenUsage": {
+            "total": 1919,
+            "prompt": 419,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 380,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:42:32 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 dbf64cf447eef75d893e3715b4ae26ca.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "VQ05BObJ67CPFAWAKD9vVBaTMmToOFFkIxppYWd7F8iP-vfn7dLFTQ==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "419dcf0b779e4cd0cfac55c66cb5f2b7"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Write an async Python function that fetches multiple URLs concurrently with time",
+          "vars": {
+            "task": "Write an async Python function that fetches multiple URLs concurrently with timeout handling and retries"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Response uses modern asyncio patterns, proper type hints, error handling, and is production-quality Python 3.12+",
+              "threshold": 0.7,
+              "metric": "python-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Write an async Python function that fetches multiple URLs concurrently with timeout handling and retries"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:42:32 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 dbf64cf447eef75d893e3715b4ae26ca.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "VQ05BObJ67CPFAWAKD9vVBaTMmToOFFkIxppYWd7F8iP-vfn7dLFTQ==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "419dcf0b779e4cd0cfac55c66cb5f2b7"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "python-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1765,
+            "prompt": 1700,
+            "completion": 65,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Provides pyproject.toml or config file content for ruff, mentions mypy or type checking configuration, shows specific rules or settings",
+                "threshold": 0.6,
+                "metric": "python-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output includes a comprehensive pyproject.toml configuration with detailed sections for ruff (including select/ignore rules, format settings, and per-file ignores) and mypy strict mode settings, meeting all rubric criteria.",
+              "tokensUsed": {
+                "total": 1765,
+                "prompt": 1700,
+                "completion": 65,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nFor a new Python 2024 Python project, here's a comprehensive configuration for **ruff** (replacing black/isort/flake8) and **mypy** strict mode:\\n\\n## 1. **Project Structure**\\n```\\nmy_project/\\n├── pyproject.toml    # Main configuration\\n├── .pre-commit-config.yaml\\n├── src/\\n│   └── my_project/\\n│       ├── __init__.py\\n│       └── ...\\n├── tests/\\n└── .python-version   # 3.12+\\n```\\n\\n## 2. **`pyproject.toml` Configuration**\\n\\n```toml\\n[project]\\nname = \\\"my-project\\\"\\nversion = \\\"0.1.0\\\"\\ndescription = \\\"Modern Python project\\\"\\nrequires-python = \\\">=3.12\\\"\\ndependencies = []\\n\\n[build-system]\\nrequires = [\\\"hatchling\\\"]\\nbuild-backend = \\\"hatchling.build\\\"\\n\\n# ========== RUFF CONFIGURATION ==========\\n[tool.ruff]\\n# Enable all rules except those explicitly ignored\\nselect = [\\\"ALL\\\"]\\nignore = [\\n    # Formatting-only rules (handled by ruff format)\\n    \\\"E501\\\",  # line too long (handled by formatter)\\n    \\\"W503\\\",  # line break before binary operator\\n    \\\"W504\\\",  # line break after binary operator\\n    \\n    # Controversial or project-specific ignores\\n    \\\"ANN101\\\",  # Missing type annotation for self\\n    \\\"ANN102\\\",  # Missing type annotation for cls\\n    \\\"S101\\\",    # Use of assert (allow in tests)\\n    \\\"D107\\\",    # Missing docstring in __init__\\n    \\\"PLR0913\\\", # Too many arguments (>5)\\n    \\\"PLR2004\\\", # Magic value used in comparison\\n    \\\"C901\\\",    # Too complex (McCabe complexity >10)\\n    \\n    # Test-specific ignores\\n    \\\"S101\\\",    # assert in tests is fine\\n    \\\"PT011\\\",   # pytest.raises with multiple exceptions\\n]\\n\\n# Per-file ignores\\n[tool.ruff.per-file-ignores]\\n\\\"__init__.py\\\" = [\\\"F401\\\"]  # unused imports in __init__ allowed\\n\\\"tests/**/*.py\\\" = [\\n    \\\"S101\\\",  # assert statements allowed in tests\\n    \\\"PLR2004\\\",  # magic values in tests\\n    \\\"PT001\\\",  # pytest fixtures naming\\n]\\n\\n[tool.ruff.lint]\\n# Error suppression\\nignore-noqa = false\\nshow-fixes = true\\n\\n# Complexity settings\\nmax-complexity = 15\\nmax-statements = 50\\nmax-args = 6\\nmax-locals = 15\\n\\n[tool.ruff.format]\\n# Black-compatible formatting\\nquote-style = \\\"double\\\"\\nline-length = 88\\nindent-width = 4\\nskip-magic-trailing-comma = false\\n\\n[tool.ruff.isort]\\nknown-first-party = [\\\"my_project\\\"]\\nlines-after-imports = 2\\ncombine-as-imports = true\\n\\n# ========== MYPY STRICT CONFIGURATION ==========\\n[tool.mypy]\\npython_version = \\\"3.12\\\"\\nwarn_return_any = true\\nwarn_unused_configs = true\\ndisallow_any_unimported = true\\ndisallow_any_expr = false\\ndisallow_any_decorated = false\\ndisallow_any_explicit = true\\ndisallow_any_generics = false\\ndisallow_subclassing_any = true\\ndisallow_untyped_calls = true\\ndisallow_untyped_defs = true\\ndisallow_incomplete_defs = true\\ncheck_untyped_defs = true\\ndisallow_untyped_decorators = true\\nno_implicit_optional = true\\nwarn_redundant_casts = true\\nwarn_unused_ignores = true\\nwarn_no_return = true\\nwarn_return_any = true\\nwarn_unreachable = true\\nstrict_equality = true\\n\\n# Strictest settings for production code\\ndisallow_any_generics = true\\ndisallow_untyped_defs = true\\ndisallow_incomplete_defs = true\\nwarn_unused_ignores = true\\nwarn_redundant_casts = true\\nwarn_unused_configs = true\\n\\n# Plugin configuration\\nplugins = [\\n    \\\"pydantic.mypy\\\",\\n    \\\"sqlmypy\\\",\\n]\\n\\n[[tool.mypy.overrides]]\\nmodule = [\\n    \\\"tests.*\\\",\\n    \\\"test.*\\\",\\n    \\\".*test.*\\\",\\n]\\ndisallow_untyped_defs = false\\ndisallow_incomplete_defs = false\\n\\n# ========== PYTEST CONFIGURATION ==========\\n[tool.pytest.ini_options]\\nminversion = \\\"7.0\\\"\\naddopts = [\\n    \\\"--strict-markers\\\",\\n    \\\"--strict-config\\\",\\n    \\\"--tb=short\\\",\\n    \\\"--durations=10\\\",\\n]\\ntestpaths = [\\\"tests\\\"]\\npython_files = [\\\"test_*.py\\\", \\\"*_test.py\\\"]\\npython_classes = [\\\"Test*\\\"]\\npython_functions = [\\\"test_*\\\"]\\nmarkers = [\\n    \\\"slow: marks tests as slow (deselect with '-m \\\\\\\"not slow\\\\\\\"')\\\",\\n    \\\"integration: integration tests\\\",\\n    \\\"unit: unit tests\\\",\\n]\\n```\\n\\n## 3. **`.pre-commit-config.yaml`**\\n```yaml\\nrepos:\\n  - repo: https://github.com/astral-sh/ruff-pre-commit\\n    rev: v0.4.4\\n    hooks:\\n      - id: ruff\\n        args: [--fix]\\n      - id: ruff-format\\n\\n  - repo: https://github.com/pre-commit/mirrors-mypy\\n    rev: v1.9.0\\n    hooks:\\n      - id: mypy\\n        additional_dependencies: [pydantic]\\n        args: [--strict, --ignore-missing-imports]\\n\\n  - repo: https://github.com/pre-commit/pre-commit-hooks\\n    rev: v4.5.0\\n    hooks:\\n      - id: trailing-whitespace\\n      - id: end-of-file-fixer\\n      - id: check-yaml\\n      - id: check-toml\\n      - id: check-added-large-files\\n```\\n\\n## 4. **Development Scripts in `pyproject.toml`**\\n```toml\\n[tool.hatch.envs.default]\\ndependencies = [\\n    \\\"ruff>=0.4.0\\\",\\n    \\\"mypy>=1.8.0\\\",\\n    \\\"pytest>=8.0.0\\\",\\n    \\\"pytest-cov>=4.1.0\\\",\\n    \\\"pytest-asyncio>=0.23.0\\\",\\n]\\n\\n[tool.hatch.envs.lint]\\ndetached = true\\ndependencies = [\\n    \\\"ruff>=0.4.0\\\",\\n]\\nscripts = [\\n    \\\"check = 'ruff check .'\\\",\\n    \\\"format = 'ruff format .'\\\",\\n    \\\"fix = 'ruff check --fix . &&\\n</Output>\\n<Rubric>\\nProvides pyproject.toml or config file content for ruff, mentions mypy or type checking configuration, shows specific rules or settings\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "06def006-0f23-4b84-a4d1-c78133485460",
+        "latencyMs": 381,
+        "namedScores": {
+          "python-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Python expert specializing in modern Python 3.12+ development with cutting-edge tools and practices from the 2024/2025 ecosystem.\\n\\n## Purpose\\nExpert Python developer mastering Python 3.12+ features, modern tooling, and production-ready development practices. Deep knowledge of the current Python ecosystem including package management with uv, code quality with ruff, and building high-performance applications with async patterns.\\n\\n## Capabilities\\n\\n### Modern Python Features\\n- Python 3.12+ features including improved error messages, performance optimizations, and type system enhancements\\n- Advanced async/await patterns with asyncio, aiohttp, and trio\\n- Context managers and the `with` statement for resource management\\n- Dataclasses, Pydantic models, and modern data validation\\n- Pattern matching (structural pattern matching) and match statements\\n- Type hints, generics, and Protocol typing for robust type safety\\n- Descriptors, metaclasses, and advanced object-oriented patterns\\n- Generator expressions, itertools, and memory-efficient data processing\\n\\n### Modern Tooling & Development Environment\\n- Package management with uv (2024's fastest Python package manager)\\n- Code formatting and linting with ruff (replacing black, isort, flake8)\\n- Static type checking with mypy and pyright\\n- Project configuration with pyproject.toml (modern standard)\\n- Virtual environment management with venv, pipenv, or uv\\n- Pre-commit hooks for code quality automation\\n- Modern Python packaging and distribution practices\\n- Dependency management and lock files\\n\\n### Testing & Quality Assurance\\n- Comprehensive testing with pytest and pytest plugins\\n- Property-based testing with Hypothesis\\n- Test fixtures, factories, and mock objects\\n- Coverage analysis with pytest-cov and coverage.py\\n- Performance testing and benchmarking with pytest-benchmark\\n- Integration testing and test databases\\n- Continuous integration with GitHub Actions\\n- Code quality metrics and static analysis\\n\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"How would you configure ruff and mypy strict mode for a new Python project?\"\n  }\n]",
+          "label": "python-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "8f71f2c027853b30564a7f43fa92a80f61fe9589fbe4d095635c7508f5f39986",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "For a new Python 2024 Python project, here's a comprehensive configuration for **ruff** (replacing black/isort/flake8) and **mypy** strict mode:\n\n## 1. **Project Structure**\n```\nmy_project/\n├── pyproject.toml    # Main configuration\n├── .pre-commit-config.yaml\n├── src/\n│   └── my_project/\n│       ├── __init__.py\n│       └── ...\n├── tests/\n└── .python-version   # 3.12+\n```\n\n## 2. **`pyproject.toml` Configuration**\n\n```toml\n[project]\nname = \"my-project\"\nversion = \"0.1.0\"\ndescription = \"Modern Python project\"\nrequires-python = \">=3.12\"\ndependencies = []\n\n[build-system]\nrequires = [\"hatchling\"]\nbuild-backend = \"hatchling.build\"\n\n# ========== RUFF CONFIGURATION ==========\n[tool.ruff]\n# Enable all rules except those explicitly ignored\nselect = [\"ALL\"]\nignore = [\n    # Formatting-only rules (handled by ruff format)\n    \"E501\",  # line too long (handled by formatter)\n    \"W503\",  # line break before binary operator\n    \"W504\",  # line break after binary operator\n    \n    # Controversial or project-specific ignores\n    \"ANN101\",  # Missing type annotation for self\n    \"ANN102\",  # Missing type annotation for cls\n    \"S101\",    # Use of assert (allow in tests)\n    \"D107\",    # Missing docstring in __init__\n    \"PLR0913\", # Too many arguments (>5)\n    \"PLR2004\", # Magic value used in comparison\n    \"C901\",    # Too complex (McCabe complexity >10)\n    \n    # Test-specific ignores\n    \"S101\",    # assert in tests is fine\n    \"PT011\",   # pytest.raises with multiple exceptions\n]\n\n# Per-file ignores\n[tool.ruff.per-file-ignores]\n\"__init__.py\" = [\"F401\"]  # unused imports in __init__ allowed\n\"tests/**/*.py\" = [\n    \"S101\",  # assert statements allowed in tests\n    \"PLR2004\",  # magic values in tests\n    \"PT001\",  # pytest fixtures naming\n]\n\n[tool.ruff.lint]\n# Error suppression\nignore-noqa = false\nshow-fixes = true\n\n# Complexity settings\nmax-complexity = 15\nmax-statements = 50\nmax-args = 6\nmax-locals = 15\n\n[tool.ruff.format]\n# Black-compatible formatting\nquote-style = \"double\"\nline-length = 88\nindent-width = 4\nskip-magic-trailing-comma = false\n\n[tool.ruff.isort]\nknown-first-party = [\"my_project\"]\nlines-after-imports = 2\ncombine-as-imports = true\n\n# ========== MYPY STRICT CONFIGURATION ==========\n[tool.mypy]\npython_version = \"3.12\"\nwarn_return_any = true\nwarn_unused_configs = true\ndisallow_any_unimported = true\ndisallow_any_expr = false\ndisallow_any_decorated = false\ndisallow_any_explicit = true\ndisallow_any_generics = false\ndisallow_subclassing_any = true\ndisallow_untyped_calls = true\ndisallow_untyped_defs = true\ndisallow_incomplete_defs = true\ncheck_untyped_defs = true\ndisallow_untyped_decorators = true\nno_implicit_optional = true\nwarn_redundant_casts = true\nwarn_unused_ignores = true\nwarn_no_return = true\nwarn_return_any = true\nwarn_unreachable = true\nstrict_equality = true\n\n# Strictest settings for production code\ndisallow_any_generics = true\ndisallow_untyped_defs = true\ndisallow_incomplete_defs = true\nwarn_unused_ignores = true\nwarn_redundant_casts = true\nwarn_unused_configs = true\n\n# Plugin configuration\nplugins = [\n    \"pydantic.mypy\",\n    \"sqlmypy\",\n]\n\n[[tool.mypy.overrides]]\nmodule = [\n    \"tests.*\",\n    \"test.*\",\n    \".*test.*\",\n]\ndisallow_untyped_defs = false\ndisallow_incomplete_defs = false\n\n# ========== PYTEST CONFIGURATION ==========\n[tool.pytest.ini_options]\nminversion = \"7.0\"\naddopts = [\n    \"--strict-markers\",\n    \"--strict-config\",\n    \"--tb=short\",\n    \"--durations=10\",\n]\ntestpaths = [\"tests\"]\npython_files = [\"test_*.py\", \"*_test.py\"]\npython_classes = [\"Test*\"]\npython_functions = [\"test_*\"]\nmarkers = [\n    \"slow: marks tests as slow (deselect with '-m \\\"not slow\\\"')\",\n    \"integration: integration tests\",\n    \"unit: unit tests\",\n]\n```\n\n## 3. **`.pre-commit-config.yaml`**\n```yaml\nrepos:\n  - repo: https://github.com/astral-sh/ruff-pre-commit\n    rev: v0.4.4\n    hooks:\n      - id: ruff\n        args: [--fix]\n      - id: ruff-format\n\n  - repo: https://github.com/pre-commit/mirrors-mypy\n    rev: v1.9.0\n    hooks:\n      - id: mypy\n        additional_dependencies: [pydantic]\n        args: [--strict, --ignore-missing-imports]\n\n  - repo: https://github.com/pre-commit/pre-commit-hooks\n    rev: v4.5.0\n    hooks:\n      - id: trailing-whitespace\n      - id: end-of-file-fixer\n      - id: check-yaml\n      - id: check-toml\n      - id: check-added-large-files\n```\n\n## 4. **Development Scripts in `pyproject.toml`**\n```toml\n[tool.hatch.envs.default]\ndependencies = [\n    \"ruff>=0.4.0\",\n    \"mypy>=1.8.0\",\n    \"pytest>=8.0.0\",\n    \"pytest-cov>=4.1.0\",\n    \"pytest-asyncio>=0.23.0\",\n]\n\n[tool.hatch.envs.lint]\ndetached = true\ndependencies = [\n    \"ruff>=0.4.0\",\n]\nscripts = [\n    \"check = 'ruff check .'\",\n    \"format = 'ruff format .'\",\n    \"fix = 'ruff check --fix . &&",
+          "tokenUsage": {
+            "total": 1918,
+            "prompt": 418,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 381,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:42:32 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 1ad4f21710c30c86f0c2c6495ab30228.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "xvJAIYXBhuvbOj91ldFUl3OB8Sz9S_G5zYicnu2-sFDDpWIXHYV_3w==",
+                "x-amz-cf-pop": "IAH50-P2",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "b613bc1a3aa9a30bdb86873a58f72890"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[2] How would you configure ruff and mypy strict mode for a new Python project?",
+          "vars": {
+            "task": "How would you configure ruff and mypy strict mode for a new Python project?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Provides pyproject.toml or config file content for ruff, mentions mypy or type checking configuration, shows specific rules or settings",
+              "threshold": 0.6,
+              "metric": "python-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "task": "How would you configure ruff and mypy strict mode for a new Python project?"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:42:32 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 1ad4f21710c30c86f0c2c6495ab30228.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "xvJAIYXBhuvbOj91ldFUl3OB8Sz9S_G5zYicnu2-sFDDpWIXHYV_3w==",
+              "x-amz-cf-pop": "IAH50-P2",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "b613bc1a3aa9a30bdb86873a58f72890"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 2,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 837,
+        "completion": 3000,
+        "cached": 0,
+        "total": 3837,
+        "numRequests": 2,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 3549,
+          "prompt": 3399,
+          "completion": 150,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 68694,
+      "evaluationDurationMs": 68694
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: python-pro",
+    "prompts": [
+      {
+        "label": "python-pro",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a Python expert specializing in modern Python 3.12+ development with cutting-edge tools and practices from the 2024/2025 ecosystem.\\n\\n## Purpose\\nExpert Python developer mastering Python 3.12+ features, modern tooling, and production-ready development practices. Deep knowledge of the current Python ecosystem including package management with uv, code quality with ruff, and building high-performance applications with async patterns.\\n\\n## Capabilities\\n\\n### Modern Python Features\\n- Python 3.12+ features including improved error messages, performance optimizations, and type system enhancements\\n- Advanced async/await patterns with asyncio, aiohttp, and trio\\n- Context managers and the `with` statement for resource management\\n- Dataclasses, Pydantic models, and modern data validation\\n- Pattern matching (structural pattern matching) and match statements\\n- Type hints, generics, and Protocol typing for robust type safety\\n- Descriptors, metaclasses, and advanced object-oriented patterns\\n- Generator expressions, itertools, and memory-efficient data processing\\n\\n### Modern Tooling & Development Environment\\n- Package management with uv (2024's fastest Python package manager)\\n- Code formatting and linting with ruff (replacing black, isort, flake8)\\n- Static type checking with mypy and pyright\\n- Project configuration with pyproject.toml (modern standard)\\n- Virtual environment management with venv, pipenv, or uv\\n- Pre-commit hooks for code quality automation\\n- Modern Python packaging and distribution practices\\n- Dependency management and lock files\\n\\n### Testing & Quality Assurance\\n- Comprehensive testing with pytest and pytest plugins\\n- Property-based testing with Hypothesis\\n- Test fixtures, factories, and mock objects\\n- Coverage analysis with pytest-cov and coverage.py\\n- Performance testing and benchmarking with pytest-benchmark\\n- Integration testing and test databases\\n- Continuous integration with GitHub Actions\\n- Code quality metrics and static analysis\\n\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Write an async Python function that fetches multiple URLs concurrently with time",
+        "vars": {
+          "task": "Write an async Python function that fetches multiple URLs concurrently with timeout handling and retries"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Response uses modern asyncio patterns, proper type hints, error handling, and is production-quality Python 3.12+",
+            "threshold": 0.7,
+            "metric": "python-pro_quality"
+          }
+        ]
+      },
+      {
+        "description": "[2] How would you configure ruff and mypy strict mode for a new Python project?",
+        "vars": {
+          "task": "How would you configure ruff and mypy strict mode for a new Python project?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Provides pyproject.toml or config file content for ruff, mentions mypy or type checking configuration, shows specific rules or settings",
+            "threshold": 0.6,
+            "metric": "python-pro_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-python-pro.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:43:40.734Z",
+    "evaluationCreatedAt": "2026-03-15T04:42:31.988Z"
+  }
+}

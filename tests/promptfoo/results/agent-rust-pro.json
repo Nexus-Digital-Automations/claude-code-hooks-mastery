@@ -1,0 +1,496 @@
+{
+  "evalId": "eval-3gt-2026-03-15T04:45:26",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:45:26.871Z",
+    "prompts": [
+      {
+        "id": "fd8224e4e7e6d1adcdb3b64f36f5f31bc4272a91f7ca6c7f4eb93e248d120f71",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a Rust expert specializing in modern Rust 1.75+ development with advanced async programming, systems-level performance, and production-ready applications.\\n\\n## Purpose\\nExpert Rust developer mastering Rust 1.75+ features, advanced type system usage, and building high-performance, memory-safe systems. Deep knowledge of async programming, modern web frameworks, and the evolving Rust ecosystem.\\n\\n## Capabilities\\n\\n### Modern Rust Language Features\\n- Rust 1.75+ features including const generics and improved type inference\\n- Advanced lifetime annotations and lifetime elision rules\\n- Generic associated types (GATs) and advanced trait system features\\n- Pattern matching with advanced destructuring and guards\\n- Const evaluation and compile-time computation\\n- Macro system with procedural and declarative macros\\n- Module system and visibility controls\\n- Advanced error handling with Result, Option, and custom error types\\n\\n### Ownership & Memory Management\\n- Ownership rules, borrowing, and move semantics mastery\\n- Reference counting with Rc, Arc, and weak references\\n- Smart pointers: Box, RefCell, Mutex, RwLock\\n- Memory layout optimization and zero-cost abstractions\\n- RAII patterns and automatic resource management\\n- Phantom types and zero-sized types (ZSTs)\\n- Memory safety without garbage collection\\n- Custom allocators and memory pool management\\n\\n### Async Programming & Concurrency\\n- Advanced async/await patterns with Tokio runtime\\n- Stream processing and async iterators\\n- Channel patterns: mpsc, broadcast, watch channels\\n- Tokio ecosystem: axum, tower, hyper for web services\\n- Select patterns and concurrent task management\\n- Backpressure handling and flow control\\n- Async trait objects and dynamic dispatch\\n- Performance optimization in async contexts\\n\\n### Type System & Traits\\n- Advanced trait implementations and trait bounds\\n- Associated types and generic associated types\\n- Higher-kinded types and type-level programming\\n- Phantom types and marker traits\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "rust-pro",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 2,
+          "testPassCount": 2,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 2,
+          "assertFailCount": 0,
+          "totalLatencyMs": 778,
+          "tokenUsage": {
+            "prompt": 833,
+            "completion": 2850,
+            "cached": 0,
+            "total": 3683,
+            "numRequests": 2,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 3401,
+              "prompt": 3249,
+              "completion": 152,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "rust-pro_quality": 2
+          },
+          "namedScoresCount": {
+            "rust-pro_quality": 2
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "rust-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1775,
+            "prompt": 1708,
+            "completion": 67,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses modern tokio async/await patterns, proper Rust error handling (anyhow/thiserror or custom errors), correct ownership semantics with Arc/Mutex where needed",
+                "threshold": 0.6,
+                "metric": "rust-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The code uses modern Tokio async/await patterns with proper async functions and awaits, implements custom error handling with thiserror for PoolError, and correctly uses Arc/Mutex for shared ownership of ConnectionPool and Shutdown structures.",
+              "tokensUsed": {
+                "total": 1775,
+                "prompt": 1708,
+                "completion": 67,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll create a production-ready async TCP server with connection pooling and graceful shutdown using Tokio. This implementation includes connection limits, proper error handling, and clean shutdown procedures.\\n\\n```rust\\nuse std::collections::HashMap;\\nuse std::net::SocketAddr;\\nuse std::sync::Arc;\\nuse std::time::{Duration, Instant};\\n\\nuse tokio::io::{AsyncReadExt, AsyncWriteExt};\\nuse tokio::net::{TcpListener, TcpStream};\\nuse tokio::sync::{mpsc, oneshot, Mutex, Semaphore};\\nuse tokio::time;\\nuse tracing::{error, info, warn, Level};\\nuse tracing_subscriber;\\n\\n/// Connection pool configuration\\n#[derive(Debug, Clone)]\\nstruct ConnectionPoolConfig {\\n    max_connections: usize,\\n    connection_timeout: Duration,\\n    idle_timeout: Duration,\\n    max_pending_connections: usize,\\n}\\n\\nimpl Default for ConnectionPoolConfig {\\n    fn default() -> Self {\\n        Self {\\n            max_connections: 100,\\n            connection_timeout: Duration::from_secs(30),\\n            idle_timeout: Duration::from_secs(300),\\n            max_pending_connections: 50,\\n        }\\n    }\\n}\\n\\n/// Connection metadata\\n#[derive(Debug)]\\nstruct ConnectionInfo {\\n    addr: SocketAddr,\\n    connected_at: Instant,\\n    last_activity: Instant,\\n}\\n\\n/// Connection pool manager\\n#[derive(Debug)]\\nstruct ConnectionPool {\\n    connections: Arc<Mutex<HashMap<SocketAddr, ConnectionInfo>>>,\\n    semaphore: Arc<Semaphore>,\\n    config: ConnectionPoolConfig,\\n}\\n\\nimpl ConnectionPool {\\n    fn new(config: ConnectionPoolConfig) -> Self {\\n        Self {\\n            connections: Arc::new(Mutex::new(HashMap::new())),\\n            semaphore: Arc::new(Semaphore::new(config.max_connections)),\\n            config,\\n        }\\n    }\\n\\n    async fn acquire_connection(&self, addr: SocketAddr) -> Result<(), PoolError> {\\n        // Try to acquire semaphore with timeout\\n        let permit = time::timeout(\\n            self.config.connection_timeout,\\n            self.semaphore.clone().acquire_owned(),\\n        )\\n        .await\\n        .map_err(|_| PoolError::Timeout)?\\n        .map_err(|_| PoolError::Closed)?;\\n\\n        let mut connections = self.connections.lock().await;\\n        \\n        // Check if connection already exists and is still valid\\n        if let Some(info) = connections.get(&addr) {\\n            if info.last_activity.elapsed() < self.config.idle_timeout {\\n                // Connection is still valid, update activity\\n                drop(connections);\\n                drop(permit); // Release permit since we're reusing connection\\n                return Ok(());\\n            }\\n        }\\n\\n        // Store new connection info\\n        connections.insert(\\n            addr,\\n            ConnectionInfo {\\n                addr,\\n                connected_at: Instant::now(),\\n                last_activity: Instant::now(),\\n            },\\n        );\\n\\n        // Keep permit alive until connection is released\\n        tokio::spawn(async move {\\n            // Permit will be dropped when this task ends\\n            drop(permit);\\n        });\\n\\n        Ok(())\\n    }\\n\\n    async fn update_activity(&self, addr: SocketAddr) {\\n        let mut connections = self.connections.lock().await;\\n        if let Some(info) = connections.get_mut(&addr) {\\n            info.last_activity = Instant::now();\\n        }\\n    }\\n\\n    async fn release_connection(&self, addr: SocketAddr) {\\n        let mut connections = self.connections.lock().await;\\n        connections.remove(&addr);\\n        // Semaphore permit is automatically released when dropped\\n    }\\n\\n    async fn cleanup_idle_connections(&self) {\\n        let mut connections = self.connections.lock().await;\\n        let now = Instant::now();\\n        \\n        connections.retain(|_, info| {\\n            let idle_time = now.duration_since(info.last_activity);\\n            idle_time < self.config.idle_timeout\\n        });\\n    }\\n\\n    async fn active_connections(&self) -> usize {\\n        self.connections.lock().await.len()\\n    }\\n}\\n\\n#[derive(Debug, thiserror::Error)]\\nenum PoolError {\\n    #[error(\\\"Connection pool timeout\\\")]\\n    Timeout,\\n    #[error(\\\"Connection pool closed\\\")]\\n    Closed,\\n    #[error(\\\"Too many pending connections\\\")]\\n    TooManyPending,\\n}\\n\\n/// Server configuration\\n#[derive(Debug, Clone)]\\nstruct ServerConfig {\\n    bind_addr: SocketAddr,\\n    pool_config: ConnectionPoolConfig,\\n    shutdown_timeout: Duration,\\n    max_request_size: usize,\\n}\\n\\nimpl Default for ServerConfig {\\n    fn default() -> Self {\\n        Self {\\n            bind_addr: \\\"127.0.0.1:8080\\\".parse().unwrap(),\\n            pool_config: ConnectionPoolConfig::default(),\\n            shutdown_timeout: Duration::from_secs(30),\\n            max_request_size: 1024 * 1024, // 1MB\\n        }\\n    }\\n}\\n\\n/// Server shutdown signal\\n#[derive(Debug)]\\nstruct Shutdown {\\n    shutdown: bool,\\n    notify: Vec<oneshot::Sender<()>>,\\n}\\n\\nimpl Shutdown {\\n    fn new() -> Self {\\n        Self {\\n            shutdown: false,\\n            notify: Vec::new(),\\n        }\\n    }\\n\\n    fn subscribe(&mut self) -> oneshot::Receiver<()> {\\n        let (tx, rx) = oneshot::channel();\\n        self.notify.push(tx);\\n        rx\\n    }\\n\\n    fn signal(&mut self) {\\n        self.shutdown = true;\\n        for tx in self.notify.drain(..) {\\n            let _ = tx.send(());\\n        }\\n    }\\n}\\n\\n/// TCP Server\\nstruct TcpServer {\\n    config: ServerConfig,\\n    connection_pool: Arc<ConnectionPool>,\\n    shutdown: Arc<Mutex<Shutdown>>,\\n}\\n\\nimpl TcpServer {\\n    fn new(config: ServerConfig) -> Self {\\n        Self {\\n            connection_pool: Arc::new(ConnectionPool::new(config.pool_config.clone())),\\n            shutdown: Arc::new(Mutex::new(Shutdown::new())),\\n            config,\\n        }\\n    }\\n\\n    async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {\\n        let listener = TcpListener::bind(self.config.bind_addr).await?;\\n        info!(\\\"Server listening on {}\\\", self.config.bind_addr);\\n\\n        // Spawn connection pool cleaner\\n        let pool_clone = self.connection_pool.clone();\\n        let cleaner_handle = tokio::spawn(async move {\\n            let mut interval = time::interval(Duration::from_secs(60));\\n            loop {\\n                interval.tick().await;\\n                pool_clone.cleanup_idle_connections().await;\\n            }\\n        });\\n\\n        // Spawn graceful shutdown handler\\n        let shutdown_clone = self.shutdown.clone();\\n        let shutdown_handle = tokio::spawn(async move {\\n            tokio::signal::ctrl_c().await.ok();\\n            info!(\\\"Received shutdown signal\\\");\\n            shutdown_clone.lock().await.signal();\\n        });\\n\\n        // Main accept\\n</Output>\\n<Rubric>\\nUses modern tokio async/await patterns, proper Rust error handling (anyhow/thiserror or custom errors), correct ownership semantics with Arc/Mutex where needed\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "8d57a3ea-1eb3-48b5-85ea-0de02e5d962a",
+        "latencyMs": 388,
+        "namedScores": {
+          "rust-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Rust expert specializing in modern Rust 1.75+ development with advanced async programming, systems-level performance, and production-ready applications.\\n\\n## Purpose\\nExpert Rust developer mastering Rust 1.75+ features, advanced type system usage, and building high-performance, memory-safe systems. Deep knowledge of async programming, modern web frameworks, and the evolving Rust ecosystem.\\n\\n## Capabilities\\n\\n### Modern Rust Language Features\\n- Rust 1.75+ features including const generics and improved type inference\\n- Advanced lifetime annotations and lifetime elision rules\\n- Generic associated types (GATs) and advanced trait system features\\n- Pattern matching with advanced destructuring and guards\\n- Const evaluation and compile-time computation\\n- Macro system with procedural and declarative macros\\n- Module system and visibility controls\\n- Advanced error handling with Result, Option, and custom error types\\n\\n### Ownership & Memory Management\\n- Ownership rules, borrowing, and move semantics mastery\\n- Reference counting with Rc, Arc, and weak references\\n- Smart pointers: Box, RefCell, Mutex, RwLock\\n- Memory layout optimization and zero-cost abstractions\\n- RAII patterns and automatic resource management\\n- Phantom types and zero-sized types (ZSTs)\\n- Memory safety without garbage collection\\n- Custom allocators and memory pool management\\n\\n### Async Programming & Concurrency\\n- Advanced async/await patterns with Tokio runtime\\n- Stream processing and async iterators\\n- Channel patterns: mpsc, broadcast, watch channels\\n- Tokio ecosystem: axum, tower, hyper for web services\\n- Select patterns and concurrent task management\\n- Backpressure handling and flow control\\n- Async trait objects and dynamic dispatch\\n- Performance optimization in async contexts\\n\\n### Type System & Traits\\n- Advanced trait implementations and trait bounds\\n- Associated types and generic associated types\\n- Higher-kinded types and type-level programming\\n- Phantom types and marker traits\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a Rust async TCP server using tokio with connection pooling and graceful shutdown\"\n  }\n]",
+          "label": "rust-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "fd8224e4e7e6d1adcdb3b64f36f5f31bc4272a91f7ca6c7f4eb93e248d120f71",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll create a production-ready async TCP server with connection pooling and graceful shutdown using Tokio. This implementation includes connection limits, proper error handling, and clean shutdown procedures.\n\n```rust\nuse std::collections::HashMap;\nuse std::net::SocketAddr;\nuse std::sync::Arc;\nuse std::time::{Duration, Instant};\n\nuse tokio::io::{AsyncReadExt, AsyncWriteExt};\nuse tokio::net::{TcpListener, TcpStream};\nuse tokio::sync::{mpsc, oneshot, Mutex, Semaphore};\nuse tokio::time;\nuse tracing::{error, info, warn, Level};\nuse tracing_subscriber;\n\n/// Connection pool configuration\n#[derive(Debug, Clone)]\nstruct ConnectionPoolConfig {\n    max_connections: usize,\n    connection_timeout: Duration,\n    idle_timeout: Duration,\n    max_pending_connections: usize,\n}\n\nimpl Default for ConnectionPoolConfig {\n    fn default() -> Self {\n        Self {\n            max_connections: 100,\n            connection_timeout: Duration::from_secs(30),\n            idle_timeout: Duration::from_secs(300),\n            max_pending_connections: 50,\n        }\n    }\n}\n\n/// Connection metadata\n#[derive(Debug)]\nstruct ConnectionInfo {\n    addr: SocketAddr,\n    connected_at: Instant,\n    last_activity: Instant,\n}\n\n/// Connection pool manager\n#[derive(Debug)]\nstruct ConnectionPool {\n    connections: Arc<Mutex<HashMap<SocketAddr, ConnectionInfo>>>,\n    semaphore: Arc<Semaphore>,\n    config: ConnectionPoolConfig,\n}\n\nimpl ConnectionPool {\n    fn new(config: ConnectionPoolConfig) -> Self {\n        Self {\n            connections: Arc::new(Mutex::new(HashMap::new())),\n            semaphore: Arc::new(Semaphore::new(config.max_connections)),\n            config,\n        }\n    }\n\n    async fn acquire_connection(&self, addr: SocketAddr) -> Result<(), PoolError> {\n        // Try to acquire semaphore with timeout\n        let permit = time::timeout(\n            self.config.connection_timeout,\n            self.semaphore.clone().acquire_owned(),\n        )\n        .await\n        .map_err(|_| PoolError::Timeout)?\n        .map_err(|_| PoolError::Closed)?;\n\n        let mut connections = self.connections.lock().await;\n        \n        // Check if connection already exists and is still valid\n        if let Some(info) = connections.get(&addr) {\n            if info.last_activity.elapsed() < self.config.idle_timeout {\n                // Connection is still valid, update activity\n                drop(connections);\n                drop(permit); // Release permit since we're reusing connection\n                return Ok(());\n            }\n        }\n\n        // Store new connection info\n        connections.insert(\n            addr,\n            ConnectionInfo {\n                addr,\n                connected_at: Instant::now(),\n                last_activity: Instant::now(),\n            },\n        );\n\n        // Keep permit alive until connection is released\n        tokio::spawn(async move {\n            // Permit will be dropped when this task ends\n            drop(permit);\n        });\n\n        Ok(())\n    }\n\n    async fn update_activity(&self, addr: SocketAddr) {\n        let mut connections = self.connections.lock().await;\n        if let Some(info) = connections.get_mut(&addr) {\n            info.last_activity = Instant::now();\n        }\n    }\n\n    async fn release_connection(&self, addr: SocketAddr) {\n        let mut connections = self.connections.lock().await;\n        connections.remove(&addr);\n        // Semaphore permit is automatically released when dropped\n    }\n\n    async fn cleanup_idle_connections(&self) {\n        let mut connections = self.connections.lock().await;\n        let now = Instant::now();\n        \n        connections.retain(|_, info| {\n            let idle_time = now.duration_since(info.last_activity);\n            idle_time < self.config.idle_timeout\n        });\n    }\n\n    async fn active_connections(&self) -> usize {\n        self.connections.lock().await.len()\n    }\n}\n\n#[derive(Debug, thiserror::Error)]\nenum PoolError {\n    #[error(\"Connection pool timeout\")]\n    Timeout,\n    #[error(\"Connection pool closed\")]\n    Closed,\n    #[error(\"Too many pending connections\")]\n    TooManyPending,\n}\n\n/// Server configuration\n#[derive(Debug, Clone)]\nstruct ServerConfig {\n    bind_addr: SocketAddr,\n    pool_config: ConnectionPoolConfig,\n    shutdown_timeout: Duration,\n    max_request_size: usize,\n}\n\nimpl Default for ServerConfig {\n    fn default() -> Self {\n        Self {\n            bind_addr: \"127.0.0.1:8080\".parse().unwrap(),\n            pool_config: ConnectionPoolConfig::default(),\n            shutdown_timeout: Duration::from_secs(30),\n            max_request_size: 1024 * 1024, // 1MB\n        }\n    }\n}\n\n/// Server shutdown signal\n#[derive(Debug)]\nstruct Shutdown {\n    shutdown: bool,\n    notify: Vec<oneshot::Sender<()>>,\n}\n\nimpl Shutdown {\n    fn new() -> Self {\n        Self {\n            shutdown: false,\n            notify: Vec::new(),\n        }\n    }\n\n    fn subscribe(&mut self) -> oneshot::Receiver<()> {\n        let (tx, rx) = oneshot::channel();\n        self.notify.push(tx);\n        rx\n    }\n\n    fn signal(&mut self) {\n        self.shutdown = true;\n        for tx in self.notify.drain(..) {\n            let _ = tx.send(());\n        }\n    }\n}\n\n/// TCP Server\nstruct TcpServer {\n    config: ServerConfig,\n    connection_pool: Arc<ConnectionPool>,\n    shutdown: Arc<Mutex<Shutdown>>,\n}\n\nimpl TcpServer {\n    fn new(config: ServerConfig) -> Self {\n        Self {\n            connection_pool: Arc::new(ConnectionPool::new(config.pool_config.clone())),\n            shutdown: Arc::new(Mutex::new(Shutdown::new())),\n            config,\n        }\n    }\n\n    async fn run(&self) -> Result<(), Box<dyn std::error::Error>> {\n        let listener = TcpListener::bind(self.config.bind_addr).await?;\n        info!(\"Server listening on {}\", self.config.bind_addr);\n\n        // Spawn connection pool cleaner\n        let pool_clone = self.connection_pool.clone();\n        let cleaner_handle = tokio::spawn(async move {\n            let mut interval = time::interval(Duration::from_secs(60));\n            loop {\n                interval.tick().await;\n                pool_clone.cleanup_idle_connections().await;\n            }\n        });\n\n        // Spawn graceful shutdown handler\n        let shutdown_clone = self.shutdown.clone();\n        let shutdown_handle = tokio::spawn(async move {\n            tokio::signal::ctrl_c().await.ok();\n            info!(\"Received shutdown signal\");\n            shutdown_clone.lock().await.signal();\n        });\n\n        // Main accept",
+          "tokenUsage": {
+            "total": 1914,
+            "prompt": 414,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 388,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:45:27 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 dfef866f9a995e6989aa7fbb0f6e46b4.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "DF5YoI_fM_Y1HJsWHzLnOKqjurR7RmrxUxE8BtLWgDdEQtbfuzmTvQ==",
+                "x-amz-cf-pop": "IAH50-P4",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "a3c67a2659d9f9e185f29e17646549ac"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Write a Rust async TCP server using tokio with connection pooling and graceful s",
+          "vars": {
+            "task": "Write a Rust async TCP server using tokio with connection pooling and graceful shutdown"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses modern tokio async/await patterns, proper Rust error handling (anyhow/thiserror or custom errors), correct ownership semantics with Arc/Mutex where needed",
+              "threshold": 0.6,
+              "metric": "rust-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Write a Rust async TCP server using tokio with connection pooling and graceful shutdown"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:45:27 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 dfef866f9a995e6989aa7fbb0f6e46b4.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "DF5YoI_fM_Y1HJsWHzLnOKqjurR7RmrxUxE8BtLWgDdEQtbfuzmTvQ==",
+              "x-amz-cf-pop": "IAH50-P4",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "a3c67a2659d9f9e185f29e17646549ac"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "rust-pro_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1626,
+            "prompt": 1541,
+            "completion": 85,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Accurately explains thread safety, runtime vs compile-time borrowing, and gives concrete examples",
+                "threshold": 0.7,
+                "metric": "rust-pro_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output thoroughly explains thread safety (RefCell is single-threaded, Arc<Mutex> is thread-safe with Send/Sync), contrasts runtime borrowing (RefCell) vs compile-time borrowing (standard Rust references), and provides multiple concrete code examples for both RefCell and Arc<Mutex> usage scenarios.",
+              "tokensUsed": {
+                "total": 1626,
+                "prompt": 1541,
+                "completion": 85,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n# Arc<Mutex<T>> vs RefCell<T> in Rust\\n\\n## Core Differences\\n\\n### **RefCell<T>**\\n- **Threading**: **Single-threaded only** - Not `Send` or `Sync`\\n- **Runtime Borrow Checking**: Enforces Rust's borrowing rules at runtime\\n- **Panic Safety**: Panics on borrow violations (double mutable borrow)\\n- **Overhead**: Minimal runtime overhead (just reference counts)\\n- **Use Case**: Interior mutability within a single thread\\n\\n### **Arc<Mutex<T>>**\\n- **Threading**: **Thread-safe** - Implements both `Send` and `Sync`\\n- **Runtime Locking**: Uses OS-level mutexes for synchronization\\n- **Deadlock Risk**: Can deadlock if locks are acquired in wrong order\\n- **Overhead**: Higher (atomic operations + OS mutex)\\n- **Use Case**: Shared mutable state across threads\\n\\n## When to Use Each\\n\\n### **Use RefCell<T> when:**\\n```rust\\n// Single-threaded scenarios\\nuse std::cell::RefCell;\\n\\nstruct Cache {\\n    data: RefCell<Vec<String>>,\\n}\\n\\nimpl Cache {\\n    fn add(&self, item: String) {\\n        // Runtime borrow check - panics if already mutably borrowed\\n        self.data.borrow_mut().push(item);\\n    }\\n    \\n    fn get(&self, index: usize) -> Option<String> {\\n        self.data.borrow().get(index).cloned()\\n    }\\n}\\n\\n// Good for:\\n// - GUI applications (single main thread)\\n// - Graph/node structures with internal references\\n// - Mock objects in tests\\n// - Caching within a single-threaded context\\n```\\n\\n### **Use Arc<Mutex<T>> when:**\\n```rust\\n// Multi-threaded scenarios\\nuse std::sync::{Arc, Mutex};\\nuse std::thread;\\n\\nstruct SharedCounter {\\n    count: Arc<Mutex<i32>>,\\n}\\n\\nimpl SharedCounter {\\n    fn increment(&self) {\\n        let mut count = self.count.lock().unwrap();\\n        *count += 1;\\n    }\\n}\\n\\n// Spawn multiple threads\\nlet counter = Arc::new(Mutex::new(0));\\nlet mut handles = vec![];\\n\\nfor _ in 0..10 {\\n    let counter_clone = Arc::clone(&counter);\\n    let handle = thread::spawn(move || {\\n        let mut num = counter_clone.lock().unwrap();\\n        *num += 1;\\n    });\\n    handles.push(handle);\\n}\\n\\n// Good for:\\n// - Web servers with shared state\\n// - Concurrent data processing\\n// - Shared configuration across threads\\n// - Producer-consumer patterns\\n```\\n\\n## Performance Considerations\\n\\n### **RefCell<T>**\\n```rust\\n// Fast path - no atomic operations\\nlet cell = RefCell::new(42);\\nlet borrow = cell.borrow();      // Just increments a counter\\nlet mut_borrow = cell.borrow_mut(); // Checks no other borrows exist\\n```\\n\\n### **Arc<Mutex<T>>**\\n```rust\\n// Slower path - atomic operations + potential syscalls\\nlet shared = Arc::new(Mutex::new(42));\\nlet lock = shared.lock().unwrap(); // Atomic increment + possible OS wait\\n```\\n\\n## Common Patterns & Alternatives\\n\\n### **Single-threaded with Rc<RefCell<T>>**\\n```rust\\nuse std::rc::Rc;\\nuse std::cell::RefCell;\\n\\n// Multiple owners, single thread\\nstruct Node {\\n    value: i32,\\n    children: Vec<Rc<RefCell<Node>>>,\\n}\\n\\n// Use for: Trees, graphs, DOM-like structures\\n```\\n\\n### **Multi-threaded with Arc<RwLock<T>>**\\n```rust\\nuse std::sync::{Arc, RwLock};\\n\\n// Multiple readers, single writer\\nlet data = Arc::new(RwLock::new(vec![1, 2, 3]));\\n\\n// Many concurrent readers\\nlet read_guard = data.read().unwrap();\\n// Single writer\\nlet mut write_guard = data.write().unwrap();\\nwrite_guard.push(4);\\n\\n// Better than Mutex when: Many reads, few writes\\n```\\n\\n### **Channel-based Communication (Often Better)**\\n```rust\\nuse std::sync::mpsc;\\nuse std::thread;\\n\\n// Instead of shared mutable state, use message passing\\nlet (tx, rx) = mpsc::channel();\\n\\nthread::spawn(move || {\\n    tx.send(\\\"Hello from thread\\\").unwrap();\\n});\\n\\n// Often cleaner than Arc<Mutex<T>> for many use cases\\n```\\n\\n## Key Decision Flow\\n\\n1. **Is it multi-threaded?**\\n   - Yes → Need `Send`/`Sync` → Use `Arc<Mutex<T>>` or `Arc<RwLock<T>>`\\n   - No → Consider `RefCell<T>`\\n\\n2. **Do you need multiple owners?**\\n   - Single-threaded + multiple owners → `Rc<RefCell<T>>`\\n   - Multi-threaded + multiple owners → `Arc<Mutex<T>>`\\n\\n3. **Read vs Write pattern?**\\n   - Many reads, few writes → Consider `RwLock` instead of `Mutex`\\n   - Balanced reads/writes → `Mutex` is usually fine\\n\\n4. **Can you use message passing instead?**\\n   - Often cleaner than shared mutable state\\n\\n## Real-World Example\\n\\n```rust\\n// WEB SERVER (multi-threaded) - Use Arc<Mutex<T>>\\nuse std::sync::{Arc, Mutex};\\nuse axum::{Router, extract::State};\\n\\nstruct AppState {\\n    user_count: Arc<Mutex<i32>>,\\n    // RefCell would be WRONG here - not thread-safe!\\n}\\n\\n// GAME ENGINE (single-threaded) - Use RefCell<T>\\nstruct GameObject {\\n    transform: RefCell<Transform>,\\n    components: RefCell<Vec<Component>>,\\n    // Arc<Mutex> would be OVERKILL here - unnecessary overhead\\n}\\n```\\n\\n## Summary\\n\\n- **RefCell<T>**: Single-threaded interior mutability with runtime checks\\n- **Arc<Mutex<T>>**: Thread-safe shared mutable state with locking\\n- **Choose based on threading needs first**, then optimize for your access patterns\\n- **Consider alternatives** like channels or RwLock when appropriate\\n- **Remember**: `RefCell` panics on violation, `Mutex` blocks (can deadlock)\\n</Output>\\n<Rubric>\\nAccurately explains thread safety, runtime vs compile-time borrowing, and gives concrete examples\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "d50e3d8f-a0d3-4b1d-8c27-fbadc8f1faa6",
+        "latencyMs": 390,
+        "namedScores": {
+          "rust-pro_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Rust expert specializing in modern Rust 1.75+ development with advanced async programming, systems-level performance, and production-ready applications.\\n\\n## Purpose\\nExpert Rust developer mastering Rust 1.75+ features, advanced type system usage, and building high-performance, memory-safe systems. Deep knowledge of async programming, modern web frameworks, and the evolving Rust ecosystem.\\n\\n## Capabilities\\n\\n### Modern Rust Language Features\\n- Rust 1.75+ features including const generics and improved type inference\\n- Advanced lifetime annotations and lifetime elision rules\\n- Generic associated types (GATs) and advanced trait system features\\n- Pattern matching with advanced destructuring and guards\\n- Const evaluation and compile-time computation\\n- Macro system with procedural and declarative macros\\n- Module system and visibility controls\\n- Advanced error handling with Result, Option, and custom error types\\n\\n### Ownership & Memory Management\\n- Ownership rules, borrowing, and move semantics mastery\\n- Reference counting with Rc, Arc, and weak references\\n- Smart pointers: Box, RefCell, Mutex, RwLock\\n- Memory layout optimization and zero-cost abstractions\\n- RAII patterns and automatic resource management\\n- Phantom types and zero-sized types (ZSTs)\\n- Memory safety without garbage collection\\n- Custom allocators and memory pool management\\n\\n### Async Programming & Concurrency\\n- Advanced async/await patterns with Tokio runtime\\n- Stream processing and async iterators\\n- Channel patterns: mpsc, broadcast, watch channels\\n- Tokio ecosystem: axum, tower, hyper for web services\\n- Select patterns and concurrent task management\\n- Backpressure handling and flow control\\n- Async trait objects and dynamic dispatch\\n- Performance optimization in async contexts\\n\\n### Type System & Traits\\n- Advanced trait implementations and trait bounds\\n- Associated types and generic associated types\\n- Higher-kinded types and type-level programming\\n- Phantom types and marker traits\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Explain the difference between Arc<Mutex<T>> and RefCell<T> and when to use each\"\n  }\n]",
+          "label": "rust-pro",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "fd8224e4e7e6d1adcdb3b64f36f5f31bc4272a91f7ca6c7f4eb93e248d120f71",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "# Arc<Mutex<T>> vs RefCell<T> in Rust\n\n## Core Differences\n\n### **RefCell<T>**\n- **Threading**: **Single-threaded only** - Not `Send` or `Sync`\n- **Runtime Borrow Checking**: Enforces Rust's borrowing rules at runtime\n- **Panic Safety**: Panics on borrow violations (double mutable borrow)\n- **Overhead**: Minimal runtime overhead (just reference counts)\n- **Use Case**: Interior mutability within a single thread\n\n### **Arc<Mutex<T>>**\n- **Threading**: **Thread-safe** - Implements both `Send` and `Sync`\n- **Runtime Locking**: Uses OS-level mutexes for synchronization\n- **Deadlock Risk**: Can deadlock if locks are acquired in wrong order\n- **Overhead**: Higher (atomic operations + OS mutex)\n- **Use Case**: Shared mutable state across threads\n\n## When to Use Each\n\n### **Use RefCell<T> when:**\n```rust\n// Single-threaded scenarios\nuse std::cell::RefCell;\n\nstruct Cache {\n    data: RefCell<Vec<String>>,\n}\n\nimpl Cache {\n    fn add(&self, item: String) {\n        // Runtime borrow check - panics if already mutably borrowed\n        self.data.borrow_mut().push(item);\n    }\n    \n    fn get(&self, index: usize) -> Option<String> {\n        self.data.borrow().get(index).cloned()\n    }\n}\n\n// Good for:\n// - GUI applications (single main thread)\n// - Graph/node structures with internal references\n// - Mock objects in tests\n// - Caching within a single-threaded context\n```\n\n### **Use Arc<Mutex<T>> when:**\n```rust\n// Multi-threaded scenarios\nuse std::sync::{Arc, Mutex};\nuse std::thread;\n\nstruct SharedCounter {\n    count: Arc<Mutex<i32>>,\n}\n\nimpl SharedCounter {\n    fn increment(&self) {\n        let mut count = self.count.lock().unwrap();\n        *count += 1;\n    }\n}\n\n// Spawn multiple threads\nlet counter = Arc::new(Mutex::new(0));\nlet mut handles = vec![];\n\nfor _ in 0..10 {\n    let counter_clone = Arc::clone(&counter);\n    let handle = thread::spawn(move || {\n        let mut num = counter_clone.lock().unwrap();\n        *num += 1;\n    });\n    handles.push(handle);\n}\n\n// Good for:\n// - Web servers with shared state\n// - Concurrent data processing\n// - Shared configuration across threads\n// - Producer-consumer patterns\n```\n\n## Performance Considerations\n\n### **RefCell<T>**\n```rust\n// Fast path - no atomic operations\nlet cell = RefCell::new(42);\nlet borrow = cell.borrow();      // Just increments a counter\nlet mut_borrow = cell.borrow_mut(); // Checks no other borrows exist\n```\n\n### **Arc<Mutex<T>>**\n```rust\n// Slower path - atomic operations + potential syscalls\nlet shared = Arc::new(Mutex::new(42));\nlet lock = shared.lock().unwrap(); // Atomic increment + possible OS wait\n```\n\n## Common Patterns & Alternatives\n\n### **Single-threaded with Rc<RefCell<T>>**\n```rust\nuse std::rc::Rc;\nuse std::cell::RefCell;\n\n// Multiple owners, single thread\nstruct Node {\n    value: i32,\n    children: Vec<Rc<RefCell<Node>>>,\n}\n\n// Use for: Trees, graphs, DOM-like structures\n```\n\n### **Multi-threaded with Arc<RwLock<T>>**\n```rust\nuse std::sync::{Arc, RwLock};\n\n// Multiple readers, single writer\nlet data = Arc::new(RwLock::new(vec![1, 2, 3]));\n\n// Many concurrent readers\nlet read_guard = data.read().unwrap();\n// Single writer\nlet mut write_guard = data.write().unwrap();\nwrite_guard.push(4);\n\n// Better than Mutex when: Many reads, few writes\n```\n\n### **Channel-based Communication (Often Better)**\n```rust\nuse std::sync::mpsc;\nuse std::thread;\n\n// Instead of shared mutable state, use message passing\nlet (tx, rx) = mpsc::channel();\n\nthread::spawn(move || {\n    tx.send(\"Hello from thread\").unwrap();\n});\n\n// Often cleaner than Arc<Mutex<T>> for many use cases\n```\n\n## Key Decision Flow\n\n1. **Is it multi-threaded?**\n   - Yes → Need `Send`/`Sync` → Use `Arc<Mutex<T>>` or `Arc<RwLock<T>>`\n   - No → Consider `RefCell<T>`\n\n2. **Do you need multiple owners?**\n   - Single-threaded + multiple owners → `Rc<RefCell<T>>`\n   - Multi-threaded + multiple owners → `Arc<Mutex<T>>`\n\n3. **Read vs Write pattern?**\n   - Many reads, few writes → Consider `RwLock` instead of `Mutex`\n   - Balanced reads/writes → `Mutex` is usually fine\n\n4. **Can you use message passing instead?**\n   - Often cleaner than shared mutable state\n\n## Real-World Example\n\n```rust\n// WEB SERVER (multi-threaded) - Use Arc<Mutex<T>>\nuse std::sync::{Arc, Mutex};\nuse axum::{Router, extract::State};\n\nstruct AppState {\n    user_count: Arc<Mutex<i32>>,\n    // RefCell would be WRONG here - not thread-safe!\n}\n\n// GAME ENGINE (single-threaded) - Use RefCell<T>\nstruct GameObject {\n    transform: RefCell<Transform>,\n    components: RefCell<Vec<Component>>,\n    // Arc<Mutex> would be OVERKILL here - unnecessary overhead\n}\n```\n\n## Summary\n\n- **RefCell<T>**: Single-threaded interior mutability with runtime checks\n- **Arc<Mutex<T>>**: Thread-safe shared mutable state with locking\n- **Choose based on threading needs first**, then optimize for your access patterns\n- **Consider alternatives** like channels or RwLock when appropriate\n- **Remember**: `RefCell` panics on violation, `Mutex` blocks (can deadlock)",
+          "tokenUsage": {
+            "total": 1769,
+            "prompt": 419,
+            "completion": 1350,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 390,
+          "finishReason": "stop",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:45:27 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 3b024f963310e80ecfd323d07d71b33c.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "pVULuomDZfkEkkddVeK8hy3sVozVTTMU5ydP39kiEnaqjNjH9VvGJQ==",
+                "x-amz-cf-pop": "IAH50-P5",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "b964302ec737d06ef518ad85d656f706"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[2] Explain the difference between Arc<Mutex<T>> and RefCell<T> and when to use each",
+          "vars": {
+            "task": "Explain the difference between Arc<Mutex<T>> and RefCell<T> and when to use each"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Accurately explains thread safety, runtime vs compile-time borrowing, and gives concrete examples",
+              "threshold": 0.7,
+              "metric": "rust-pro_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "vars": {
+          "task": "Explain the difference between Arc<Mutex<T>> and RefCell<T> and when to use each"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:45:27 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 3b024f963310e80ecfd323d07d71b33c.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "pVULuomDZfkEkkddVeK8hy3sVozVTTMU5ydP39kiEnaqjNjH9VvGJQ==",
+              "x-amz-cf-pop": "IAH50-P5",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "b964302ec737d06ef518ad85d656f706"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 2,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 833,
+        "completion": 2850,
+        "cached": 0,
+        "total": 3683,
+        "numRequests": 2,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 3401,
+          "prompt": 3249,
+          "completion": 152,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 70270,
+      "evaluationDurationMs": 70270
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: rust-pro",
+    "prompts": [
+      {
+        "label": "rust-pro",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a Rust expert specializing in modern Rust 1.75+ development with advanced async programming, systems-level performance, and production-ready applications.\\n\\n## Purpose\\nExpert Rust developer mastering Rust 1.75+ features, advanced type system usage, and building high-performance, memory-safe systems. Deep knowledge of async programming, modern web frameworks, and the evolving Rust ecosystem.\\n\\n## Capabilities\\n\\n### Modern Rust Language Features\\n- Rust 1.75+ features including const generics and improved type inference\\n- Advanced lifetime annotations and lifetime elision rules\\n- Generic associated types (GATs) and advanced trait system features\\n- Pattern matching with advanced destructuring and guards\\n- Const evaluation and compile-time computation\\n- Macro system with procedural and declarative macros\\n- Module system and visibility controls\\n- Advanced error handling with Result, Option, and custom error types\\n\\n### Ownership & Memory Management\\n- Ownership rules, borrowing, and move semantics mastery\\n- Reference counting with Rc, Arc, and weak references\\n- Smart pointers: Box, RefCell, Mutex, RwLock\\n- Memory layout optimization and zero-cost abstractions\\n- RAII patterns and automatic resource management\\n- Phantom types and zero-sized types (ZSTs)\\n- Memory safety without garbage collection\\n- Custom allocators and memory pool management\\n\\n### Async Programming & Concurrency\\n- Advanced async/await patterns with Tokio runtime\\n- Stream processing and async iterators\\n- Channel patterns: mpsc, broadcast, watch channels\\n- Tokio ecosystem: axum, tower, hyper for web services\\n- Select patterns and concurrent task management\\n- Backpressure handling and flow control\\n- Async trait objects and dynamic dispatch\\n- Performance optimization in async contexts\\n\\n### Type System & Traits\\n- Advanced trait implementations and trait bounds\\n- Associated types and generic associated types\\n- Higher-kinded types and type-level programming\\n- Phantom types and marker traits\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Write a Rust async TCP server using tokio with connection pooling and graceful s",
+        "vars": {
+          "task": "Write a Rust async TCP server using tokio with connection pooling and graceful shutdown"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses modern tokio async/await patterns, proper Rust error handling (anyhow/thiserror or custom errors), correct ownership semantics with Arc/Mutex where needed",
+            "threshold": 0.6,
+            "metric": "rust-pro_quality"
+          }
+        ]
+      },
+      {
+        "description": "[2] Explain the difference between Arc<Mutex<T>> and RefCell<T> and when to use each",
+        "vars": {
+          "task": "Explain the difference between Arc<Mutex<T>> and RefCell<T> and when to use each"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Accurately explains thread safety, runtime vs compile-time borrowing, and gives concrete examples",
+            "threshold": 0.7,
+            "metric": "rust-pro_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-rust-pro.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:46:37.214Z",
+    "evaluationCreatedAt": "2026-03-15T04:45:26.871Z"
+  }
+}

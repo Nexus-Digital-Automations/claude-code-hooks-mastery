@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-mVb-2026-03-15T04:23:16",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:23:16.495Z",
+    "prompts": [
+      {
+        "id": "93a449becc9d0fd793f5de57f93d354e4419a36d181136293c5157a1d916105e",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are a database architect specializing in designing scalable, performant, and maintainable data layers from the ground up.\\n\\n## Purpose\\nExpert database architect with comprehensive knowledge of data modeling, technology selection, and scalable database design. Masters both greenfield architecture and re-architecture of existing systems. Specializes in choosing the right database technology, designing optimal schemas, planning migrations, and building performance-first data architectures that scale with application growth.\\n\\n## Core Philosophy\\nDesign the data layer right from the start to avoid costly rework. Focus on choosing the right technology, modeling data correctly, and planning for scale from day one. Build architectures that are both performant today and adaptable for tomorrow's requirements.\\n\\n## Capabilities\\n\\n### Technology Selection & Evaluation\\n- **Relational databases**: PostgreSQL, MySQL, MariaDB, SQL Server, Oracle\\n- **NoSQL databases**: MongoDB, DynamoDB, Cassandra, CouchDB, Redis, Couchbase\\n- **Time-series databases**: TimescaleDB, InfluxDB, ClickHouse, QuestDB\\n- **NewSQL databases**: CockroachDB, TiDB, Google Spanner, YugabyteDB\\n- **Graph databases**: Neo4j, Amazon Neptune, ArangoDB\\n- **Search engines**: Elasticsearch, OpenSearch, Meilisearch, Typesense\\n- **Document stores**: MongoDB, Firestore, RavenDB, DocumentDB\\n- **Key-value stores**: Redis, DynamoDB, etcd, Memcached\\n- **Wide-column stores**: Cassandra, HBase, ScyllaDB, Bigtable\\n- **Multi-model databases**: ArangoDB, OrientDB, FaunaDB, CosmosDB\\n- **Decision frameworks**: Consistency vs availability trade-offs, CAP theorem implications\\n- **Technology assessment**: Performance characteristics, operational complexity, cost implications\\n- **Hybrid architectures**: Polyglot persistence, multi-database strategies, data synchronization\\n\\n### Data Modeling & Schema Design\\n- **Conceptual modeling**: Entity-relationship diagrams, domain modeling, business requirement mapping\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "database-architect",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 385,
+          "tokenUsage": {
+            "prompt": 438,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1938,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1780,
+              "prompt": 1691,
+              "completion": 89,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "database-architect_quality": 1
+          },
+          "namedScoresCount": {
+            "database-architect_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "database-architect_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1780,
+            "prompt": 1691,
+            "completion": 89,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Uses proper schema design, row-level security policies, tenant isolation, indexing strategy",
+                "threshold": 0.7,
+                "metric": "database-architect_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output includes a comprehensive PostgreSQL schema with proper schema design (tables for tenants, tenant_users, projects, tasks, audit_logs), row-level security policies (RLS enabled, policies defined), tenant isolation (via tenant_id columns and RLS functions), and indexing strategy (indexes on foreign keys and queryable columns).",
+              "tokensUsed": {
+                "total": 1780,
+                "prompt": 1691,
+                "completion": 89,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll design a comprehensive PostgreSQL schema for a multi-tenant SaaS application with row-level security (RLS). This design prioritizes security, scalability, and maintainability.\\n\\n## **Architecture Overview**\\n\\nWe'll implement a **shared database, shared schema** approach with RLS for tenant isolation. This balances security with operational simplicity.\\n\\n### **Key Design Decisions:**\\n1. **Tenant Isolation**: Row-level security with tenant context\\n2. **Performance**: Indexed tenant columns, connection pooling\\n3. **Auditing**: Comprehensive audit trails\\n4. **Scalability**: Partitioning-ready structure\\n5. **Security**: Principle of least privilege\\n\\n---\\n\\n## **Core Schema Design**\\n\\n```sql\\n-- Enable required extensions\\nCREATE EXTENSION IF NOT EXISTS \\\"uuid-ossp\\\";\\nCREATE EXTENSION IF NOT EXISTS \\\"pgcrypto\\\";\\n\\n-- ============================================\\n-- 1. TENANT MANAGEMENT\\n-- ============================================\\n\\nCREATE TABLE tenants (\\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\\n    name VARCHAR(255) NOT NULL,\\n    subdomain VARCHAR(63) UNIQUE NOT NULL,\\n    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'pending')),\\n    plan_tier VARCHAR(50) DEFAULT 'starter',\\n    settings JSONB DEFAULT '{}'::jsonb,\\n    created_at TIMESTAMPTZ DEFAULT NOW(),\\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\\n    deleted_at TIMESTAMPTZ,\\n    \\n    -- Performance indexes\\n    INDEX idx_tenants_subdomain (subdomain),\\n    INDEX idx_tenants_status (status)\\n);\\n\\n-- Tenant users (cross-tenant user management)\\nCREATE TABLE tenant_users (\\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\\n    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    user_id UUID NOT NULL,\\n    role VARCHAR(50) DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member', 'viewer')),\\n    permissions JSONB DEFAULT '{}'::jsonb,\\n    invited_by UUID,\\n    invited_at TIMESTAMPTZ,\\n    joined_at TIMESTAMPTZ DEFAULT NOW(),\\n    last_active_at TIMESTAMPTZ,\\n    \\n    UNIQUE(tenant_id, user_id),\\n    \\n    -- Performance indexes\\n    INDEX idx_tenant_users_tenant_id (tenant_id),\\n    INDEX idx_tenant_users_user_id (user_id),\\n    INDEX idx_tenant_users_role (role)\\n);\\n\\n-- ============================================\\n-- 2. APPLICATION SCHEMA (Tenant-specific data)\\n-- ============================================\\n\\n-- Example: Projects table (tenant-specific)\\nCREATE TABLE projects (\\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\\n    tenant_id UUID NOT NULL,\\n    name VARCHAR(255) NOT NULL,\\n    description TEXT,\\n    status VARCHAR(50) DEFAULT 'active',\\n    settings JSONB DEFAULT '{}'::jsonb,\\n    created_by UUID,\\n    created_at TIMESTAMPTZ DEFAULT NOW(),\\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\\n    deleted_at TIMESTAMPTZ,\\n    \\n    -- Foreign key to tenants (enforced by RLS)\\n    CONSTRAINT fk_projects_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id),\\n    \\n    -- Performance indexes\\n    INDEX idx_projects_tenant_id (tenant_id),\\n    INDEX idx_projects_status (status),\\n    INDEX idx_projects_created_at (created_at)\\n);\\n\\n-- Example: Tasks table (nested tenant data)\\nCREATE TABLE tasks (\\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\\n    tenant_id UUID NOT NULL,\\n    project_id UUID NOT NULL,\\n    title VARCHAR(500) NOT NULL,\\n    description TEXT,\\n    status VARCHAR(50) DEFAULT 'todo',\\n    priority INTEGER DEFAULT 3,\\n    assignee_id UUID,\\n    due_date DATE,\\n    completed_at TIMESTAMPTZ,\\n    metadata JSONB DEFAULT '{}'::jsonb,\\n    created_at TIMESTAMPTZ DEFAULT NOW(),\\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\\n    deleted_at TIMESTAMPTZ,\\n    \\n    -- Foreign keys\\n    CONSTRAINT fk_tasks_project FOREIGN KEY (project_id) REFERENCES projects(id),\\n    \\n    -- Performance indexes\\n    INDEX idx_tasks_tenant_id (tenant_id),\\n    INDEX idx_tasks_project_id (project_id),\\n    INDEX idx_tasks_status (status),\\n    INDEX idx_tasks_assignee_id (assignee_id),\\n    INDEX idx_tasks_due_date (due_date)\\n);\\n\\n-- ============================================\\n-- 3. AUDIT LOGGING\\n-- ============================================\\n\\nCREATE TABLE audit_logs (\\n    id BIGSERIAL PRIMARY KEY,\\n    tenant_id UUID,\\n    table_name VARCHAR(100) NOT NULL,\\n    record_id UUID NOT NULL,\\n    action VARCHAR(10) CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),\\n    old_data JSONB,\\n    new_data JSONB,\\n    changed_fields TEXT[],\\n    performed_by UUID,\\n    performed_at TIMESTAMPTZ DEFAULT NOW(),\\n    ip_address INET,\\n    user_agent TEXT,\\n    \\n    -- Performance indexes\\n    INDEX idx_audit_logs_tenant_id (tenant_id),\\n    INDEX idx_audit_logs_table_record (table_name, record_id),\\n    INDEX idx_audit_logs_performed_at (performed_at)\\n);\\n\\n-- ============================================\\n-- 4. ROW-LEVEL SECURITY SETUP\\n-- ============================================\\n\\n-- Create application roles\\nCREATE ROLE authenticator NOINHERIT;\\nCREATE ROLE tenant_user;\\nCREATE ROLE tenant_admin;\\nCREATE ROLE system_admin;\\n\\n-- Grant basic permissions\\nGRANT CONNECT ON DATABASE current_database() TO authenticator;\\nGRANT USAGE ON SCHEMA public TO authenticator;\\n\\n-- Enable RLS on all tenant-specific tables\\nALTER TABLE projects ENABLE ROW LEVEL SECURITY;\\nALTER TABLE tasks ENABLE ROW LEVEL SECURITY;\\nALTER TABLE tenant_users ENABLE ROW LEVEL SECURITY;\\nALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;\\n\\n-- ============================================\\n-- 5. RLS POLICIES\\n-- ============================================\\n\\n-- Function to get current tenant context\\nCREATE OR REPLACE FUNCTION current_tenant_id()\\nRETURNS UUID AS $$\\nBEGIN\\n    RETURN current_setting('app.current_tenant_id', TRUE)::UUID;\\nEXCEPTION\\n    WHEN OTHERS THEN\\n        RETURN NULL;\\nEND;\\n$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;\\n\\n-- Function to get current user role for tenant\\nCREATE OR REPLACE FUNCTION current_tenant_role()\\nRETURNS VARCHAR AS $$\\nBEGIN\\n    RETURN current_setting('app.current_tenant_role', TRUE);\\nEXCEPTION\\n    WHEN OTHERS THEN\\n        RETURN NULL;\\nEND;\\n$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;\\n\\n-- Policy for tenant_users (users can see their own tenant memberships)\\nCREATE POLICY tenant_users_policy ON tenant_users\\n    USING (tenant_id = current_tenant_id() OR \\n           current_tenant_role() = 'system_admin');\\n\\n-- Policy for projects (tenant isolation)\\nCREATE POLICY projects_policy ON projects\\n    USING (tenant\\n</Output>\\n<Rubric>\\nUses proper schema design, row-level security policies, tenant isolation, indexing strategy\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "c77a3808-b581-4320-898e-6ce2717fc639",
+        "latencyMs": 385,
+        "namedScores": {
+          "database-architect_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a database architect specializing in designing scalable, performant, and maintainable data layers from the ground up.\\n\\n## Purpose\\nExpert database architect with comprehensive knowledge of data modeling, technology selection, and scalable database design. Masters both greenfield architecture and re-architecture of existing systems. Specializes in choosing the right database technology, designing optimal schemas, planning migrations, and building performance-first data architectures that scale with application growth.\\n\\n## Core Philosophy\\nDesign the data layer right from the start to avoid costly rework. Focus on choosing the right technology, modeling data correctly, and planning for scale from day one. Build architectures that are both performant today and adaptable for tomorrow's requirements.\\n\\n## Capabilities\\n\\n### Technology Selection & Evaluation\\n- **Relational databases**: PostgreSQL, MySQL, MariaDB, SQL Server, Oracle\\n- **NoSQL databases**: MongoDB, DynamoDB, Cassandra, CouchDB, Redis, Couchbase\\n- **Time-series databases**: TimescaleDB, InfluxDB, ClickHouse, QuestDB\\n- **NewSQL databases**: CockroachDB, TiDB, Google Spanner, YugabyteDB\\n- **Graph databases**: Neo4j, Amazon Neptune, ArangoDB\\n- **Search engines**: Elasticsearch, OpenSearch, Meilisearch, Typesense\\n- **Document stores**: MongoDB, Firestore, RavenDB, DocumentDB\\n- **Key-value stores**: Redis, DynamoDB, etcd, Memcached\\n- **Wide-column stores**: Cassandra, HBase, ScyllaDB, Bigtable\\n- **Multi-model databases**: ArangoDB, OrientDB, FaunaDB, CosmosDB\\n- **Decision frameworks**: Consistency vs availability trade-offs, CAP theorem implications\\n- **Technology assessment**: Performance characteristics, operational complexity, cost implications\\n- **Hybrid architectures**: Polyglot persistence, multi-database strategies, data synchronization\\n\\n### Data Modeling & Schema Design\\n- **Conceptual modeling**: Entity-relationship diagrams, domain modeling, business requirement mapping\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Design a PostgreSQL schema for a multi-tenant SaaS application with row-level security\"\n  }\n]",
+          "label": "database-architect",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "93a449becc9d0fd793f5de57f93d354e4419a36d181136293c5157a1d916105e",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll design a comprehensive PostgreSQL schema for a multi-tenant SaaS application with row-level security (RLS). This design prioritizes security, scalability, and maintainability.\n\n## **Architecture Overview**\n\nWe'll implement a **shared database, shared schema** approach with RLS for tenant isolation. This balances security with operational simplicity.\n\n### **Key Design Decisions:**\n1. **Tenant Isolation**: Row-level security with tenant context\n2. **Performance**: Indexed tenant columns, connection pooling\n3. **Auditing**: Comprehensive audit trails\n4. **Scalability**: Partitioning-ready structure\n5. **Security**: Principle of least privilege\n\n---\n\n## **Core Schema Design**\n\n```sql\n-- Enable required extensions\nCREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";\nCREATE EXTENSION IF NOT EXISTS \"pgcrypto\";\n\n-- ============================================\n-- 1. TENANT MANAGEMENT\n-- ============================================\n\nCREATE TABLE tenants (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    name VARCHAR(255) NOT NULL,\n    subdomain VARCHAR(63) UNIQUE NOT NULL,\n    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'pending')),\n    plan_tier VARCHAR(50) DEFAULT 'starter',\n    settings JSONB DEFAULT '{}'::jsonb,\n    created_at TIMESTAMPTZ DEFAULT NOW(),\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\n    deleted_at TIMESTAMPTZ,\n    \n    -- Performance indexes\n    INDEX idx_tenants_subdomain (subdomain),\n    INDEX idx_tenants_status (status)\n);\n\n-- Tenant users (cross-tenant user management)\nCREATE TABLE tenant_users (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    user_id UUID NOT NULL,\n    role VARCHAR(50) DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member', 'viewer')),\n    permissions JSONB DEFAULT '{}'::jsonb,\n    invited_by UUID,\n    invited_at TIMESTAMPTZ,\n    joined_at TIMESTAMPTZ DEFAULT NOW(),\n    last_active_at TIMESTAMPTZ,\n    \n    UNIQUE(tenant_id, user_id),\n    \n    -- Performance indexes\n    INDEX idx_tenant_users_tenant_id (tenant_id),\n    INDEX idx_tenant_users_user_id (user_id),\n    INDEX idx_tenant_users_role (role)\n);\n\n-- ============================================\n-- 2. APPLICATION SCHEMA (Tenant-specific data)\n-- ============================================\n\n-- Example: Projects table (tenant-specific)\nCREATE TABLE projects (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    tenant_id UUID NOT NULL,\n    name VARCHAR(255) NOT NULL,\n    description TEXT,\n    status VARCHAR(50) DEFAULT 'active',\n    settings JSONB DEFAULT '{}'::jsonb,\n    created_by UUID,\n    created_at TIMESTAMPTZ DEFAULT NOW(),\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\n    deleted_at TIMESTAMPTZ,\n    \n    -- Foreign key to tenants (enforced by RLS)\n    CONSTRAINT fk_projects_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id),\n    \n    -- Performance indexes\n    INDEX idx_projects_tenant_id (tenant_id),\n    INDEX idx_projects_status (status),\n    INDEX idx_projects_created_at (created_at)\n);\n\n-- Example: Tasks table (nested tenant data)\nCREATE TABLE tasks (\n    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),\n    tenant_id UUID NOT NULL,\n    project_id UUID NOT NULL,\n    title VARCHAR(500) NOT NULL,\n    description TEXT,\n    status VARCHAR(50) DEFAULT 'todo',\n    priority INTEGER DEFAULT 3,\n    assignee_id UUID,\n    due_date DATE,\n    completed_at TIMESTAMPTZ,\n    metadata JSONB DEFAULT '{}'::jsonb,\n    created_at TIMESTAMPTZ DEFAULT NOW(),\n    updated_at TIMESTAMPTZ DEFAULT NOW(),\n    deleted_at TIMESTAMPTZ,\n    \n    -- Foreign keys\n    CONSTRAINT fk_tasks_project FOREIGN KEY (project_id) REFERENCES projects(id),\n    \n    -- Performance indexes\n    INDEX idx_tasks_tenant_id (tenant_id),\n    INDEX idx_tasks_project_id (project_id),\n    INDEX idx_tasks_status (status),\n    INDEX idx_tasks_assignee_id (assignee_id),\n    INDEX idx_tasks_due_date (due_date)\n);\n\n-- ============================================\n-- 3. AUDIT LOGGING\n-- ============================================\n\nCREATE TABLE audit_logs (\n    id BIGSERIAL PRIMARY KEY,\n    tenant_id UUID,\n    table_name VARCHAR(100) NOT NULL,\n    record_id UUID NOT NULL,\n    action VARCHAR(10) CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),\n    old_data JSONB,\n    new_data JSONB,\n    changed_fields TEXT[],\n    performed_by UUID,\n    performed_at TIMESTAMPTZ DEFAULT NOW(),\n    ip_address INET,\n    user_agent TEXT,\n    \n    -- Performance indexes\n    INDEX idx_audit_logs_tenant_id (tenant_id),\n    INDEX idx_audit_logs_table_record (table_name, record_id),\n    INDEX idx_audit_logs_performed_at (performed_at)\n);\n\n-- ============================================\n-- 4. ROW-LEVEL SECURITY SETUP\n-- ============================================\n\n-- Create application roles\nCREATE ROLE authenticator NOINHERIT;\nCREATE ROLE tenant_user;\nCREATE ROLE tenant_admin;\nCREATE ROLE system_admin;\n\n-- Grant basic permissions\nGRANT CONNECT ON DATABASE current_database() TO authenticator;\nGRANT USAGE ON SCHEMA public TO authenticator;\n\n-- Enable RLS on all tenant-specific tables\nALTER TABLE projects ENABLE ROW LEVEL SECURITY;\nALTER TABLE tasks ENABLE ROW LEVEL SECURITY;\nALTER TABLE tenant_users ENABLE ROW LEVEL SECURITY;\nALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;\n\n-- ============================================\n-- 5. RLS POLICIES\n-- ============================================\n\n-- Function to get current tenant context\nCREATE OR REPLACE FUNCTION current_tenant_id()\nRETURNS UUID AS $$\nBEGIN\n    RETURN current_setting('app.current_tenant_id', TRUE)::UUID;\nEXCEPTION\n    WHEN OTHERS THEN\n        RETURN NULL;\nEND;\n$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;\n\n-- Function to get current user role for tenant\nCREATE OR REPLACE FUNCTION current_tenant_role()\nRETURNS VARCHAR AS $$\nBEGIN\n    RETURN current_setting('app.current_tenant_role', TRUE);\nEXCEPTION\n    WHEN OTHERS THEN\n        RETURN NULL;\nEND;\n$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;\n\n-- Policy for tenant_users (users can see their own tenant memberships)\nCREATE POLICY tenant_users_policy ON tenant_users\n    USING (tenant_id = current_tenant_id() OR \n           current_tenant_role() = 'system_admin');\n\n-- Policy for projects (tenant isolation)\nCREATE POLICY projects_policy ON projects\n    USING (tenant",
+          "tokenUsage": {
+            "total": 1938,
+            "prompt": 438,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 385,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:23:16 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 864750bfd12723eb69620fdbbc8139d2.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "MqcWk_QtFjLO52jcAxdocKlMie11URKSbjt-67wv8wLMKrU46SbmNg==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "408749c947acb903533e220ae0df2147"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Design a PostgreSQL schema for a multi-tenant SaaS application with row-level se",
+          "vars": {
+            "task": "Design a PostgreSQL schema for a multi-tenant SaaS application with row-level security"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Uses proper schema design, row-level security policies, tenant isolation, indexing strategy",
+              "threshold": 0.7,
+              "metric": "database-architect_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Design a PostgreSQL schema for a multi-tenant SaaS application with row-level security"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:23:16 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 864750bfd12723eb69620fdbbc8139d2.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "MqcWk_QtFjLO52jcAxdocKlMie11URKSbjt-67wv8wLMKrU46SbmNg==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "408749c947acb903533e220ae0df2147"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 438,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1938,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1780,
+          "prompt": 1691,
+          "completion": 89,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 64808,
+      "evaluationDurationMs": 64808
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: database-architect",
+    "prompts": [
+      {
+        "label": "database-architect",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are a database architect specializing in designing scalable, performant, and maintainable data layers from the ground up.\\n\\n## Purpose\\nExpert database architect with comprehensive knowledge of data modeling, technology selection, and scalable database design. Masters both greenfield architecture and re-architecture of existing systems. Specializes in choosing the right database technology, designing optimal schemas, planning migrations, and building performance-first data architectures that scale with application growth.\\n\\n## Core Philosophy\\nDesign the data layer right from the start to avoid costly rework. Focus on choosing the right technology, modeling data correctly, and planning for scale from day one. Build architectures that are both performant today and adaptable for tomorrow's requirements.\\n\\n## Capabilities\\n\\n### Technology Selection & Evaluation\\n- **Relational databases**: PostgreSQL, MySQL, MariaDB, SQL Server, Oracle\\n- **NoSQL databases**: MongoDB, DynamoDB, Cassandra, CouchDB, Redis, Couchbase\\n- **Time-series databases**: TimescaleDB, InfluxDB, ClickHouse, QuestDB\\n- **NewSQL databases**: CockroachDB, TiDB, Google Spanner, YugabyteDB\\n- **Graph databases**: Neo4j, Amazon Neptune, ArangoDB\\n- **Search engines**: Elasticsearch, OpenSearch, Meilisearch, Typesense\\n- **Document stores**: MongoDB, Firestore, RavenDB, DocumentDB\\n- **Key-value stores**: Redis, DynamoDB, etcd, Memcached\\n- **Wide-column stores**: Cassandra, HBase, ScyllaDB, Bigtable\\n- **Multi-model databases**: ArangoDB, OrientDB, FaunaDB, CosmosDB\\n- **Decision frameworks**: Consistency vs availability trade-offs, CAP theorem implications\\n- **Technology assessment**: Performance characteristics, operational complexity, cost implications\\n- **Hybrid architectures**: Polyglot persistence, multi-database strategies, data synchronization\\n\\n### Data Modeling & Schema Design\\n- **Conceptual modeling**: Entity-relationship diagrams, domain modeling, business requirement mapping\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Design a PostgreSQL schema for a multi-tenant SaaS application with row-level se",
+        "vars": {
+          "task": "Design a PostgreSQL schema for a multi-tenant SaaS application with row-level security"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Uses proper schema design, row-level security policies, tenant isolation, indexing strategy",
+            "threshold": 0.7,
+            "metric": "database-architect_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-database-architect.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:24:21.351Z",
+    "evaluationCreatedAt": "2026-03-15T04:23:16.495Z"
+  }
+}

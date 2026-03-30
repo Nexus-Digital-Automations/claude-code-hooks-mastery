@@ -1,0 +1,319 @@
+{
+  "evalId": "eval-8Un-2026-03-15T04:50:00",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-03-15T04:50:00.788Z",
+    "prompts": [
+      {
+        "id": "82e815b5bdb1b20be44464996dfdaa7d83e3e3d3d0643bb6d07a5c09a3ef89da",
+        "raw": "[{\"role\": \"system\", \"content\": \"You are an expert TDD orchestrator specializing in comprehensive test-driven development coordination, modern TDD practices, and multi-agent workflow management.\\n\\n## Expert Purpose\\nElite TDD orchestrator focused on enforcing disciplined test-driven development practices across complex software projects. Masters the complete red-green-refactor cycle, coordinates multi-agent TDD workflows, and ensures comprehensive test coverage while maintaining development velocity. Combines deep TDD expertise with modern AI-assisted testing tools to deliver robust, maintainable, and thoroughly tested software systems.\\n\\n## Capabilities\\n\\n### TDD Discipline & Cycle Management\\n- Complete red-green-refactor cycle orchestration and enforcement\\n- TDD rhythm establishment and maintenance across development teams\\n- Test-first discipline verification and automated compliance checking\\n- Refactoring safety nets and regression prevention strategies\\n- TDD flow state optimization and developer productivity enhancement\\n- Cycle time measurement and optimization for rapid feedback loops\\n- TDD anti-pattern detection and prevention (test-after, partial coverage)\\n\\n### Multi-Agent TDD Workflow Coordination\\n- Orchestration of specialized testing agents (unit, integration, E2E)\\n- Coordinated test suite evolution across multiple development streams\\n- Cross-team TDD practice synchronization and knowledge sharing\\n- Agent task delegation for parallel test development and execution\\n- Workflow automation for continuous TDD compliance monitoring\\n- Integration with development tools and IDE TDD plugins\\n- Multi-repository TDD governance and consistency enforcement\\n\\n### Modern TDD Practices & Methodologies\\n- Classic TDD (Chicago School) implementation and coaching\\n- London School (mockist) TDD practices and double management\\n- Acceptance Test-Driven Development (ATDD) integration\\n- Behavior-Driven Development (BDD) workflow orchestration\\n- Outside-in TDD for feature development and user story implementation\\n\\n[... truncated ...]\"}, {\"role\": \"user\", \"content\": \"{{task}}\"}]",
+        "label": "tdd-orchestrator",
+        "provider": "openai:chat:deepseek-chat",
+        "metrics": {
+          "score": 1,
+          "testPassCount": 1,
+          "testFailCount": 0,
+          "testErrorCount": 0,
+          "assertPassCount": 1,
+          "assertFailCount": 0,
+          "totalLatencyMs": 413,
+          "tokenUsage": {
+            "prompt": 386,
+            "completion": 1500,
+            "cached": 0,
+            "total": 1886,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0
+            },
+            "assertions": {
+              "total": 1761,
+              "prompt": 1698,
+              "completion": 63,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0
+              }
+            }
+          },
+          "namedScores": {
+            "tdd-orchestrator_quality": 1
+          },
+          "namedScoresCount": {
+            "tdd-orchestrator_quality": 1
+          },
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {
+            "tdd-orchestrator_quality": 1
+          },
+          "tokensUsed": {
+            "total": 1761,
+            "prompt": 1698,
+            "completion": 63,
+            "cached": 0,
+            "numRequests": 1
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Demonstrates red-green-refactor cycle, starts with failing test, implements minimum code, refactors, proper assertions",
+                "threshold": 0.7,
+                "metric": "tdd-orchestrator_quality"
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "The output demonstrates the red-green-refactor cycle by starting with a failing test (RED), implementing minimal code to pass (GREEN), and then refactoring, with proper assertions used throughout each phase.",
+              "tokensUsed": {
+                "total": 1761,
+                "prompt": 1698,
+                "completion": 63,
+                "cached": 0,
+                "numRequests": 1,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nI'll guide you through a complete TDD cycle for implementing a shopping cart in Python. Let's start with the classic red-green-refactor approach.\\n\\n## **TDD Cycle: Shopping Cart Implementation**\\n\\n### **Phase 1: Setup & First Test**\\n\\n**Step 1: Create test file** (`test_shopping_cart.py`)\\n```python\\nimport pytest\\nfrom shopping_cart import ShoppingCart\\n```\\n\\n**Step 2: First Test - RED** (Test fails because class doesn't exist)\\n```python\\ndef test_can_create_empty_cart():\\n    \\\"\\\"\\\"Test that we can create an empty shopping cart\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    assert cart is not None\\n```\\n\\n**Step 3: Minimal Implementation - GREEN**\\nCreate `shopping_cart.py`:\\n```python\\nclass ShoppingCart:\\n    pass\\n```\\n\\n**Step 4: REFACTOR** (No refactoring needed yet)\\n\\n---\\n\\n### **Phase 2: Add Item Functionality**\\n\\n**Step 1: RED** - Test adding an item\\n```python\\ndef test_can_add_item_to_cart():\\n    \\\"\\\"\\\"Test adding a single item to the cart\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.add_item(\\\"Apple\\\", 1.50)\\n    assert cart.get_item_count() == 1\\n```\\n\\n**Step 2: GREEN** - Minimal implementation\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self.items = []\\n    \\n    def add_item(self, name, price):\\n        self.items.append((name, price))\\n    \\n    def get_item_count(self):\\n        return len(self.items)\\n```\\n\\n**Step 3: REFACTOR** - Improve method names\\n```python\\ndef test_can_add_item_to_cart():\\n    cart = ShoppingCart()\\n    cart.add(\\\"Apple\\\", 1.50)\\n    assert cart.item_count == 1\\n```\\n\\nUpdate implementation:\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self._items = []\\n    \\n    def add(self, name, price):\\n        self._items.append({\\\"name\\\": name, \\\"price\\\": price})\\n    \\n    @property\\n    def item_count(self):\\n        return len(self._items)\\n```\\n\\n---\\n\\n### **Phase 3: Calculate Total**\\n\\n**Step 1: RED** - Test total calculation\\n```python\\ndef test_calculate_total_for_single_item():\\n    \\\"\\\"\\\"Test total calculation for single item\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.add(\\\"Apple\\\", 1.50)\\n    assert cart.total == 1.50\\n\\ndef test_calculate_total_for_multiple_items():\\n    \\\"\\\"\\\"Test total calculation for multiple items\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.add(\\\"Apple\\\", 1.50)\\n    cart.add(\\\"Banana\\\", 0.75)\\n    cart.add(\\\"Orange\\\", 1.25)\\n    assert cart.total == 3.50\\n```\\n\\n**Step 2: GREEN** - Implement total calculation\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self._items = []\\n    \\n    def add(self, name, price):\\n        self._items.append({\\\"name\\\": name, \\\"price\\\": price})\\n    \\n    @property\\n    def item_count(self):\\n        return len(self._items)\\n    \\n    @property\\n    def total(self):\\n        return sum(item[\\\"price\\\"] for item in self._items)\\n```\\n\\n**Step 3: REFACTOR** - Extract item as a dataclass\\n```python\\nfrom dataclasses import dataclass\\n\\n@dataclass\\nclass CartItem:\\n    name: str\\n    price: float\\n\\nclass ShoppingCart:\\n    def __init__(self):\\n        self._items = []\\n    \\n    def add(self, name, price):\\n        self._items.append(CartItem(name, price))\\n    \\n    @property\\n    def item_count(self):\\n        return len(self._items)\\n    \\n    @property\\n    def total(self):\\n        return sum(item.price for item in self._items)\\n```\\n\\n---\\n\\n### **Phase 4: Remove Item Functionality**\\n\\n**Step 1: RED** - Test removing items\\n```python\\ndef test_can_remove_item_by_name():\\n    \\\"\\\"\\\"Test removing an item by name\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.add(\\\"Apple\\\", 1.50)\\n    cart.add(\\\"Banana\\\", 0.75)\\n    cart.add(\\\"Apple\\\", 1.50)  # Second apple\\n    \\n    cart.remove(\\\"Apple\\\")\\n    assert cart.item_count == 2\\n    assert cart.total == 2.25  # Only banana + one apple removed\\n\\ndef test_remove_nonexistent_item():\\n    \\\"\\\"\\\"Test removing item that doesn't exist\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.add(\\\"Apple\\\", 1.50)\\n    \\n    # Should not raise error, just do nothing\\n    cart.remove(\\\"Banana\\\")\\n    assert cart.item_count == 1\\n```\\n\\n**Step 2: GREEN** - Implement remove functionality\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self._items = []\\n    \\n    def add(self, name, price):\\n        self._items.append(CartItem(name, price))\\n    \\n    def remove(self, name):\\n        \\\"\\\"\\\"Remove first occurrence of item with given name\\\"\\\"\\\"\\n        for i, item in enumerate(self._items):\\n            if item.name == name:\\n                del self._items[i]\\n                break\\n    \\n    @property\\n    def item_count(self):\\n        return len(self._items)\\n    \\n    @property\\n    def total(self):\\n        return sum(item.price for item in self._items)\\n```\\n\\n**Step 3: REFACTOR** - Improve remove logic and add edge case tests\\n```python\\ndef test_remove_all_instances_of_item():\\n    \\\"\\\"\\\"Test removing all instances of an item\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.add(\\\"Apple\\\", 1.50)\\n    cart.add(\\\"Banana\\\", 0.75)\\n    cart.add(\\\"Apple\\\", 1.50)\\n    \\n    cart.remove_all(\\\"Apple\\\")\\n    assert cart.item_count == 1\\n    assert cart.total == 0.75\\n\\ndef test_remove_from_empty_cart():\\n    \\\"\\\"\\\"Test removing from empty cart\\\"\\\"\\\"\\n    cart = ShoppingCart()\\n    cart.remove(\\\"Apple\\\")  # Should not raise error\\n    assert cart.item_count == 0\\n```\\n\\nUpdate implementation:\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self._items = []\\n    \\n    def add(self, name, price):\\n        self._items.append(CartItem(name, price))\\n    \\n    def remove(self, name):\\n        \\\"\\\"\\\"Remove first occurrence of item with given name\\\"\\\"\\\"\\n        for i, item in enumerate(self._items):\\n            if item.name == name:\\n                del self._items[i]\\n                break\\n    \\n    def remove_all(self, name):\\n        \\\"\\\"\\\"Remove all items with given name\\\"\\\"\\\"\\n        self._items = [item for item in self._items if item.name != name]\\n    \\n    @property\\n    def item_count(self):\\n        return len(self._items)\\n    \\n    @property\\n    def total(self):\\n        return sum(item.price for item in self._items)\\n```\\n\\n---\\n\\n### **Phase 5: Advanced Features & Edge Cases**\\n\\n**Step 1: RED** - Test\\n</Output>\\n<Rubric>\\nDemonstrates red-green-refactor cycle, starts with failing test, implements minimum code, refactors, proper assertions\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "e4279dc0-fe41-497c-9236-527a3e36d861",
+        "latencyMs": 413,
+        "namedScores": {
+          "tdd-orchestrator_quality": 1
+        },
+        "prompt": {
+          "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are an expert TDD orchestrator specializing in comprehensive test-driven development coordination, modern TDD practices, and multi-agent workflow management.\\n\\n## Expert Purpose\\nElite TDD orchestrator focused on enforcing disciplined test-driven development practices across complex software projects. Masters the complete red-green-refactor cycle, coordinates multi-agent TDD workflows, and ensures comprehensive test coverage while maintaining development velocity. Combines deep TDD expertise with modern AI-assisted testing tools to deliver robust, maintainable, and thoroughly tested software systems.\\n\\n## Capabilities\\n\\n### TDD Discipline & Cycle Management\\n- Complete red-green-refactor cycle orchestration and enforcement\\n- TDD rhythm establishment and maintenance across development teams\\n- Test-first discipline verification and automated compliance checking\\n- Refactoring safety nets and regression prevention strategies\\n- TDD flow state optimization and developer productivity enhancement\\n- Cycle time measurement and optimization for rapid feedback loops\\n- TDD anti-pattern detection and prevention (test-after, partial coverage)\\n\\n### Multi-Agent TDD Workflow Coordination\\n- Orchestration of specialized testing agents (unit, integration, E2E)\\n- Coordinated test suite evolution across multiple development streams\\n- Cross-team TDD practice synchronization and knowledge sharing\\n- Agent task delegation for parallel test development and execution\\n- Workflow automation for continuous TDD compliance monitoring\\n- Integration with development tools and IDE TDD plugins\\n- Multi-repository TDD governance and consistency enforcement\\n\\n### Modern TDD Practices & Methodologies\\n- Classic TDD (Chicago School) implementation and coaching\\n- London School (mockist) TDD practices and double management\\n- Acceptance Test-Driven Development (ATDD) integration\\n- Behavior-Driven Development (BDD) workflow orchestration\\n- Outside-in TDD for feature development and user story implementation\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Show me the TDD cycle for implementing a shopping cart with add/remove/total functionality in Python\"\n  }\n]",
+          "label": "tdd-orchestrator",
+          "config": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          }
+        },
+        "promptId": "82e815b5bdb1b20be44464996dfdaa7d83e3e3d3d0643bb6d07a5c09a3ef89da",
+        "promptIdx": 0,
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "label": ""
+        },
+        "response": {
+          "output": "I'll guide you through a complete TDD cycle for implementing a shopping cart in Python. Let's start with the classic red-green-refactor approach.\n\n## **TDD Cycle: Shopping Cart Implementation**\n\n### **Phase 1: Setup & First Test**\n\n**Step 1: Create test file** (`test_shopping_cart.py`)\n```python\nimport pytest\nfrom shopping_cart import ShoppingCart\n```\n\n**Step 2: First Test - RED** (Test fails because class doesn't exist)\n```python\ndef test_can_create_empty_cart():\n    \"\"\"Test that we can create an empty shopping cart\"\"\"\n    cart = ShoppingCart()\n    assert cart is not None\n```\n\n**Step 3: Minimal Implementation - GREEN**\nCreate `shopping_cart.py`:\n```python\nclass ShoppingCart:\n    pass\n```\n\n**Step 4: REFACTOR** (No refactoring needed yet)\n\n---\n\n### **Phase 2: Add Item Functionality**\n\n**Step 1: RED** - Test adding an item\n```python\ndef test_can_add_item_to_cart():\n    \"\"\"Test adding a single item to the cart\"\"\"\n    cart = ShoppingCart()\n    cart.add_item(\"Apple\", 1.50)\n    assert cart.get_item_count() == 1\n```\n\n**Step 2: GREEN** - Minimal implementation\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self.items = []\n    \n    def add_item(self, name, price):\n        self.items.append((name, price))\n    \n    def get_item_count(self):\n        return len(self.items)\n```\n\n**Step 3: REFACTOR** - Improve method names\n```python\ndef test_can_add_item_to_cart():\n    cart = ShoppingCart()\n    cart.add(\"Apple\", 1.50)\n    assert cart.item_count == 1\n```\n\nUpdate implementation:\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self._items = []\n    \n    def add(self, name, price):\n        self._items.append({\"name\": name, \"price\": price})\n    \n    @property\n    def item_count(self):\n        return len(self._items)\n```\n\n---\n\n### **Phase 3: Calculate Total**\n\n**Step 1: RED** - Test total calculation\n```python\ndef test_calculate_total_for_single_item():\n    \"\"\"Test total calculation for single item\"\"\"\n    cart = ShoppingCart()\n    cart.add(\"Apple\", 1.50)\n    assert cart.total == 1.50\n\ndef test_calculate_total_for_multiple_items():\n    \"\"\"Test total calculation for multiple items\"\"\"\n    cart = ShoppingCart()\n    cart.add(\"Apple\", 1.50)\n    cart.add(\"Banana\", 0.75)\n    cart.add(\"Orange\", 1.25)\n    assert cart.total == 3.50\n```\n\n**Step 2: GREEN** - Implement total calculation\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self._items = []\n    \n    def add(self, name, price):\n        self._items.append({\"name\": name, \"price\": price})\n    \n    @property\n    def item_count(self):\n        return len(self._items)\n    \n    @property\n    def total(self):\n        return sum(item[\"price\"] for item in self._items)\n```\n\n**Step 3: REFACTOR** - Extract item as a dataclass\n```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass CartItem:\n    name: str\n    price: float\n\nclass ShoppingCart:\n    def __init__(self):\n        self._items = []\n    \n    def add(self, name, price):\n        self._items.append(CartItem(name, price))\n    \n    @property\n    def item_count(self):\n        return len(self._items)\n    \n    @property\n    def total(self):\n        return sum(item.price for item in self._items)\n```\n\n---\n\n### **Phase 4: Remove Item Functionality**\n\n**Step 1: RED** - Test removing items\n```python\ndef test_can_remove_item_by_name():\n    \"\"\"Test removing an item by name\"\"\"\n    cart = ShoppingCart()\n    cart.add(\"Apple\", 1.50)\n    cart.add(\"Banana\", 0.75)\n    cart.add(\"Apple\", 1.50)  # Second apple\n    \n    cart.remove(\"Apple\")\n    assert cart.item_count == 2\n    assert cart.total == 2.25  # Only banana + one apple removed\n\ndef test_remove_nonexistent_item():\n    \"\"\"Test removing item that doesn't exist\"\"\"\n    cart = ShoppingCart()\n    cart.add(\"Apple\", 1.50)\n    \n    # Should not raise error, just do nothing\n    cart.remove(\"Banana\")\n    assert cart.item_count == 1\n```\n\n**Step 2: GREEN** - Implement remove functionality\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self._items = []\n    \n    def add(self, name, price):\n        self._items.append(CartItem(name, price))\n    \n    def remove(self, name):\n        \"\"\"Remove first occurrence of item with given name\"\"\"\n        for i, item in enumerate(self._items):\n            if item.name == name:\n                del self._items[i]\n                break\n    \n    @property\n    def item_count(self):\n        return len(self._items)\n    \n    @property\n    def total(self):\n        return sum(item.price for item in self._items)\n```\n\n**Step 3: REFACTOR** - Improve remove logic and add edge case tests\n```python\ndef test_remove_all_instances_of_item():\n    \"\"\"Test removing all instances of an item\"\"\"\n    cart = ShoppingCart()\n    cart.add(\"Apple\", 1.50)\n    cart.add(\"Banana\", 0.75)\n    cart.add(\"Apple\", 1.50)\n    \n    cart.remove_all(\"Apple\")\n    assert cart.item_count == 1\n    assert cart.total == 0.75\n\ndef test_remove_from_empty_cart():\n    \"\"\"Test removing from empty cart\"\"\"\n    cart = ShoppingCart()\n    cart.remove(\"Apple\")  # Should not raise error\n    assert cart.item_count == 0\n```\n\nUpdate implementation:\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self._items = []\n    \n    def add(self, name, price):\n        self._items.append(CartItem(name, price))\n    \n    def remove(self, name):\n        \"\"\"Remove first occurrence of item with given name\"\"\"\n        for i, item in enumerate(self._items):\n            if item.name == name:\n                del self._items[i]\n                break\n    \n    def remove_all(self, name):\n        \"\"\"Remove all items with given name\"\"\"\n        self._items = [item for item in self._items if item.name != name]\n    \n    @property\n    def item_count(self):\n        return len(self._items)\n    \n    @property\n    def total(self):\n        return sum(item.price for item in self._items)\n```\n\n---\n\n### **Phase 5: Advanced Features & Edge Cases**\n\n**Step 1: RED** - Test",
+          "tokenUsage": {
+            "total": 1886,
+            "prompt": 386,
+            "completion": 1500,
+            "numRequests": 1
+          },
+          "cached": false,
+          "latencyMs": 413,
+          "finishReason": "length",
+          "guardrails": {
+            "flagged": false
+          },
+          "metadata": {
+            "http": {
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "access-control-allow-credentials": "true",
+                "connection": "keep-alive",
+                "content-encoding": "br",
+                "content-type": "application/json",
+                "date": "Sun, 15 Mar 2026 04:50:01 GMT",
+                "server": "elb",
+                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+                "transfer-encoding": "chunked",
+                "vary": "origin, access-control-request-method, access-control-request-headers",
+                "via": "1.1 e65b32b1d336e1f83a40a2861817027c.cloudfront.net (CloudFront)",
+                "x-amz-cf-id": "y4j-Vpy6dr0hh_6xtbNpSQr2wOgWbq1zooN4upz3Z25cFoMAF8wcBg==",
+                "x-amz-cf-pop": "IAH50-P3",
+                "x-cache": "Miss from cloudfront",
+                "x-content-type-options": "nosniff",
+                "x-ds-trace-id": "5225819c374a0fda56389434db304dc6"
+              }
+            }
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "[1] Show me the TDD cycle for implementing a shopping cart with add/remove/total fun",
+          "vars": {
+            "task": "Show me the TDD cycle for implementing a shopping cart with add/remove/total functionality in Python"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Demonstrates red-green-refactor cycle, starts with failing test, implements minimum code, refactors, proper assertions",
+              "threshold": 0.7,
+              "metric": "tdd-orchestrator_quality"
+            }
+          ],
+          "options": {
+            "provider": {
+              "id": "openai:chat:deepseek-chat",
+              "config": {
+                "apiBaseUrl": "https://api.deepseek.com",
+                "apiKeyEnvar": "DEEPSEEK_API_KEY"
+              }
+            }
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "vars": {
+          "task": "Show me the TDD cycle for implementing a shopping cart with add/remove/total functionality in Python"
+        },
+        "metadata": {
+          "http": {
+            "status": 200,
+            "statusText": "OK",
+            "headers": {
+              "access-control-allow-credentials": "true",
+              "connection": "keep-alive",
+              "content-encoding": "br",
+              "content-type": "application/json",
+              "date": "Sun, 15 Mar 2026 04:50:01 GMT",
+              "server": "elb",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "transfer-encoding": "chunked",
+              "vary": "origin, access-control-request-method, access-control-request-headers",
+              "via": "1.1 e65b32b1d336e1f83a40a2861817027c.cloudfront.net (CloudFront)",
+              "x-amz-cf-id": "y4j-Vpy6dr0hh_6xtbNpSQr2wOgWbq1zooN4upz3Z25cFoMAF8wcBg==",
+              "x-amz-cf-pop": "IAH50-P3",
+              "x-cache": "Miss from cloudfront",
+              "x-content-type-options": "nosniff",
+              "x-ds-trace-id": "5225819c374a0fda56389434db304dc6"
+            }
+          },
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 1,
+      "failures": 0,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 386,
+        "completion": 1500,
+        "cached": 0,
+        "total": 1886,
+        "numRequests": 1,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0
+        },
+        "assertions": {
+          "total": 1761,
+          "prompt": 1698,
+          "completion": 63,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0
+          }
+        }
+      },
+      "durationMs": 69688,
+      "evaluationDurationMs": 69688
+    }
+  },
+  "config": {
+    "tags": {},
+    "description": "Agent quality: tdd-orchestrator",
+    "prompts": [
+      {
+        "label": "tdd-orchestrator",
+        "raw": "[{\"role\":\"system\",\"content\":\"You are an expert TDD orchestrator specializing in comprehensive test-driven development coordination, modern TDD practices, and multi-agent workflow management.\\n\\n## Expert Purpose\\nElite TDD orchestrator focused on enforcing disciplined test-driven development practices across complex software projects. Masters the complete red-green-refactor cycle, coordinates multi-agent TDD workflows, and ensures comprehensive test coverage while maintaining development velocity. Combines deep TDD expertise with modern AI-assisted testing tools to deliver robust, maintainable, and thoroughly tested software systems.\\n\\n## Capabilities\\n\\n### TDD Discipline & Cycle Management\\n- Complete red-green-refactor cycle orchestration and enforcement\\n- TDD rhythm establishment and maintenance across development teams\\n- Test-first discipline verification and automated compliance checking\\n- Refactoring safety nets and regression prevention strategies\\n- TDD flow state optimization and developer productivity enhancement\\n- Cycle time measurement and optimization for rapid feedback loops\\n- TDD anti-pattern detection and prevention (test-after, partial coverage)\\n\\n### Multi-Agent TDD Workflow Coordination\\n- Orchestration of specialized testing agents (unit, integration, E2E)\\n- Coordinated test suite evolution across multiple development streams\\n- Cross-team TDD practice synchronization and knowledge sharing\\n- Agent task delegation for parallel test development and execution\\n- Workflow automation for continuous TDD compliance monitoring\\n- Integration with development tools and IDE TDD plugins\\n- Multi-repository TDD governance and consistency enforcement\\n\\n### Modern TDD Practices & Methodologies\\n- Classic TDD (Chicago School) implementation and coaching\\n- London School (mockist) TDD practices and double management\\n- Acceptance Test-Driven Development (ATDD) integration\\n- Behavior-Driven Development (BDD) workflow orchestration\\n- Outside-in TDD for feature development and user story implementation\\n\\n[... truncated ...]\"},{\"role\":\"user\",\"content\":\"{{task}}\"}]"
+      }
+    ],
+    "providers": [
+      {
+        "id": "openai:chat:deepseek-chat",
+        "config": {
+          "apiBaseUrl": "https://api.deepseek.com",
+          "apiKeyEnvar": "[REDACTED]",
+          "max_tokens": 1500,
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "[1] Show me the TDD cycle for implementing a shopping cart with add/remove/total fun",
+        "vars": {
+          "task": "Show me the TDD cycle for implementing a shopping cart with add/remove/total functionality in Python"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Demonstrates red-green-refactor cycle, starts with failing test, implements minimum code, refactors, proper assertions",
+            "threshold": 0.7,
+            "metric": "tdd-orchestrator_quality"
+          }
+        ]
+      }
+    ],
+    "scenarios": [],
+    "env": {},
+    "defaultTest": {
+      "options": {
+        "provider": {
+          "id": "openai:chat:deepseek-chat",
+          "config": {
+            "apiBaseUrl": "https://api.deepseek.com",
+            "apiKeyEnvar": "[REDACTED]"
+          }
+        }
+      },
+      "vars": {},
+      "assert": [],
+      "metadata": {}
+    },
+    "outputPath": [
+      "tests/promptfoo/results/agent-tdd-orchestrator.json"
+    ],
+    "extensions": [],
+    "metadata": {},
+    "evaluateOptions": {}
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.2",
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-03-15T04:51:10.506Z",
+    "evaluationCreatedAt": "2026-03-15T04:50:00.788Z"
+  }
+}
