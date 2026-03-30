@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-zdS-2026-03-30T03:56:31",
+  "evalId": "eval-rMh-2026-03-30T18:17:24",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:56:31.850Z",
+    "timestamp": "2026-03-30T18:17:24.123Z",
     "prompts": [
       {
         "id": "888b53a9b05bc1ac56e0c05057ce77922c7f2d9b824816e5424085971374a378",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 5602,
+          "totalLatencyMs": 6330,
           "tokenUsage": {
             "prompt": 499,
-            "completion": 273,
+            "completion": 282,
             "cached": 0,
-            "total": 772,
+            "total": 781,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 515,
-              "prompt": 473,
-              "completion": 42,
+              "total": 516,
+              "prompt": 482,
+              "completion": 34,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "refactoring-specialist-sonnet_quality": 1
           },
-          "cost": 0.00023865
+          "cost": 0.00024405
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00023865,
+        "cost": 0.00024405,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "refactoring-specialist-sonnet_quality": 1
           },
           "tokensUsed": {
-            "total": 515,
-            "prompt": 473,
-            "completion": 42,
+            "total": 516,
+            "prompt": 482,
+            "completion": 34,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output suggests using guard clauses and provides actual refactored code demonstrating early returns, which aligns with the rubric's requirements.",
+              "reason": "The output suggests using guard clauses and provides actual refactored code demonstrating this approach.",
               "tokensUsed": {
-                "total": 515,
-                "prompt": 473,
-                "completion": 42,
+                "total": 516,
+                "prompt": 482,
+                "completion": 34,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo refactor the deeply nested if-else block into a cleaner pattern, we can use the **Guard Clauses** approach. This involves handling the conditions in a way that reduces nesting and makes the code easier to read. Here's how we can refactor the provided code:\\n\\n### Original Code\\n```python\\nif condition1:\\n    if condition2:\\n        if condition3:\\n            do_something()\\n        else:\\n            do_other()\\n    else:\\n        fallback()\\nelse:\\n    default()\\n```\\n\\n### Refactored Code\\n```python\\nif not condition1:\\n    default()\\n    return\\n\\nif not condition2:\\n    fallback()\\n    return\\n\\nif condition3:\\n    do_something()\\nelse:\\n    do_other()\\n```\\n\\n### Explanation\\n1. **Guard Clauses**: We check the conditions in a straightforward manner. If `condition1` is not met, we call `default()` and return immediately. This eliminates the need for further nesting.\\n2. **Early Returns**: Similarly, if `condition2` is not met, we call `fallback()` and return. This keeps the logic flat and easy to follow.\\n3. **Final Condition**: Finally, we check `condition3` and execute the appropriate function based on its value.\\n\\nThis refactoring improves readability and maintainability by reducing the complexity of the nested structure.\\n</Output>\\n<Rubric>\\nSuggests early returns / guard clauses, or strategy pattern, or table-driven approach — with actual code\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo refactor the deeply nested if-else block into a cleaner pattern, we can use guard clauses to handle the conditions more clearly. This approach reduces the nesting and makes the code easier to read and maintain. Here's how you can refactor the provided code:\\n\\n### Original Code\\n```python\\nif condition1:\\n    if condition2:\\n        if condition3:\\n            do_something()\\n        else:\\n            do_other()\\n    else:\\n        fallback()\\nelse:\\n    default()\\n```\\n\\n### Refactored Code\\n```python\\nif not condition1:\\n    default()\\n    return\\n\\nif not condition2:\\n    fallback()\\n    return\\n\\nif condition3:\\n    do_something()\\nelse:\\n    do_other()\\n```\\n\\n### Explanation\\n1. **Guard Clauses**: Each condition is checked at the beginning, and if it fails, the corresponding action is taken immediately (e.g., calling `default()` or `fallback()`) and then returning from the function. This eliminates the need for nested blocks.\\n  \\n2. **Readability**: The refactored code is easier to read and understand because it clearly outlines the flow of logic without deep nesting.\\n\\n3. **Maintainability**: Future changes to any of the conditions or actions can be made more easily without having to navigate through multiple levels of indentation. \\n\\nThis refactoring maintains the original behavior while improving the structure of the code.\\n</Output>\\n<Rubric>\\nSuggests early returns / guard clauses, or strategy pattern, or table-driven approach — with actual code\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "10d2c55a-ffdc-4e31-b9a0-a59fcdefc06d",
-        "latencyMs": 5602,
+        "id": "41f80a10-a361-4f1a-a2bd-115499bd6bb2",
+        "latencyMs": 6330,
         "namedScores": {
           "refactoring-specialist-sonnet_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To refactor the deeply nested if-else block into a cleaner pattern, we can use the **Guard Clauses** approach. This involves handling the conditions in a way that reduces nesting and makes the code easier to read. Here's how we can refactor the provided code:\n\n### Original Code\n```python\nif condition1:\n    if condition2:\n        if condition3:\n            do_something()\n        else:\n            do_other()\n    else:\n        fallback()\nelse:\n    default()\n```\n\n### Refactored Code\n```python\nif not condition1:\n    default()\n    return\n\nif not condition2:\n    fallback()\n    return\n\nif condition3:\n    do_something()\nelse:\n    do_other()\n```\n\n### Explanation\n1. **Guard Clauses**: We check the conditions in a straightforward manner. If `condition1` is not met, we call `default()` and return immediately. This eliminates the need for further nesting.\n2. **Early Returns**: Similarly, if `condition2` is not met, we call `fallback()` and return. This keeps the logic flat and easy to follow.\n3. **Final Condition**: Finally, we check `condition3` and execute the appropriate function based on its value.\n\nThis refactoring improves readability and maintainability by reducing the complexity of the nested structure.",
+          "output": "To refactor the deeply nested if-else block into a cleaner pattern, we can use guard clauses to handle the conditions more clearly. This approach reduces the nesting and makes the code easier to read and maintain. Here's how you can refactor the provided code:\n\n### Original Code\n```python\nif condition1:\n    if condition2:\n        if condition3:\n            do_something()\n        else:\n            do_other()\n    else:\n        fallback()\nelse:\n    default()\n```\n\n### Refactored Code\n```python\nif not condition1:\n    default()\n    return\n\nif not condition2:\n    fallback()\n    return\n\nif condition3:\n    do_something()\nelse:\n    do_other()\n```\n\n### Explanation\n1. **Guard Clauses**: Each condition is checked at the beginning, and if it fails, the corresponding action is taken immediately (e.g., calling `default()` or `fallback()`) and then returning from the function. This eliminates the need for nested blocks.\n  \n2. **Readability**: The refactored code is easier to read and understand because it clearly outlines the flow of logic without deep nesting.\n\n3. **Maintainability**: Future changes to any of the conditions or actions can be made more easily without having to navigate through multiple levels of indentation. \n\nThis refactoring maintains the original behavior while improving the structure of the code.",
           "tokenUsage": {
-            "total": 772,
+            "total": 781,
             "prompt": 499,
-            "completion": 273,
+            "completion": 282,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 5602,
+          "latencyMs": 6330,
           "finishReason": "stop",
-          "cost": 0.00023865,
+          "cost": 0.00024405,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442f5b8f60fbc2-IAH",
+                "cf-ray": "9e491c669a53c2f8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:56:37 GMT",
+                "date": "Mon, 30 Mar 2026 18:17:30 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "5197",
+                "openai-processing-ms": "6060",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=dmMi2u3qmxgQFKy9y4exio04RzFjFdqVxgS796Tslu8-1774842991.925673-1.0.1.1-_h8jVyPRbc.F0RaU9l3bem2p._xUsdZ4jKou7jOGPt4WCov7kyTOG_Av4KmS6xZZ8N8w8I2G5f7SAVk9TOFWA_vKrN5k1EdJ6ZEiiH_H.tAOBU5XS0aDtU9lveVXTWJt; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:26:37 GMT",
+                "set-cookie": "__cf_bm=wrAZUIrH.kr4PYIZYImCPX4a98VSxRYc5cgvAdBkW0c-1774894644.253552-1.0.1.1-xMr0D9Ex62fv.z0B4G.1p.CuY5dhVK9htCOq4ul3EaEGPgjZJ3H_d36IhkroiKDZWIjS00kvEFYFYK2QHd4taV61S3jClKnr4G8oJ1rMYzQBKWCg9F_JAh_l3vDqydcm; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:30 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9544",
+                "x-ratelimit-remaining-requests": "9090",
                 "x-ratelimit-remaining-tokens": "199450",
-                "x-ratelimit-reset-requests": "1h5m32.234s",
+                "x-ratelimit-reset-requests": "2h10m54.025s",
                 "x-ratelimit-reset-tokens": "165ms",
-                "x-request-id": "req_b5b329bf7a9f40b9b4e76ab73525a1a8"
+                "x-request-id": "req_da28ac10f05d4be980fee9fd30e5f23a"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442f5b8f60fbc2-IAH",
+              "cf-ray": "9e491c669a53c2f8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:56:37 GMT",
+              "date": "Mon, 30 Mar 2026 18:17:30 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "5197",
+              "openai-processing-ms": "6060",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=dmMi2u3qmxgQFKy9y4exio04RzFjFdqVxgS796Tslu8-1774842991.925673-1.0.1.1-_h8jVyPRbc.F0RaU9l3bem2p._xUsdZ4jKou7jOGPt4WCov7kyTOG_Av4KmS6xZZ8N8w8I2G5f7SAVk9TOFWA_vKrN5k1EdJ6ZEiiH_H.tAOBU5XS0aDtU9lveVXTWJt; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:26:37 GMT",
+              "set-cookie": "__cf_bm=wrAZUIrH.kr4PYIZYImCPX4a98VSxRYc5cgvAdBkW0c-1774894644.253552-1.0.1.1-xMr0D9Ex62fv.z0B4G.1p.CuY5dhVK9htCOq4ul3EaEGPgjZJ3H_d36IhkroiKDZWIjS00kvEFYFYK2QHd4taV61S3jClKnr4G8oJ1rMYzQBKWCg9F_JAh_l3vDqydcm; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:30 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9544",
+              "x-ratelimit-remaining-requests": "9090",
               "x-ratelimit-remaining-tokens": "199450",
-              "x-ratelimit-reset-requests": "1h5m32.234s",
+              "x-ratelimit-reset-requests": "2h10m54.025s",
               "x-ratelimit-reset-tokens": "165ms",
-              "x-request-id": "req_b5b329bf7a9f40b9b4e76ab73525a1a8"
+              "x-request-id": "req_da28ac10f05d4be980fee9fd30e5f23a"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 499,
-        "completion": 273,
+        "completion": 282,
         "cached": 0,
-        "total": 772,
+        "total": 781,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 515,
-          "prompt": 473,
-          "completion": 42,
+          "total": 516,
+          "prompt": 482,
+          "completion": 34,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 6761,
-      "evaluationDurationMs": 6761
+      "durationMs": 7728,
+      "evaluationDurationMs": 7728
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:56:38.658Z",
-    "evaluationCreatedAt": "2026-03-30T03:56:31.850Z"
+    "exportedAt": "2026-03-30T18:17:31.904Z",
+    "evaluationCreatedAt": "2026-03-30T18:17:24.123Z"
   }
 }

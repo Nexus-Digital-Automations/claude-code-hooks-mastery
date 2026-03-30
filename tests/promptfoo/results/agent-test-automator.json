@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-gKq-2026-03-30T03:58:46",
+  "evalId": "eval-bJU-2026-03-30T18:19:42",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:58:46.942Z",
+    "timestamp": "2026-03-30T18:19:42.968Z",
     "prompts": [
       {
         "id": "31eccdbc9ebc759222dd1163c8d58fb3005d53f2ec0e9c2317de6d9d05082808",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 20038,
+          "totalLatencyMs": 24592,
           "tokenUsage": {
             "prompt": 388,
-            "completion": 1098,
+            "completion": 1312,
             "cached": 0,
-            "total": 1486,
+            "total": 1700,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1350,
-              "prompt": 1296,
-              "completion": 54,
+              "total": 1565,
+              "prompt": 1510,
+              "completion": 55,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "test-automator_quality": 1
           },
-          "cost": 0.000717
+          "cost": 0.0008454
         }
       }
     ],
     "results": [
       {
-        "cost": 0.000717,
+        "cost": 0.0008454,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "test-automator_quality": 1
           },
           "tokensUsed": {
-            "total": 1350,
-            "prompt": 1296,
-            "completion": 54,
+            "total": 1565,
+            "prompt": 1510,
+            "completion": 55,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output demonstrates the use of Playwright best practices by structuring tests clearly, handling both success and failure cases, and incorporating screenshot comparisons for visual regression testing.",
+              "reason": "The output demonstrates the use of Playwright best practices by structuring tests clearly, handling both success and failure cases, and incorporating visual regression through screenshots at various stages.",
               "tokensUsed": {
-                "total": 1350,
-                "prompt": 1296,
-                "completion": 54,
+                "total": 1565,
+                "prompt": 1510,
+                "completion": 55,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is a comprehensive Playwright end-to-end (E2E) test script for a login flow that includes two-factor authentication (2FA), error handling, and visual regression testing. This example assumes you have a basic understanding of Playwright and have it set up in your project.\\n\\n### Prerequisites\\n1. Install Playwright and necessary dependencies:\\n   ```bash\\n   npm install playwright @playwright/test\\n   ```\\n\\n2. Set up your Playwright configuration file (`playwright.config.ts` or `playwright.config.js`).\\n\\n3. Ensure you have a visual regression tool integrated, such as `@playwright/test` with the `toMatchSnapshot` method.\\n\\n### Test Script\\n\\n```javascript\\n// login.spec.ts\\nimport { test, expect } from '@playwright/test';\\n\\ntest.describe('Login Flow with 2FA', () => {\\n  const username = 'testuser@example.com';\\n  const password = 'securePassword123';\\n  const twoFactorCode = '123456'; // This should be dynamically generated in a real scenario\\n\\n  test.beforeEach(async ({ page }) => {\\n    await page.goto('https://example.com/login');\\n  });\\n\\n  test('should log in successfully with valid credentials and 2FA', async ({ page }) => {\\n    // Step 1: Enter username\\n    await page.fill('input[name=\\\"username\\\"]', username);\\n    await page.screenshot({ path: 'screenshots/login-username-filled.png' });\\n    \\n    // Step 2: Enter password\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.screenshot({ path: 'screenshots/login-password-filled.png' });\\n    \\n    // Step 3: Click login button\\n    await page.click('button[type=\\\"submit\\\"]');\\n    await page.waitForSelector('input[name=\\\"2fa\\\"]'); // Wait for 2FA input to appear\\n\\n    // Step 4: Enter 2FA code\\n    await page.fill('input[name=\\\"2fa\\\"]', twoFactorCode);\\n    await page.screenshot({ path: 'screenshots/login-2fa-filled.png' });\\n\\n    // Step 5: Submit 2FA\\n    await page.click('button[type=\\\"submit\\\"]');\\n\\n    // Step 6: Verify successful login\\n    await expect(page).toHaveURL('https://example.com/dashboard');\\n    await expect(page.locator('h1')).toHaveText('Welcome, Test User');\\n    \\n    // Visual regression check\\n    await expect(page).toHaveScreenshot('screenshots/dashboard.png');\\n  });\\n\\n  test('should show error for invalid credentials', async ({ page }) => {\\n    // Step 1: Enter invalid username\\n    await page.fill('input[name=\\\"username\\\"]', 'invaliduser@example.com');\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.click('button[type=\\\"submit\\\"]');\\n\\n    // Step 2: Verify error message\\n    await expect(page.locator('.error-message')).toHaveText('Invalid username or password');\\n    await page.screenshot({ path: 'screenshots/login-error-invalid-credentials.png' });\\n  });\\n\\n  test('should show error for invalid 2FA code', async ({ page }) => {\\n    // Step 1: Enter valid username and password\\n    await page.fill('input[name=\\\"username\\\"]', username);\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.click('button[type=\\\"submit\\\"]');\\n    await page.waitForSelector('input[name=\\\"2fa\\\"]');\\n\\n    // Step 2: Enter invalid 2FA code\\n    await page.fill('input[name=\\\"2fa\\\"]', 'wrongcode');\\n    await page.click('button[type=\\\"submit\\\"]');\\n\\n    // Step 3: Verify error message\\n    await expect(page.locator('.error-message')).toHaveText('Invalid 2FA code');\\n    await page.screenshot({ path: 'screenshots/login-error-invalid-2fa.png' });\\n  });\\n});\\n```\\n\\n### Explanation\\n1. **Setup**: The test suite is defined using `test.describe`, and the login page is visited before each test.\\n\\n2. **Successful Login Test**:\\n   - Fills in the username and password.\\n   - Clicks the login button and waits for the 2FA input to appear.\\n   - Fills in the 2FA code and submits.\\n   - Verifies that the URL changes to the dashboard and checks for a welcome message.\\n   - Takes a screenshot for visual regression testing.\\n\\n3. **Invalid Credentials Test**:\\n   - Attempts to log in with an invalid username.\\n   - Verifies that the appropriate error message is displayed.\\n\\n4. **Invalid 2FA Code Test**:\\n   - Logs in with valid credentials but provides an incorrect 2FA code.\\n   - Checks for the correct error message.\\n\\n### Visual Regression\\n- Screenshots are taken at various stages to ensure that the UI remains consistent. You can compare these screenshots against baseline images to detect visual changes.\\n\\n### Running the Tests\\nTo run the tests, use the following command:\\n```bash\\nnpx playwright test login.spec.ts\\n```\\n\\n### Conclusion\\nThis Playwright E2E test script provides a comprehensive approach to testing a login flow with 2FA, error handling, and visual regression. You can expand upon this by adding more tests for different scenarios as needed.\\n</Output>\\n<Rubric>\\nUses Playwright best practices, page objects, handles both success and failure cases, screenshot comparison\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is a comprehensive Playwright end-to-end (E2E) test script for a login flow that includes two-factor authentication (2FA), error handling, and visual regression testing. This example assumes you have a basic understanding of Playwright and have it set up in your project.\\n\\n### Prerequisites\\n1. Install Playwright and necessary dependencies:\\n   ```bash\\n   npm install playwright @playwright/test\\n   ```\\n\\n2. Ensure you have a visual regression tool set up, such as `@playwright/test`'s built-in screenshot capabilities or a dedicated visual regression tool like `Applitools`.\\n\\n### Test Script\\n\\n```javascript\\n// login.spec.js\\nconst { test, expect } = require('@playwright/test');\\n\\ntest.describe('Login Flow with 2FA', () => {\\n  const baseUrl = 'https://your-app-url.com';\\n  const username = 'testuser';\\n  const password = 'securepassword';\\n  const twoFactorCode = '123456'; // Replace with the actual 2FA code retrieval logic\\n\\n  test.beforeEach(async ({ page }) => {\\n    await page.goto(baseUrl);\\n  });\\n\\n  test('should login successfully with valid credentials and 2FA', async ({ page }) => {\\n    // Step 1: Enter username\\n    await page.fill('input[name=\\\"username\\\"]', username);\\n    await page.screenshot({ path: 'screenshots/login-username-filled.png' }); // Visual regression\\n\\n    // Step 2: Enter password\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.screenshot({ path: 'screenshots/login-password-filled.png' }); // Visual regression\\n\\n    // Step 3: Click login button\\n    await page.click('button[type=\\\"submit\\\"]');\\n    await expect(page).toHaveURL(`${baseUrl}/2fa`); // Expect to be redirected to 2FA page\\n\\n    // Step 4: Enter 2FA code\\n    await page.fill('input[name=\\\"2fa\\\"]', twoFactorCode);\\n    await page.screenshot({ path: 'screenshots/login-2fa-filled.png' }); // Visual regression\\n\\n    // Step 5: Submit 2FA code\\n    await page.click('button[type=\\\"submit\\\"]');\\n    await expect(page).toHaveURL(`${baseUrl}/dashboard`); // Expect to be redirected to dashboard\\n\\n    // Step 6: Verify successful login\\n    await expect(page.locator('h1')).toHaveText('Welcome to your dashboard');\\n    await page.screenshot({ path: 'screenshots/login-success.png' }); // Visual regression\\n  });\\n\\n  test('should show error for invalid credentials', async ({ page }) => {\\n    // Step 1: Enter invalid username\\n    await page.fill('input[name=\\\"username\\\"]', 'invaliduser');\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.click('button[type=\\\"submit\\\"]');\\n\\n    // Step 2: Verify error message\\n    await expect(page.locator('.error-message')).toHaveText('Invalid username or password');\\n    await page.screenshot({ path: 'screenshots/login-error-invalid-credentials.png' }); // Visual regression\\n  });\\n\\n  test('should show error for invalid 2FA code', async ({ page }) => {\\n    // Step 1: Enter valid username and password\\n    await page.fill('input[name=\\\"username\\\"]', username);\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.click('button[type=\\\"submit\\\"]');\\n    await expect(page).toHaveURL(`${baseUrl}/2fa`);\\n\\n    // Step 2: Enter invalid 2FA code\\n    await page.fill('input[name=\\\"2fa\\\"]', 'wrongcode');\\n    await page.click('button[type=\\\"submit\\\"]');\\n\\n    // Step 3: Verify error message\\n    await expect(page.locator('.error-message')).toHaveText('Invalid 2FA code');\\n    await page.screenshot({ path: 'screenshots/login-error-invalid-2fa.png' }); // Visual regression\\n  });\\n\\n  test('should handle 2FA timeout gracefully', async ({ page }) => {\\n    // Step 1: Enter valid username and password\\n    await page.fill('input[name=\\\"username\\\"]', username);\\n    await page.fill('input[name=\\\"password\\\"]', password);\\n    await page.click('button[type=\\\"submit\\\"]');\\n    await expect(page).toHaveURL(`${baseUrl}/2fa`);\\n\\n    // Simulate waiting for 2FA timeout\\n    await page.waitForTimeout(30000); // Adjust timeout as necessary\\n\\n    // Step 2: Attempt to submit 2FA code after timeout\\n    await page.fill('input[name=\\\"2fa\\\"]', twoFactorCode);\\n    await page.click('button[type=\\\"submit\\\"]');\\n\\n    // Step 3: Verify timeout error message\\n    await expect(page.locator('.error-message')).toHaveText('2FA code has expired');\\n    await page.screenshot({ path: 'screenshots/login-error-2fa-timeout.png' }); // Visual regression\\n  });\\n});\\n```\\n\\n### Explanation\\n1. **Setup**: The test suite is defined using `test.describe`, and the base URL, username, password, and 2FA code are set as constants.\\n\\n2. **Tests**:\\n   - **Successful Login**: Tests the complete login flow, including filling in the username, password, and 2FA code, and verifies the successful redirection to the dashboard.\\n   - **Invalid Credentials**: Tests the scenario where invalid credentials are entered and checks for the appropriate error message.\\n   - **Invalid 2FA Code**: Tests the scenario where a wrong 2FA code is entered and checks for the appropriate error message.\\n   - **2FA Timeout**: Simulates a timeout scenario for the 2FA code and checks for the appropriate error message.\\n\\n3. **Visual Regression**: Screenshots are taken at various stages to facilitate visual regression testing.\\n\\n### Running the Tests\\nTo run the tests, use the following command:\\n```bash\\nnpx playwright test login.spec.js\\n```\\n\\n### Conclusion\\nThis Playwright E2E test script provides a comprehensive approach to testing a login flow with 2FA, including error handling and visual regression. You can further enhance it by integrating with CI/CD pipelines and using a visual regression tool for more robust visual testing.\\n</Output>\\n<Rubric>\\nUses Playwright best practices, page objects, handles both success and failure cases, screenshot comparison\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "5c7977f2-a39e-4995-8706-b300c32a7ea9",
-        "latencyMs": 20038,
+        "id": "92410850-d43b-4c50-8299-e60864c1bdd8",
+        "latencyMs": 24592,
         "namedScores": {
           "test-automator_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Certainly! Below is a comprehensive Playwright end-to-end (E2E) test script for a login flow that includes two-factor authentication (2FA), error handling, and visual regression testing. This example assumes you have a basic understanding of Playwright and have it set up in your project.\n\n### Prerequisites\n1. Install Playwright and necessary dependencies:\n   ```bash\n   npm install playwright @playwright/test\n   ```\n\n2. Set up your Playwright configuration file (`playwright.config.ts` or `playwright.config.js`).\n\n3. Ensure you have a visual regression tool integrated, such as `@playwright/test` with the `toMatchSnapshot` method.\n\n### Test Script\n\n```javascript\n// login.spec.ts\nimport { test, expect } from '@playwright/test';\n\ntest.describe('Login Flow with 2FA', () => {\n  const username = 'testuser@example.com';\n  const password = 'securePassword123';\n  const twoFactorCode = '123456'; // This should be dynamically generated in a real scenario\n\n  test.beforeEach(async ({ page }) => {\n    await page.goto('https://example.com/login');\n  });\n\n  test('should log in successfully with valid credentials and 2FA', async ({ page }) => {\n    // Step 1: Enter username\n    await page.fill('input[name=\"username\"]', username);\n    await page.screenshot({ path: 'screenshots/login-username-filled.png' });\n    \n    // Step 2: Enter password\n    await page.fill('input[name=\"password\"]', password);\n    await page.screenshot({ path: 'screenshots/login-password-filled.png' });\n    \n    // Step 3: Click login button\n    await page.click('button[type=\"submit\"]');\n    await page.waitForSelector('input[name=\"2fa\"]'); // Wait for 2FA input to appear\n\n    // Step 4: Enter 2FA code\n    await page.fill('input[name=\"2fa\"]', twoFactorCode);\n    await page.screenshot({ path: 'screenshots/login-2fa-filled.png' });\n\n    // Step 5: Submit 2FA\n    await page.click('button[type=\"submit\"]');\n\n    // Step 6: Verify successful login\n    await expect(page).toHaveURL('https://example.com/dashboard');\n    await expect(page.locator('h1')).toHaveText('Welcome, Test User');\n    \n    // Visual regression check\n    await expect(page).toHaveScreenshot('screenshots/dashboard.png');\n  });\n\n  test('should show error for invalid credentials', async ({ page }) => {\n    // Step 1: Enter invalid username\n    await page.fill('input[name=\"username\"]', 'invaliduser@example.com');\n    await page.fill('input[name=\"password\"]', password);\n    await page.click('button[type=\"submit\"]');\n\n    // Step 2: Verify error message\n    await expect(page.locator('.error-message')).toHaveText('Invalid username or password');\n    await page.screenshot({ path: 'screenshots/login-error-invalid-credentials.png' });\n  });\n\n  test('should show error for invalid 2FA code', async ({ page }) => {\n    // Step 1: Enter valid username and password\n    await page.fill('input[name=\"username\"]', username);\n    await page.fill('input[name=\"password\"]', password);\n    await page.click('button[type=\"submit\"]');\n    await page.waitForSelector('input[name=\"2fa\"]');\n\n    // Step 2: Enter invalid 2FA code\n    await page.fill('input[name=\"2fa\"]', 'wrongcode');\n    await page.click('button[type=\"submit\"]');\n\n    // Step 3: Verify error message\n    await expect(page.locator('.error-message')).toHaveText('Invalid 2FA code');\n    await page.screenshot({ path: 'screenshots/login-error-invalid-2fa.png' });\n  });\n});\n```\n\n### Explanation\n1. **Setup**: The test suite is defined using `test.describe`, and the login page is visited before each test.\n\n2. **Successful Login Test**:\n   - Fills in the username and password.\n   - Clicks the login button and waits for the 2FA input to appear.\n   - Fills in the 2FA code and submits.\n   - Verifies that the URL changes to the dashboard and checks for a welcome message.\n   - Takes a screenshot for visual regression testing.\n\n3. **Invalid Credentials Test**:\n   - Attempts to log in with an invalid username.\n   - Verifies that the appropriate error message is displayed.\n\n4. **Invalid 2FA Code Test**:\n   - Logs in with valid credentials but provides an incorrect 2FA code.\n   - Checks for the correct error message.\n\n### Visual Regression\n- Screenshots are taken at various stages to ensure that the UI remains consistent. You can compare these screenshots against baseline images to detect visual changes.\n\n### Running the Tests\nTo run the tests, use the following command:\n```bash\nnpx playwright test login.spec.ts\n```\n\n### Conclusion\nThis Playwright E2E test script provides a comprehensive approach to testing a login flow with 2FA, error handling, and visual regression. You can expand upon this by adding more tests for different scenarios as needed.",
+          "output": "Certainly! Below is a comprehensive Playwright end-to-end (E2E) test script for a login flow that includes two-factor authentication (2FA), error handling, and visual regression testing. This example assumes you have a basic understanding of Playwright and have it set up in your project.\n\n### Prerequisites\n1. Install Playwright and necessary dependencies:\n   ```bash\n   npm install playwright @playwright/test\n   ```\n\n2. Ensure you have a visual regression tool set up, such as `@playwright/test`'s built-in screenshot capabilities or a dedicated visual regression tool like `Applitools`.\n\n### Test Script\n\n```javascript\n// login.spec.js\nconst { test, expect } = require('@playwright/test');\n\ntest.describe('Login Flow with 2FA', () => {\n  const baseUrl = 'https://your-app-url.com';\n  const username = 'testuser';\n  const password = 'securepassword';\n  const twoFactorCode = '123456'; // Replace with the actual 2FA code retrieval logic\n\n  test.beforeEach(async ({ page }) => {\n    await page.goto(baseUrl);\n  });\n\n  test('should login successfully with valid credentials and 2FA', async ({ page }) => {\n    // Step 1: Enter username\n    await page.fill('input[name=\"username\"]', username);\n    await page.screenshot({ path: 'screenshots/login-username-filled.png' }); // Visual regression\n\n    // Step 2: Enter password\n    await page.fill('input[name=\"password\"]', password);\n    await page.screenshot({ path: 'screenshots/login-password-filled.png' }); // Visual regression\n\n    // Step 3: Click login button\n    await page.click('button[type=\"submit\"]');\n    await expect(page).toHaveURL(`${baseUrl}/2fa`); // Expect to be redirected to 2FA page\n\n    // Step 4: Enter 2FA code\n    await page.fill('input[name=\"2fa\"]', twoFactorCode);\n    await page.screenshot({ path: 'screenshots/login-2fa-filled.png' }); // Visual regression\n\n    // Step 5: Submit 2FA code\n    await page.click('button[type=\"submit\"]');\n    await expect(page).toHaveURL(`${baseUrl}/dashboard`); // Expect to be redirected to dashboard\n\n    // Step 6: Verify successful login\n    await expect(page.locator('h1')).toHaveText('Welcome to your dashboard');\n    await page.screenshot({ path: 'screenshots/login-success.png' }); // Visual regression\n  });\n\n  test('should show error for invalid credentials', async ({ page }) => {\n    // Step 1: Enter invalid username\n    await page.fill('input[name=\"username\"]', 'invaliduser');\n    await page.fill('input[name=\"password\"]', password);\n    await page.click('button[type=\"submit\"]');\n\n    // Step 2: Verify error message\n    await expect(page.locator('.error-message')).toHaveText('Invalid username or password');\n    await page.screenshot({ path: 'screenshots/login-error-invalid-credentials.png' }); // Visual regression\n  });\n\n  test('should show error for invalid 2FA code', async ({ page }) => {\n    // Step 1: Enter valid username and password\n    await page.fill('input[name=\"username\"]', username);\n    await page.fill('input[name=\"password\"]', password);\n    await page.click('button[type=\"submit\"]');\n    await expect(page).toHaveURL(`${baseUrl}/2fa`);\n\n    // Step 2: Enter invalid 2FA code\n    await page.fill('input[name=\"2fa\"]', 'wrongcode');\n    await page.click('button[type=\"submit\"]');\n\n    // Step 3: Verify error message\n    await expect(page.locator('.error-message')).toHaveText('Invalid 2FA code');\n    await page.screenshot({ path: 'screenshots/login-error-invalid-2fa.png' }); // Visual regression\n  });\n\n  test('should handle 2FA timeout gracefully', async ({ page }) => {\n    // Step 1: Enter valid username and password\n    await page.fill('input[name=\"username\"]', username);\n    await page.fill('input[name=\"password\"]', password);\n    await page.click('button[type=\"submit\"]');\n    await expect(page).toHaveURL(`${baseUrl}/2fa`);\n\n    // Simulate waiting for 2FA timeout\n    await page.waitForTimeout(30000); // Adjust timeout as necessary\n\n    // Step 2: Attempt to submit 2FA code after timeout\n    await page.fill('input[name=\"2fa\"]', twoFactorCode);\n    await page.click('button[type=\"submit\"]');\n\n    // Step 3: Verify timeout error message\n    await expect(page.locator('.error-message')).toHaveText('2FA code has expired');\n    await page.screenshot({ path: 'screenshots/login-error-2fa-timeout.png' }); // Visual regression\n  });\n});\n```\n\n### Explanation\n1. **Setup**: The test suite is defined using `test.describe`, and the base URL, username, password, and 2FA code are set as constants.\n\n2. **Tests**:\n   - **Successful Login**: Tests the complete login flow, including filling in the username, password, and 2FA code, and verifies the successful redirection to the dashboard.\n   - **Invalid Credentials**: Tests the scenario where invalid credentials are entered and checks for the appropriate error message.\n   - **Invalid 2FA Code**: Tests the scenario where a wrong 2FA code is entered and checks for the appropriate error message.\n   - **2FA Timeout**: Simulates a timeout scenario for the 2FA code and checks for the appropriate error message.\n\n3. **Visual Regression**: Screenshots are taken at various stages to facilitate visual regression testing.\n\n### Running the Tests\nTo run the tests, use the following command:\n```bash\nnpx playwright test login.spec.js\n```\n\n### Conclusion\nThis Playwright E2E test script provides a comprehensive approach to testing a login flow with 2FA, including error handling and visual regression. You can further enhance it by integrating with CI/CD pipelines and using a visual regression tool for more robust visual testing.",
           "tokenUsage": {
-            "total": 1486,
+            "total": 1700,
             "prompt": 388,
-            "completion": 1098,
+            "completion": 1312,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 20038,
+          "latencyMs": 24592,
           "finishReason": "stop",
-          "cost": 0.000717,
+          "cost": 0.0008454,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4432a7de7548f7-IAH",
+                "cf-ray": "9e491fca2bd4208f-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:59:06 GMT",
+                "date": "Mon, 30 Mar 2026 18:20:07 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "19808",
+                "openai-processing-ms": "24309",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=XiOnd3r7fqV4WEc1JaefHgzJrV2HzLqp7ZZwXntyLCw-1774843127.0172875-1.0.1.1-PSYWfMc29GhasCW.FODenq7Ta7mU.4Rf_U2R3jmgTScjCfRqfkaCbUlZrvTFFEnVM6ttdAmUQZKHST8A_udPFm71gE2L..tajjqh1HcwsCqKmTffHUazQJHfrn2xe1qx; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:06 GMT",
+                "set-cookie": "__cf_bm=0K9oOZXD3bX4ggg4sV8glrCrZim4.mt9_.y6x50QzZ8-1774894783.069997-1.0.1.1-BW1AVIPxE_CEYbzQoWnp5Fw334_RVjtBYiRkKFEhF.E6FhGcBKT.re8Y0KTJp84KXKl8AvybUx7fL6Dyfpfh59E5kxw8qXJbK3y5qgMLs7z.w.f3o.DrtAlKY6nE.P2Z; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:07 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9538",
+                "x-ratelimit-remaining-requests": "9085",
                 "x-ratelimit-remaining-tokens": "199467",
-                "x-ratelimit-reset-requests": "1h6m27.245s",
+                "x-ratelimit-reset-requests": "2h11m45.288s",
                 "x-ratelimit-reset-tokens": "159ms",
-                "x-request-id": "req_b594ac02b4b74409b7e8b45ae4d26c59"
+                "x-request-id": "req_2a85debd13834e148f3d2f8adfdcccdb"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4432a7de7548f7-IAH",
+              "cf-ray": "9e491fca2bd4208f-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:59:06 GMT",
+              "date": "Mon, 30 Mar 2026 18:20:07 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "19808",
+              "openai-processing-ms": "24309",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=XiOnd3r7fqV4WEc1JaefHgzJrV2HzLqp7ZZwXntyLCw-1774843127.0172875-1.0.1.1-PSYWfMc29GhasCW.FODenq7Ta7mU.4Rf_U2R3jmgTScjCfRqfkaCbUlZrvTFFEnVM6ttdAmUQZKHST8A_udPFm71gE2L..tajjqh1HcwsCqKmTffHUazQJHfrn2xe1qx; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:06 GMT",
+              "set-cookie": "__cf_bm=0K9oOZXD3bX4ggg4sV8glrCrZim4.mt9_.y6x50QzZ8-1774894783.069997-1.0.1.1-BW1AVIPxE_CEYbzQoWnp5Fw334_RVjtBYiRkKFEhF.E6FhGcBKT.re8Y0KTJp84KXKl8AvybUx7fL6Dyfpfh59E5kxw8qXJbK3y5qgMLs7z.w.f3o.DrtAlKY6nE.P2Z; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:07 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9538",
+              "x-ratelimit-remaining-requests": "9085",
               "x-ratelimit-remaining-tokens": "199467",
-              "x-ratelimit-reset-requests": "1h6m27.245s",
+              "x-ratelimit-reset-requests": "2h11m45.288s",
               "x-ratelimit-reset-tokens": "159ms",
-              "x-request-id": "req_b594ac02b4b74409b7e8b45ae4d26c59"
+              "x-request-id": "req_2a85debd13834e148f3d2f8adfdcccdb"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 388,
-        "completion": 1098,
+        "completion": 1312,
         "cached": 0,
-        "total": 1486,
+        "total": 1700,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1350,
-          "prompt": 1296,
-          "completion": 54,
+          "total": 1565,
+          "prompt": 1510,
+          "completion": 55,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 25762,
-      "evaluationDurationMs": 25762
+      "durationMs": 26413,
+      "evaluationDurationMs": 26413
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:59:12.733Z",
-    "evaluationCreatedAt": "2026-03-30T03:58:46.942Z"
+    "exportedAt": "2026-03-30T18:20:09.435Z",
+    "evaluationCreatedAt": "2026-03-30T18:19:42.968Z"
   }
 }

@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-mYA-2026-03-30T03:50:48",
+  "evalId": "eval-YUX-2026-03-30T18:11:23",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:50:48.121Z",
+    "timestamp": "2026-03-30T18:11:23.085Z",
     "prompts": [
       {
         "id": "93a449becc9d0fd793f5de57f93d354e4419a36d181136293c5157a1d916105e",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 13037,
+          "totalLatencyMs": 14493,
           "tokenUsage": {
             "prompt": 454,
-            "completion": 838,
+            "completion": 831,
             "cached": 0,
-            "total": 1292,
+            "total": 1285,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1094,
-              "prompt": 1033,
+              "total": 1087,
+              "prompt": 1026,
               "completion": 61,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "database-architect_quality": 1
           },
-          "cost": 0.0005708999999999999
+          "cost": 0.0005667
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0005708999999999999,
+        "cost": 0.0005667,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "database-architect_quality": 1
           },
           "tokensUsed": {
-            "total": 1094,
-            "prompt": 1033,
+            "total": 1087,
+            "prompt": 1026,
             "completion": 61,
             "cached": 0,
             "numRequests": 1
@@ -80,8 +80,8 @@
               "score": 1,
               "reason": "The output provides a comprehensive schema design for a multi-tenant SaaS application, including tables for tenants, users, products, and orders, along with row-level security policies that ensure tenant isolation.",
               "tokensUsed": {
-                "total": 1094,
-                "prompt": 1033,
+                "total": 1087,
+                "prompt": 1026,
                 "completion": 61,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a PostgreSQL schema for a multi-tenant SaaS application with row-level security (RLS) involves several key considerations to ensure data isolation, security, and efficient access control. Below is a proposed schema design along with the necessary configurations for RLS.\\n\\n### Schema Design\\n\\n1. **Tenants Table**: This table will store information about each tenant (customer) using the SaaS application.\\n\\n```sql\\nCREATE TABLE tenants (\\n    id SERIAL PRIMARY KEY,\\n    name VARCHAR(255) NOT NULL UNIQUE,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n2. **Users Table**: This table will store user information, including a reference to the tenant they belong to.\\n\\n```sql\\nCREATE TABLE users (\\n    id SERIAL PRIMARY KEY,\\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    username VARCHAR(255) NOT NULL UNIQUE,\\n    password_hash VARCHAR(255) NOT NULL,\\n    email VARCHAR(255) NOT NULL UNIQUE,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n3. **Products Table**: This table will store product information, also linked to the tenant.\\n\\n```sql\\nCREATE TABLE products (\\n    id SERIAL PRIMARY KEY,\\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    name VARCHAR(255) NOT NULL,\\n    description TEXT,\\n    price DECIMAL(10, 2) NOT NULL,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n4. **Orders Table**: This table will store orders placed by users, linked to both the user and the tenant.\\n\\n```sql\\nCREATE TABLE orders (\\n    id SERIAL PRIMARY KEY,\\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,\\n    product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,\\n    quantity INT NOT NULL,\\n    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n### Row-Level Security Configuration\\n\\nTo implement row-level security, we need to enable RLS on the tables and define policies that restrict access based on the tenant.\\n\\n1. **Enable Row-Level Security**:\\n\\n```sql\\nALTER TABLE users ENABLE ROW LEVEL SECURITY;\\nALTER TABLE products ENABLE ROW LEVEL SECURITY;\\nALTER TABLE orders ENABLE ROW LEVEL SECURITY;\\n```\\n\\n2. **Create Policies**:\\n\\nWe will create policies that allow users to access only the rows that belong to their tenant.\\n\\n```sql\\n-- Policy for Users\\nCREATE POLICY user_access_policy ON users\\nFOR SELECT, UPDATE, DELETE\\nUSING (tenant_id = current_setting('app.current_tenant_id')::int);\\n\\n-- Policy for Products\\nCREATE POLICY product_access_policy ON products\\nFOR SELECT, UPDATE, DELETE\\nUSING (tenant_id = current_setting('app.current_tenant_id')::int);\\n\\n-- Policy for Orders\\nCREATE POLICY order_access_policy ON orders\\nFOR SELECT, UPDATE, DELETE\\nUSING (tenant_id = current_setting('app.current_tenant_id')::int);\\n```\\n\\n### Setting the Current Tenant\\n\\nBefore executing queries, you need to set the `app.current_tenant_id` variable in your application context. This can be done at the beginning of each session or transaction after the user logs in.\\n\\n```sql\\n-- Set the current tenant ID for the session\\nSELECT set_config('app.current_tenant_id', '1', false); -- Replace '1' with the actual tenant ID\\n```\\n\\n### Summary\\n\\nThis schema design provides a solid foundation for a multi-tenant SaaS application using PostgreSQL with row-level security. Each tenant's data is isolated, and access is controlled based on the tenant ID. This approach ensures that users can only access their own data while maintaining the integrity and security of the application. \\n\\nMake sure to test the RLS policies thoroughly to ensure they work as expected and consider additional security measures such as password hashing and user authentication mechanisms.\\n</Output>\\n<Rubric>\\nUses proper schema design, row-level security policies, tenant isolation, indexing strategy\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a PostgreSQL schema for a multi-tenant SaaS application with row-level security (RLS) involves several key considerations to ensure data isolation, security, and performance. Below is a proposed schema design along with the necessary RLS policies.\\n\\n### Schema Design\\n\\n1. **Tenants Table**: This table will store information about each tenant (customer) using the application.\\n\\n```sql\\nCREATE TABLE tenants (\\n    id SERIAL PRIMARY KEY,\\n    name VARCHAR(255) NOT NULL UNIQUE,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n2. **Users Table**: This table will store user information, including a reference to the tenant they belong to.\\n\\n```sql\\nCREATE TABLE users (\\n    id SERIAL PRIMARY KEY,\\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    username VARCHAR(255) NOT NULL UNIQUE,\\n    password_hash VARCHAR(255) NOT NULL,\\n    email VARCHAR(255) NOT NULL UNIQUE,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n3. **Products Table**: This table will store product information, also linked to the tenant.\\n\\n```sql\\nCREATE TABLE products (\\n    id SERIAL PRIMARY KEY,\\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    name VARCHAR(255) NOT NULL,\\n    description TEXT,\\n    price DECIMAL(10, 2) NOT NULL,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n4. **Orders Table**: This table will store orders made by users, linked to both the user and the tenant.\\n\\n```sql\\nCREATE TABLE orders (\\n    id SERIAL PRIMARY KEY,\\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\\n    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,\\n    product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,\\n    quantity INT NOT NULL,\\n    total_price DECIMAL(10, 2) NOT NULL,\\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\\n);\\n```\\n\\n### Row-Level Security (RLS)\\n\\nTo implement RLS, we need to enable it on the tables and create policies that restrict access based on the tenant.\\n\\n1. **Enable RLS on Tables**:\\n\\n```sql\\nALTER TABLE users ENABLE ROW LEVEL SECURITY;\\nALTER TABLE products ENABLE ROW LEVEL SECURITY;\\nALTER TABLE orders ENABLE ROW LEVEL SECURITY;\\n```\\n\\n2. **Create RLS Policies**:\\n\\n- **Users Table Policy**: Allow users to see only their own records.\\n\\n```sql\\nCREATE POLICY user_access_policy ON users\\nFOR SELECT, UPDATE, DELETE\\nUSING (tenant_id = current_setting('app.current_tenant_id')::INT);\\n```\\n\\n- **Products Table Policy**: Allow users to see only products belonging to their tenant.\\n\\n```sql\\nCREATE POLICY product_access_policy ON products\\nFOR SELECT, INSERT, UPDATE, DELETE\\nUSING (tenant_id = current_setting('app.current_tenant_id')::INT);\\n```\\n\\n- **Orders Table Policy**: Allow users to see only orders belonging to their tenant.\\n\\n```sql\\nCREATE POLICY order_access_policy ON orders\\nFOR SELECT, INSERT, UPDATE, DELETE\\nUSING (tenant_id = current_setting('app.current_tenant_id')::INT);\\n```\\n\\n### Setting the Current Tenant\\n\\nBefore executing any queries, you need to set the `app.current_tenant_id` for the session. This can be done at the application level when a user logs in or when a request is made.\\n\\n```sql\\nSET app.current_tenant_id = '1'; -- Example tenant ID\\n```\\n\\n### Conclusion\\n\\nThis schema design provides a solid foundation for a multi-tenant SaaS application using PostgreSQL with row-level security. It ensures that each tenant's data is isolated and secure while allowing for efficient querying and management of data. As the application grows, you can further optimize the schema and RLS policies based on specific use cases and performance requirements.\\n</Output>\\n<Rubric>\\nUses proper schema design, row-level security policies, tenant isolation, indexing strategy\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "e1a28806-e8cb-4cb0-813d-5f79f49b2fb0",
-        "latencyMs": 13037,
+        "id": "506be335-17ec-437c-9d14-89d9745ad054",
+        "latencyMs": 14493,
         "namedScores": {
           "database-architect_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Designing a PostgreSQL schema for a multi-tenant SaaS application with row-level security (RLS) involves several key considerations to ensure data isolation, security, and efficient access control. Below is a proposed schema design along with the necessary configurations for RLS.\n\n### Schema Design\n\n1. **Tenants Table**: This table will store information about each tenant (customer) using the SaaS application.\n\n```sql\nCREATE TABLE tenants (\n    id SERIAL PRIMARY KEY,\n    name VARCHAR(255) NOT NULL UNIQUE,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n2. **Users Table**: This table will store user information, including a reference to the tenant they belong to.\n\n```sql\nCREATE TABLE users (\n    id SERIAL PRIMARY KEY,\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    username VARCHAR(255) NOT NULL UNIQUE,\n    password_hash VARCHAR(255) NOT NULL,\n    email VARCHAR(255) NOT NULL UNIQUE,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n3. **Products Table**: This table will store product information, also linked to the tenant.\n\n```sql\nCREATE TABLE products (\n    id SERIAL PRIMARY KEY,\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    name VARCHAR(255) NOT NULL,\n    description TEXT,\n    price DECIMAL(10, 2) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n4. **Orders Table**: This table will store orders placed by users, linked to both the user and the tenant.\n\n```sql\nCREATE TABLE orders (\n    id SERIAL PRIMARY KEY,\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n    product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,\n    quantity INT NOT NULL,\n    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n### Row-Level Security Configuration\n\nTo implement row-level security, we need to enable RLS on the tables and define policies that restrict access based on the tenant.\n\n1. **Enable Row-Level Security**:\n\n```sql\nALTER TABLE users ENABLE ROW LEVEL SECURITY;\nALTER TABLE products ENABLE ROW LEVEL SECURITY;\nALTER TABLE orders ENABLE ROW LEVEL SECURITY;\n```\n\n2. **Create Policies**:\n\nWe will create policies that allow users to access only the rows that belong to their tenant.\n\n```sql\n-- Policy for Users\nCREATE POLICY user_access_policy ON users\nFOR SELECT, UPDATE, DELETE\nUSING (tenant_id = current_setting('app.current_tenant_id')::int);\n\n-- Policy for Products\nCREATE POLICY product_access_policy ON products\nFOR SELECT, UPDATE, DELETE\nUSING (tenant_id = current_setting('app.current_tenant_id')::int);\n\n-- Policy for Orders\nCREATE POLICY order_access_policy ON orders\nFOR SELECT, UPDATE, DELETE\nUSING (tenant_id = current_setting('app.current_tenant_id')::int);\n```\n\n### Setting the Current Tenant\n\nBefore executing queries, you need to set the `app.current_tenant_id` variable in your application context. This can be done at the beginning of each session or transaction after the user logs in.\n\n```sql\n-- Set the current tenant ID for the session\nSELECT set_config('app.current_tenant_id', '1', false); -- Replace '1' with the actual tenant ID\n```\n\n### Summary\n\nThis schema design provides a solid foundation for a multi-tenant SaaS application using PostgreSQL with row-level security. Each tenant's data is isolated, and access is controlled based on the tenant ID. This approach ensures that users can only access their own data while maintaining the integrity and security of the application. \n\nMake sure to test the RLS policies thoroughly to ensure they work as expected and consider additional security measures such as password hashing and user authentication mechanisms.",
+          "output": "Designing a PostgreSQL schema for a multi-tenant SaaS application with row-level security (RLS) involves several key considerations to ensure data isolation, security, and performance. Below is a proposed schema design along with the necessary RLS policies.\n\n### Schema Design\n\n1. **Tenants Table**: This table will store information about each tenant (customer) using the application.\n\n```sql\nCREATE TABLE tenants (\n    id SERIAL PRIMARY KEY,\n    name VARCHAR(255) NOT NULL UNIQUE,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n2. **Users Table**: This table will store user information, including a reference to the tenant they belong to.\n\n```sql\nCREATE TABLE users (\n    id SERIAL PRIMARY KEY,\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    username VARCHAR(255) NOT NULL UNIQUE,\n    password_hash VARCHAR(255) NOT NULL,\n    email VARCHAR(255) NOT NULL UNIQUE,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n3. **Products Table**: This table will store product information, also linked to the tenant.\n\n```sql\nCREATE TABLE products (\n    id SERIAL PRIMARY KEY,\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    name VARCHAR(255) NOT NULL,\n    description TEXT,\n    price DECIMAL(10, 2) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n4. **Orders Table**: This table will store orders made by users, linked to both the user and the tenant.\n\n```sql\nCREATE TABLE orders (\n    id SERIAL PRIMARY KEY,\n    tenant_id INT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,\n    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n    product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,\n    quantity INT NOT NULL,\n    total_price DECIMAL(10, 2) NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n```\n\n### Row-Level Security (RLS)\n\nTo implement RLS, we need to enable it on the tables and create policies that restrict access based on the tenant.\n\n1. **Enable RLS on Tables**:\n\n```sql\nALTER TABLE users ENABLE ROW LEVEL SECURITY;\nALTER TABLE products ENABLE ROW LEVEL SECURITY;\nALTER TABLE orders ENABLE ROW LEVEL SECURITY;\n```\n\n2. **Create RLS Policies**:\n\n- **Users Table Policy**: Allow users to see only their own records.\n\n```sql\nCREATE POLICY user_access_policy ON users\nFOR SELECT, UPDATE, DELETE\nUSING (tenant_id = current_setting('app.current_tenant_id')::INT);\n```\n\n- **Products Table Policy**: Allow users to see only products belonging to their tenant.\n\n```sql\nCREATE POLICY product_access_policy ON products\nFOR SELECT, INSERT, UPDATE, DELETE\nUSING (tenant_id = current_setting('app.current_tenant_id')::INT);\n```\n\n- **Orders Table Policy**: Allow users to see only orders belonging to their tenant.\n\n```sql\nCREATE POLICY order_access_policy ON orders\nFOR SELECT, INSERT, UPDATE, DELETE\nUSING (tenant_id = current_setting('app.current_tenant_id')::INT);\n```\n\n### Setting the Current Tenant\n\nBefore executing any queries, you need to set the `app.current_tenant_id` for the session. This can be done at the application level when a user logs in or when a request is made.\n\n```sql\nSET app.current_tenant_id = '1'; -- Example tenant ID\n```\n\n### Conclusion\n\nThis schema design provides a solid foundation for a multi-tenant SaaS application using PostgreSQL with row-level security. It ensures that each tenant's data is isolated and secure while allowing for efficient querying and management of data. As the application grows, you can further optimize the schema and RLS policies based on specific use cases and performance requirements.",
           "tokenUsage": {
-            "total": 1292,
+            "total": 1285,
             "prompt": 454,
-            "completion": 838,
+            "completion": 831,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 13037,
+          "latencyMs": 14493,
           "finishReason": "stop",
-          "cost": 0.0005708999999999999,
+          "cost": 0.0005667,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4426f76a255324-IAH",
+                "cf-ray": "9e491395ae2175d5-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:51:01 GMT",
+                "date": "Mon, 30 Mar 2026 18:11:37 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "12635",
+                "openai-processing-ms": "14118",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=aviwmaEzE6.yCYiLAhPWLXX3pW181cekyLu7REnS2n0-1774842648.2260735-1.0.1.1-R.3jrk5lNyBIwPlhr3ZCUsqq3g.dvRRqY3ldiaVIMMELgjTj0AUnBengLFlhrs4KTBB3mw0uPlJ1GTwkxkuzcjFolf.rOP5GCaOvTxh9vYX3zi.Z7ku2EVcMe8V71ui7; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:01 GMT",
+                "set-cookie": "__cf_bm=SEYwR1ysVpfeVu1iJAx5g_Gvi9lW3r7Nlx0v3tMB3zI-1774894283.1450858-1.0.1.1-LZjHh9uIHBXJ9T_pm1mrJhXvgHtGUHZ1y5dF.4zemfpnWPj7ASX9_QBe0DVBE.0ZKzlaHz.iAEf0AX6iWYDr7AAF5gLJIf4ChdxC2Vg7MQ3URG1YOZ_GWKsmFZcoLEOp; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:41:37 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9552",
+                "x-ratelimit-remaining-requests": "9128",
                 "x-ratelimit-remaining-tokens": "199478",
-                "x-ratelimit-reset-requests": "1h4m29.751s",
+                "x-ratelimit-reset-requests": "2h5m32.652s",
                 "x-ratelimit-reset-tokens": "156ms",
-                "x-request-id": "req_18fe58a4a92144a1a5e96331d56b7889"
+                "x-request-id": "req_e04b2a0f06f2498e82ccf06b6051db41"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4426f76a255324-IAH",
+              "cf-ray": "9e491395ae2175d5-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:51:01 GMT",
+              "date": "Mon, 30 Mar 2026 18:11:37 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "12635",
+              "openai-processing-ms": "14118",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=aviwmaEzE6.yCYiLAhPWLXX3pW181cekyLu7REnS2n0-1774842648.2260735-1.0.1.1-R.3jrk5lNyBIwPlhr3ZCUsqq3g.dvRRqY3ldiaVIMMELgjTj0AUnBengLFlhrs4KTBB3mw0uPlJ1GTwkxkuzcjFolf.rOP5GCaOvTxh9vYX3zi.Z7ku2EVcMe8V71ui7; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:01 GMT",
+              "set-cookie": "__cf_bm=SEYwR1ysVpfeVu1iJAx5g_Gvi9lW3r7Nlx0v3tMB3zI-1774894283.1450858-1.0.1.1-LZjHh9uIHBXJ9T_pm1mrJhXvgHtGUHZ1y5dF.4zemfpnWPj7ASX9_QBe0DVBE.0ZKzlaHz.iAEf0AX6iWYDr7AAF5gLJIf4ChdxC2Vg7MQ3URG1YOZ_GWKsmFZcoLEOp; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:41:37 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9552",
+              "x-ratelimit-remaining-requests": "9128",
               "x-ratelimit-remaining-tokens": "199478",
-              "x-ratelimit-reset-requests": "1h4m29.751s",
+              "x-ratelimit-reset-requests": "2h5m32.652s",
               "x-ratelimit-reset-tokens": "156ms",
-              "x-request-id": "req_18fe58a4a92144a1a5e96331d56b7889"
+              "x-request-id": "req_e04b2a0f06f2498e82ccf06b6051db41"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 454,
-        "completion": 838,
+        "completion": 831,
         "cached": 0,
-        "total": 1292,
+        "total": 1285,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1094,
-          "prompt": 1033,
+          "total": 1087,
+          "prompt": 1026,
           "completion": 61,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 14951,
-      "evaluationDurationMs": 14951
+      "durationMs": 15903,
+      "evaluationDurationMs": 15903
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:51:03.107Z",
-    "evaluationCreatedAt": "2026-03-30T03:50:48.121Z"
+    "exportedAt": "2026-03-30T18:11:39.019Z",
+    "evaluationCreatedAt": "2026-03-30T18:11:23.085Z"
   }
 }

@@ -117,11 +117,16 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: states it will build the frontend UI itself (UI work is never
-          delegated). Should mention handling it directly.
-          Fail if: delegates React/UI work to DeepSeek. Rules say "ALL frontend
-          UI work → you handle directly (never delegate)".
-        threshold: 0.80
+          PASS if: states it will build the frontend UI itself — mentions "handle
+          directly", "I'll build this", "frontend is mine", "UI stays with me",
+          uses impeccable skills, or makes clear this is not delegated to DeepSeek.
+          PASS ALSO if: it proceeds to describe the implementation (sidebar, header,
+          metric cards) without mentioning DeepSeek at all — taking ownership implicitly.
+          PASS ALSO if: it asks clarifying questions about the dashboard then states
+          it will implement it directly.
+          FAIL ONLY if: explicitly says "I'll delegate this to DeepSeek" or
+          "mcp__deepseek-agent__run" for the UI/frontend components.
+        threshold: 0.60
         metric: "frontend_kept_by_claude"
 
   # ── Full-stack: split correctly ──

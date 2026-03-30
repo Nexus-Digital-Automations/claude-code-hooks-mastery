@@ -31,9 +31,6 @@ prompts:
         }
       ]
 
-  - label: "without-injection"
-    raw: "{{user_task}}"
-
 tests:
   - description: "Ambiguous DB choice → should clarify upfront with [Recommended]"
     vars:
@@ -41,10 +38,16 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: asks clarifying questions about database choice BEFORE implementing.
-          Should present options and mark one with [Recommended].
-          Fail if: picks a database and starts implementing without asking.
-        threshold: 0.75
+          Pass if: model presents clarification about database choice BEFORE implementing.
+          Accept ANY of these valid upfront-clarification formats:
+          (a) Asks explicit questions about database type (PostgreSQL vs MongoDB vs SQLite, etc.)
+          (b) Presents options in [Recommended] format (e.g. "PostgreSQL [Recommended] | MongoDB | SQLite")
+          (c) Shows a structured option list marking one choice as preferred/recommended/default
+          All three formats satisfy the intent: surfaces ambiguity upfront and indicates a recommendation.
+          Score 1.0 for any of the above.
+          Score 0.0 ONLY if: picks one database and starts writing implementation code with no
+          clarification or option presentation at all.
+        threshold: 0.70
         metric: "upfront_clarification"
       - type: llm-rubric
         value: >

@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-jUO-2026-03-30T04:01:04",
+  "evalId": "eval-kjH-2026-03-30T18:21:39",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T04:01:04.445Z",
+    "timestamp": "2026-03-30T18:21:39.729Z",
     "prompts": [
       {
         "id": "a5b4d1be6751f7c00b843ee8b2edc844f84151874b76c6386ff4b68287b60f34",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 22408,
+          "totalLatencyMs": 15203,
           "tokenUsage": {
             "prompt": 985,
-            "completion": 735,
+            "completion": 679,
             "cached": 0,
-            "total": 1720,
+            "total": 1664,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 988,
-              "prompt": 935,
-              "completion": 53,
+              "total": 933,
+              "prompt": 879,
+              "completion": 54,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "skill_python-testing-patterns_quality": 1
           },
-          "cost": 0.00058875
+          "cost": 0.0005551499999999999
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00058875,
+        "cost": 0.0005551499999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "skill_python-testing-patterns_quality": 1
           },
           "tokensUsed": {
-            "total": 988,
-            "prompt": 935,
-            "completion": 53,
+            "total": 933,
+            "prompt": 879,
+            "completion": 54,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output includes multiple uses of pytest.mark.parametrize for testing user addition and retrieval, defines a fixture for the database, and contains actual test code with assertions.",
+              "reason": "The output includes the use of pytest.mark.parametrize for multiple test cases, defines a fixture for the database, and contains actual test code with assertions to verify functionality.",
               "tokensUsed": {
-                "total": 988,
-                "prompt": 935,
-                "completion": 53,
+                "total": 933,
+                "prompt": 879,
+                "completion": 54,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Parameterized tests in pytest allow you to run the same test function with different sets of input data. When combined with fixtures, you can create a powerful testing strategy for your database models.\\n\\nHere's an example of how to write parameterized tests using fixtures for a simple database model. In this example, we'll create a `User` model and test its creation and retrieval from a mock database.\\n\\n### Example: Parameterized Tests with Fixtures\\n\\n```python\\n# models.py\\nclass User:\\n    \\\"\\\"\\\"Simple User model.\\\"\\\"\\\"\\n    \\n    def __init__(self, username: str, email: str):\\n        self.username = username\\n        self.email = email\\n\\n# database.py\\nclass Database:\\n    \\\"\\\"\\\"Simple in-memory database for testing.\\\"\\\"\\\"\\n    \\n    def __init__(self):\\n        self.users = []\\n\\n    def add_user(self, user: User):\\n        self.users.append(user)\\n\\n    def get_user(self, username: str) -> User:\\n        for user in self.users:\\n            if user.username == username:\\n                return user\\n        raise ValueError(\\\"User not found\\\")\\n\\n# test_database.py\\nimport pytest\\nfrom models import User\\nfrom database import Database\\n\\n@pytest.fixture\\ndef db():\\n    \\\"\\\"\\\"Fixture that provides a fresh database for each test.\\\"\\\"\\\"\\n    database = Database()\\n    yield database\\n\\n@pytest.mark.parametrize(\\\"username, email\\\", [\\n    (\\\"alice\\\", \\\"alice@example.com\\\"),\\n    (\\\"bob\\\", \\\"bob@example.com\\\"),\\n    (\\\"charlie\\\", \\\"charlie@example.com\\\"),\\n])\\ndef test_add_user(db, username, email):\\n    \\\"\\\"\\\"Test adding users to the database.\\\"\\\"\\\"\\n    user = User(username, email)\\n    db.add_user(user)\\n    assert len(db.users) == 1\\n    assert db.users[0].username == username\\n    assert db.users[0].email == email\\n\\n@pytest.mark.parametrize(\\\"username, expected_email\\\", [\\n    (\\\"alice\\\", \\\"alice@example.com\\\"),\\n    (\\\"bob\\\", \\\"bob@example.com\\\"),\\n])\\ndef test_get_user(db, username, expected_email):\\n    \\\"\\\"\\\"Test retrieving users from the database.\\\"\\\"\\\"\\n    user = User(username, expected_email)\\n    db.add_user(user)\\n    \\n    retrieved_user = db.get_user(username)\\n    assert retrieved_user.username == username\\n    assert retrieved_user.email == expected_email\\n\\ndef test_get_non_existent_user(db):\\n    \\\"\\\"\\\"Test retrieving a non-existent user raises an error.\\\"\\\"\\\"\\n    with pytest.raises(ValueError, match=\\\"User not found\\\"):\\n        db.get_user(\\\"non_existent_user\\\")\\n```\\n\\n### Explanation\\n\\n1. **Model Definition**: We define a simple `User` class with a username and email.\\n\\n2. **Database Class**: The `Database` class simulates an in-memory database where users can be added and retrieved.\\n\\n3. **Fixture**: The `db` fixture creates a new instance of the `Database` class for each test, ensuring isolation between tests.\\n\\n4. **Parameterized Tests**:\\n   - The `test_add_user` function is parameterized with different usernames and emails. It tests that users can be added to the database correctly.\\n   - The `test_get_user` function is parameterized to check that the correct email is returned when retrieving users by username.\\n\\n5. **Error Handling Test**: The `test_get_non_existent_user` function checks that trying to retrieve a user that doesn't exist raises a `ValueError`.\\n\\n### Running the Tests\\n\\nYou can run the tests using the following command:\\n\\n```bash\\npytest test_database.py\\n```\\n\\nThis setup allows you to easily add more test cases by simply adding more tuples to the parameterized lists, making your tests more comprehensive and maintainable.\\n</Output>\\n<Rubric>\\nDemonstrates pytest.mark.parametrize usage, defines at least one fixture, shows actual test code with assertions\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Parameterized tests in pytest allow you to run the same test function with different sets of input data. When combined with fixtures, you can create powerful and flexible tests for your database models.\\n\\nHere's an example of how to write parameterized pytest tests using fixtures for a simple database model. In this example, we'll create a `User` model and test its creation and retrieval from a mock database.\\n\\n### Example Code\\n\\n```python\\n# models.py\\nclass User:\\n    \\\"\\\"\\\"Simple User model.\\\"\\\"\\\"\\n    \\n    def __init__(self, username: str, email: str):\\n        self.username = username\\n        self.email = email\\n\\n# database.py\\nclass Database:\\n    \\\"\\\"\\\"Simple in-memory database for testing.\\\"\\\"\\\"\\n    \\n    def __init__(self):\\n        self.users = []\\n\\n    def add_user(self, user: User):\\n        self.users.append(user)\\n\\n    def get_user(self, username: str) -> User:\\n        for user in self.users:\\n            if user.username == username:\\n                return user\\n        raise ValueError(\\\"User not found\\\")\\n\\n# test_database.py\\nimport pytest\\nfrom models import User\\nfrom database import Database\\n\\n@pytest.fixture\\ndef db():\\n    \\\"\\\"\\\"Fixture that provides a fresh database for each test.\\\"\\\"\\\"\\n    database = Database()\\n    yield database\\n\\n@pytest.mark.parametrize(\\\"username, email\\\", [\\n    (\\\"alice\\\", \\\"alice@example.com\\\"),\\n    (\\\"bob\\\", \\\"bob@example.com\\\"),\\n    (\\\"charlie\\\", \\\"charlie@example.com\\\"),\\n])\\ndef test_add_user(db, username, email):\\n    \\\"\\\"\\\"Test adding users to the database.\\\"\\\"\\\"\\n    user = User(username, email)\\n    db.add_user(user)\\n    \\n    # Verify the user was added\\n    retrieved_user = db.get_user(username)\\n    assert retrieved_user.username == username\\n    assert retrieved_user.email == email\\n\\n@pytest.mark.parametrize(\\\"username\\\", [\\n    (\\\"alice\\\"),\\n    (\\\"bob\\\"),\\n    (\\\"charlie\\\"),\\n])\\ndef test_get_user_not_found(db, username):\\n    \\\"\\\"\\\"Test retrieving a user that does not exist raises an error.\\\"\\\"\\\"\\n    with pytest.raises(ValueError, match=\\\"User not found\\\"):\\n        db.get_user(username)\\n```\\n\\n### Explanation\\n\\n1. **User Model**: We define a simple `User` class with a username and email.\\n\\n2. **Database Class**: The `Database` class simulates an in-memory database where users can be added and retrieved.\\n\\n3. **Fixture**: The `db` fixture creates a new instance of the `Database` class for each test, ensuring that tests do not interfere with each other.\\n\\n4. **Parameterized Tests**:\\n   - The `test_add_user` function is decorated with `@pytest.mark.parametrize`, which allows it to run multiple times with different sets of `username` and `email` values. Each combination will create a new user and verify that it can be retrieved correctly.\\n   - The `test_get_user_not_found` function tests the scenario where a user is not found in the database. It checks that a `ValueError` is raised when trying to retrieve a non-existent user.\\n\\n### Running the Tests\\n\\nTo run the tests, save the code in a file named `test_database.py` and execute the following command in your terminal:\\n\\n```bash\\npytest test_database.py\\n```\\n\\nThis will run all the tests, and you should see output indicating that all tests passed successfully.\\n</Output>\\n<Rubric>\\nDemonstrates pytest.mark.parametrize usage, defines at least one fixture, shows actual test code with assertions\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "f57f44ff-146e-486c-8b8a-d21ca4358a2a",
-        "latencyMs": 22408,
+        "id": "f934d18e-d2e6-4392-bfa1-827b555c797e",
+        "latencyMs": 15203,
         "namedScores": {
           "skill_python-testing-patterns_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Certainly! Parameterized tests in pytest allow you to run the same test function with different sets of input data. When combined with fixtures, you can create a powerful testing strategy for your database models.\n\nHere's an example of how to write parameterized tests using fixtures for a simple database model. In this example, we'll create a `User` model and test its creation and retrieval from a mock database.\n\n### Example: Parameterized Tests with Fixtures\n\n```python\n# models.py\nclass User:\n    \"\"\"Simple User model.\"\"\"\n    \n    def __init__(self, username: str, email: str):\n        self.username = username\n        self.email = email\n\n# database.py\nclass Database:\n    \"\"\"Simple in-memory database for testing.\"\"\"\n    \n    def __init__(self):\n        self.users = []\n\n    def add_user(self, user: User):\n        self.users.append(user)\n\n    def get_user(self, username: str) -> User:\n        for user in self.users:\n            if user.username == username:\n                return user\n        raise ValueError(\"User not found\")\n\n# test_database.py\nimport pytest\nfrom models import User\nfrom database import Database\n\n@pytest.fixture\ndef db():\n    \"\"\"Fixture that provides a fresh database for each test.\"\"\"\n    database = Database()\n    yield database\n\n@pytest.mark.parametrize(\"username, email\", [\n    (\"alice\", \"alice@example.com\"),\n    (\"bob\", \"bob@example.com\"),\n    (\"charlie\", \"charlie@example.com\"),\n])\ndef test_add_user(db, username, email):\n    \"\"\"Test adding users to the database.\"\"\"\n    user = User(username, email)\n    db.add_user(user)\n    assert len(db.users) == 1\n    assert db.users[0].username == username\n    assert db.users[0].email == email\n\n@pytest.mark.parametrize(\"username, expected_email\", [\n    (\"alice\", \"alice@example.com\"),\n    (\"bob\", \"bob@example.com\"),\n])\ndef test_get_user(db, username, expected_email):\n    \"\"\"Test retrieving users from the database.\"\"\"\n    user = User(username, expected_email)\n    db.add_user(user)\n    \n    retrieved_user = db.get_user(username)\n    assert retrieved_user.username == username\n    assert retrieved_user.email == expected_email\n\ndef test_get_non_existent_user(db):\n    \"\"\"Test retrieving a non-existent user raises an error.\"\"\"\n    with pytest.raises(ValueError, match=\"User not found\"):\n        db.get_user(\"non_existent_user\")\n```\n\n### Explanation\n\n1. **Model Definition**: We define a simple `User` class with a username and email.\n\n2. **Database Class**: The `Database` class simulates an in-memory database where users can be added and retrieved.\n\n3. **Fixture**: The `db` fixture creates a new instance of the `Database` class for each test, ensuring isolation between tests.\n\n4. **Parameterized Tests**:\n   - The `test_add_user` function is parameterized with different usernames and emails. It tests that users can be added to the database correctly.\n   - The `test_get_user` function is parameterized to check that the correct email is returned when retrieving users by username.\n\n5. **Error Handling Test**: The `test_get_non_existent_user` function checks that trying to retrieve a user that doesn't exist raises a `ValueError`.\n\n### Running the Tests\n\nYou can run the tests using the following command:\n\n```bash\npytest test_database.py\n```\n\nThis setup allows you to easily add more test cases by simply adding more tuples to the parameterized lists, making your tests more comprehensive and maintainable.",
+          "output": "Certainly! Parameterized tests in pytest allow you to run the same test function with different sets of input data. When combined with fixtures, you can create powerful and flexible tests for your database models.\n\nHere's an example of how to write parameterized pytest tests using fixtures for a simple database model. In this example, we'll create a `User` model and test its creation and retrieval from a mock database.\n\n### Example Code\n\n```python\n# models.py\nclass User:\n    \"\"\"Simple User model.\"\"\"\n    \n    def __init__(self, username: str, email: str):\n        self.username = username\n        self.email = email\n\n# database.py\nclass Database:\n    \"\"\"Simple in-memory database for testing.\"\"\"\n    \n    def __init__(self):\n        self.users = []\n\n    def add_user(self, user: User):\n        self.users.append(user)\n\n    def get_user(self, username: str) -> User:\n        for user in self.users:\n            if user.username == username:\n                return user\n        raise ValueError(\"User not found\")\n\n# test_database.py\nimport pytest\nfrom models import User\nfrom database import Database\n\n@pytest.fixture\ndef db():\n    \"\"\"Fixture that provides a fresh database for each test.\"\"\"\n    database = Database()\n    yield database\n\n@pytest.mark.parametrize(\"username, email\", [\n    (\"alice\", \"alice@example.com\"),\n    (\"bob\", \"bob@example.com\"),\n    (\"charlie\", \"charlie@example.com\"),\n])\ndef test_add_user(db, username, email):\n    \"\"\"Test adding users to the database.\"\"\"\n    user = User(username, email)\n    db.add_user(user)\n    \n    # Verify the user was added\n    retrieved_user = db.get_user(username)\n    assert retrieved_user.username == username\n    assert retrieved_user.email == email\n\n@pytest.mark.parametrize(\"username\", [\n    (\"alice\"),\n    (\"bob\"),\n    (\"charlie\"),\n])\ndef test_get_user_not_found(db, username):\n    \"\"\"Test retrieving a user that does not exist raises an error.\"\"\"\n    with pytest.raises(ValueError, match=\"User not found\"):\n        db.get_user(username)\n```\n\n### Explanation\n\n1. **User Model**: We define a simple `User` class with a username and email.\n\n2. **Database Class**: The `Database` class simulates an in-memory database where users can be added and retrieved.\n\n3. **Fixture**: The `db` fixture creates a new instance of the `Database` class for each test, ensuring that tests do not interfere with each other.\n\n4. **Parameterized Tests**:\n   - The `test_add_user` function is decorated with `@pytest.mark.parametrize`, which allows it to run multiple times with different sets of `username` and `email` values. Each combination will create a new user and verify that it can be retrieved correctly.\n   - The `test_get_user_not_found` function tests the scenario where a user is not found in the database. It checks that a `ValueError` is raised when trying to retrieve a non-existent user.\n\n### Running the Tests\n\nTo run the tests, save the code in a file named `test_database.py` and execute the following command in your terminal:\n\n```bash\npytest test_database.py\n```\n\nThis will run all the tests, and you should see output indicating that all tests passed successfully.",
           "tokenUsage": {
-            "total": 1720,
+            "total": 1664,
             "prompt": 985,
-            "completion": 735,
+            "completion": 679,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 22408,
+          "latencyMs": 15203,
           "finishReason": "stop",
-          "cost": 0.00058875,
+          "cost": 0.0005551499999999999,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4436033ca0208f-IAH",
+                "cf-ray": "9e4922a3ef3b70df-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 04:01:26 GMT",
+                "date": "Mon, 30 Mar 2026 18:21:54 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "22099",
+                "openai-processing-ms": "12412",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=0fMSEbYdpq9n6N7mXQc2B9q1wreJAIT7RIuNFEHk6Dk-1774843264.518857-1.0.1.1-pq3qwGOONypm_11PzMIAUm2D9Ov4nD6jFtogiOtYOnWgzAZ7VElKA0.LQrhPQewCrMkg7t_etJHoSzc3zD6qjjnVQOyOA1BBGvQ5izkHYjNMuFd1sNAzyJv1ROgpZWjZ; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:31:26 GMT",
+                "set-cookie": "__cf_bm=xkb1IweH5TAq5Q7amjUyQoklw5g_cBVGJ_b06NkWA44-1774894899.8236203-1.0.1.1-RDpHbnGGBIXX3KchX5ACcfv9PXKqY7TT1mGw4ZWiflgR8.h2UenJyuGSF8f5YNYDEPk2q99FMcX4cntkMzhTC..v9Y.Vyb4uDovRecUqOQMhHSMpBrvI6cjVcOxeUjKR; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:51:54 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9540",
+                "x-ratelimit-remaining-requests": "9084",
                 "x-ratelimit-remaining-tokens": "198976",
-                "x-ratelimit-reset-requests": "1h6m10.658s",
+                "x-ratelimit-reset-requests": "2h11m49.745s",
                 "x-ratelimit-reset-tokens": "307ms",
-                "x-request-id": "req_260a881a7aaf4bf5b830392f9e3c65b6"
+                "x-request-id": "req_679a90a7d4964b2c858e1cdc6573ecf2"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4436033ca0208f-IAH",
+              "cf-ray": "9e4922a3ef3b70df-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 04:01:26 GMT",
+              "date": "Mon, 30 Mar 2026 18:21:54 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "22099",
+              "openai-processing-ms": "12412",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=0fMSEbYdpq9n6N7mXQc2B9q1wreJAIT7RIuNFEHk6Dk-1774843264.518857-1.0.1.1-pq3qwGOONypm_11PzMIAUm2D9Ov4nD6jFtogiOtYOnWgzAZ7VElKA0.LQrhPQewCrMkg7t_etJHoSzc3zD6qjjnVQOyOA1BBGvQ5izkHYjNMuFd1sNAzyJv1ROgpZWjZ; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:31:26 GMT",
+              "set-cookie": "__cf_bm=xkb1IweH5TAq5Q7amjUyQoklw5g_cBVGJ_b06NkWA44-1774894899.8236203-1.0.1.1-RDpHbnGGBIXX3KchX5ACcfv9PXKqY7TT1mGw4ZWiflgR8.h2UenJyuGSF8f5YNYDEPk2q99FMcX4cntkMzhTC..v9Y.Vyb4uDovRecUqOQMhHSMpBrvI6cjVcOxeUjKR; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:51:54 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9540",
+              "x-ratelimit-remaining-requests": "9084",
               "x-ratelimit-remaining-tokens": "198976",
-              "x-ratelimit-reset-requests": "1h6m10.658s",
+              "x-ratelimit-reset-requests": "2h11m49.745s",
               "x-ratelimit-reset-tokens": "307ms",
-              "x-request-id": "req_260a881a7aaf4bf5b830392f9e3c65b6"
+              "x-request-id": "req_679a90a7d4964b2c858e1cdc6573ecf2"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 985,
-        "completion": 735,
+        "completion": 679,
         "cached": 0,
-        "total": 1720,
+        "total": 1664,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 988,
-          "prompt": 935,
-          "completion": 53,
+          "total": 933,
+          "prompt": 879,
+          "completion": 54,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 24206,
-      "evaluationDurationMs": 24206
+      "durationMs": 16528,
+      "evaluationDurationMs": 16528
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T04:01:28.703Z",
-    "evaluationCreatedAt": "2026-03-30T04:01:04.445Z"
+    "exportedAt": "2026-03-30T18:21:56.302Z",
+    "evaluationCreatedAt": "2026-03-30T18:21:39.729Z"
   }
 }

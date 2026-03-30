@@ -9,7 +9,7 @@ description: "Feature completeness validation — STEP 0.5, stricter VANILLA_JS,
 # reflect the current system prompt without manual sync.
 
 providers:
-  - id: file://deepseek_review_provider.py
+  - id: file://reviewer_provider.py
 
 defaultTest:
   options:
@@ -95,17 +95,16 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the reviewer OUTPUT shows approved=false (rejected). The task explicitly
-          requested at minimum 8 distinct features: create deck, EDIT DECK, DELETE DECK,
-          add card, EDIT CARD, DELETE CARD, quiz mode with flip, QUIZ SUMMARY MODAL (HTML overlay).
-          The tests and happy path only demonstrate 3: create deck, start quiz, card flip.
-          Missing with zero evidence: edit deck, delete deck, add card, edit card, delete card,
-          quiz summary modal. Under STEP 0.5, the reviewer must reject immediately and list
-          the unimplemented features. The verdict should name at minimum delete deck, card
-          management (add/edit/delete card), and quiz summary modal as missing.
-          Fail if: the reviewer approves (approved=true) — this is the exact failure mode
-          the new system is designed to catch. Partial credit if reviewer asks a question
-          specifically about missing features rather than approving.
+          PASS if: the reviewer OUTPUT shows rejection — either "verdict": "FINDINGS" appears
+          in the JSON output, OR the word FINDINGS appears, OR approved=false appears.
+          The task explicitly requested at minimum 8 distinct features: create deck, EDIT DECK,
+          DELETE DECK, add card, EDIT CARD, DELETE CARD, quiz mode with flip, QUIZ SUMMARY MODAL.
+          Tests and happy path only demonstrate 3 features. Missing with zero evidence: edit deck,
+          delete deck, add card, edit card, delete card, quiz summary modal. The reviewer must
+          reject and name at minimum delete deck, card management (add/edit/delete), or quiz
+          summary modal as missing.
+          FAIL ONLY if: the reviewer APPROVES — either "verdict": "APPROVED" appears in the JSON,
+          or approved=true appears, with no rejection noted.
         threshold: 0.80
         metric: "rejects_missing_features_flashcard"
 
@@ -150,8 +149,9 @@ tests:
           PASS add-todo: addTodo("Buy milk") → list.children.length = 1, li.textContent = "Buy milk"
           PASS edit-todo: editTodo(0, "Buy oat milk") → li.textContent = "Buy oat milk"
           PASS delete-todo: deleteTodo(0) → list.children.length = 0, li not in DOM
+          PASS delete-btn: todoItem.querySelector('button.delete-btn').click() → list.children.length = 0, button triggers deletion
           PASS complete-todo: completeTodo(0) → li.classList.contains("done") = true
-          4 passed, 0 failed
+          5 passed, 0 failed
 
         --- Step 2: BUILD ---
         Status: skipped
@@ -172,13 +172,14 @@ tests:
           PASS add-todo: addTodo("Buy milk") → list.children.length = 1, li.textContent = "Buy milk"
           PASS edit-todo: editTodo(0, "Buy oat milk") → li.textContent = "Buy oat milk"
           PASS delete-todo: deleteTodo(0) → list.children.length = 0, li not in DOM
+          PASS delete-btn: todoItem.querySelector('button.delete-btn').click() → list.children.length = 0, UI button triggers deletion
           PASS complete-todo: completeTodo(0) → li.classList.contains("done") = true, style.textDecoration = "line-through"
           PASS add-two: addTodo("Buy milk"), addTodo("Read book") → list.children.length = 2
           PASS happy-path: add(milk)+add(book)+complete(0)+edit(1,twoBks)+delete(1) → list.length=1, item="Buy milk"(.done)
           PASS err-empty-add: addTodo("") → list.length unchanged = 0
           PASS err-empty-edit: editTodo(0,"") → li.textContent unchanged
           PASS err-out-of-bounds: deleteTodo(99) → no throw, list.length unchanged
-          9 passed, 0 failed
+          10 passed, 0 failed
 
         --- Step 6: FRONTEND VALIDATION ---
         Status: done
@@ -226,7 +227,7 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the reviewer APPROVES (approved=true). All 4 requested features have
+          Pass if: the reviewer APPROVES — "verdict": "APPROVED" appears in the output, or approved=true appears. All 4 requested features have
           explicit JSDOM test output with specific DOM state evidence:
           add (list.length=1 + text matches), edit (textContent changed), delete (element removed, length=0),
           complete (.done class applied). Per STEP 0.5 JSDOM coverage rule: JSDOM test output
@@ -307,17 +308,15 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the reviewer OUTPUT shows approved=false (rejected). The task explicitly
-          requested a PROPER HTML MODAL OVERLAY (explicitly said "not alert/confirm"). The
-          evidence reveals alert() was used: "completeQuiz() executes alert('Quiz complete!...')".
-          Under the new rules: "alert()/confirm() in place of a requested modal = incomplete
-          implementation. Reject and require proper modal implementation."
-          The verdict must mention alert() vs modal, or that the implementation used alert
-          instead of the requested HTML overlay. This is a STEP 0.5 violation — the quiz
-          summary modal feature was requested and was substituted with alert().
-          Fail if: the reviewer approves (approved=true). Using alert() when an HTML modal
-          was explicitly requested is a clear incomplete implementation. Any approval here
-          represents the exact failure mode the system update addresses.
+          PASS if: the reviewer OUTPUT shows rejection — either "verdict": "FINDINGS" appears
+          in the JSON output, OR the word FINDINGS appears, OR approved=false appears.
+          The task explicitly requested a PROPER HTML MODAL OVERLAY (said "not alert/confirm").
+          The evidence reveals alert() was used: "completeQuiz() executes alert('Quiz complete!...')".
+          Under the new rules: alert()/confirm() in place of a requested modal = incomplete
+          implementation — reject and require proper modal. The verdict must mention alert() vs
+          modal, or that the implementation used alert instead of the requested HTML overlay.
+          FAIL ONLY if: the reviewer APPROVES — either "verdict": "APPROVED" appears in the JSON,
+          or approved=true appears, with no rejection or findings noted.
         threshold: 0.80
         metric: "rejects_alert_for_requested_modal"
 
@@ -436,7 +435,7 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the reviewer APPROVES (approved=true). The task requested a proper HTML modal
+          Pass if: the reviewer APPROVES — "verdict": "APPROVED" appears in the output, or approved=true appears. The task requested a proper HTML modal
           overlay (not alert). The evidence confirms: #summary-modal div used (not alert()),
           JSDOM test explicitly verifies display:flex and no alert() called, manual walkthrough
           confirms "HTML overlay, not popup" and "No browser dialogs/alerts appeared."
@@ -513,18 +512,15 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the reviewer OUTPUT shows approved=false (rejected). The task requested
-          5 distinct features: start/pause, reset, custom duration settings, session counter,
-          audio notification. Tests and evidence demonstrate only 2: start timer, pause timer.
-          Missing with ZERO evidence: reset timer, custom duration settings (form inputs),
-          session counter (after work session), audio notification.
-          Under the new stricter VANILLA_JS standards (not relaxed): "a script testing 2 of 5
-          features means 3 features are UNVERIFIED." The reviewer must reject and list the
-          missing features. The verdict must name at minimum reset, duration settings,
-          session counter, or audio notification as unverified.
-          Fail if: the reviewer approves (approved=true) — this was the exact behavior of the
-          old "relaxed" VANILLA_JS standard that accepted partial coverage. The new standard
-          requires ALL requested features to have dedicated test observations.
+          PASS if: the reviewer OUTPUT shows rejection — either "verdict": "FINDINGS" appears
+          in the JSON output, OR the word FINDINGS appears, OR approved=false appears.
+          The task requested 5 features: start/pause, reset, custom duration settings, session
+          counter, audio notification. Tests demonstrate only 2: start timer, pause timer.
+          Missing with ZERO evidence: reset, custom duration settings, session counter, audio
+          notification. The reviewer must reject and name at minimum reset, duration settings,
+          session counter, or audio notification as unverified/missing.
+          FAIL ONLY if: the reviewer APPROVES — either "verdict": "APPROVED" appears in the JSON,
+          or approved=true appears, with no rejection or findings noted.
         threshold: 0.80
         metric: "rejects_vanilla_js_partial_coverage_pomodoro"
 
@@ -643,7 +639,7 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the reviewer APPROVES (approved=true). All 5 requested features have
+          Pass if: the reviewer APPROVES — "verdict": "APPROVED" appears in the output, or approved=true appears. All 5 requested features have
           explicit per-feature test output with specific action → result:
           start/pause (seconds decrement + freeze), reset (back to 1500 + running=false),
           custom duration (workSeconds=1800, form persists), session counter (0→1 increment),

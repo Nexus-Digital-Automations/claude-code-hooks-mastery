@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-DVp-2026-03-30T03:48:17",
+  "evalId": "eval-XPK-2026-03-30T18:08:03",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:48:17.514Z",
+    "timestamp": "2026-03-30T18:08:03.489Z",
     "prompts": [
       {
         "id": "4fa52cc06b985dbb80c53993d0783db4fdcb02e991f7832f160dc5103826b0da",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 16489,
+          "totalLatencyMs": 18894,
           "tokenUsage": {
             "prompt": 368,
-            "completion": 871,
+            "completion": 826,
             "cached": 0,
-            "total": 1239,
+            "total": 1194,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1126,
-              "prompt": 1080,
-              "completion": 46,
+              "total": 1082,
+              "prompt": 1035,
+              "completion": 47,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "backend-security-coder_quality": 1
           },
-          "cost": 0.0005778000000000001
+          "cost": 0.0005508
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0005778000000000001,
+        "cost": 0.0005508,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "backend-security-coder_quality": 1
           },
           "tokensUsed": {
-            "total": 1126,
-            "prompt": 1080,
-            "completion": 46,
+            "total": 1082,
+            "prompt": 1035,
+            "completion": 47,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output covers file type validation, size limits, and unique filenames, and it demonstrates secure coding patterns throughout the implementation.",
+              "reason": "The output covers file type validation, size limits, and safe storage path, and it demonstrates secure coding patterns throughout the implementation.",
               "tokensUsed": {
-                "total": 1126,
-                "prompt": 1080,
-                "completion": 46,
+                "total": 1082,
+                "prompt": 1035,
+                "completion": 47,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHandling user file uploads securely in a Node.js/Express application involves several best practices to mitigate risks such as file upload vulnerabilities, malware, and unauthorized access. Below are secure code patterns for implementing file uploads:\\n\\n### 1. Use a Library for File Uploads\\nUtilize a well-maintained library like `multer` for handling file uploads. It simplifies the process and provides built-in features for file handling.\\n\\n```bash\\nnpm install multer\\n```\\n\\n### 2. Set Up Multer with Security Configurations\\n\\nHere’s how to configure `multer` with security measures:\\n\\n```javascript\\nconst express = require('express');\\nconst multer = require('multer');\\nconst path = require('path');\\n\\nconst app = express();\\n\\n// Define storage options\\nconst storage = multer.diskStorage({\\n  destination: (req, file, cb) => {\\n    cb(null, 'uploads/'); // Ensure this directory exists\\n  },\\n  filename: (req, file, cb) => {\\n    // Use a unique filename to prevent overwriting\\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);\\n    cb(null, uniqueSuffix + path.extname(file.originalname)); // Preserve file extension\\n  }\\n});\\n\\n// File filter to restrict file types\\nconst fileFilter = (req, file, cb) => {\\n  const allowedTypes = /jpeg|jpg|png|gif|pdf/; // Define allowed file types\\n  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());\\n  const mimetype = allowedTypes.test(file.mimetype);\\n\\n  if (extname && mimetype) {\\n    return cb(null, true);\\n  }\\n  cb(new Error('File type not allowed'), false);\\n};\\n\\n// Initialize multer with storage and file filter\\nconst upload = multer({\\n  storage: storage,\\n  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB\\n  fileFilter: fileFilter\\n});\\n\\n// Route for file upload\\napp.post('/upload', upload.single('file'), (req, res) => {\\n  if (!req.file) {\\n    return res.status(400).send('No file uploaded.');\\n  }\\n  res.send(`File uploaded successfully: ${req.file.filename}`);\\n});\\n\\n// Error handling middleware\\napp.use((err, req, res, next) => {\\n  if (err instanceof multer.MulterError) {\\n    return res.status(500).send(err.message);\\n  } else if (err) {\\n    return res.status(400).send(err.message);\\n  }\\n  next();\\n});\\n\\n// Start the server\\nconst PORT = process.env.PORT || 3000;\\napp.listen(PORT, () => {\\n  console.log(`Server running on port ${PORT}`);\\n});\\n```\\n\\n### 3. Security Considerations\\n\\n- **File Type Validation**: Ensure that only specific file types are allowed. This is done using the `fileFilter` function in the `multer` configuration.\\n  \\n- **File Size Limit**: Set a maximum file size limit to prevent denial-of-service attacks through large file uploads.\\n\\n- **Unique Filenames**: Generate unique filenames to prevent overwriting existing files and to avoid predictable file names that could be exploited.\\n\\n- **Directory Permissions**: Ensure that the upload directory has the correct permissions set. It should not be executable, and ideally, it should not be accessible directly via the web server.\\n\\n- **Virus Scanning**: Consider integrating a virus scanning service (like ClamAV) to scan uploaded files for malware.\\n\\n- **Secure Storage**: Store uploaded files in a secure location, and consider using cloud storage solutions with proper access controls.\\n\\n- **Content Security Policy (CSP)**: Implement a CSP to mitigate risks associated with file uploads, especially if files are served back to users.\\n\\n### 4. Additional Recommendations\\n\\n- **Rate Limiting**: Implement rate limiting on the upload endpoint to prevent abuse.\\n  \\n- **Logging**: Log upload attempts, including successes and failures, to monitor for suspicious activity.\\n\\n- **User Authentication**: Ensure that only authenticated users can upload files, if applicable.\\n\\nBy following these patterns and practices, you can significantly enhance the security of file uploads in your Node.js/Express application.\\n</Output>\\n<Rubric>\\nCovers at least 3 of: file type validation, size limits, safe storage path, sanitized filenames, malware scanning. Shows secure coding patterns\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nHandling user file uploads securely in a Node.js/Express application involves several best practices to mitigate risks such as file upload vulnerabilities, malware, and unauthorized access. Below are secure code patterns for implementing file uploads:\\n\\n### 1. Use a Library for File Uploads\\nUtilize a well-maintained library like `multer` for handling multipart/form-data, which is commonly used for file uploads.\\n\\n```bash\\nnpm install multer\\n```\\n\\n### 2. Set Up Multer with Security Configurations\\nConfigure `multer` to limit file types, file sizes, and storage options.\\n\\n```javascript\\nconst express = require('express');\\nconst multer = require('multer');\\nconst path = require('path');\\n\\nconst app = express();\\n\\n// Define storage options\\nconst storage = multer.diskStorage({\\n  destination: (req, file, cb) => {\\n    cb(null, 'uploads/'); // Ensure this directory exists\\n  },\\n  filename: (req, file, cb) => {\\n    // Use a unique filename to prevent overwriting\\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);\\n    cb(null, uniqueSuffix + path.extname(file.originalname));\\n  }\\n});\\n\\n// File filter to restrict file types\\nconst fileFilter = (req, file, cb) => {\\n  const allowedTypes = /jpeg|jpg|png|gif|pdf/; // Define allowed file types\\n  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());\\n  const mimetype = allowedTypes.test(file.mimetype);\\n\\n  if (extname && mimetype) {\\n    return cb(null, true);\\n  }\\n  cb(new Error('File type not allowed'), false);\\n};\\n\\n// Set up multer with limits and file filter\\nconst upload = multer({\\n  storage: storage,\\n  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB\\n  fileFilter: fileFilter\\n});\\n\\n// Route for file upload\\napp.post('/upload', upload.single('file'), (req, res) => {\\n  if (!req.file) {\\n    return res.status(400).send('No file uploaded.');\\n  }\\n  res.send(`File uploaded successfully: ${req.file.filename}`);\\n});\\n```\\n\\n### 3. Validate File Uploads\\nAlways validate the uploaded file's content type and size on the server side, even if you have client-side validation.\\n\\n### 4. Store Files Securely\\n- Store uploaded files outside the web root to prevent direct access.\\n- Use a unique naming convention to avoid overwriting files and to prevent enumeration attacks.\\n\\n### 5. Implement Proper Error Handling\\nHandle errors gracefully without exposing sensitive information.\\n\\n```javascript\\napp.use((err, req, res, next) => {\\n  if (err instanceof multer.MulterError) {\\n    return res.status(400).send(err.message);\\n  } else if (err) {\\n    return res.status(500).send('An error occurred while uploading the file.');\\n  }\\n  next();\\n});\\n```\\n\\n### 6. Set HTTP Security Headers\\nUse security headers to protect against common vulnerabilities.\\n\\n```javascript\\nconst helmet = require('helmet');\\napp.use(helmet());\\n```\\n\\n### 7. Use Content Security Policy (CSP)\\nImplement a Content Security Policy to mitigate XSS attacks.\\n\\n```javascript\\napp.use(helmet.contentSecurityPolicy({\\n  directives: {\\n    defaultSrc: [\\\"'self'\\\"],\\n    scriptSrc: [\\\"'self'\\\"],\\n    objectSrc: [\\\"'none'\\\"],\\n    upgradeInsecureRequests: [],\\n  },\\n}));\\n```\\n\\n### 8. Regularly Update Dependencies\\nKeep your dependencies up to date to mitigate vulnerabilities in libraries.\\n\\n### 9. Monitor and Log Uploads\\nImplement logging for file uploads to monitor for suspicious activity.\\n\\n### Conclusion\\nBy following these secure coding patterns, you can significantly reduce the risks associated with file uploads in your Node.js/Express application. Always stay informed about the latest security practices and vulnerabilities to keep your application secure.\\n</Output>\\n<Rubric>\\nCovers at least 3 of: file type validation, size limits, safe storage path, sanitized filenames, malware scanning. Shows secure coding patterns\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "46cc6f86-3847-4f11-9bf9-242e5c256ea1",
-        "latencyMs": 16489,
+        "id": "41aaba6e-cab1-43b9-9482-163db15175a1",
+        "latencyMs": 18894,
         "namedScores": {
           "backend-security-coder_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Handling user file uploads securely in a Node.js/Express application involves several best practices to mitigate risks such as file upload vulnerabilities, malware, and unauthorized access. Below are secure code patterns for implementing file uploads:\n\n### 1. Use a Library for File Uploads\nUtilize a well-maintained library like `multer` for handling file uploads. It simplifies the process and provides built-in features for file handling.\n\n```bash\nnpm install multer\n```\n\n### 2. Set Up Multer with Security Configurations\n\nHere’s how to configure `multer` with security measures:\n\n```javascript\nconst express = require('express');\nconst multer = require('multer');\nconst path = require('path');\n\nconst app = express();\n\n// Define storage options\nconst storage = multer.diskStorage({\n  destination: (req, file, cb) => {\n    cb(null, 'uploads/'); // Ensure this directory exists\n  },\n  filename: (req, file, cb) => {\n    // Use a unique filename to prevent overwriting\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);\n    cb(null, uniqueSuffix + path.extname(file.originalname)); // Preserve file extension\n  }\n});\n\n// File filter to restrict file types\nconst fileFilter = (req, file, cb) => {\n  const allowedTypes = /jpeg|jpg|png|gif|pdf/; // Define allowed file types\n  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());\n  const mimetype = allowedTypes.test(file.mimetype);\n\n  if (extname && mimetype) {\n    return cb(null, true);\n  }\n  cb(new Error('File type not allowed'), false);\n};\n\n// Initialize multer with storage and file filter\nconst upload = multer({\n  storage: storage,\n  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB\n  fileFilter: fileFilter\n});\n\n// Route for file upload\napp.post('/upload', upload.single('file'), (req, res) => {\n  if (!req.file) {\n    return res.status(400).send('No file uploaded.');\n  }\n  res.send(`File uploaded successfully: ${req.file.filename}`);\n});\n\n// Error handling middleware\napp.use((err, req, res, next) => {\n  if (err instanceof multer.MulterError) {\n    return res.status(500).send(err.message);\n  } else if (err) {\n    return res.status(400).send(err.message);\n  }\n  next();\n});\n\n// Start the server\nconst PORT = process.env.PORT || 3000;\napp.listen(PORT, () => {\n  console.log(`Server running on port ${PORT}`);\n});\n```\n\n### 3. Security Considerations\n\n- **File Type Validation**: Ensure that only specific file types are allowed. This is done using the `fileFilter` function in the `multer` configuration.\n  \n- **File Size Limit**: Set a maximum file size limit to prevent denial-of-service attacks through large file uploads.\n\n- **Unique Filenames**: Generate unique filenames to prevent overwriting existing files and to avoid predictable file names that could be exploited.\n\n- **Directory Permissions**: Ensure that the upload directory has the correct permissions set. It should not be executable, and ideally, it should not be accessible directly via the web server.\n\n- **Virus Scanning**: Consider integrating a virus scanning service (like ClamAV) to scan uploaded files for malware.\n\n- **Secure Storage**: Store uploaded files in a secure location, and consider using cloud storage solutions with proper access controls.\n\n- **Content Security Policy (CSP)**: Implement a CSP to mitigate risks associated with file uploads, especially if files are served back to users.\n\n### 4. Additional Recommendations\n\n- **Rate Limiting**: Implement rate limiting on the upload endpoint to prevent abuse.\n  \n- **Logging**: Log upload attempts, including successes and failures, to monitor for suspicious activity.\n\n- **User Authentication**: Ensure that only authenticated users can upload files, if applicable.\n\nBy following these patterns and practices, you can significantly enhance the security of file uploads in your Node.js/Express application.",
+          "output": "Handling user file uploads securely in a Node.js/Express application involves several best practices to mitigate risks such as file upload vulnerabilities, malware, and unauthorized access. Below are secure code patterns for implementing file uploads:\n\n### 1. Use a Library for File Uploads\nUtilize a well-maintained library like `multer` for handling multipart/form-data, which is commonly used for file uploads.\n\n```bash\nnpm install multer\n```\n\n### 2. Set Up Multer with Security Configurations\nConfigure `multer` to limit file types, file sizes, and storage options.\n\n```javascript\nconst express = require('express');\nconst multer = require('multer');\nconst path = require('path');\n\nconst app = express();\n\n// Define storage options\nconst storage = multer.diskStorage({\n  destination: (req, file, cb) => {\n    cb(null, 'uploads/'); // Ensure this directory exists\n  },\n  filename: (req, file, cb) => {\n    // Use a unique filename to prevent overwriting\n    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);\n    cb(null, uniqueSuffix + path.extname(file.originalname));\n  }\n});\n\n// File filter to restrict file types\nconst fileFilter = (req, file, cb) => {\n  const allowedTypes = /jpeg|jpg|png|gif|pdf/; // Define allowed file types\n  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());\n  const mimetype = allowedTypes.test(file.mimetype);\n\n  if (extname && mimetype) {\n    return cb(null, true);\n  }\n  cb(new Error('File type not allowed'), false);\n};\n\n// Set up multer with limits and file filter\nconst upload = multer({\n  storage: storage,\n  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB\n  fileFilter: fileFilter\n});\n\n// Route for file upload\napp.post('/upload', upload.single('file'), (req, res) => {\n  if (!req.file) {\n    return res.status(400).send('No file uploaded.');\n  }\n  res.send(`File uploaded successfully: ${req.file.filename}`);\n});\n```\n\n### 3. Validate File Uploads\nAlways validate the uploaded file's content type and size on the server side, even if you have client-side validation.\n\n### 4. Store Files Securely\n- Store uploaded files outside the web root to prevent direct access.\n- Use a unique naming convention to avoid overwriting files and to prevent enumeration attacks.\n\n### 5. Implement Proper Error Handling\nHandle errors gracefully without exposing sensitive information.\n\n```javascript\napp.use((err, req, res, next) => {\n  if (err instanceof multer.MulterError) {\n    return res.status(400).send(err.message);\n  } else if (err) {\n    return res.status(500).send('An error occurred while uploading the file.');\n  }\n  next();\n});\n```\n\n### 6. Set HTTP Security Headers\nUse security headers to protect against common vulnerabilities.\n\n```javascript\nconst helmet = require('helmet');\napp.use(helmet());\n```\n\n### 7. Use Content Security Policy (CSP)\nImplement a Content Security Policy to mitigate XSS attacks.\n\n```javascript\napp.use(helmet.contentSecurityPolicy({\n  directives: {\n    defaultSrc: [\"'self'\"],\n    scriptSrc: [\"'self'\"],\n    objectSrc: [\"'none'\"],\n    upgradeInsecureRequests: [],\n  },\n}));\n```\n\n### 8. Regularly Update Dependencies\nKeep your dependencies up to date to mitigate vulnerabilities in libraries.\n\n### 9. Monitor and Log Uploads\nImplement logging for file uploads to monitor for suspicious activity.\n\n### Conclusion\nBy following these secure coding patterns, you can significantly reduce the risks associated with file uploads in your Node.js/Express application. Always stay informed about the latest security practices and vulnerabilities to keep your application secure.",
           "tokenUsage": {
-            "total": 1239,
+            "total": 1194,
             "prompt": 368,
-            "completion": 871,
+            "completion": 826,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 16489,
+          "latencyMs": 18894,
           "finishReason": "stop",
-          "cost": 0.0005778000000000001,
+          "cost": 0.0005508,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442349dccf7b2b-IAH",
+                "cf-ray": "9e490eb87abfcbf9-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:48:34 GMT",
+                "date": "Mon, 30 Mar 2026 18:08:22 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "16162",
+                "openai-processing-ms": "18600",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=4HxWmBVFxPyisdbOfYG68WzCtRUNCN3a225jVHxklvQ-1774842497.579579-1.0.1.1-VFRLvs5zJ3Kg7wxE16h6_3BOf6t7Tv_P1t3HgR9Elrs9li_dmFH2genjU035bbytc6yRRUG8L.dPaY5jYVL3jdda_l6dJ_WKfdwE_G7WZY8EhBRsbUfQGwZnwdZ55X1y; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:18:34 GMT",
+                "set-cookie": "__cf_bm=dFuvp2gIju4ANBoqHUgGZniuPZNa.6ZYfhhkYtWxPGo-1774894083.9143815-1.0.1.1-sZneWQ0.11aOKed9OvkYPSbcbyG7he1C5eHoXkIBvQGsk4K6RZz52YebZSqyvHCohL6jL1l1nA6KfLkph0mSVFey3hogj0AUUSYU3EqnRcNeGERfwPWvfJi6ocyxlH.P; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:38:22 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9545",
+                "x-ratelimit-remaining-requests": "9207",
                 "x-ratelimit-remaining-tokens": "199482",
-                "x-ratelimit-reset-requests": "1h5m25.37s",
+                "x-ratelimit-reset-requests": "1h54m10.783s",
                 "x-ratelimit-reset-tokens": "155ms",
-                "x-request-id": "req_40fa8f6ccb854224ba51526030cfa22d"
+                "x-request-id": "req_c846f5bf006c4d08b250024bd011096b"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442349dccf7b2b-IAH",
+              "cf-ray": "9e490eb87abfcbf9-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:48:34 GMT",
+              "date": "Mon, 30 Mar 2026 18:08:22 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "16162",
+              "openai-processing-ms": "18600",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=4HxWmBVFxPyisdbOfYG68WzCtRUNCN3a225jVHxklvQ-1774842497.579579-1.0.1.1-VFRLvs5zJ3Kg7wxE16h6_3BOf6t7Tv_P1t3HgR9Elrs9li_dmFH2genjU035bbytc6yRRUG8L.dPaY5jYVL3jdda_l6dJ_WKfdwE_G7WZY8EhBRsbUfQGwZnwdZ55X1y; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:18:34 GMT",
+              "set-cookie": "__cf_bm=dFuvp2gIju4ANBoqHUgGZniuPZNa.6ZYfhhkYtWxPGo-1774894083.9143815-1.0.1.1-sZneWQ0.11aOKed9OvkYPSbcbyG7he1C5eHoXkIBvQGsk4K6RZz52YebZSqyvHCohL6jL1l1nA6KfLkph0mSVFey3hogj0AUUSYU3EqnRcNeGERfwPWvfJi6ocyxlH.P; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:38:22 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9545",
+              "x-ratelimit-remaining-requests": "9207",
               "x-ratelimit-remaining-tokens": "199482",
-              "x-ratelimit-reset-requests": "1h5m25.37s",
+              "x-ratelimit-reset-requests": "1h54m10.783s",
               "x-ratelimit-reset-tokens": "155ms",
-              "x-request-id": "req_40fa8f6ccb854224ba51526030cfa22d"
+              "x-request-id": "req_c846f5bf006c4d08b250024bd011096b"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 368,
-        "completion": 871,
+        "completion": 826,
         "cached": 0,
-        "total": 1239,
+        "total": 1194,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1126,
-          "prompt": 1080,
-          "completion": 46,
+          "total": 1082,
+          "prompt": 1035,
+          "completion": 47,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 18065,
-      "evaluationDurationMs": 18065
+      "durationMs": 28483,
+      "evaluationDurationMs": 28483
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:48:35.613Z",
-    "evaluationCreatedAt": "2026-03-30T03:48:17.514Z"
+    "exportedAt": "2026-03-30T18:08:32.135Z",
+    "evaluationCreatedAt": "2026-03-30T18:08:03.489Z"
   }
 }

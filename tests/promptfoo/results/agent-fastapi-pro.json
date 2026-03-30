@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-ZrA-2026-03-30T03:52:16",
+  "evalId": "eval-Jx9-2026-03-30T18:13:01",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:52:16.022Z",
+    "timestamp": "2026-03-30T18:13:01.514Z",
     "prompts": [
       {
         "id": "df89ba1145468fc26252ef3e72a42394e2efed427dee8bd580a5726e4edac299",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 21432,
+          "totalLatencyMs": 18095,
           "tokenUsage": {
             "prompt": 418,
-            "completion": 1030,
+            "completion": 1141,
             "cached": 0,
-            "total": 1448,
+            "total": 1559,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1295,
-              "prompt": 1233,
+              "total": 1406,
+              "prompt": 1344,
               "completion": 62,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "fastapi-pro_quality": 1
           },
-          "cost": 0.0006806999999999999
+          "cost": 0.0007472999999999999
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0006806999999999999,
+        "cost": 0.0007472999999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "fastapi-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1295,
-            "prompt": 1233,
+            "total": 1406,
+            "prompt": 1344,
             "completion": 62,
             "cached": 0,
             "numRequests": 1
@@ -78,10 +78,10 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output demonstrates the use of FastAPI's Depends() for authentication, utilizes Pydantic models for input validation, implements BackgroundTasks for sending emails, and uses proper HTTP status codes for error handling.",
+              "reason": "The output demonstrates the use of FastAPI's Depends() for authentication, utilizes Pydantic models for request validation, implements BackgroundTasks for background processing, and employs proper HTTP status codes for error handling.",
               "tokensUsed": {
-                "total": 1295,
-                "prompt": 1233,
+                "total": 1406,
+                "prompt": 1344,
                 "completion": 62,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is an example of a FastAPI application that includes a JWT authentication mechanism, request validation using Pydantic, and a background task. This example demonstrates how to create a simple user registration endpoint that issues a JWT token upon successful registration, and a background task that sends a welcome email.\\n\\n### FastAPI Application Structure\\n\\n1. **Dependencies**: Install the required packages.\\n   ```bash\\n   pip install fastapi[all] python-jose[cryptography] pydantic\\n   ```\\n\\n2. **Create the FastAPI application**:\\n\\n```python\\nfrom fastapi import FastAPI, Depends, HTTPException, BackgroundTasks\\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\\nfrom pydantic import BaseModel, EmailStr\\nfrom jose import JWTError, jwt\\nfrom datetime import datetime, timedelta\\nfrom typing import Optional\\nimport uvicorn\\n\\n# Constants\\nSECRET_KEY = \\\"your_secret_key\\\"  # Change this to a strong secret key\\nALGORITHM = \\\"HS256\\\"\\nACCESS_TOKEN_EXPIRE_MINUTES = 30\\n\\n# FastAPI app\\napp = FastAPI()\\n\\n# OAuth2 scheme\\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\\\"token\\\")\\n\\n# User model\\nclass User(BaseModel):\\n    username: str\\n    email: EmailStr\\n\\nclass UserInDB(User):\\n    hashed_password: str\\n\\n# In-memory user storage (for demonstration purposes)\\nfake_users_db = {}\\n\\n# JWT token creation\\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None):\\n    to_encode = data.copy()\\n    if expires_delta:\\n        expire = datetime.utcnow() + expires_delta\\n    else:\\n        expire = datetime.utcnow() + timedelta(minutes=15)\\n    to_encode.update({\\\"exp\\\": expire})\\n    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)\\n    return encoded_jwt\\n\\n# Background task to send a welcome email\\ndef send_welcome_email(email: str):\\n    print(f\\\"Sending welcome email to {email}\\\")\\n\\n# User registration endpoint\\n@app.post(\\\"/register\\\", response_model=User)\\nasync def register(user: User, background_tasks: BackgroundTasks):\\n    if user.username in fake_users_db:\\n        raise HTTPException(status_code=400, detail=\\\"Username already registered\\\")\\n    \\n    # Here you would hash the password and store it in the database\\n    fake_users_db[user.username] = UserInDB(**user.dict(), hashed_password=\\\"fakehashedpassword\\\")\\n    \\n    # Send welcome email in the background\\n    background_tasks.add_task(send_welcome_email, user.email)\\n    \\n    return user\\n\\n# Token generation endpoint\\n@app.post(\\\"/token\\\")\\nasync def login(form_data: OAuth2PasswordRequestForm = Depends()):\\n    user = fake_users_db.get(form_data.username)\\n    if not user or user.hashed_password != \\\"fakehashedpassword\\\":  # Replace with actual password check\\n        raise HTTPException(status_code=400, detail=\\\"Incorrect username or password\\\")\\n    \\n    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)\\n    access_token = create_access_token(data={\\\"sub\\\": user.username}, expires_delta=access_token_expires)\\n    return {\\\"access_token\\\": access_token, \\\"token_type\\\": \\\"bearer\\\"}\\n\\n# Protected route example\\n@app.get(\\\"/users/me\\\")\\nasync def read_users_me(token: str = Depends(oauth2_scheme)):\\n    credentials_exception = HTTPException(\\n        status_code=401,\\n        detail=\\\"Could not validate credentials\\\",\\n        headers={\\\"WWW-Authenticate\\\": \\\"Bearer\\\"},\\n    )\\n    try:\\n        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\\n        username: str = payload.get(\\\"sub\\\")\\n        if username is None:\\n            raise credentials_exception\\n    except JWTError:\\n        raise credentials_exception\\n    user = fake_users_db.get(username)\\n    if user is None:\\n        raise credentials_exception\\n    return user\\n\\n# Run the application\\nif __name__ == \\\"__main__\\\":\\n    uvicorn.run(app, host=\\\"127.0.0.1\\\", port=8000)\\n```\\n\\n### Explanation\\n\\n1. **User Registration**: The `/register` endpoint allows users to register. It validates the input using Pydantic and checks if the username already exists. If successful, it adds a background task to send a welcome email.\\n\\n2. **JWT Authentication**: The `/token` endpoint generates a JWT token for the user after validating their credentials. The token is signed with a secret key.\\n\\n3. **Protected Route**: The `/users/me` endpoint is protected and requires a valid JWT token to access. It decodes the token and retrieves the user information.\\n\\n4. **Background Tasks**: The `send_welcome_email` function simulates sending an email in the background after user registration.\\n\\n### Running the Application\\nTo run the application, save the code in a file (e.g., `main.py`) and execute it with:\\n```bash\\npython main.py\\n```\\n\\nYou can then test the endpoints using tools like Postman or curl.\\n</Output>\\n<Rubric>\\nUses FastAPI's Depends() for auth, Pydantic models for validation, BackgroundTasks, proper HTTP status codes\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is an example of a FastAPI application that includes a JWT authentication mechanism, request validation using Pydantic, and a background task. This example demonstrates how to create a simple API endpoint that allows users to log in, receive a JWT token, and then access a protected endpoint that triggers a background task.\\n\\n### FastAPI Application with JWT Authentication, Request Validation, and Background Tasks\\n\\n```python\\nfrom fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, status\\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\\nfrom pydantic import BaseModel\\nfrom jose import JWTError, jwt\\nfrom datetime import datetime, timedelta\\nfrom typing import Optional\\nimport uvicorn\\n\\n# Secret key for JWT encoding/decoding\\nSECRET_KEY = \\\"your_secret_key\\\"\\nALGORITHM = \\\"HS256\\\"\\nACCESS_TOKEN_EXPIRE_MINUTES = 30\\n\\n# Fake user database\\nfake_users_db = {\\n    \\\"johndoe\\\": {\\n        \\\"username\\\": \\\"johndoe\\\",\\n        \\\"full_name\\\": \\\"John Doe\\\",\\n        \\\"email\\\": \\\"johndoe@example.com\\\",\\n        \\\"hashed_password\\\": \\\"fakehashedsecret\\\",\\n        \\\"disabled\\\": False,\\n    }\\n}\\n\\n# Pydantic models\\nclass User(BaseModel):\\n    username: str\\n    email: str\\n    full_name: str\\n    disabled: Optional[bool] = None\\n\\nclass UserInDB(User):\\n    hashed_password: str\\n\\nclass Token(BaseModel):\\n    access_token: str\\n    token_type: str\\n\\nclass TokenData(BaseModel):\\n    username: str\\n\\n# FastAPI app instance\\napp = FastAPI()\\n\\n# OAuth2 password bearer\\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\\\"token\\\")\\n\\n# Utility functions\\ndef verify_password(plain_password, hashed_password):\\n    return plain_password == hashed_password  # Replace with a proper hash check\\n\\ndef get_user(db, username: str):\\n    if username in db:\\n        user_dict = db[username]\\n        return UserInDB(**user_dict)\\n\\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None):\\n    to_encode = data.copy()\\n    if expires_delta:\\n        expire = datetime.utcnow() + expires_delta\\n    else:\\n        expire = datetime.utcnow() + timedelta(minutes=15)\\n    to_encode.update({\\\"exp\\\": expire})\\n    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)\\n    return encoded_jwt\\n\\n# Dependency to get the current user\\nasync def get_current_user(token: str = Depends(oauth2_scheme)):\\n    credentials_exception = HTTPException(\\n        status_code=status.HTTP_401_UNAUTHORIZED,\\n        detail=\\\"Could not validate credentials\\\",\\n        headers={\\\"WWW-Authenticate\\\": \\\"Bearer\\\"},\\n    )\\n    try:\\n        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\\n        username: str = payload.get(\\\"sub\\\")\\n        if username is None:\\n            raise credentials_exception\\n        token_data = TokenData(username=username)\\n    except JWTError:\\n        raise credentials_exception\\n    user = get_user(fake_users_db, username=token_data.username)\\n    if user is None:\\n        raise credentials_exception\\n    return user\\n\\n# Background task function\\ndef background_task(username: str):\\n    print(f\\\"Background task for user: {username}\\\")\\n\\n# Login endpoint to get JWT token\\n@app.post(\\\"/token\\\", response_model=Token)\\nasync def login(form_data: OAuth2PasswordRequestForm = Depends()):\\n    user = get_user(fake_users_db, form_data.username)\\n    if not user or not verify_password(form_data.password, user.hashed_password):\\n        raise HTTPException(\\n            status_code=status.HTTP_401_UNAUTHORIZED,\\n            detail=\\\"Incorrect username or password\\\",\\n            headers={\\\"WWW-Authenticate\\\": \\\"Bearer\\\"},\\n        )\\n    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)\\n    access_token = create_access_token(\\n        data={\\\"sub\\\": user.username}, expires_delta=access_token_expires\\n    )\\n    return {\\\"access_token\\\": access_token, \\\"token_type\\\": \\\"bearer\\\"}\\n\\n# Protected endpoint\\n@app.get(\\\"/users/me\\\", response_model=User)\\nasync def read_users_me(current_user: User = Depends(get_current_user), background_tasks: BackgroundTasks = Depends()):\\n    background_tasks.add_task(background_task, current_user.username)\\n    return current_user\\n\\n# Run the application\\nif __name__ == \\\"__main__\\\":\\n    uvicorn.run(app, host=\\\"0.0.0.0\\\", port=8000)\\n```\\n\\n### Explanation\\n\\n1. **JWT Authentication**:\\n   - The `login` endpoint allows users to authenticate and receive a JWT token.\\n   - The token is created using the `create_access_token` function, which encodes the username and expiration time.\\n\\n2. **Request Validation**:\\n   - Pydantic models (`User`, `UserInDB`, `Token`, `TokenData`) are used for request and response validation.\\n\\n3. **Background Tasks**:\\n   - The `background_task` function simulates a background task that runs after the protected endpoint is accessed.\\n   - The `read_users_me` endpoint adds the background task to the queue using `background_tasks.add_task`.\\n\\n### Running the Application\\nTo run the application, save the code to a file (e.g., `main.py`) and execute it with:\\n```bash\\nuvicorn main:app --reload\\n```\\n\\nYou can then test the endpoints using a tool like Postman or curl. First, authenticate to get the token, and then use that token to access the protected endpoint.\\n</Output>\\n<Rubric>\\nUses FastAPI's Depends() for auth, Pydantic models for validation, BackgroundTasks, proper HTTP status codes\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "4db42052-8575-4cd8-8abc-85c0e2c4bdfe",
-        "latencyMs": 21432,
+        "id": "12888476-b45c-4998-b355-3e58631cda72",
+        "latencyMs": 18095,
         "namedScores": {
           "fastapi-pro_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Certainly! Below is an example of a FastAPI application that includes a JWT authentication mechanism, request validation using Pydantic, and a background task. This example demonstrates how to create a simple user registration endpoint that issues a JWT token upon successful registration, and a background task that sends a welcome email.\n\n### FastAPI Application Structure\n\n1. **Dependencies**: Install the required packages.\n   ```bash\n   pip install fastapi[all] python-jose[cryptography] pydantic\n   ```\n\n2. **Create the FastAPI application**:\n\n```python\nfrom fastapi import FastAPI, Depends, HTTPException, BackgroundTasks\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\nfrom pydantic import BaseModel, EmailStr\nfrom jose import JWTError, jwt\nfrom datetime import datetime, timedelta\nfrom typing import Optional\nimport uvicorn\n\n# Constants\nSECRET_KEY = \"your_secret_key\"  # Change this to a strong secret key\nALGORITHM = \"HS256\"\nACCESS_TOKEN_EXPIRE_MINUTES = 30\n\n# FastAPI app\napp = FastAPI()\n\n# OAuth2 scheme\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\"token\")\n\n# User model\nclass User(BaseModel):\n    username: str\n    email: EmailStr\n\nclass UserInDB(User):\n    hashed_password: str\n\n# In-memory user storage (for demonstration purposes)\nfake_users_db = {}\n\n# JWT token creation\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None):\n    to_encode = data.copy()\n    if expires_delta:\n        expire = datetime.utcnow() + expires_delta\n    else:\n        expire = datetime.utcnow() + timedelta(minutes=15)\n    to_encode.update({\"exp\": expire})\n    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)\n    return encoded_jwt\n\n# Background task to send a welcome email\ndef send_welcome_email(email: str):\n    print(f\"Sending welcome email to {email}\")\n\n# User registration endpoint\n@app.post(\"/register\", response_model=User)\nasync def register(user: User, background_tasks: BackgroundTasks):\n    if user.username in fake_users_db:\n        raise HTTPException(status_code=400, detail=\"Username already registered\")\n    \n    # Here you would hash the password and store it in the database\n    fake_users_db[user.username] = UserInDB(**user.dict(), hashed_password=\"fakehashedpassword\")\n    \n    # Send welcome email in the background\n    background_tasks.add_task(send_welcome_email, user.email)\n    \n    return user\n\n# Token generation endpoint\n@app.post(\"/token\")\nasync def login(form_data: OAuth2PasswordRequestForm = Depends()):\n    user = fake_users_db.get(form_data.username)\n    if not user or user.hashed_password != \"fakehashedpassword\":  # Replace with actual password check\n        raise HTTPException(status_code=400, detail=\"Incorrect username or password\")\n    \n    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)\n    access_token = create_access_token(data={\"sub\": user.username}, expires_delta=access_token_expires)\n    return {\"access_token\": access_token, \"token_type\": \"bearer\"}\n\n# Protected route example\n@app.get(\"/users/me\")\nasync def read_users_me(token: str = Depends(oauth2_scheme)):\n    credentials_exception = HTTPException(\n        status_code=401,\n        detail=\"Could not validate credentials\",\n        headers={\"WWW-Authenticate\": \"Bearer\"},\n    )\n    try:\n        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\n        username: str = payload.get(\"sub\")\n        if username is None:\n            raise credentials_exception\n    except JWTError:\n        raise credentials_exception\n    user = fake_users_db.get(username)\n    if user is None:\n        raise credentials_exception\n    return user\n\n# Run the application\nif __name__ == \"__main__\":\n    uvicorn.run(app, host=\"127.0.0.1\", port=8000)\n```\n\n### Explanation\n\n1. **User Registration**: The `/register` endpoint allows users to register. It validates the input using Pydantic and checks if the username already exists. If successful, it adds a background task to send a welcome email.\n\n2. **JWT Authentication**: The `/token` endpoint generates a JWT token for the user after validating their credentials. The token is signed with a secret key.\n\n3. **Protected Route**: The `/users/me` endpoint is protected and requires a valid JWT token to access. It decodes the token and retrieves the user information.\n\n4. **Background Tasks**: The `send_welcome_email` function simulates sending an email in the background after user registration.\n\n### Running the Application\nTo run the application, save the code in a file (e.g., `main.py`) and execute it with:\n```bash\npython main.py\n```\n\nYou can then test the endpoints using tools like Postman or curl.",
+          "output": "Certainly! Below is an example of a FastAPI application that includes a JWT authentication mechanism, request validation using Pydantic, and a background task. This example demonstrates how to create a simple API endpoint that allows users to log in, receive a JWT token, and then access a protected endpoint that triggers a background task.\n\n### FastAPI Application with JWT Authentication, Request Validation, and Background Tasks\n\n```python\nfrom fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, status\nfrom fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm\nfrom pydantic import BaseModel\nfrom jose import JWTError, jwt\nfrom datetime import datetime, timedelta\nfrom typing import Optional\nimport uvicorn\n\n# Secret key for JWT encoding/decoding\nSECRET_KEY = \"your_secret_key\"\nALGORITHM = \"HS256\"\nACCESS_TOKEN_EXPIRE_MINUTES = 30\n\n# Fake user database\nfake_users_db = {\n    \"johndoe\": {\n        \"username\": \"johndoe\",\n        \"full_name\": \"John Doe\",\n        \"email\": \"johndoe@example.com\",\n        \"hashed_password\": \"fakehashedsecret\",\n        \"disabled\": False,\n    }\n}\n\n# Pydantic models\nclass User(BaseModel):\n    username: str\n    email: str\n    full_name: str\n    disabled: Optional[bool] = None\n\nclass UserInDB(User):\n    hashed_password: str\n\nclass Token(BaseModel):\n    access_token: str\n    token_type: str\n\nclass TokenData(BaseModel):\n    username: str\n\n# FastAPI app instance\napp = FastAPI()\n\n# OAuth2 password bearer\noauth2_scheme = OAuth2PasswordBearer(tokenUrl=\"token\")\n\n# Utility functions\ndef verify_password(plain_password, hashed_password):\n    return plain_password == hashed_password  # Replace with a proper hash check\n\ndef get_user(db, username: str):\n    if username in db:\n        user_dict = db[username]\n        return UserInDB(**user_dict)\n\ndef create_access_token(data: dict, expires_delta: Optional[timedelta] = None):\n    to_encode = data.copy()\n    if expires_delta:\n        expire = datetime.utcnow() + expires_delta\n    else:\n        expire = datetime.utcnow() + timedelta(minutes=15)\n    to_encode.update({\"exp\": expire})\n    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)\n    return encoded_jwt\n\n# Dependency to get the current user\nasync def get_current_user(token: str = Depends(oauth2_scheme)):\n    credentials_exception = HTTPException(\n        status_code=status.HTTP_401_UNAUTHORIZED,\n        detail=\"Could not validate credentials\",\n        headers={\"WWW-Authenticate\": \"Bearer\"},\n    )\n    try:\n        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])\n        username: str = payload.get(\"sub\")\n        if username is None:\n            raise credentials_exception\n        token_data = TokenData(username=username)\n    except JWTError:\n        raise credentials_exception\n    user = get_user(fake_users_db, username=token_data.username)\n    if user is None:\n        raise credentials_exception\n    return user\n\n# Background task function\ndef background_task(username: str):\n    print(f\"Background task for user: {username}\")\n\n# Login endpoint to get JWT token\n@app.post(\"/token\", response_model=Token)\nasync def login(form_data: OAuth2PasswordRequestForm = Depends()):\n    user = get_user(fake_users_db, form_data.username)\n    if not user or not verify_password(form_data.password, user.hashed_password):\n        raise HTTPException(\n            status_code=status.HTTP_401_UNAUTHORIZED,\n            detail=\"Incorrect username or password\",\n            headers={\"WWW-Authenticate\": \"Bearer\"},\n        )\n    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)\n    access_token = create_access_token(\n        data={\"sub\": user.username}, expires_delta=access_token_expires\n    )\n    return {\"access_token\": access_token, \"token_type\": \"bearer\"}\n\n# Protected endpoint\n@app.get(\"/users/me\", response_model=User)\nasync def read_users_me(current_user: User = Depends(get_current_user), background_tasks: BackgroundTasks = Depends()):\n    background_tasks.add_task(background_task, current_user.username)\n    return current_user\n\n# Run the application\nif __name__ == \"__main__\":\n    uvicorn.run(app, host=\"0.0.0.0\", port=8000)\n```\n\n### Explanation\n\n1. **JWT Authentication**:\n   - The `login` endpoint allows users to authenticate and receive a JWT token.\n   - The token is created using the `create_access_token` function, which encodes the username and expiration time.\n\n2. **Request Validation**:\n   - Pydantic models (`User`, `UserInDB`, `Token`, `TokenData`) are used for request and response validation.\n\n3. **Background Tasks**:\n   - The `background_task` function simulates a background task that runs after the protected endpoint is accessed.\n   - The `read_users_me` endpoint adds the background task to the queue using `background_tasks.add_task`.\n\n### Running the Application\nTo run the application, save the code to a file (e.g., `main.py`) and execute it with:\n```bash\nuvicorn main:app --reload\n```\n\nYou can then test the endpoints using a tool like Postman or curl. First, authenticate to get the token, and then use that token to access the protected endpoint.",
           "tokenUsage": {
-            "total": 1448,
+            "total": 1559,
             "prompt": 418,
-            "completion": 1030,
+            "completion": 1141,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 21432,
+          "latencyMs": 18095,
           "finishReason": "stop",
-          "cost": 0.0006806999999999999,
+          "cost": 0.0007472999999999999,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44291c89be37b8-IAH",
+                "cf-ray": "9e4915fcef9937b8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:52:37 GMT",
+                "date": "Mon, 30 Mar 2026 18:13:19 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "20912",
+                "openai-processing-ms": "17866",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=gLdjCkIgRa.4y7Aa9c8LOmHL1OI3__9VdaGJK1HBP6U-1774842736.089341-1.0.1.1-KGliUTlaq2akS1ayj_.VfxkN6ybVyCDT.Y3MKzU.R97qJBDV9k7fnpTmuglXX4Ny_S6.1T.Pn6V9yIGDFG6TWVdbgvHWTmDP3FWmAFzT2O1HJnDrzCZXMj20obt90eqB; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:22:37 GMT",
+                "set-cookie": "__cf_bm=Ds080aHtQWLSjUmetM_0HegiJwEG0.5io1Jj_ERvqv4-1774894381.5843744-1.0.1.1-SPeu7.2Vx.fPPnl.86uXLDu4ohSp5qUI_GqP.v9FnzsKC3VdFaYxQFKWIXTEsInS3.ALj4vTb8OvoyDU.bJfvoIeRVnS8WqOLtSthB02NYyRvFnyKjUbQyZLLK8tHtNb; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:43:19 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-requests": "9111",
                 "x-ratelimit-remaining-tokens": "199478",
-                "x-ratelimit-reset-requests": "1h5m11.302s",
+                "x-ratelimit-reset-requests": "2h7m56.045s",
                 "x-ratelimit-reset-tokens": "156ms",
-                "x-request-id": "req_88ca891becb349718c6ac060bf90ea5d"
+                "x-request-id": "req_bef0f0b790464c6b9c1c2848de5fb310"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44291c89be37b8-IAH",
+              "cf-ray": "9e4915fcef9937b8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:52:37 GMT",
+              "date": "Mon, 30 Mar 2026 18:13:19 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "20912",
+              "openai-processing-ms": "17866",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=gLdjCkIgRa.4y7Aa9c8LOmHL1OI3__9VdaGJK1HBP6U-1774842736.089341-1.0.1.1-KGliUTlaq2akS1ayj_.VfxkN6ybVyCDT.Y3MKzU.R97qJBDV9k7fnpTmuglXX4Ny_S6.1T.Pn6V9yIGDFG6TWVdbgvHWTmDP3FWmAFzT2O1HJnDrzCZXMj20obt90eqB; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:22:37 GMT",
+              "set-cookie": "__cf_bm=Ds080aHtQWLSjUmetM_0HegiJwEG0.5io1Jj_ERvqv4-1774894381.5843744-1.0.1.1-SPeu7.2Vx.fPPnl.86uXLDu4ohSp5qUI_GqP.v9FnzsKC3VdFaYxQFKWIXTEsInS3.ALj4vTb8OvoyDU.bJfvoIeRVnS8WqOLtSthB02NYyRvFnyKjUbQyZLLK8tHtNb; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:43:19 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-requests": "9111",
               "x-ratelimit-remaining-tokens": "199478",
-              "x-ratelimit-reset-requests": "1h5m11.302s",
+              "x-ratelimit-reset-requests": "2h7m56.045s",
               "x-ratelimit-reset-tokens": "156ms",
-              "x-request-id": "req_88ca891becb349718c6ac060bf90ea5d"
+              "x-request-id": "req_bef0f0b790464c6b9c1c2848de5fb310"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 418,
-        "completion": 1030,
+        "completion": 1141,
         "cached": 0,
-        "total": 1448,
+        "total": 1559,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1295,
-          "prompt": 1233,
+          "total": 1406,
+          "prompt": 1344,
           "completion": 62,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 22794,
-      "evaluationDurationMs": 22794
+      "durationMs": 19774,
+      "evaluationDurationMs": 19774
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:52:38.849Z",
-    "evaluationCreatedAt": "2026-03-30T03:52:16.022Z"
+    "exportedAt": "2026-03-30T18:13:21.324Z",
+    "evaluationCreatedAt": "2026-03-30T18:13:01.514Z"
   }
 }

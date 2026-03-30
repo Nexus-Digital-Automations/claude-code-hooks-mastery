@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-drJ-2026-03-30T03:51:19",
+  "evalId": "eval-sdU-2026-03-30T18:11:56",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:51:19.724Z",
+    "timestamp": "2026-03-30T18:11:56.937Z",
     "prompts": [
       {
         "id": "117cfb550c24b65bc5c446a8b758aca6c7da893443863d00c0e1fe2de9c7a25d",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 12583,
+          "totalLatencyMs": 17046,
           "tokenUsage": {
             "prompt": 456,
-            "completion": 900,
+            "completion": 918,
             "cached": 0,
-            "total": 1356,
+            "total": 1374,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1157,
-              "prompt": 1101,
-              "completion": 56,
+              "total": 1168,
+              "prompt": 1119,
+              "completion": 49,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "deployment-engineer_quality": 1
           },
-          "cost": 0.0006084
+          "cost": 0.0006192
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0006084,
+        "cost": 0.0006192,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "deployment-engineer_quality": 1
           },
           "tokensUsed": {
-            "total": 1157,
-            "prompt": 1101,
-            "completion": 56,
+            "total": 1168,
+            "prompt": 1119,
+            "completion": 49,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output thoroughly discusses rolling updates, database migration strategies, health checks (readiness and liveness probes), rollback procedures, and both blue-green and canary deployment options.",
+              "reason": "The output thoroughly discusses rolling updates, database migration strategies, health checks, rollback procedures, and both blue-green and canary deployment options.",
               "tokensUsed": {
-                "total": 1157,
-                "prompt": 1101,
-                "completion": 56,
+                "total": 1168,
+                "prompt": 1119,
+                "completion": 49,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes involves several key components and best practices. Below is a comprehensive approach that includes preparation, deployment, and rollback strategies.\\n\\n### 1. Preparation\\n\\n#### a. Database Migrations\\n- **Versioned Migrations**: Use a migration tool (e.g., Flyway, Liquibase) to manage database schema changes. Ensure that migrations are backward-compatible.\\n- **Non-Destructive Changes**: Always make non-destructive changes first (e.g., adding columns, creating new tables) before removing or altering existing structures.\\n\\n#### b. Readiness and Liveness Probes\\n- Implement readiness and liveness probes in your Kubernetes deployment to ensure that the application only receives traffic when it is fully ready to handle requests.\\n\\n#### c. Configuration Management\\n- Use ConfigMaps and Secrets to manage application configurations and sensitive data, ensuring that they can be updated without downtime.\\n\\n### 2. Deployment Strategy\\n\\n#### a. Blue-Green Deployment\\n- **Two Environments**: Maintain two identical environments (Blue and Green). The current version runs in Blue, while the new version is deployed to Green.\\n- **Traffic Switching**: Once the Green environment is fully tested and ready, switch traffic from Blue to Green using a service or ingress controller.\\n\\n#### b. Canary Releases\\n- Deploy the new version to a small subset of users (e.g., 5-10%) while the majority continue to use the stable version. Monitor performance and error rates before gradually increasing the traffic to the new version.\\n\\n#### c. Rolling Updates\\n- Use Kubernetes rolling updates to gradually replace instances of the old version with the new version. Ensure that the deployment strategy is configured to maintain a minimum number of available replicas.\\n\\n### 3. Handling Stateful Components\\n\\n#### a. StatefulSets for PostgreSQL\\n- Use a StatefulSet to manage PostgreSQL instances, ensuring stable network identities and persistent storage.\\n- Configure persistent volumes (PVs) and persistent volume claims (PVCs) to ensure data is retained across pod restarts.\\n\\n#### b. Connection Pooling\\n- Implement a connection pooler (e.g., PgBouncer) to manage database connections efficiently and reduce the load on the PostgreSQL database during deployments.\\n\\n### 4. Monitoring and Observability\\n- Implement monitoring and logging (e.g., Prometheus, Grafana, ELK stack) to track application performance, database health, and error rates during the deployment process.\\n- Set up alerts for any anomalies detected during the deployment.\\n\\n### 5. Rollback Strategy\\n- **Automated Rollbacks**: In case of failure, automate the rollback process to revert to the previous stable version. This can be achieved using Kubernetes deployment strategies or by switching back to the Blue environment in a Blue-Green deployment.\\n- **Database Rollbacks**: Ensure that database migrations can be rolled back safely. This may involve writing down migrations in a way that allows for easy reversal.\\n\\n### 6. Testing\\n- Conduct thorough testing in a staging environment that mirrors production as closely as possible. This includes load testing, integration testing, and user acceptance testing.\\n\\n### 7. Documentation and Communication\\n- Document the deployment process, including steps for rollback and troubleshooting.\\n- Communicate with stakeholders about the deployment schedule and any potential impacts.\\n\\n### Example Kubernetes Manifest Snippet\\n\\nHere’s a simplified example of a Kubernetes deployment manifest for a PostgreSQL-backed API using a rolling update strategy:\\n\\n```yaml\\napiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: api-deployment\\nspec:\\n  replicas: 3\\n  strategy:\\n    type: RollingUpdate\\n    rollingUpdate:\\n      maxUnavailable: 1\\n      maxSurge: 1\\n  selector:\\n    matchLabels:\\n      app: api\\n  template:\\n    metadata:\\n      labels:\\n        app: api\\n    spec:\\n      containers:\\n      - name: api\\n        image: my-api:latest\\n        ports:\\n        - containerPort: 8080\\n        readinessProbe:\\n          httpGet:\\n            path: /health\\n            port: 8080\\n          initialDelaySeconds: 5\\n          periodSeconds: 10\\n```\\n\\n### Conclusion\\nBy following these strategies and best practices, you can achieve a zero-downtime deployment for your PostgreSQL-backed API on Kubernetes, ensuring a smooth transition between application versions while maintaining data integrity and availability.\\n</Output>\\n<Rubric>\\nCovers rolling updates, DB migration strategy, health checks, rollback procedure, blue-green or canary option\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes involves several key components and best practices. Below is a comprehensive approach that includes preparation, deployment, and rollback strategies.\\n\\n### 1. Preparation\\n\\n#### a. Database Migrations\\n- **Versioned Migrations**: Use a migration tool (e.g., Flyway, Liquibase) to manage database schema changes. Ensure that migrations are backward-compatible.\\n- **Non-Destructive Changes**: Always make non-destructive changes first (e.g., adding columns, creating new tables) before removing or altering existing structures.\\n\\n#### b. Readiness and Liveness Probes\\n- Implement readiness and liveness probes in your Kubernetes deployment configuration to ensure that the application only receives traffic when it is fully ready to handle requests.\\n\\n#### c. Health Checks\\n- Ensure that your API has health check endpoints that can be used by Kubernetes to determine the health of the application.\\n\\n### 2. Deployment Strategy\\n\\n#### a. Blue-Green Deployment\\n- **Two Environments**: Maintain two identical environments (blue and green). The current version runs in one (e.g., blue), while the new version is deployed to the other (e.g., green).\\n- **Traffic Switching**: Once the new version is verified, switch traffic to the green environment using a service update.\\n\\n#### b. Canary Releases\\n- Deploy the new version to a small subset of users (e.g., 5-10%) and monitor for issues before rolling it out to the entire user base.\\n- Use Kubernetes' `Deployment` strategy to manage the rollout.\\n\\n#### c. Rolling Updates\\n- Configure the Kubernetes deployment to use a rolling update strategy, ensuring that a certain number of pods are always available during the update process.\\n- Set `maxUnavailable` to 0 to ensure that no pods are taken down during the update.\\n\\n### 3. Handling Stateful Components\\n\\n#### a. StatefulSets for PostgreSQL\\n- Use a `StatefulSet` for PostgreSQL to manage the database instances. This ensures stable network identities and persistent storage.\\n- Ensure that the PostgreSQL pods are configured with persistent volumes to retain data across pod restarts.\\n\\n#### b. Connection Pooling\\n- Implement a connection pooler (e.g., PgBouncer) to manage database connections efficiently and reduce the load on the PostgreSQL database during deployments.\\n\\n### 4. Monitoring and Observability\\n- Implement monitoring and logging for both the API and the PostgreSQL database. Use tools like Prometheus, Grafana, and ELK stack to track performance and errors.\\n- Set up alerts for any anomalies during the deployment process.\\n\\n### 5. Rollback Strategy\\n- **Automated Rollbacks**: In case of failure, have a rollback mechanism in place that can quickly revert to the previous version of the application and database schema.\\n- **Database Rollback**: If a migration fails, ensure that you can revert to the previous schema version without data loss. This may involve using a rollback script or a backup strategy.\\n\\n### 6. Testing\\n- Conduct thorough testing in a staging environment that mirrors production as closely as possible.\\n- Use automated tests to validate the application and database after deployment.\\n\\n### 7. Documentation and Communication\\n- Document the deployment process and ensure that all team members are aware of the strategy.\\n- Communicate with stakeholders about the deployment schedule and any potential impacts.\\n\\n### Example Kubernetes Deployment Configuration\\n\\nHere’s a simplified example of a Kubernetes deployment configuration for the API:\\n\\n```yaml\\napiVersion: apps/v1\\nkind: Deployment\\nmetadata:\\n  name: api\\nspec:\\n  replicas: 3\\n  strategy:\\n    type: RollingUpdate\\n    rollingUpdate:\\n      maxUnavailable: 0\\n      maxSurge: 1\\n  selector:\\n    matchLabels:\\n      app: api\\n  template:\\n    metadata:\\n      labels:\\n        app: api\\n    spec:\\n      containers:\\n      - name: api\\n        image: my-api:latest\\n        ports:\\n        - containerPort: 8080\\n        readinessProbe:\\n          httpGet:\\n            path: /health\\n            port: 8080\\n          initialDelaySeconds: 5\\n          periodSeconds: 10\\n```\\n\\n### Conclusion\\nBy following these strategies and best practices, you can achieve a zero-downtime deployment for your PostgreSQL-backed API on Kubernetes. This approach ensures that your application remains available to users while updates are applied, minimizing the risk of downtime and service disruption.\\n</Output>\\n<Rubric>\\nCovers rolling updates, DB migration strategy, health checks, rollback procedure, blue-green or canary option\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "05327371-ff16-4153-8598-e764a9f8c5bb",
-        "latencyMs": 12583,
+        "id": "b7562c84-9d12-40ce-9397-08dca13859b0",
+        "latencyMs": 17046,
         "namedScores": {
           "deployment-engineer_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Designing a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes involves several key components and best practices. Below is a comprehensive approach that includes preparation, deployment, and rollback strategies.\n\n### 1. Preparation\n\n#### a. Database Migrations\n- **Versioned Migrations**: Use a migration tool (e.g., Flyway, Liquibase) to manage database schema changes. Ensure that migrations are backward-compatible.\n- **Non-Destructive Changes**: Always make non-destructive changes first (e.g., adding columns, creating new tables) before removing or altering existing structures.\n\n#### b. Readiness and Liveness Probes\n- Implement readiness and liveness probes in your Kubernetes deployment to ensure that the application only receives traffic when it is fully ready to handle requests.\n\n#### c. Configuration Management\n- Use ConfigMaps and Secrets to manage application configurations and sensitive data, ensuring that they can be updated without downtime.\n\n### 2. Deployment Strategy\n\n#### a. Blue-Green Deployment\n- **Two Environments**: Maintain two identical environments (Blue and Green). The current version runs in Blue, while the new version is deployed to Green.\n- **Traffic Switching**: Once the Green environment is fully tested and ready, switch traffic from Blue to Green using a service or ingress controller.\n\n#### b. Canary Releases\n- Deploy the new version to a small subset of users (e.g., 5-10%) while the majority continue to use the stable version. Monitor performance and error rates before gradually increasing the traffic to the new version.\n\n#### c. Rolling Updates\n- Use Kubernetes rolling updates to gradually replace instances of the old version with the new version. Ensure that the deployment strategy is configured to maintain a minimum number of available replicas.\n\n### 3. Handling Stateful Components\n\n#### a. StatefulSets for PostgreSQL\n- Use a StatefulSet to manage PostgreSQL instances, ensuring stable network identities and persistent storage.\n- Configure persistent volumes (PVs) and persistent volume claims (PVCs) to ensure data is retained across pod restarts.\n\n#### b. Connection Pooling\n- Implement a connection pooler (e.g., PgBouncer) to manage database connections efficiently and reduce the load on the PostgreSQL database during deployments.\n\n### 4. Monitoring and Observability\n- Implement monitoring and logging (e.g., Prometheus, Grafana, ELK stack) to track application performance, database health, and error rates during the deployment process.\n- Set up alerts for any anomalies detected during the deployment.\n\n### 5. Rollback Strategy\n- **Automated Rollbacks**: In case of failure, automate the rollback process to revert to the previous stable version. This can be achieved using Kubernetes deployment strategies or by switching back to the Blue environment in a Blue-Green deployment.\n- **Database Rollbacks**: Ensure that database migrations can be rolled back safely. This may involve writing down migrations in a way that allows for easy reversal.\n\n### 6. Testing\n- Conduct thorough testing in a staging environment that mirrors production as closely as possible. This includes load testing, integration testing, and user acceptance testing.\n\n### 7. Documentation and Communication\n- Document the deployment process, including steps for rollback and troubleshooting.\n- Communicate with stakeholders about the deployment schedule and any potential impacts.\n\n### Example Kubernetes Manifest Snippet\n\nHere’s a simplified example of a Kubernetes deployment manifest for a PostgreSQL-backed API using a rolling update strategy:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api-deployment\nspec:\n  replicas: 3\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxUnavailable: 1\n      maxSurge: 1\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n      - name: api\n        image: my-api:latest\n        ports:\n        - containerPort: 8080\n        readinessProbe:\n          httpGet:\n            path: /health\n            port: 8080\n          initialDelaySeconds: 5\n          periodSeconds: 10\n```\n\n### Conclusion\nBy following these strategies and best practices, you can achieve a zero-downtime deployment for your PostgreSQL-backed API on Kubernetes, ensuring a smooth transition between application versions while maintaining data integrity and availability.",
+          "output": "Designing a zero-downtime deployment strategy for a stateful PostgreSQL-backed API on Kubernetes involves several key components and best practices. Below is a comprehensive approach that includes preparation, deployment, and rollback strategies.\n\n### 1. Preparation\n\n#### a. Database Migrations\n- **Versioned Migrations**: Use a migration tool (e.g., Flyway, Liquibase) to manage database schema changes. Ensure that migrations are backward-compatible.\n- **Non-Destructive Changes**: Always make non-destructive changes first (e.g., adding columns, creating new tables) before removing or altering existing structures.\n\n#### b. Readiness and Liveness Probes\n- Implement readiness and liveness probes in your Kubernetes deployment configuration to ensure that the application only receives traffic when it is fully ready to handle requests.\n\n#### c. Health Checks\n- Ensure that your API has health check endpoints that can be used by Kubernetes to determine the health of the application.\n\n### 2. Deployment Strategy\n\n#### a. Blue-Green Deployment\n- **Two Environments**: Maintain two identical environments (blue and green). The current version runs in one (e.g., blue), while the new version is deployed to the other (e.g., green).\n- **Traffic Switching**: Once the new version is verified, switch traffic to the green environment using a service update.\n\n#### b. Canary Releases\n- Deploy the new version to a small subset of users (e.g., 5-10%) and monitor for issues before rolling it out to the entire user base.\n- Use Kubernetes' `Deployment` strategy to manage the rollout.\n\n#### c. Rolling Updates\n- Configure the Kubernetes deployment to use a rolling update strategy, ensuring that a certain number of pods are always available during the update process.\n- Set `maxUnavailable` to 0 to ensure that no pods are taken down during the update.\n\n### 3. Handling Stateful Components\n\n#### a. StatefulSets for PostgreSQL\n- Use a `StatefulSet` for PostgreSQL to manage the database instances. This ensures stable network identities and persistent storage.\n- Ensure that the PostgreSQL pods are configured with persistent volumes to retain data across pod restarts.\n\n#### b. Connection Pooling\n- Implement a connection pooler (e.g., PgBouncer) to manage database connections efficiently and reduce the load on the PostgreSQL database during deployments.\n\n### 4. Monitoring and Observability\n- Implement monitoring and logging for both the API and the PostgreSQL database. Use tools like Prometheus, Grafana, and ELK stack to track performance and errors.\n- Set up alerts for any anomalies during the deployment process.\n\n### 5. Rollback Strategy\n- **Automated Rollbacks**: In case of failure, have a rollback mechanism in place that can quickly revert to the previous version of the application and database schema.\n- **Database Rollback**: If a migration fails, ensure that you can revert to the previous schema version without data loss. This may involve using a rollback script or a backup strategy.\n\n### 6. Testing\n- Conduct thorough testing in a staging environment that mirrors production as closely as possible.\n- Use automated tests to validate the application and database after deployment.\n\n### 7. Documentation and Communication\n- Document the deployment process and ensure that all team members are aware of the strategy.\n- Communicate with stakeholders about the deployment schedule and any potential impacts.\n\n### Example Kubernetes Deployment Configuration\n\nHere’s a simplified example of a Kubernetes deployment configuration for the API:\n\n```yaml\napiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 3\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxUnavailable: 0\n      maxSurge: 1\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n      - name: api\n        image: my-api:latest\n        ports:\n        - containerPort: 8080\n        readinessProbe:\n          httpGet:\n            path: /health\n            port: 8080\n          initialDelaySeconds: 5\n          periodSeconds: 10\n```\n\n### Conclusion\nBy following these strategies and best practices, you can achieve a zero-downtime deployment for your PostgreSQL-backed API on Kubernetes. This approach ensures that your application remains available to users while updates are applied, minimizing the risk of downtime and service disruption.",
           "tokenUsage": {
-            "total": 1356,
+            "total": 1374,
             "prompt": 456,
-            "completion": 900,
+            "completion": 918,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 12583,
+          "latencyMs": 17046,
           "finishReason": "stop",
-          "cost": 0.0006084,
+          "cost": 0.0006192,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4427bcad850722-IAH",
+                "cf-ray": "9e4914693af637b8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:51:32 GMT",
+                "date": "Mon, 30 Mar 2026 18:12:14 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "12200",
+                "openai-processing-ms": "16777",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=.wSM0_R_bJcmBAsQpbfxtttTtftfAzI_2hW_f7ARlkU-1774842679.790893-1.0.1.1-D4kuOGrR8zKttNdvPn0mOhB6yMyH6ftC3sCcp3fBpjhz78HDDtZsMargplxPcx1qcx8IzQNfiMGsZuf9rpw1yWQR9gFvN_XGb.x4EkTtSga50orrDuOo32xpL2xahpmS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:32 GMT",
+                "set-cookie": "__cf_bm=nZRQK3rLgi1qppur98bslxVGv2k32Rvwxcoc6futnt8-1774894316.9990735-1.0.1.1-oveRvzqBgKlu7thxHjd0jtnxbU1kFXIpUHsOxHI7QJrYkxFOw0ptsMBt4DILi7eeLoZu.rfnGyc_wrdATS0RhsvEPRJ_o9mpEoXA4T4XFlmeUhphbRck6w8vj1JDbvh3; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:42:13 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-requests": "9122",
                 "x-ratelimit-remaining-tokens": "199474",
-                "x-ratelimit-reset-requests": "1h5m15.922s",
+                "x-ratelimit-reset-requests": "2h6m25.042s",
                 "x-ratelimit-reset-tokens": "157ms",
-                "x-request-id": "req_87d3056b2f65488aa94e809d295c315f"
+                "x-request-id": "req_d27f9e8d9b0a4baeb5c9c013e3090757"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4427bcad850722-IAH",
+              "cf-ray": "9e4914693af637b8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:51:32 GMT",
+              "date": "Mon, 30 Mar 2026 18:12:14 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "12200",
+              "openai-processing-ms": "16777",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=.wSM0_R_bJcmBAsQpbfxtttTtftfAzI_2hW_f7ARlkU-1774842679.790893-1.0.1.1-D4kuOGrR8zKttNdvPn0mOhB6yMyH6ftC3sCcp3fBpjhz78HDDtZsMargplxPcx1qcx8IzQNfiMGsZuf9rpw1yWQR9gFvN_XGb.x4EkTtSga50orrDuOo32xpL2xahpmS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:32 GMT",
+              "set-cookie": "__cf_bm=nZRQK3rLgi1qppur98bslxVGv2k32Rvwxcoc6futnt8-1774894316.9990735-1.0.1.1-oveRvzqBgKlu7thxHjd0jtnxbU1kFXIpUHsOxHI7QJrYkxFOw0ptsMBt4DILi7eeLoZu.rfnGyc_wrdATS0RhsvEPRJ_o9mpEoXA4T4XFlmeUhphbRck6w8vj1JDbvh3; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:42:13 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-requests": "9122",
               "x-ratelimit-remaining-tokens": "199474",
-              "x-ratelimit-reset-requests": "1h5m15.922s",
+              "x-ratelimit-reset-requests": "2h6m25.042s",
               "x-ratelimit-reset-tokens": "157ms",
-              "x-request-id": "req_87d3056b2f65488aa94e809d295c315f"
+              "x-request-id": "req_d27f9e8d9b0a4baeb5c9c013e3090757"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 456,
-        "completion": 900,
+        "completion": 918,
         "cached": 0,
-        "total": 1356,
+        "total": 1374,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1157,
-          "prompt": 1101,
-          "completion": 56,
+          "total": 1168,
+          "prompt": 1119,
+          "completion": 49,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 14025,
-      "evaluationDurationMs": 14025
+      "durationMs": 18612,
+      "evaluationDurationMs": 18612
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:51:33.789Z",
-    "evaluationCreatedAt": "2026-03-30T03:51:19.724Z"
+    "exportedAt": "2026-03-30T18:12:15.618Z",
+    "evaluationCreatedAt": "2026-03-30T18:11:56.937Z"
   }
 }

@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-wwf-2026-03-30T03:59:14",
+  "evalId": "eval-KUH-2026-03-30T18:20:13",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:59:14.467Z",
+    "timestamp": "2026-03-30T18:20:13.589Z",
     "prompts": [
       {
         "id": "e008cd9cd9a02042ec5be9359638594181fa73d788e063d02f243554fb7c859b",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 21649,
+          "totalLatencyMs": 18661,
           "tokenUsage": {
             "prompt": 303,
-            "completion": 1046,
+            "completion": 1041,
             "cached": 0,
-            "total": 1349,
+            "total": 1344,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1299,
-              "prompt": 1256,
-              "completion": 43,
+              "total": 1315,
+              "prompt": 1251,
+              "completion": 64,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "threat-modeling-expert_quality": 1
           },
-          "cost": 0.00067305
+          "cost": 0.00067005
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00067305,
+        "cost": 0.00067005,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "threat-modeling-expert_quality": 1
           },
           "tokensUsed": {
-            "total": 1299,
-            "prompt": 1256,
-            "completion": 43,
+            "total": 1315,
+            "prompt": 1251,
+            "completion": 64,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output systematically applies all STRIDE categories to the components of the web application, including authentication, file uploads, and payment processing.",
+              "reason": "The output applies all six STRIDE categories (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) to the components of authentication, file uploads, and payment processing.",
               "tokensUsed": {
-                "total": 1299,
-                "prompt": 1256,
-                "completion": 43,
+                "total": 1315,
+                "prompt": 1251,
+                "completion": 64,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo perform a STRIDE threat model for a web application with user authentication, file uploads, and payment processing, we will follow the structured workflow outlined earlier. \\n\\n### 1. Define System Scope and Trust Boundaries\\n- **System Scope**: A web application that allows users to authenticate, upload files, and process payments.\\n- **Trust Boundaries**: \\n  - User's browser to web server (untrusted)\\n  - Web server to database (trusted)\\n  - Payment gateway integration (external trusted service)\\n\\n### 2. Create Data Flow Diagrams\\n- **Data Flows**:\\n  - User submits credentials → Web server (authentication)\\n  - User uploads files → Web server (file storage)\\n  - User initiates payment → Web server → Payment gateway\\n  - Web server retrieves user data → Database\\n\\n### 3. Identify Assets and Entry Points\\n- **Assets**:\\n  - User credentials\\n  - Uploaded files\\n  - Payment information\\n  - User data in the database\\n- **Entry Points**:\\n  - Authentication endpoint\\n  - File upload endpoint\\n  - Payment processing endpoint\\n\\n### 4. Apply STRIDE to Each Component\\n#### Authentication\\n- **Spoofing**: \\n  - Attackers may impersonate users by stealing credentials (e.g., phishing).\\n- **Tampering**: \\n  - Attackers may modify authentication tokens or session IDs.\\n- **Repudiation**: \\n  - Users may deny actions if proper logging is not in place.\\n- **Information Disclosure**: \\n  - Sensitive user data may be exposed through insecure transmission.\\n- **Denial of Service**: \\n  - Attackers may flood the authentication endpoint to disrupt service.\\n- **Elevation of Privilege**: \\n  - Attackers may exploit vulnerabilities to gain unauthorized access.\\n\\n#### File Uploads\\n- **Spoofing**: \\n  - Attackers may upload files masquerading as legitimate file types.\\n- **Tampering**: \\n  - Uploaded files may be modified before processing.\\n- **Repudiation**: \\n  - Users may deny uploading malicious files if logs are inadequate.\\n- **Information Disclosure**: \\n  - Sensitive data in uploaded files may be exposed.\\n- **Denial of Service**: \\n  - Large file uploads may exhaust server resources.\\n- **Elevation of Privilege**: \\n  - Malicious files may exploit server vulnerabilities to gain access.\\n\\n#### Payment Processing\\n- **Spoofing**: \\n  - Attackers may impersonate the payment gateway.\\n- **Tampering**: \\n  - Payment data may be altered during transmission.\\n- **Repudiation**: \\n  - Users may dispute transactions if not properly logged.\\n- **Information Disclosure**: \\n  - Payment information may be intercepted if not encrypted.\\n- **Denial of Service**: \\n  - Attackers may disrupt payment processing services.\\n- **Elevation of Privilege**: \\n  - Attackers may exploit vulnerabilities to process unauthorized payments.\\n\\n### 5. Build Attack Trees for Critical Paths\\n- **Authentication Attack Tree**:\\n  - Root: Compromise user account\\n    - Leaf: Phishing attack\\n    - Leaf: Credential stuffing\\n    - Leaf: Session hijacking\\n\\n- **File Upload Attack Tree**:\\n  - Root: Upload malicious file\\n    - Leaf: Bypass file type validation\\n    - Leaf: Exploit file processing vulnerability\\n\\n- **Payment Processing Attack Tree**:\\n  - Root: Fraudulent transaction\\n    - Leaf: Man-in-the-middle attack\\n    - Leaf: Replay attack\\n\\n### 6. Score and Prioritize Threats\\n- **Scoring Criteria**: Likelihood (1-5) and Impact (1-5)\\n- Example:\\n  - Phishing attack: Likelihood 4, Impact 5 → Score 20\\n  - Malicious file upload: Likelihood 3, Impact 4 → Score 12\\n  - Man-in-the-middle attack: Likelihood 2, Impact 5 → Score 10\\n\\n### 7. Design Mitigations\\n- **Authentication**:\\n  - Implement multi-factor authentication (MFA).\\n  - Use secure session management practices.\\n  - Log all authentication attempts.\\n\\n- **File Uploads**:\\n  - Validate file types and sizes on the server.\\n  - Store uploaded files outside the web root.\\n  - Scan files for malware before processing.\\n\\n- **Payment Processing**:\\n  - Use HTTPS for all payment transactions.\\n  - Implement web application firewalls (WAF) to detect anomalies.\\n  - Log all payment transactions with user identifiers.\\n\\n### 8. Document Residual Risks\\n- **Residual Risks**:\\n  - Risk of sophisticated phishing attacks despite MFA.\\n  - Potential for zero-day vulnerabilities in file processing.\\n  - Risk of social engineering attacks targeting users.\\n\\n### Conclusion\\nThis STRIDE threat model provides a comprehensive overview of potential threats to the web application. By identifying and prioritizing these threats, we can implement effective mitigations to enhance the security posture of the application. Regular reviews and updates to the threat model are essential as the application evolves.\\n</Output>\\n<Rubric>\\nApplies STRIDE categories (Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation) to the system components\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo perform a STRIDE threat model for a web application with user authentication, file uploads, and payment processing, we will follow the structured workflow outlined earlier. \\n\\n### 1. Define System Scope and Trust Boundaries\\n- **System Scope**: A web application that allows users to authenticate, upload files, and process payments.\\n- **Trust Boundaries**: \\n  - User's browser to web server (untrusted)\\n  - Web server to database (trusted)\\n  - Payment gateway integration (external, trusted)\\n\\n### 2. Create Data Flow Diagrams\\n- **Data Flows**:\\n  - User submits credentials → Web server (authentication)\\n  - User uploads files → Web server (file storage)\\n  - User initiates payment → Web server → Payment gateway\\n  - Web server retrieves user data → Database\\n\\n### 3. Identify Assets and Entry Points\\n- **Assets**:\\n  - User credentials\\n  - Uploaded files\\n  - Payment information\\n  - User data in the database\\n- **Entry Points**:\\n  - Authentication endpoint\\n  - File upload endpoint\\n  - Payment processing endpoint\\n\\n### 4. Apply STRIDE to Each Component\\n#### Authentication\\n- **Spoofing**: \\n  - Attackers may impersonate users by stealing credentials (e.g., phishing).\\n- **Tampering**: \\n  - Attackers may modify authentication tokens or session IDs.\\n- **Repudiation**: \\n  - Users may deny actions if proper logging is not in place.\\n- **Information Disclosure**: \\n  - Sensitive user data may be exposed through insecure transmission.\\n- **Denial of Service**: \\n  - Attackers may flood the authentication endpoint to disrupt service.\\n- **Elevation of Privilege**: \\n  - Attackers may exploit vulnerabilities to gain unauthorized access.\\n\\n#### File Uploads\\n- **Spoofing**: \\n  - Attackers may upload files masquerading as legitimate file types.\\n- **Tampering**: \\n  - Uploaded files may be modified before processing.\\n- **Repudiation**: \\n  - Users may deny uploading malicious files if logs are inadequate.\\n- **Information Disclosure**: \\n  - Sensitive files may be exposed if access controls are weak.\\n- **Denial of Service**: \\n  - Large file uploads may exhaust server resources.\\n- **Elevation of Privilege**: \\n  - Malicious files may exploit server vulnerabilities to gain higher privileges.\\n\\n#### Payment Processing\\n- **Spoofing**: \\n  - Attackers may impersonate the payment gateway.\\n- **Tampering**: \\n  - Payment data may be altered during transmission.\\n- **Repudiation**: \\n  - Users may dispute transactions if not properly logged.\\n- **Information Disclosure**: \\n  - Payment information may be intercepted if not encrypted.\\n- **Denial of Service**: \\n  - Attackers may disrupt payment processing services.\\n- **Elevation of Privilege**: \\n  - Attackers may exploit vulnerabilities to process unauthorized payments.\\n\\n### 5. Build Attack Trees for Critical Paths\\n- **Authentication Attack Tree**:\\n  - Root: Compromise user account\\n    - Leaf: Phishing attack\\n    - Leaf: Credential stuffing\\n    - Leaf: Session hijacking\\n\\n- **File Upload Attack Tree**:\\n  - Root: Upload malicious file\\n    - Leaf: Bypass file type validation\\n    - Leaf: Exploit file processing vulnerability\\n\\n- **Payment Processing Attack Tree**:\\n  - Root: Fraudulent transaction\\n    - Leaf: Man-in-the-middle attack\\n    - Leaf: Replay attack\\n\\n### 6. Score and Prioritize Threats\\n- **Scoring Criteria**: Likelihood (1-5) and Impact (1-5)\\n- Example:\\n  - Phishing attack: Likelihood 4, Impact 5 → Score 20\\n  - Malicious file upload: Likelihood 3, Impact 4 → Score 12\\n  - Man-in-the-middle attack: Likelihood 2, Impact 5 → Score 10\\n\\n### 7. Design Mitigations\\n- **Authentication**:\\n  - Implement multi-factor authentication (MFA).\\n  - Use secure session management practices.\\n  - Log all authentication attempts.\\n\\n- **File Uploads**:\\n  - Validate file types and sizes on the server.\\n  - Store uploaded files outside the web root.\\n  - Scan files for malware before processing.\\n\\n- **Payment Processing**:\\n  - Use HTTPS for all payment transactions.\\n  - Implement web application firewalls (WAF) to detect anomalies.\\n  - Log all payment transactions with user identifiers.\\n\\n### 8. Document Residual Risks\\n- **Residual Risks**:\\n  - Even with mitigations, phishing attacks may still succeed.\\n  - File upload validation may not catch all malicious files.\\n  - Payment processing may still be vulnerable to sophisticated attacks.\\n\\n### Conclusion\\nThis STRIDE threat model provides a comprehensive overview of potential threats to the web application, along with mitigation strategies. Regular reviews and updates to the threat model are essential as the application evolves and new threats emerge.\\n</Output>\\n<Rubric>\\nApplies STRIDE categories (Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation) to the system components\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "cb22141f-e3f2-47fd-8db3-71650ddc9378",
-        "latencyMs": 21649,
+        "id": "bdd38598-a64b-4fee-84ae-91a6a91d4512",
+        "latencyMs": 18661,
         "namedScores": {
           "threat-modeling-expert_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To perform a STRIDE threat model for a web application with user authentication, file uploads, and payment processing, we will follow the structured workflow outlined earlier. \n\n### 1. Define System Scope and Trust Boundaries\n- **System Scope**: A web application that allows users to authenticate, upload files, and process payments.\n- **Trust Boundaries**: \n  - User's browser to web server (untrusted)\n  - Web server to database (trusted)\n  - Payment gateway integration (external trusted service)\n\n### 2. Create Data Flow Diagrams\n- **Data Flows**:\n  - User submits credentials → Web server (authentication)\n  - User uploads files → Web server (file storage)\n  - User initiates payment → Web server → Payment gateway\n  - Web server retrieves user data → Database\n\n### 3. Identify Assets and Entry Points\n- **Assets**:\n  - User credentials\n  - Uploaded files\n  - Payment information\n  - User data in the database\n- **Entry Points**:\n  - Authentication endpoint\n  - File upload endpoint\n  - Payment processing endpoint\n\n### 4. Apply STRIDE to Each Component\n#### Authentication\n- **Spoofing**: \n  - Attackers may impersonate users by stealing credentials (e.g., phishing).\n- **Tampering**: \n  - Attackers may modify authentication tokens or session IDs.\n- **Repudiation**: \n  - Users may deny actions if proper logging is not in place.\n- **Information Disclosure**: \n  - Sensitive user data may be exposed through insecure transmission.\n- **Denial of Service**: \n  - Attackers may flood the authentication endpoint to disrupt service.\n- **Elevation of Privilege**: \n  - Attackers may exploit vulnerabilities to gain unauthorized access.\n\n#### File Uploads\n- **Spoofing**: \n  - Attackers may upload files masquerading as legitimate file types.\n- **Tampering**: \n  - Uploaded files may be modified before processing.\n- **Repudiation**: \n  - Users may deny uploading malicious files if logs are inadequate.\n- **Information Disclosure**: \n  - Sensitive data in uploaded files may be exposed.\n- **Denial of Service**: \n  - Large file uploads may exhaust server resources.\n- **Elevation of Privilege**: \n  - Malicious files may exploit server vulnerabilities to gain access.\n\n#### Payment Processing\n- **Spoofing**: \n  - Attackers may impersonate the payment gateway.\n- **Tampering**: \n  - Payment data may be altered during transmission.\n- **Repudiation**: \n  - Users may dispute transactions if not properly logged.\n- **Information Disclosure**: \n  - Payment information may be intercepted if not encrypted.\n- **Denial of Service**: \n  - Attackers may disrupt payment processing services.\n- **Elevation of Privilege**: \n  - Attackers may exploit vulnerabilities to process unauthorized payments.\n\n### 5. Build Attack Trees for Critical Paths\n- **Authentication Attack Tree**:\n  - Root: Compromise user account\n    - Leaf: Phishing attack\n    - Leaf: Credential stuffing\n    - Leaf: Session hijacking\n\n- **File Upload Attack Tree**:\n  - Root: Upload malicious file\n    - Leaf: Bypass file type validation\n    - Leaf: Exploit file processing vulnerability\n\n- **Payment Processing Attack Tree**:\n  - Root: Fraudulent transaction\n    - Leaf: Man-in-the-middle attack\n    - Leaf: Replay attack\n\n### 6. Score and Prioritize Threats\n- **Scoring Criteria**: Likelihood (1-5) and Impact (1-5)\n- Example:\n  - Phishing attack: Likelihood 4, Impact 5 → Score 20\n  - Malicious file upload: Likelihood 3, Impact 4 → Score 12\n  - Man-in-the-middle attack: Likelihood 2, Impact 5 → Score 10\n\n### 7. Design Mitigations\n- **Authentication**:\n  - Implement multi-factor authentication (MFA).\n  - Use secure session management practices.\n  - Log all authentication attempts.\n\n- **File Uploads**:\n  - Validate file types and sizes on the server.\n  - Store uploaded files outside the web root.\n  - Scan files for malware before processing.\n\n- **Payment Processing**:\n  - Use HTTPS for all payment transactions.\n  - Implement web application firewalls (WAF) to detect anomalies.\n  - Log all payment transactions with user identifiers.\n\n### 8. Document Residual Risks\n- **Residual Risks**:\n  - Risk of sophisticated phishing attacks despite MFA.\n  - Potential for zero-day vulnerabilities in file processing.\n  - Risk of social engineering attacks targeting users.\n\n### Conclusion\nThis STRIDE threat model provides a comprehensive overview of potential threats to the web application. By identifying and prioritizing these threats, we can implement effective mitigations to enhance the security posture of the application. Regular reviews and updates to the threat model are essential as the application evolves.",
+          "output": "To perform a STRIDE threat model for a web application with user authentication, file uploads, and payment processing, we will follow the structured workflow outlined earlier. \n\n### 1. Define System Scope and Trust Boundaries\n- **System Scope**: A web application that allows users to authenticate, upload files, and process payments.\n- **Trust Boundaries**: \n  - User's browser to web server (untrusted)\n  - Web server to database (trusted)\n  - Payment gateway integration (external, trusted)\n\n### 2. Create Data Flow Diagrams\n- **Data Flows**:\n  - User submits credentials → Web server (authentication)\n  - User uploads files → Web server (file storage)\n  - User initiates payment → Web server → Payment gateway\n  - Web server retrieves user data → Database\n\n### 3. Identify Assets and Entry Points\n- **Assets**:\n  - User credentials\n  - Uploaded files\n  - Payment information\n  - User data in the database\n- **Entry Points**:\n  - Authentication endpoint\n  - File upload endpoint\n  - Payment processing endpoint\n\n### 4. Apply STRIDE to Each Component\n#### Authentication\n- **Spoofing**: \n  - Attackers may impersonate users by stealing credentials (e.g., phishing).\n- **Tampering**: \n  - Attackers may modify authentication tokens or session IDs.\n- **Repudiation**: \n  - Users may deny actions if proper logging is not in place.\n- **Information Disclosure**: \n  - Sensitive user data may be exposed through insecure transmission.\n- **Denial of Service**: \n  - Attackers may flood the authentication endpoint to disrupt service.\n- **Elevation of Privilege**: \n  - Attackers may exploit vulnerabilities to gain unauthorized access.\n\n#### File Uploads\n- **Spoofing**: \n  - Attackers may upload files masquerading as legitimate file types.\n- **Tampering**: \n  - Uploaded files may be modified before processing.\n- **Repudiation**: \n  - Users may deny uploading malicious files if logs are inadequate.\n- **Information Disclosure**: \n  - Sensitive files may be exposed if access controls are weak.\n- **Denial of Service**: \n  - Large file uploads may exhaust server resources.\n- **Elevation of Privilege**: \n  - Malicious files may exploit server vulnerabilities to gain higher privileges.\n\n#### Payment Processing\n- **Spoofing**: \n  - Attackers may impersonate the payment gateway.\n- **Tampering**: \n  - Payment data may be altered during transmission.\n- **Repudiation**: \n  - Users may dispute transactions if not properly logged.\n- **Information Disclosure**: \n  - Payment information may be intercepted if not encrypted.\n- **Denial of Service**: \n  - Attackers may disrupt payment processing services.\n- **Elevation of Privilege**: \n  - Attackers may exploit vulnerabilities to process unauthorized payments.\n\n### 5. Build Attack Trees for Critical Paths\n- **Authentication Attack Tree**:\n  - Root: Compromise user account\n    - Leaf: Phishing attack\n    - Leaf: Credential stuffing\n    - Leaf: Session hijacking\n\n- **File Upload Attack Tree**:\n  - Root: Upload malicious file\n    - Leaf: Bypass file type validation\n    - Leaf: Exploit file processing vulnerability\n\n- **Payment Processing Attack Tree**:\n  - Root: Fraudulent transaction\n    - Leaf: Man-in-the-middle attack\n    - Leaf: Replay attack\n\n### 6. Score and Prioritize Threats\n- **Scoring Criteria**: Likelihood (1-5) and Impact (1-5)\n- Example:\n  - Phishing attack: Likelihood 4, Impact 5 → Score 20\n  - Malicious file upload: Likelihood 3, Impact 4 → Score 12\n  - Man-in-the-middle attack: Likelihood 2, Impact 5 → Score 10\n\n### 7. Design Mitigations\n- **Authentication**:\n  - Implement multi-factor authentication (MFA).\n  - Use secure session management practices.\n  - Log all authentication attempts.\n\n- **File Uploads**:\n  - Validate file types and sizes on the server.\n  - Store uploaded files outside the web root.\n  - Scan files for malware before processing.\n\n- **Payment Processing**:\n  - Use HTTPS for all payment transactions.\n  - Implement web application firewalls (WAF) to detect anomalies.\n  - Log all payment transactions with user identifiers.\n\n### 8. Document Residual Risks\n- **Residual Risks**:\n  - Even with mitigations, phishing attacks may still succeed.\n  - File upload validation may not catch all malicious files.\n  - Payment processing may still be vulnerable to sophisticated attacks.\n\n### Conclusion\nThis STRIDE threat model provides a comprehensive overview of potential threats to the web application, along with mitigation strategies. Regular reviews and updates to the threat model are essential as the application evolves and new threats emerge.",
           "tokenUsage": {
-            "total": 1349,
+            "total": 1344,
             "prompt": 303,
-            "completion": 1046,
+            "completion": 1041,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 21649,
+          "latencyMs": 18661,
           "finishReason": "stop",
-          "cost": 0.00067305,
+          "cost": 0.00067005,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e443353ce236103-IAH",
+                "cf-ray": "9e4920897e5aa9fc-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:59:36 GMT",
+                "date": "Mon, 30 Mar 2026 18:20:32 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "21443",
+                "openai-processing-ms": "18464",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=HnBPzNFSWKalQjP4YrGzAFd58p8ImheEUaSYvp2W0e8-1774843154.5265486-1.0.1.1-Z1rmOtJ0EA6x..GH3J2cdV8oT75qq4enRJXE5B_OeK89AU1_c65MyvWV0aATS1.rLW2ULMQfJo22WL5UcQ2Xv9Pun35kz.MXLUd6vwufqRO57.CJ4VTT9Vk.ByvsgWPg; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:36 GMT",
+                "set-cookie": "__cf_bm=RI1auxkD0qBCuR44x4okJPEux0dEL1n0GLBYstBhT4Q-1774894813.6723766-1.0.1.1-oWP9zs.Q7nuzgBUQksbEHgI0Dmdv.eiH1ExgAnqanbUCpqDYF4_GkCJEqgjI4Sb7CkxYAwLtr0jnwnp9OZ2TQ.3pUD8Ku_6sYmlZ5DZwkEVdDQ1EsqtVoBvgA2_QZs5H; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:32 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9539",
+                "x-ratelimit-remaining-requests": "9086",
                 "x-ratelimit-remaining-tokens": "199625",
-                "x-ratelimit-reset-requests": "1h6m17.047s",
+                "x-ratelimit-reset-requests": "2h11m31.993s",
                 "x-ratelimit-reset-tokens": "112ms",
-                "x-request-id": "req_75b7516aeec34dfd810b73149d0405ce"
+                "x-request-id": "req_c53e06b22c4044e88c8362626d50dc0f"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e443353ce236103-IAH",
+              "cf-ray": "9e4920897e5aa9fc-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:59:36 GMT",
+              "date": "Mon, 30 Mar 2026 18:20:32 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "21443",
+              "openai-processing-ms": "18464",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=HnBPzNFSWKalQjP4YrGzAFd58p8ImheEUaSYvp2W0e8-1774843154.5265486-1.0.1.1-Z1rmOtJ0EA6x..GH3J2cdV8oT75qq4enRJXE5B_OeK89AU1_c65MyvWV0aATS1.rLW2ULMQfJo22WL5UcQ2Xv9Pun35kz.MXLUd6vwufqRO57.CJ4VTT9Vk.ByvsgWPg; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:36 GMT",
+              "set-cookie": "__cf_bm=RI1auxkD0qBCuR44x4okJPEux0dEL1n0GLBYstBhT4Q-1774894813.6723766-1.0.1.1-oWP9zs.Q7nuzgBUQksbEHgI0Dmdv.eiH1ExgAnqanbUCpqDYF4_GkCJEqgjI4Sb7CkxYAwLtr0jnwnp9OZ2TQ.3pUD8Ku_6sYmlZ5DZwkEVdDQ1EsqtVoBvgA2_QZs5H; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:32 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9539",
+              "x-ratelimit-remaining-requests": "9086",
               "x-ratelimit-remaining-tokens": "199625",
-              "x-ratelimit-reset-requests": "1h6m17.047s",
+              "x-ratelimit-reset-requests": "2h11m31.993s",
               "x-ratelimit-reset-tokens": "112ms",
-              "x-request-id": "req_75b7516aeec34dfd810b73149d0405ce"
+              "x-request-id": "req_c53e06b22c4044e88c8362626d50dc0f"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 303,
-        "completion": 1046,
+        "completion": 1041,
         "cached": 0,
-        "total": 1349,
+        "total": 1344,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1299,
-          "prompt": 1256,
-          "completion": 43,
+          "total": 1315,
+          "prompt": 1251,
+          "completion": 64,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 23676,
-      "evaluationDurationMs": 23676
+      "durationMs": 20149,
+      "evaluationDurationMs": 20149
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:59:38.191Z",
-    "evaluationCreatedAt": "2026-03-30T03:59:14.467Z"
+    "exportedAt": "2026-03-30T18:20:33.781Z",
+    "evaluationCreatedAt": "2026-03-30T18:20:13.589Z"
   }
 }

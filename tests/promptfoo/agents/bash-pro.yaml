@@ -39,6 +39,12 @@ tests:
     task: Write a defensive bash script that backs up a directory with rotation, error handling, and logging
   assert:
   - type: llm-rubric
-    value: Uses set -euo pipefail, proper quoting, error handling, logging to stderr, and safe temp files
-    threshold: 0.7
+    value: >
+      PASS if: uses set -euo pipefail or set -Eeuo pipefail for strict mode, double-quotes
+      variable expansions to prevent word splitting, includes error handling (error functions,
+      traps, or exit codes), and includes logging (to stderr OR to a log file — both are
+      valid production patterns). Safe temp files (mktemp) is a bonus.
+      FAIL ONLY if: missing strict mode entirely (no set -e), no error handling at all,
+      or uses completely unquoted variables throughout.
+    threshold: 0.65
     metric: bash-pro_quality

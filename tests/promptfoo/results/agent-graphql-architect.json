@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-fRT-2026-03-30T03:53:17",
+  "evalId": "eval-Wj5-2026-03-30T18:14:03",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:53:17.513Z",
+    "timestamp": "2026-03-30T18:14:03.281Z",
     "prompts": [
       {
         "id": "fc5f5f053e2fb51a8f90745a5abc857f608df75477a71609a66b3d0af9d27757",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 15333,
+          "totalLatencyMs": 15067,
           "tokenUsage": {
             "prompt": 378,
-            "completion": 910,
+            "completion": 895,
             "cached": 0,
-            "total": 1288,
+            "total": 1273,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1170,
-              "prompt": 1117,
+              "total": 1155,
+              "prompt": 1102,
               "completion": 53,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "graphql-architect_quality": 1
           },
-          "cost": 0.0006027
+          "cost": 0.0005937
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0006027,
+        "cost": 0.0005937,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "graphql-architect_quality": 1
           },
           "tokensUsed": {
-            "total": 1170,
-            "prompt": 1117,
+            "total": 1155,
+            "prompt": 1102,
             "completion": 53,
             "cached": 0,
             "numRequests": 1
@@ -80,8 +80,8 @@
               "score": 1,
               "reason": "The output includes a comprehensive GraphQL schema with defined types for users, posts, and comments, as well as queries and mutations, fulfilling the rubric requirements.",
               "tokensUsed": {
-                "total": 1170,
-                "prompt": 1117,
+                "total": 1155,
+                "prompt": 1102,
                 "completion": 53,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a GraphQL schema for a social platform involves defining the core entities and their relationships. Below is a schema that includes users, posts, comments, and real-time notifications, along with some advanced features like pagination, filtering, and subscriptions for real-time updates.\\n\\n### GraphQL Schema\\n\\n```graphql\\n# User Type\\ntype User {\\n  id: ID!\\n  username: String!\\n  email: String!\\n  createdAt: String!\\n  updatedAt: String!\\n  posts: [Post!]!\\n  comments: [Comment!]!\\n  notifications: [Notification!]!\\n}\\n\\n# Post Type\\ntype Post {\\n  id: ID!\\n  author: User!\\n  content: String!\\n  createdAt: String!\\n  updatedAt: String!\\n  comments: [Comment!]!\\n  likes: Int!\\n}\\n\\n# Comment Type\\ntype Comment {\\n  id: ID!\\n  post: Post!\\n  author: User!\\n  content: String!\\n  createdAt: String!\\n  updatedAt: String!\\n}\\n\\n# Notification Type\\ntype Notification {\\n  id: ID!\\n  user: User!\\n  message: String!\\n  createdAt: String!\\n  read: Boolean!\\n}\\n\\n# Query Type\\ntype Query {\\n  users(limit: Int, offset: Int): [User!]!\\n  user(id: ID!): User\\n  posts(limit: Int, offset: Int): [Post!]!\\n  post(id: ID!): Post\\n  comments(postId: ID!, limit: Int, offset: Int): [Comment!]!\\n  notifications(userId: ID!, limit: Int, offset: Int): [Notification!]!\\n}\\n\\n# Mutation Type\\ntype Mutation {\\n  createUser(username: String!, email: String!): User!\\n  updateUser(id: ID!, username: String, email: String): User!\\n  deleteUser(id: ID!): Boolean!\\n\\n  createPost(authorId: ID!, content: String!): Post!\\n  updatePost(id: ID!, content: String!): Post!\\n  deletePost(id: ID!): Boolean!\\n\\n  createComment(postId: ID!, authorId: ID!, content: String!): Comment!\\n  updateComment(id: ID!, content: String!): Comment!\\n  deleteComment(id: ID!): Boolean!\\n\\n  sendNotification(userId: ID!, message: String!): Notification!\\n  markNotificationAsRead(id: ID!): Notification!\\n}\\n\\n# Subscription Type\\ntype Subscription {\\n  postCreated: Post!\\n  commentCreated(postId: ID!): Comment!\\n  notificationReceived(userId: ID!): Notification!\\n}\\n```\\n\\n### Explanation of the Schema\\n\\n1. **User Type**: Represents a user in the system with fields for their ID, username, email, and timestamps for creation and updates. It also includes relationships to their posts, comments, and notifications.\\n\\n2. **Post Type**: Represents a post created by a user. It includes fields for the content, timestamps, and a list of comments associated with the post.\\n\\n3. **Comment Type**: Represents a comment made on a post. It includes a reference to the post it belongs to, the author, and timestamps.\\n\\n4. **Notification Type**: Represents notifications sent to users, including a message, a read status, and timestamps.\\n\\n5. **Query Type**: Defines the read operations available in the API, including fetching users, posts, comments, and notifications with optional pagination.\\n\\n6. **Mutation Type**: Defines the write operations available in the API, allowing users to create, update, and delete users, posts, comments, and notifications.\\n\\n7. **Subscription Type**: Enables real-time updates for clients. It allows clients to subscribe to events such as new posts, new comments on a specific post, and notifications received by a user.\\n\\n### Additional Considerations\\n\\n- **Pagination**: The `limit` and `offset` arguments in queries allow for efficient pagination of results.\\n- **Real-time Notifications**: The subscription model allows users to receive real-time updates, enhancing user engagement.\\n- **Authorization**: Implement field-level authorization to ensure users can only perform actions they are permitted to (e.g., a user can only delete their own posts/comments).\\n- **Input Validation**: Ensure that inputs for mutations are validated to prevent issues like SQL injection or invalid data formats.\\n\\nThis schema serves as a solid foundation for a social platform and can be extended with additional features such as user profiles, friend relationships, or media uploads as needed.\\n</Output>\\n<Rubric>\\nShows GraphQL schema with types for users, posts, and comments. Includes at least queries and types (mutations/subscriptions a bonus)\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a GraphQL schema for a social platform involves defining the types, queries, mutations, and subscriptions that will allow users to interact with the data effectively. Below is a proposed schema that includes users, posts, comments, and real-time notifications.\\n\\n### GraphQL Schema\\n\\n```graphql\\n# User Type\\ntype User {\\n  id: ID!\\n  username: String!\\n  email: String!\\n  createdAt: String!\\n  updatedAt: String!\\n  posts: [Post!]!\\n  comments: [Comment!]!\\n  notifications: [Notification!]!\\n}\\n\\n# Post Type\\ntype Post {\\n  id: ID!\\n  author: User!\\n  content: String!\\n  createdAt: String!\\n  updatedAt: String!\\n  comments: [Comment!]!\\n}\\n\\n# Comment Type\\ntype Comment {\\n  id: ID!\\n  post: Post!\\n  author: User!\\n  content: String!\\n  createdAt: String!\\n  updatedAt: String!\\n}\\n\\n# Notification Type\\ntype Notification {\\n  id: ID!\\n  user: User!\\n  message: String!\\n  createdAt: String!\\n  isRead: Boolean!\\n}\\n\\n# Queries\\ntype Query {\\n  users: [User!]!\\n  user(id: ID!): User\\n  posts: [Post!]!\\n  post(id: ID!): Post\\n  comments(postId: ID!): [Comment!]!\\n  notifications(userId: ID!): [Notification!]!\\n}\\n\\n# Mutations\\ntype Mutation {\\n  createUser(username: String!, email: String!): User!\\n  updateUser(id: ID!, username: String, email: String): User!\\n  deleteUser(id: ID!): Boolean!\\n\\n  createPost(authorId: ID!, content: String!): Post!\\n  updatePost(id: ID!, content: String!): Post!\\n  deletePost(id: ID!): Boolean!\\n\\n  createComment(postId: ID!, authorId: ID!, content: String!): Comment!\\n  updateComment(id: ID!, content: String!): Comment!\\n  deleteComment(id: ID!): Boolean!\\n\\n  markNotificationAsRead(id: ID!): Notification!\\n}\\n\\n# Subscriptions\\ntype Subscription {\\n  postCreated: Post!\\n  commentCreated(postId: ID!): Comment!\\n  notificationReceived(userId: ID!): Notification!\\n}\\n```\\n\\n### Explanation of the Schema\\n\\n1. **Types**:\\n   - **User**: Represents a user in the system with fields for their ID, username, email, and timestamps for creation and updates. It also includes relationships to their posts, comments, and notifications.\\n   - **Post**: Represents a post created by a user, including the content and timestamps. It has a relationship to comments.\\n   - **Comment**: Represents a comment on a post, including the content and timestamps. It has relationships to the post and the author.\\n   - **Notification**: Represents notifications for users, including a message, read status, and timestamps.\\n\\n2. **Queries**:\\n   - Queries allow fetching users, posts, comments, and notifications. This provides the necessary read operations for the social platform.\\n\\n3. **Mutations**:\\n   - Mutations allow creating, updating, and deleting users, posts, and comments. They also include a mutation to mark notifications as read.\\n\\n4. **Subscriptions**:\\n   - Subscriptions enable real-time updates for new posts, new comments on a specific post, and notifications received by a user. This is crucial for a social platform to keep users engaged.\\n\\n### Considerations for Implementation\\n\\n- **Authentication and Authorization**: Implement JWT or session-based authentication to secure mutations and subscriptions. Ensure that users can only perform actions on their own data.\\n- **Pagination**: For queries that return lists (e.g., posts, comments, notifications), consider implementing pagination to handle large datasets efficiently.\\n- **Rate Limiting**: Implement rate limiting on mutations to prevent abuse, especially for creating posts and comments.\\n- **Performance Optimization**: Use DataLoader to batch and cache requests to avoid N+1 query problems, especially when fetching related data like posts and comments for users.\\n- **Real-time Notifications**: Use WebSocket or similar technology to handle subscriptions for real-time updates.\\n\\nThis schema provides a solid foundation for a social platform and can be extended with additional features such as likes, shares, user profiles, and more as the application grows.\\n</Output>\\n<Rubric>\\nShows GraphQL schema with types for users, posts, and comments. Includes at least queries and types (mutations/subscriptions a bonus)\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "65a847e5-aacd-47cb-83a0-bdc959f0e309",
-        "latencyMs": 15333,
+        "id": "5ed95f89-fbb9-41cb-a250-31ed80a7947c",
+        "latencyMs": 15067,
         "namedScores": {
           "graphql-architect_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Designing a GraphQL schema for a social platform involves defining the core entities and their relationships. Below is a schema that includes users, posts, comments, and real-time notifications, along with some advanced features like pagination, filtering, and subscriptions for real-time updates.\n\n### GraphQL Schema\n\n```graphql\n# User Type\ntype User {\n  id: ID!\n  username: String!\n  email: String!\n  createdAt: String!\n  updatedAt: String!\n  posts: [Post!]!\n  comments: [Comment!]!\n  notifications: [Notification!]!\n}\n\n# Post Type\ntype Post {\n  id: ID!\n  author: User!\n  content: String!\n  createdAt: String!\n  updatedAt: String!\n  comments: [Comment!]!\n  likes: Int!\n}\n\n# Comment Type\ntype Comment {\n  id: ID!\n  post: Post!\n  author: User!\n  content: String!\n  createdAt: String!\n  updatedAt: String!\n}\n\n# Notification Type\ntype Notification {\n  id: ID!\n  user: User!\n  message: String!\n  createdAt: String!\n  read: Boolean!\n}\n\n# Query Type\ntype Query {\n  users(limit: Int, offset: Int): [User!]!\n  user(id: ID!): User\n  posts(limit: Int, offset: Int): [Post!]!\n  post(id: ID!): Post\n  comments(postId: ID!, limit: Int, offset: Int): [Comment!]!\n  notifications(userId: ID!, limit: Int, offset: Int): [Notification!]!\n}\n\n# Mutation Type\ntype Mutation {\n  createUser(username: String!, email: String!): User!\n  updateUser(id: ID!, username: String, email: String): User!\n  deleteUser(id: ID!): Boolean!\n\n  createPost(authorId: ID!, content: String!): Post!\n  updatePost(id: ID!, content: String!): Post!\n  deletePost(id: ID!): Boolean!\n\n  createComment(postId: ID!, authorId: ID!, content: String!): Comment!\n  updateComment(id: ID!, content: String!): Comment!\n  deleteComment(id: ID!): Boolean!\n\n  sendNotification(userId: ID!, message: String!): Notification!\n  markNotificationAsRead(id: ID!): Notification!\n}\n\n# Subscription Type\ntype Subscription {\n  postCreated: Post!\n  commentCreated(postId: ID!): Comment!\n  notificationReceived(userId: ID!): Notification!\n}\n```\n\n### Explanation of the Schema\n\n1. **User Type**: Represents a user in the system with fields for their ID, username, email, and timestamps for creation and updates. It also includes relationships to their posts, comments, and notifications.\n\n2. **Post Type**: Represents a post created by a user. It includes fields for the content, timestamps, and a list of comments associated with the post.\n\n3. **Comment Type**: Represents a comment made on a post. It includes a reference to the post it belongs to, the author, and timestamps.\n\n4. **Notification Type**: Represents notifications sent to users, including a message, a read status, and timestamps.\n\n5. **Query Type**: Defines the read operations available in the API, including fetching users, posts, comments, and notifications with optional pagination.\n\n6. **Mutation Type**: Defines the write operations available in the API, allowing users to create, update, and delete users, posts, comments, and notifications.\n\n7. **Subscription Type**: Enables real-time updates for clients. It allows clients to subscribe to events such as new posts, new comments on a specific post, and notifications received by a user.\n\n### Additional Considerations\n\n- **Pagination**: The `limit` and `offset` arguments in queries allow for efficient pagination of results.\n- **Real-time Notifications**: The subscription model allows users to receive real-time updates, enhancing user engagement.\n- **Authorization**: Implement field-level authorization to ensure users can only perform actions they are permitted to (e.g., a user can only delete their own posts/comments).\n- **Input Validation**: Ensure that inputs for mutations are validated to prevent issues like SQL injection or invalid data formats.\n\nThis schema serves as a solid foundation for a social platform and can be extended with additional features such as user profiles, friend relationships, or media uploads as needed.",
+          "output": "Designing a GraphQL schema for a social platform involves defining the types, queries, mutations, and subscriptions that will allow users to interact with the data effectively. Below is a proposed schema that includes users, posts, comments, and real-time notifications.\n\n### GraphQL Schema\n\n```graphql\n# User Type\ntype User {\n  id: ID!\n  username: String!\n  email: String!\n  createdAt: String!\n  updatedAt: String!\n  posts: [Post!]!\n  comments: [Comment!]!\n  notifications: [Notification!]!\n}\n\n# Post Type\ntype Post {\n  id: ID!\n  author: User!\n  content: String!\n  createdAt: String!\n  updatedAt: String!\n  comments: [Comment!]!\n}\n\n# Comment Type\ntype Comment {\n  id: ID!\n  post: Post!\n  author: User!\n  content: String!\n  createdAt: String!\n  updatedAt: String!\n}\n\n# Notification Type\ntype Notification {\n  id: ID!\n  user: User!\n  message: String!\n  createdAt: String!\n  isRead: Boolean!\n}\n\n# Queries\ntype Query {\n  users: [User!]!\n  user(id: ID!): User\n  posts: [Post!]!\n  post(id: ID!): Post\n  comments(postId: ID!): [Comment!]!\n  notifications(userId: ID!): [Notification!]!\n}\n\n# Mutations\ntype Mutation {\n  createUser(username: String!, email: String!): User!\n  updateUser(id: ID!, username: String, email: String): User!\n  deleteUser(id: ID!): Boolean!\n\n  createPost(authorId: ID!, content: String!): Post!\n  updatePost(id: ID!, content: String!): Post!\n  deletePost(id: ID!): Boolean!\n\n  createComment(postId: ID!, authorId: ID!, content: String!): Comment!\n  updateComment(id: ID!, content: String!): Comment!\n  deleteComment(id: ID!): Boolean!\n\n  markNotificationAsRead(id: ID!): Notification!\n}\n\n# Subscriptions\ntype Subscription {\n  postCreated: Post!\n  commentCreated(postId: ID!): Comment!\n  notificationReceived(userId: ID!): Notification!\n}\n```\n\n### Explanation of the Schema\n\n1. **Types**:\n   - **User**: Represents a user in the system with fields for their ID, username, email, and timestamps for creation and updates. It also includes relationships to their posts, comments, and notifications.\n   - **Post**: Represents a post created by a user, including the content and timestamps. It has a relationship to comments.\n   - **Comment**: Represents a comment on a post, including the content and timestamps. It has relationships to the post and the author.\n   - **Notification**: Represents notifications for users, including a message, read status, and timestamps.\n\n2. **Queries**:\n   - Queries allow fetching users, posts, comments, and notifications. This provides the necessary read operations for the social platform.\n\n3. **Mutations**:\n   - Mutations allow creating, updating, and deleting users, posts, and comments. They also include a mutation to mark notifications as read.\n\n4. **Subscriptions**:\n   - Subscriptions enable real-time updates for new posts, new comments on a specific post, and notifications received by a user. This is crucial for a social platform to keep users engaged.\n\n### Considerations for Implementation\n\n- **Authentication and Authorization**: Implement JWT or session-based authentication to secure mutations and subscriptions. Ensure that users can only perform actions on their own data.\n- **Pagination**: For queries that return lists (e.g., posts, comments, notifications), consider implementing pagination to handle large datasets efficiently.\n- **Rate Limiting**: Implement rate limiting on mutations to prevent abuse, especially for creating posts and comments.\n- **Performance Optimization**: Use DataLoader to batch and cache requests to avoid N+1 query problems, especially when fetching related data like posts and comments for users.\n- **Real-time Notifications**: Use WebSocket or similar technology to handle subscriptions for real-time updates.\n\nThis schema provides a solid foundation for a social platform and can be extended with additional features such as likes, shares, user profiles, and more as the application grows.",
           "tokenUsage": {
-            "total": 1288,
+            "total": 1273,
             "prompt": 378,
-            "completion": 910,
+            "completion": 895,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 15333,
+          "latencyMs": 15067,
           "finishReason": "stop",
-          "cost": 0.0006027,
+          "cost": 0.0005937,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442a9cfc519e12-IAH",
+                "cf-ray": "9e49177eef6ed470-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:53:32 GMT",
+                "date": "Mon, 30 Mar 2026 18:14:18 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "15149",
+                "openai-processing-ms": "13925",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=iwr8RAifxe7ymS6z8ybWGy.3sNVEeF1FPqjcxZFsnis-1774842797.6025677-1.0.1.1-6oH0SC2od_LTFGi_9m7ilu1Af3A4ird_DqO5g7aa7LD2tci93rWmZhx6QOCiNfdGW0VeW5spd_oBOSyk9tWPi.EhLlF6OUHl7a8bG7sR_R5LOUK7cRrtte24FN2EagnX; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:32 GMT",
+                "set-cookie": "__cf_bm=fQRrIT8eKjKHJNPiWeI2jhkQzUPv7X4ewBi2F8YyBo4-1774894443.3440845-1.0.1.1-KbqBOpF3KEQRRsUPa2PnxM0Sy3eaq.QrTGurdFESDJwBo2xajGrgby89braDbb_uVIJhXnIjJAsJeKNZwyovqfAIofkU1JkaNUgRH.7t6LnKTjfR9K7Dj183SrRGh2SW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:44:18 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-requests": "9106",
                 "x-ratelimit-remaining-tokens": "199470",
-                "x-ratelimit-reset-requests": "1h5m19.268s",
+                "x-ratelimit-reset-requests": "2h8m37.737s",
                 "x-ratelimit-reset-tokens": "159ms",
-                "x-request-id": "req_aaa083cea5504a2b9045450bac742826"
+                "x-request-id": "req_0388194a429945bc9496d9e582ab4dda"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442a9cfc519e12-IAH",
+              "cf-ray": "9e49177eef6ed470-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:53:32 GMT",
+              "date": "Mon, 30 Mar 2026 18:14:18 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "15149",
+              "openai-processing-ms": "13925",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=iwr8RAifxe7ymS6z8ybWGy.3sNVEeF1FPqjcxZFsnis-1774842797.6025677-1.0.1.1-6oH0SC2od_LTFGi_9m7ilu1Af3A4ird_DqO5g7aa7LD2tci93rWmZhx6QOCiNfdGW0VeW5spd_oBOSyk9tWPi.EhLlF6OUHl7a8bG7sR_R5LOUK7cRrtte24FN2EagnX; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:32 GMT",
+              "set-cookie": "__cf_bm=fQRrIT8eKjKHJNPiWeI2jhkQzUPv7X4ewBi2F8YyBo4-1774894443.3440845-1.0.1.1-KbqBOpF3KEQRRsUPa2PnxM0Sy3eaq.QrTGurdFESDJwBo2xajGrgby89braDbb_uVIJhXnIjJAsJeKNZwyovqfAIofkU1JkaNUgRH.7t6LnKTjfR9K7Dj183SrRGh2SW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:44:18 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-requests": "9106",
               "x-ratelimit-remaining-tokens": "199470",
-              "x-ratelimit-reset-requests": "1h5m19.268s",
+              "x-ratelimit-reset-requests": "2h8m37.737s",
               "x-ratelimit-reset-tokens": "159ms",
-              "x-request-id": "req_aaa083cea5504a2b9045450bac742826"
+              "x-request-id": "req_0388194a429945bc9496d9e582ab4dda"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 378,
-        "completion": 910,
+        "completion": 895,
         "cached": 0,
-        "total": 1288,
+        "total": 1273,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1170,
-          "prompt": 1117,
+          "total": 1155,
+          "prompt": 1102,
           "completion": 53,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 16556,
-      "evaluationDurationMs": 16556
+      "durationMs": 16612,
+      "evaluationDurationMs": 16612
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:53:34.112Z",
-    "evaluationCreatedAt": "2026-03-30T03:53:17.513Z"
+    "exportedAt": "2026-03-30T18:14:19.979Z",
+    "evaluationCreatedAt": "2026-03-30T18:14:03.281Z"
   }
 }

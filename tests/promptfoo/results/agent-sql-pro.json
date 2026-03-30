@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-Baz-2026-03-30T03:57:55",
+  "evalId": "eval-QCz-2026-03-30T18:18:31",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:57:55.122Z",
+    "timestamp": "2026-03-30T18:18:31.852Z",
     "prompts": [
       {
         "id": "0bd839501704289f923c3f782c534ee182cf1828b09190aa01e8e5130195aea6",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 7910,
+          "totalLatencyMs": 7518,
           "tokenUsage": {
             "prompt": 400,
-            "completion": 480,
+            "completion": 419,
             "cached": 0,
-            "total": 880,
+            "total": 819,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 720,
-              "prompt": 677,
+              "total": 659,
+              "prompt": 616,
               "completion": 43,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "sql-pro_quality": 1
           },
-          "cost": 0.000348
+          "cost": 0.0003114
         }
       }
     ],
     "results": [
       {
-        "cost": 0.000348,
+        "cost": 0.0003114,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "sql-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 720,
-            "prompt": 677,
+            "total": 659,
+            "prompt": 616,
             "completion": 43,
             "cached": 0,
             "numRequests": 1
@@ -80,8 +80,8 @@
               "score": 1,
               "reason": "The output correctly uses GROUP BY to aggregate data by customer_id and applies date arithmetic to filter orders from the last 90 days.",
               "tokensUsed": {
-                "total": 720,
-                "prompt": 677,
+                "total": 659,
+                "prompt": 616,
                 "completion": 43,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo write an optimized SQL query that retrieves the top 10 customers by revenue in the last 90 days along with their order count, we need to ensure that we are efficiently aggregating the data and filtering it correctly. Below is an example SQL query that accomplishes this task. This query assumes you have a table named `orders` with relevant columns such as `customer_id`, `order_date`, `order_amount`, and `order_id`.\\n\\n```sql\\nWITH RevenueData AS (\\n    SELECT \\n        customer_id,\\n        SUM(order_amount) AS total_revenue,\\n        COUNT(order_id) AS order_count\\n    FROM \\n        orders\\n    WHERE \\n        order_date >= CURRENT_DATE - INTERVAL '90 days'\\n    GROUP BY \\n        customer_id\\n)\\nSELECT \\n    customer_id,\\n    total_revenue,\\n    order_count\\nFROM \\n    RevenueData\\nORDER BY \\n    total_revenue DESC\\nLIMIT 10;\\n```\\n\\n### Explanation:\\n1. **Common Table Expression (CTE)**: The `WITH RevenueData AS (...)` clause creates a CTE that calculates the total revenue and order count for each customer in the last 90 days.\\n2. **Filtering**: The `WHERE` clause filters the orders to include only those from the last 90 days using `CURRENT_DATE - INTERVAL '90 days'`.\\n3. **Aggregation**: The `SUM(order_amount)` calculates the total revenue, and `COUNT(order_id)` counts the number of orders for each customer.\\n4. **Grouping**: The `GROUP BY customer_id` groups the results by customer.\\n5. **Final Selection**: The outer query selects the customer ID, total revenue, and order count from the CTE.\\n6. **Ordering and Limiting**: The results are ordered by `total_revenue` in descending order, and the `LIMIT 10` clause restricts the output to the top 10 customers.\\n\\n### Performance Considerations:\\n- **Indexing**: Ensure that there are indexes on `order_date`, `customer_id`, and possibly `order_amount` to speed up the filtering and aggregation.\\n- **Statistics**: Keep database statistics up to date to help the query planner optimize the execution plan.\\n- **Partitioning**: If the `orders` table is large, consider partitioning it by date to improve query performance for time-based queries.\\n</Output>\\n<Rubric>\\nUses window functions or GROUP BY correctly, date arithmetic, proper joins, efficient indexing hints\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo find the top 10 customers by revenue in the last 90 days along with their order count, you can use the following optimized SQL query. This query assumes you have a table named `orders` with at least the following columns: `customer_id`, `order_id`, `order_date`, and `total_amount`.\\n\\nHere's the SQL query:\\n\\n```sql\\nWITH RevenueData AS (\\n    SELECT \\n        customer_id,\\n        SUM(total_amount) AS total_revenue,\\n        COUNT(order_id) AS order_count\\n    FROM \\n        orders\\n    WHERE \\n        order_date >= CURRENT_DATE - INTERVAL '90 days'\\n    GROUP BY \\n        customer_id\\n)\\nSELECT \\n    customer_id,\\n    total_revenue,\\n    order_count\\nFROM \\n    RevenueData\\nORDER BY \\n    total_revenue DESC\\nLIMIT 10;\\n```\\n\\n### Explanation:\\n1. **Common Table Expression (CTE)**: The `WITH RevenueData AS (...)` clause creates a temporary result set that calculates the total revenue and order count for each customer in the last 90 days.\\n2. **Filtering**: The `WHERE` clause filters orders to include only those placed in the last 90 days.\\n3. **Aggregation**: The `SUM(total_amount)` calculates the total revenue, and `COUNT(order_id)` counts the number of orders for each customer.\\n4. **Grouping**: The `GROUP BY customer_id` groups the results by customer.\\n5. **Final Selection**: The outer `SELECT` retrieves the customer ID, total revenue, and order count from the CTE.\\n6. **Ordering and Limiting**: The results are ordered by `total_revenue` in descending order, and the `LIMIT 10` clause restricts the output to the top 10 customers.\\n\\n### Performance Considerations:\\n- Ensure that there are appropriate indexes on `order_date`, `customer_id`, and `order_id` to optimize the filtering and grouping operations.\\n- If the `orders` table is large, consider partitioning it by date to improve query performance further.\\n</Output>\\n<Rubric>\\nUses window functions or GROUP BY correctly, date arithmetic, proper joins, efficient indexing hints\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "39b2b401-01ce-409e-ab65-fa0c7266fc92",
-        "latencyMs": 7910,
+        "id": "8d51d91a-eec9-4a3b-87d0-eb9ad9f76550",
+        "latencyMs": 7518,
         "namedScores": {
           "sql-pro_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To write an optimized SQL query that retrieves the top 10 customers by revenue in the last 90 days along with their order count, we need to ensure that we are efficiently aggregating the data and filtering it correctly. Below is an example SQL query that accomplishes this task. This query assumes you have a table named `orders` with relevant columns such as `customer_id`, `order_date`, `order_amount`, and `order_id`.\n\n```sql\nWITH RevenueData AS (\n    SELECT \n        customer_id,\n        SUM(order_amount) AS total_revenue,\n        COUNT(order_id) AS order_count\n    FROM \n        orders\n    WHERE \n        order_date >= CURRENT_DATE - INTERVAL '90 days'\n    GROUP BY \n        customer_id\n)\nSELECT \n    customer_id,\n    total_revenue,\n    order_count\nFROM \n    RevenueData\nORDER BY \n    total_revenue DESC\nLIMIT 10;\n```\n\n### Explanation:\n1. **Common Table Expression (CTE)**: The `WITH RevenueData AS (...)` clause creates a CTE that calculates the total revenue and order count for each customer in the last 90 days.\n2. **Filtering**: The `WHERE` clause filters the orders to include only those from the last 90 days using `CURRENT_DATE - INTERVAL '90 days'`.\n3. **Aggregation**: The `SUM(order_amount)` calculates the total revenue, and `COUNT(order_id)` counts the number of orders for each customer.\n4. **Grouping**: The `GROUP BY customer_id` groups the results by customer.\n5. **Final Selection**: The outer query selects the customer ID, total revenue, and order count from the CTE.\n6. **Ordering and Limiting**: The results are ordered by `total_revenue` in descending order, and the `LIMIT 10` clause restricts the output to the top 10 customers.\n\n### Performance Considerations:\n- **Indexing**: Ensure that there are indexes on `order_date`, `customer_id`, and possibly `order_amount` to speed up the filtering and aggregation.\n- **Statistics**: Keep database statistics up to date to help the query planner optimize the execution plan.\n- **Partitioning**: If the `orders` table is large, consider partitioning it by date to improve query performance for time-based queries.",
+          "output": "To find the top 10 customers by revenue in the last 90 days along with their order count, you can use the following optimized SQL query. This query assumes you have a table named `orders` with at least the following columns: `customer_id`, `order_id`, `order_date`, and `total_amount`.\n\nHere's the SQL query:\n\n```sql\nWITH RevenueData AS (\n    SELECT \n        customer_id,\n        SUM(total_amount) AS total_revenue,\n        COUNT(order_id) AS order_count\n    FROM \n        orders\n    WHERE \n        order_date >= CURRENT_DATE - INTERVAL '90 days'\n    GROUP BY \n        customer_id\n)\nSELECT \n    customer_id,\n    total_revenue,\n    order_count\nFROM \n    RevenueData\nORDER BY \n    total_revenue DESC\nLIMIT 10;\n```\n\n### Explanation:\n1. **Common Table Expression (CTE)**: The `WITH RevenueData AS (...)` clause creates a temporary result set that calculates the total revenue and order count for each customer in the last 90 days.\n2. **Filtering**: The `WHERE` clause filters orders to include only those placed in the last 90 days.\n3. **Aggregation**: The `SUM(total_amount)` calculates the total revenue, and `COUNT(order_id)` counts the number of orders for each customer.\n4. **Grouping**: The `GROUP BY customer_id` groups the results by customer.\n5. **Final Selection**: The outer `SELECT` retrieves the customer ID, total revenue, and order count from the CTE.\n6. **Ordering and Limiting**: The results are ordered by `total_revenue` in descending order, and the `LIMIT 10` clause restricts the output to the top 10 customers.\n\n### Performance Considerations:\n- Ensure that there are appropriate indexes on `order_date`, `customer_id`, and `order_id` to optimize the filtering and grouping operations.\n- If the `orders` table is large, consider partitioning it by date to improve query performance further.",
           "tokenUsage": {
-            "total": 880,
+            "total": 819,
             "prompt": 400,
-            "completion": 480,
+            "completion": 419,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 7910,
+          "latencyMs": 7518,
           "finishReason": "stop",
-          "cost": 0.000348,
+          "cost": 0.0003114,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e443163eb878bf0-IAH",
+                "cf-ray": "9e491e0d7bc96103-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:58:03 GMT",
+                "date": "Mon, 30 Mar 2026 18:18:39 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "7543",
+                "openai-processing-ms": "7359",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=9S6Jv2LXpUCM0IxcaX42zldk6ZAAcNTNJiBbQerZXsg-1774843075.1889493-1.0.1.1-sWeaFZmIfRPGuar93IHbc5YMFc19XvF2FykI7L62aRGR.5NYogFxC2gcdkGqlDpnG1aglZL0tK0JlrrT_uTST2sb0HI2hKDqOGLqJpKOjWy0c5Lmu_hORhjdxEVagwQ4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:28:03 GMT",
+                "set-cookie": "__cf_bm=bLg7uOS4F6Ac1yINWIY.TKnQxVmRYorTVbacVFRPZ2Y-1774894711.9143064-1.0.1.1-nWAIEirT_iZ1MGiDGAVaHJTQ4.egowsIwqWoYToSaLE9Z7kSvit8mXCCftK7BU8e7f5Rqq85otrjzJw7SOoT89yQ7WhLL_vHNvQ14bGfl2la_7jETAPiv7aJ23_X4oQa; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:48:39 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9538",
+                "x-ratelimit-remaining-requests": "9082",
                 "x-ratelimit-remaining-tokens": "199477",
-                "x-ratelimit-reset-requests": "1h6m27.088s",
+                "x-ratelimit-reset-requests": "2h12m4.643s",
                 "x-ratelimit-reset-tokens": "156ms",
-                "x-request-id": "req_5c6e9867922d42ee80f35a67c0d2da18"
+                "x-request-id": "req_8d175942420f44458269a138d5941577"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e443163eb878bf0-IAH",
+              "cf-ray": "9e491e0d7bc96103-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:58:03 GMT",
+              "date": "Mon, 30 Mar 2026 18:18:39 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "7543",
+              "openai-processing-ms": "7359",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=9S6Jv2LXpUCM0IxcaX42zldk6ZAAcNTNJiBbQerZXsg-1774843075.1889493-1.0.1.1-sWeaFZmIfRPGuar93IHbc5YMFc19XvF2FykI7L62aRGR.5NYogFxC2gcdkGqlDpnG1aglZL0tK0JlrrT_uTST2sb0HI2hKDqOGLqJpKOjWy0c5Lmu_hORhjdxEVagwQ4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:28:03 GMT",
+              "set-cookie": "__cf_bm=bLg7uOS4F6Ac1yINWIY.TKnQxVmRYorTVbacVFRPZ2Y-1774894711.9143064-1.0.1.1-nWAIEirT_iZ1MGiDGAVaHJTQ4.egowsIwqWoYToSaLE9Z7kSvit8mXCCftK7BU8e7f5Rqq85otrjzJw7SOoT89yQ7WhLL_vHNvQ14bGfl2la_7jETAPiv7aJ23_X4oQa; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:48:39 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9538",
+              "x-ratelimit-remaining-requests": "9082",
               "x-ratelimit-remaining-tokens": "199477",
-              "x-ratelimit-reset-requests": "1h6m27.088s",
+              "x-ratelimit-reset-requests": "2h12m4.643s",
               "x-ratelimit-reset-tokens": "156ms",
-              "x-request-id": "req_5c6e9867922d42ee80f35a67c0d2da18"
+              "x-request-id": "req_8d175942420f44458269a138d5941577"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 400,
-        "completion": 480,
+        "completion": 419,
         "cached": 0,
-        "total": 880,
+        "total": 819,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 720,
-          "prompt": 677,
+          "total": 659,
+          "prompt": 616,
           "completion": 43,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 9532,
-      "evaluationDurationMs": 9532
+      "durationMs": 8845,
+      "evaluationDurationMs": 8845
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:58:04.692Z",
-    "evaluationCreatedAt": "2026-03-30T03:57:55.122Z"
+    "exportedAt": "2026-03-30T18:18:40.723Z",
+    "evaluationCreatedAt": "2026-03-30T18:18:31.852Z"
   }
 }

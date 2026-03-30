@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-idV-2026-03-30T03:54:06",
+  "evalId": "eval-f5s-2026-03-30T18:15:02",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:54:06.474Z",
+    "timestamp": "2026-03-30T18:15:02.127Z",
     "prompts": [
       {
         "id": "ffca85616afda83002029cabd70a4ad245739d9b76ce4232942d230a4c57c07c",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 16745,
+          "totalLatencyMs": 16040,
           "tokenUsage": {
             "prompt": 217,
-            "completion": 793,
+            "completion": 776,
             "cached": 0,
-            "total": 1010,
+            "total": 993,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1050,
-              "prompt": 994,
+              "total": 1033,
+              "prompt": 977,
               "completion": 56,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "javascript-pro_quality": 1
           },
-          "cost": 0.00050835
+          "cost": 0.0004981499999999999
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00050835,
+        "cost": 0.0004981499999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "javascript-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1050,
-            "prompt": 994,
+            "total": 1033,
+            "prompt": 977,
             "completion": 56,
             "cached": 0,
             "numRequests": 1
@@ -80,8 +80,8 @@
               "score": 1,
               "reason": "The output uses modern ES6+ class syntax, handles edge cases with proper cleanup in the 'off' method, and includes useful JSDoc comments for type information.",
               "tokensUsed": {
-                "total": 1050,
-                "prompt": 994,
+                "total": 1033,
+                "prompt": 977,
                 "completion": 56,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is a JavaScript implementation of an EventEmitter class that includes memory leak prevention and is compatible with TypeScript through JSDoc comments. This implementation uses modern JavaScript features and follows best practices for event handling.\\n\\n```javascript\\n/**\\n * @class EventEmitter\\n * @description A simple event emitter class that allows for registering, emitting, and removing event listeners.\\n */\\nclass EventEmitter {\\n    constructor() {\\n        /** @private @type {Map<string, Set<Function>>} */\\n        this.events = new Map();\\n    }\\n\\n    /**\\n     * Registers an event listener for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @param {Function} listener - The callback function to execute when the event is emitted.\\n     * @returns {this}\\n     */\\n    on(event, listener) {\\n        if (!this.events.has(event)) {\\n            this.events.set(event, new Set());\\n        }\\n        this.events.get(event).add(listener);\\n        return this;\\n    }\\n\\n    /**\\n     * Emits an event, calling all registered listeners with the provided arguments.\\n     * @param {string} event - The name of the event.\\n     * @param {...any} args - The arguments to pass to the event listeners.\\n     * @returns {this}\\n     */\\n    emit(event, ...args) {\\n        if (this.events.has(event)) {\\n            for (const listener of this.events.get(event)) {\\n                listener(...args);\\n            }\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes a specific listener for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @param {Function} listener - The callback function to remove.\\n     * @returns {this}\\n     */\\n    off(event, listener) {\\n        if (this.events.has(event)) {\\n            this.events.get(event).delete(listener);\\n            // Clean up if there are no more listeners for the event\\n            if (this.events.get(event).size === 0) {\\n                this.events.delete(event);\\n            }\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes all listeners for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @returns {this}\\n     */\\n    removeAllListeners(event) {\\n        if (this.events.has(event)) {\\n            this.events.delete(event);\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Returns the number of listeners for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @returns {number}\\n     */\\n    listenerCount(event) {\\n        return this.events.has(event) ? this.events.get(event).size : 0;\\n    }\\n}\\n\\n// Example usage\\nconst emitter = new EventEmitter();\\n\\nconst listener = (data) => {\\n    console.log('Event received:', data);\\n};\\n\\nemitter.on('data', listener);\\nemitter.emit('data', { key: 'value' }); // Event received: { key: 'value' }\\nemitter.off('data', listener);\\nemitter.emit('data', { key: 'value' }); // No output, listener removed\\n```\\n\\n### Key Features:\\n- **Memory Leak Prevention**: The `off` method removes listeners, and if no listeners remain for an event, the event is deleted from the map.\\n- **TypeScript Compatibility**: JSDoc comments provide type information that can be used by TypeScript for type checking.\\n- **Modern JavaScript**: Utilizes ES6+ features such as `Map` and `Set` for efficient storage and management of event listeners.\\n\\n### Usage:\\nYou can use this `EventEmitter` class in both Node.js and browser environments. Just instantiate the class and use the `on`, `emit`, `off`, and `removeAllListeners` methods to manage your events.\\n</Output>\\n<Rubric>\\nUses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCertainly! Below is a JavaScript implementation of an EventEmitter class that includes proper memory leak prevention techniques and is compatible with TypeScript through JSDoc comments. This implementation uses modern JavaScript features and follows best practices.\\n\\n```javascript\\n/**\\n * @class EventEmitter\\n * @description A simple event emitter class that allows for registering, emitting, and removing event listeners.\\n */\\nclass EventEmitter {\\n    constructor() {\\n        /** @private @type {Map<string, Set<Function>>} */\\n        this.events = new Map();\\n    }\\n\\n    /**\\n     * Registers a listener for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @param {Function} listener - The callback function to execute when the event is emitted.\\n     * @returns {this}\\n     */\\n    on(event, listener) {\\n        if (!this.events.has(event)) {\\n            this.events.set(event, new Set());\\n        }\\n        this.events.get(event).add(listener);\\n        return this;\\n    }\\n\\n    /**\\n     * Emits an event, calling all registered listeners with the provided arguments.\\n     * @param {string} event - The name of the event.\\n     * @param {...any} args - The arguments to pass to the listeners.\\n     * @returns {this}\\n     */\\n    emit(event, ...args) {\\n        if (this.events.has(event)) {\\n            for (const listener of this.events.get(event)) {\\n                listener(...args);\\n            }\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes a listener for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @param {Function} listener - The callback function to remove.\\n     * @returns {this}\\n     */\\n    off(event, listener) {\\n        if (this.events.has(event)) {\\n            this.events.get(event).delete(listener);\\n            // Clean up if there are no more listeners for the event\\n            if (this.events.get(event).size === 0) {\\n                this.events.delete(event);\\n            }\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes all listeners for a specific event.\\n     * @param {string} event - The name of the event.\\n     * @returns {this}\\n     */\\n    removeAllListeners(event) {\\n        if (this.events.has(event)) {\\n            this.events.delete(event);\\n        }\\n        return this;\\n    }\\n\\n    /**\\n     * Removes all listeners for all events.\\n     * @returns {this}\\n     */\\n    removeAll() {\\n        this.events.clear();\\n        return this;\\n    }\\n}\\n\\n// Example usage\\nconst emitter = new EventEmitter();\\n\\nconst listener = (data) => {\\n    console.log('Event received:', data);\\n};\\n\\nemitter.on('data', listener);\\nemitter.emit('data', { key: 'value' }); // Event received: { key: 'value' }\\n\\nemitter.off('data', listener);\\nemitter.emit('data', { key: 'value' }); // No output, listener removed\\n\\nexport default EventEmitter;\\n```\\n\\n### Key Features:\\n1. **Memory Leak Prevention**: The `off` method removes listeners and cleans up the event map if there are no remaining listeners for an event.\\n2. **TypeScript Compatibility**: JSDoc comments provide type information that can be used by TypeScript for type checking.\\n3. **Modern JavaScript**: Utilizes ES6+ features such as `Map`, `Set`, and arrow functions for cleaner syntax.\\n4. **Flexible API**: Methods for adding, emitting, and removing listeners are straightforward and easy to use.\\n\\n### Usage:\\nYou can use this `EventEmitter` class in both Node.js and browser environments. Just import it as needed, and you can start emitting events and managing listeners effectively.\\n</Output>\\n<Rubric>\\nUses modern ES6+ class syntax, handles edge cases, includes proper cleanup, has useful JSDoc\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "f0501fa0-aa69-41ce-a6f3-5085f3914686",
-        "latencyMs": 16745,
+        "id": "31bf0c52-e21d-4ce3-9e4d-98d11e6d58c4",
+        "latencyMs": 16040,
         "namedScores": {
           "javascript-pro_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Certainly! Below is a JavaScript implementation of an EventEmitter class that includes memory leak prevention and is compatible with TypeScript through JSDoc comments. This implementation uses modern JavaScript features and follows best practices for event handling.\n\n```javascript\n/**\n * @class EventEmitter\n * @description A simple event emitter class that allows for registering, emitting, and removing event listeners.\n */\nclass EventEmitter {\n    constructor() {\n        /** @private @type {Map<string, Set<Function>>} */\n        this.events = new Map();\n    }\n\n    /**\n     * Registers an event listener for a specific event.\n     * @param {string} event - The name of the event.\n     * @param {Function} listener - The callback function to execute when the event is emitted.\n     * @returns {this}\n     */\n    on(event, listener) {\n        if (!this.events.has(event)) {\n            this.events.set(event, new Set());\n        }\n        this.events.get(event).add(listener);\n        return this;\n    }\n\n    /**\n     * Emits an event, calling all registered listeners with the provided arguments.\n     * @param {string} event - The name of the event.\n     * @param {...any} args - The arguments to pass to the event listeners.\n     * @returns {this}\n     */\n    emit(event, ...args) {\n        if (this.events.has(event)) {\n            for (const listener of this.events.get(event)) {\n                listener(...args);\n            }\n        }\n        return this;\n    }\n\n    /**\n     * Removes a specific listener for a specific event.\n     * @param {string} event - The name of the event.\n     * @param {Function} listener - The callback function to remove.\n     * @returns {this}\n     */\n    off(event, listener) {\n        if (this.events.has(event)) {\n            this.events.get(event).delete(listener);\n            // Clean up if there are no more listeners for the event\n            if (this.events.get(event).size === 0) {\n                this.events.delete(event);\n            }\n        }\n        return this;\n    }\n\n    /**\n     * Removes all listeners for a specific event.\n     * @param {string} event - The name of the event.\n     * @returns {this}\n     */\n    removeAllListeners(event) {\n        if (this.events.has(event)) {\n            this.events.delete(event);\n        }\n        return this;\n    }\n\n    /**\n     * Returns the number of listeners for a specific event.\n     * @param {string} event - The name of the event.\n     * @returns {number}\n     */\n    listenerCount(event) {\n        return this.events.has(event) ? this.events.get(event).size : 0;\n    }\n}\n\n// Example usage\nconst emitter = new EventEmitter();\n\nconst listener = (data) => {\n    console.log('Event received:', data);\n};\n\nemitter.on('data', listener);\nemitter.emit('data', { key: 'value' }); // Event received: { key: 'value' }\nemitter.off('data', listener);\nemitter.emit('data', { key: 'value' }); // No output, listener removed\n```\n\n### Key Features:\n- **Memory Leak Prevention**: The `off` method removes listeners, and if no listeners remain for an event, the event is deleted from the map.\n- **TypeScript Compatibility**: JSDoc comments provide type information that can be used by TypeScript for type checking.\n- **Modern JavaScript**: Utilizes ES6+ features such as `Map` and `Set` for efficient storage and management of event listeners.\n\n### Usage:\nYou can use this `EventEmitter` class in both Node.js and browser environments. Just instantiate the class and use the `on`, `emit`, `off`, and `removeAllListeners` methods to manage your events.",
+          "output": "Certainly! Below is a JavaScript implementation of an EventEmitter class that includes proper memory leak prevention techniques and is compatible with TypeScript through JSDoc comments. This implementation uses modern JavaScript features and follows best practices.\n\n```javascript\n/**\n * @class EventEmitter\n * @description A simple event emitter class that allows for registering, emitting, and removing event listeners.\n */\nclass EventEmitter {\n    constructor() {\n        /** @private @type {Map<string, Set<Function>>} */\n        this.events = new Map();\n    }\n\n    /**\n     * Registers a listener for a specific event.\n     * @param {string} event - The name of the event.\n     * @param {Function} listener - The callback function to execute when the event is emitted.\n     * @returns {this}\n     */\n    on(event, listener) {\n        if (!this.events.has(event)) {\n            this.events.set(event, new Set());\n        }\n        this.events.get(event).add(listener);\n        return this;\n    }\n\n    /**\n     * Emits an event, calling all registered listeners with the provided arguments.\n     * @param {string} event - The name of the event.\n     * @param {...any} args - The arguments to pass to the listeners.\n     * @returns {this}\n     */\n    emit(event, ...args) {\n        if (this.events.has(event)) {\n            for (const listener of this.events.get(event)) {\n                listener(...args);\n            }\n        }\n        return this;\n    }\n\n    /**\n     * Removes a listener for a specific event.\n     * @param {string} event - The name of the event.\n     * @param {Function} listener - The callback function to remove.\n     * @returns {this}\n     */\n    off(event, listener) {\n        if (this.events.has(event)) {\n            this.events.get(event).delete(listener);\n            // Clean up if there are no more listeners for the event\n            if (this.events.get(event).size === 0) {\n                this.events.delete(event);\n            }\n        }\n        return this;\n    }\n\n    /**\n     * Removes all listeners for a specific event.\n     * @param {string} event - The name of the event.\n     * @returns {this}\n     */\n    removeAllListeners(event) {\n        if (this.events.has(event)) {\n            this.events.delete(event);\n        }\n        return this;\n    }\n\n    /**\n     * Removes all listeners for all events.\n     * @returns {this}\n     */\n    removeAll() {\n        this.events.clear();\n        return this;\n    }\n}\n\n// Example usage\nconst emitter = new EventEmitter();\n\nconst listener = (data) => {\n    console.log('Event received:', data);\n};\n\nemitter.on('data', listener);\nemitter.emit('data', { key: 'value' }); // Event received: { key: 'value' }\n\nemitter.off('data', listener);\nemitter.emit('data', { key: 'value' }); // No output, listener removed\n\nexport default EventEmitter;\n```\n\n### Key Features:\n1. **Memory Leak Prevention**: The `off` method removes listeners and cleans up the event map if there are no remaining listeners for an event.\n2. **TypeScript Compatibility**: JSDoc comments provide type information that can be used by TypeScript for type checking.\n3. **Modern JavaScript**: Utilizes ES6+ features such as `Map`, `Set`, and arrow functions for cleaner syntax.\n4. **Flexible API**: Methods for adding, emitting, and removing listeners are straightforward and easy to use.\n\n### Usage:\nYou can use this `EventEmitter` class in both Node.js and browser environments. Just import it as needed, and you can start emitting events and managing listeners effectively.",
           "tokenUsage": {
-            "total": 1010,
+            "total": 993,
             "prompt": 217,
-            "completion": 793,
+            "completion": 776,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 16745,
+          "latencyMs": 16040,
           "finishReason": "stop",
-          "cost": 0.00050835,
+          "cost": 0.0004981499999999999,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442bced844c9ba-IAH",
+                "cf-ray": "9e4918eedf3875d5-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:54:23 GMT",
+                "date": "Mon, 30 Mar 2026 18:15:18 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "16589",
+                "openai-processing-ms": "15824",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=z9skGzJreeoEcSXkKNuxlrrQuT62jWquHc0W3mNjMNs-1774842846.5327244-1.0.1.1-9gwyl9fyaxPNTtbFc66k4AVHV4sHE3.yT0bZvLbJJKbe2aEahIJmCGFRqDBmCGn9mwn4..TynFM9HX3adnofG39sMGNONnquZMnIX4.wUpdNRcB6O5DuNC7oXS9DUtci; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:23 GMT",
+                "set-cookie": "__cf_bm=uXLQkOAHtahgI5SRGttdr.PpT3RsL3TVDBBEqVeQCc8-1774894502.2157316-1.0.1.1-Ea4lQJIoASPgpmRMmpJaQcwaDphKm_.pJWIET..MkpWCzqF7_XG3ks5B4q_571B7cf5OKCUKalFcZeJLun6YsgcDjUasO73nkzteCaQ8cF4OX8xBbB_KfsjfQpsMozUE; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:45:18 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-requests": "9099",
                 "x-ratelimit-remaining-tokens": "199738",
-                "x-ratelimit-reset-requests": "1h5m22.162s",
+                "x-ratelimit-reset-requests": "2h9m40.043s",
                 "x-ratelimit-reset-tokens": "78ms",
-                "x-request-id": "req_51339dd96abd4cfe8ff8a7370dd5b6ad"
+                "x-request-id": "req_caa79999d8354e348c069f2768e0721a"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442bced844c9ba-IAH",
+              "cf-ray": "9e4918eedf3875d5-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:54:23 GMT",
+              "date": "Mon, 30 Mar 2026 18:15:18 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "16589",
+              "openai-processing-ms": "15824",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=z9skGzJreeoEcSXkKNuxlrrQuT62jWquHc0W3mNjMNs-1774842846.5327244-1.0.1.1-9gwyl9fyaxPNTtbFc66k4AVHV4sHE3.yT0bZvLbJJKbe2aEahIJmCGFRqDBmCGn9mwn4..TynFM9HX3adnofG39sMGNONnquZMnIX4.wUpdNRcB6O5DuNC7oXS9DUtci; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:23 GMT",
+              "set-cookie": "__cf_bm=uXLQkOAHtahgI5SRGttdr.PpT3RsL3TVDBBEqVeQCc8-1774894502.2157316-1.0.1.1-Ea4lQJIoASPgpmRMmpJaQcwaDphKm_.pJWIET..MkpWCzqF7_XG3ks5B4q_571B7cf5OKCUKalFcZeJLun6YsgcDjUasO73nkzteCaQ8cF4OX8xBbB_KfsjfQpsMozUE; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:45:18 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-requests": "9099",
               "x-ratelimit-remaining-tokens": "199738",
-              "x-ratelimit-reset-requests": "1h5m22.162s",
+              "x-ratelimit-reset-requests": "2h9m40.043s",
               "x-ratelimit-reset-tokens": "78ms",
-              "x-request-id": "req_51339dd96abd4cfe8ff8a7370dd5b6ad"
+              "x-request-id": "req_caa79999d8354e348c069f2768e0721a"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 217,
-        "completion": 793,
+        "completion": 776,
         "cached": 0,
-        "total": 1010,
+        "total": 993,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1050,
-          "prompt": 994,
+          "total": 1033,
+          "prompt": 977,
           "completion": 56,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 17817,
-      "evaluationDurationMs": 17817
+      "durationMs": 17270,
+      "evaluationDurationMs": 17270
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:54:24.326Z",
-    "evaluationCreatedAt": "2026-03-30T03:54:06.474Z"
+    "exportedAt": "2026-03-30T18:15:19.442Z",
+    "evaluationCreatedAt": "2026-03-30T18:15:02.127Z"
   }
 }

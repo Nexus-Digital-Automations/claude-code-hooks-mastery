@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-yXS-2026-03-30T03:56:11",
+  "evalId": "eval-7XQ-2026-03-30T18:17:06",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:56:11.172Z",
+    "timestamp": "2026-03-30T18:17:06.337Z",
     "prompts": [
       {
         "id": "d183d512a385045b11214983a9cdb096e8f678ec14e41dd88ffd69cf3dae37b4",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 17244,
+          "totalLatencyMs": 14356,
           "tokenUsage": {
             "prompt": 543,
-            "completion": 721,
+            "completion": 684,
             "cached": 0,
-            "total": 1264,
+            "total": 1227,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 960,
-              "prompt": 917,
+              "total": 923,
+              "prompt": 880,
               "completion": 43,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "python-security-sonnet_quality": 1
           },
-          "cost": 0.00051405
+          "cost": 0.0004918500000000001
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00051405,
+        "cost": 0.0004918500000000001,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "python-security-sonnet_quality": 1
           },
           "tokensUsed": {
-            "total": 960,
-            "prompt": 917,
+            "total": 923,
+            "prompt": 880,
             "completion": 43,
             "cached": 0,
             "numRequests": 1
@@ -78,10 +78,10 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output identifies command injection via subprocess and insecure password storage, and it provides safe alternatives for both issues.",
+              "reason": "The output identifies command injection via subprocess and insecure password storage, and it provides safe alternatives for both vulnerabilities.",
               "tokensUsed": {
-                "total": 960,
-                "prompt": 917,
+                "total": 923,
+                "prompt": 880,
                 "completion": 43,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo analyze the provided Flask endpoint for security issues, we can follow the steps outlined in the workflow. However, since I cannot directly execute code or run security tools, I will guide you through the process of identifying the vulnerabilities in the code snippet you provided.\\n\\n### Common Security Issues in the Given Scenario\\n\\n1. **Subprocess Injection**: Passing user input directly to `subprocess.run()` can lead to command injection vulnerabilities. If an attacker can manipulate the input, they could execute arbitrary commands on the server.\\n\\n2. **Storing Passwords in Plain Text**: Storing passwords without hashing is a critical security flaw. Passwords should always be hashed using a strong hashing algorithm (e.g., bcrypt, Argon2) before storage to protect user credentials.\\n\\n### Example Flask Endpoint\\n\\nHere’s an example of what the Flask endpoint might look like:\\n\\n```python\\nfrom flask import Flask, request\\nimport subprocess\\n\\napp = Flask(__name__)\\n\\n@app.route('/execute', methods=['POST'])\\ndef execute_command():\\n    user_input = request.form['command']\\n    result = subprocess.run(user_input, shell=True, capture_output=True)\\n    return result.stdout\\n\\n@app.route('/store_password', methods=['POST'])\\ndef store_password():\\n    password = request.form['password']\\n    # Storing password in plain text (not secure)\\n    with open('passwords.txt', 'a') as f:\\n        f.write(password + '\\\\n')\\n    return 'Password stored'\\n```\\n\\n### Security Analysis Steps\\n\\n1. **Static Code Analysis**: Use tools like Bandit and Semgrep to analyze the code for vulnerabilities.\\n\\n   - **Bandit**: Run the following command to scan the code:\\n     ```bash\\n     bandit -r . -f json -o bandit-results.json\\n     ```\\n\\n   - **Semgrep**: Use Semgrep with specific rules for Flask and security:\\n     ```bash\\n     semgrep --config=p/flask --config=p/owasp-top-ten\\n     ```\\n\\n2. **Dependency Scanning**: Check for vulnerabilities in dependencies using `pip-audit` and `safety`.\\n\\n   - **pip-audit**:\\n     ```bash\\n     pip-audit --format=json --output=pip-audit-results.json\\n     ```\\n\\n   - **safety**:\\n     ```bash\\n     safety check --json --output=safety-results.json\\n     ```\\n\\n### Recommendations for Fixes\\n\\n1. **Prevent Subprocess Injection**:\\n   - Avoid using `shell=True` in `subprocess.run()`. Instead, pass the command as a list of arguments.\\n   - Validate and sanitize user input before using it in subprocess calls.\\n\\n   Example fix:\\n   ```python\\n   result = subprocess.run(['command', user_input], capture_output=True)\\n   ```\\n\\n2. **Hash Passwords**:\\n   - Use a library like `bcrypt` or `werkzeug.security` to hash passwords before storing them.\\n\\n   Example fix:\\n   ```python\\n   from werkzeug.security import generate_password_hash\\n\\n   @app.route('/store_password', methods=['POST'])\\n   def store_password():\\n       password = request.form['password']\\n       hashed_password = generate_password_hash(password)\\n       with open('passwords.txt', 'a') as f:\\n           f.write(hashed_password + '\\\\n')\\n       return 'Password stored'\\n   ```\\n\\n### Conclusion\\n\\nBy following the above steps and recommendations, you can significantly improve the security of the Flask endpoint. Make sure to run the security tools to identify any additional vulnerabilities and address them accordingly.\\n</Output>\\n<Rubric>\\nIdentifies command injection via subprocess, insecure password storage, recommends safe alternatives for both\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo analyze the provided Flask endpoint for security issues, we will focus on two main vulnerabilities: \\n\\n1. **Command Injection**: Passing user input directly to `subprocess.run()` can lead to command injection vulnerabilities if the input is not properly sanitized.\\n2. **Storing Passwords in Plain Text**: Storing passwords without hashing is a critical security issue, as it exposes user credentials in case of a data breach.\\n\\n### Example Flask Endpoint\\n\\nHere’s an example of a Flask endpoint that might have these vulnerabilities:\\n\\n```python\\nfrom flask import Flask, request\\nimport subprocess\\n\\napp = Flask(__name__)\\n\\n@app.route('/execute', methods=['POST'])\\ndef execute_command():\\n    user_input = request.form['command']\\n    # Vulnerable to command injection\\n    result = subprocess.run(user_input, shell=True, capture_output=True)\\n    return result.stdout\\n\\n@app.route('/store_password', methods=['POST'])\\ndef store_password():\\n    password = request.form['password']\\n    # Storing password in plain text\\n    with open('passwords.txt', 'a') as f:\\n        f.write(password + '\\\\n')\\n    return 'Password stored'\\n```\\n\\n### Security Issues\\n\\n1. **Command Injection**:\\n   - The `subprocess.run(user_input, shell=True, capture_output=True)` line allows an attacker to execute arbitrary commands on the server. If an attacker sends a crafted command, they can execute any command with the privileges of the user running the Flask application.\\n\\n2. **Storing Passwords in Plain Text**:\\n   - The password is stored directly in a text file without any hashing or encryption. If an attacker gains access to this file, they will have access to all user passwords.\\n\\n### Recommendations for Mitigation\\n\\n1. **Prevent Command Injection**:\\n   - Avoid using `shell=True` in `subprocess.run()`. Instead, pass the command and its arguments as a list. This way, the input is treated as arguments rather than a shell command.\\n   - Validate and sanitize user input to ensure it only contains expected characters.\\n\\n   ```python\\n   import shlex\\n\\n   @app.route('/execute', methods=['POST'])\\n   def execute_command():\\n       user_input = request.form['command']\\n       # Sanitize and validate user input\\n       command = shlex.split(user_input)  # Safely parse the command\\n       result = subprocess.run(command, capture_output=True)\\n       return result.stdout\\n   ```\\n\\n2. **Hash Passwords**:\\n   - Use a secure hashing algorithm (e.g., bcrypt, Argon2) to hash passwords before storing them. This ensures that even if the storage is compromised, the actual passwords are not exposed.\\n\\n   ```python\\n   from werkzeug.security import generate_password_hash\\n\\n   @app.route('/store_password', methods=['POST'])\\n   def store_password():\\n       password = request.form['password']\\n       hashed_password = generate_password_hash(password)\\n       with open('passwords.txt', 'a') as f:\\n           f.write(hashed_password + '\\\\n')\\n       return 'Password stored'\\n   ```\\n\\n### Conclusion\\n\\nThe provided Flask endpoint has significant security vulnerabilities related to command injection and password storage. By implementing the recommended changes, you can significantly improve the security posture of the application. \\n\\nTo further analyze the code, you can run the security tools mentioned in the workflow to identify any additional vulnerabilities.\\n</Output>\\n<Rubric>\\nIdentifies command injection via subprocess, insecure password storage, recommends safe alternatives for both\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "425e5ff9-5b86-4f15-99cd-5b16acc8c58d",
-        "latencyMs": 17244,
+        "id": "cbcaa070-5476-48f4-a975-97fbe729ab1b",
+        "latencyMs": 14356,
         "namedScores": {
           "python-security-sonnet_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To analyze the provided Flask endpoint for security issues, we can follow the steps outlined in the workflow. However, since I cannot directly execute code or run security tools, I will guide you through the process of identifying the vulnerabilities in the code snippet you provided.\n\n### Common Security Issues in the Given Scenario\n\n1. **Subprocess Injection**: Passing user input directly to `subprocess.run()` can lead to command injection vulnerabilities. If an attacker can manipulate the input, they could execute arbitrary commands on the server.\n\n2. **Storing Passwords in Plain Text**: Storing passwords without hashing is a critical security flaw. Passwords should always be hashed using a strong hashing algorithm (e.g., bcrypt, Argon2) before storage to protect user credentials.\n\n### Example Flask Endpoint\n\nHere’s an example of what the Flask endpoint might look like:\n\n```python\nfrom flask import Flask, request\nimport subprocess\n\napp = Flask(__name__)\n\n@app.route('/execute', methods=['POST'])\ndef execute_command():\n    user_input = request.form['command']\n    result = subprocess.run(user_input, shell=True, capture_output=True)\n    return result.stdout\n\n@app.route('/store_password', methods=['POST'])\ndef store_password():\n    password = request.form['password']\n    # Storing password in plain text (not secure)\n    with open('passwords.txt', 'a') as f:\n        f.write(password + '\\n')\n    return 'Password stored'\n```\n\n### Security Analysis Steps\n\n1. **Static Code Analysis**: Use tools like Bandit and Semgrep to analyze the code for vulnerabilities.\n\n   - **Bandit**: Run the following command to scan the code:\n     ```bash\n     bandit -r . -f json -o bandit-results.json\n     ```\n\n   - **Semgrep**: Use Semgrep with specific rules for Flask and security:\n     ```bash\n     semgrep --config=p/flask --config=p/owasp-top-ten\n     ```\n\n2. **Dependency Scanning**: Check for vulnerabilities in dependencies using `pip-audit` and `safety`.\n\n   - **pip-audit**:\n     ```bash\n     pip-audit --format=json --output=pip-audit-results.json\n     ```\n\n   - **safety**:\n     ```bash\n     safety check --json --output=safety-results.json\n     ```\n\n### Recommendations for Fixes\n\n1. **Prevent Subprocess Injection**:\n   - Avoid using `shell=True` in `subprocess.run()`. Instead, pass the command as a list of arguments.\n   - Validate and sanitize user input before using it in subprocess calls.\n\n   Example fix:\n   ```python\n   result = subprocess.run(['command', user_input], capture_output=True)\n   ```\n\n2. **Hash Passwords**:\n   - Use a library like `bcrypt` or `werkzeug.security` to hash passwords before storing them.\n\n   Example fix:\n   ```python\n   from werkzeug.security import generate_password_hash\n\n   @app.route('/store_password', methods=['POST'])\n   def store_password():\n       password = request.form['password']\n       hashed_password = generate_password_hash(password)\n       with open('passwords.txt', 'a') as f:\n           f.write(hashed_password + '\\n')\n       return 'Password stored'\n   ```\n\n### Conclusion\n\nBy following the above steps and recommendations, you can significantly improve the security of the Flask endpoint. Make sure to run the security tools to identify any additional vulnerabilities and address them accordingly.",
+          "output": "To analyze the provided Flask endpoint for security issues, we will focus on two main vulnerabilities: \n\n1. **Command Injection**: Passing user input directly to `subprocess.run()` can lead to command injection vulnerabilities if the input is not properly sanitized.\n2. **Storing Passwords in Plain Text**: Storing passwords without hashing is a critical security issue, as it exposes user credentials in case of a data breach.\n\n### Example Flask Endpoint\n\nHere’s an example of a Flask endpoint that might have these vulnerabilities:\n\n```python\nfrom flask import Flask, request\nimport subprocess\n\napp = Flask(__name__)\n\n@app.route('/execute', methods=['POST'])\ndef execute_command():\n    user_input = request.form['command']\n    # Vulnerable to command injection\n    result = subprocess.run(user_input, shell=True, capture_output=True)\n    return result.stdout\n\n@app.route('/store_password', methods=['POST'])\ndef store_password():\n    password = request.form['password']\n    # Storing password in plain text\n    with open('passwords.txt', 'a') as f:\n        f.write(password + '\\n')\n    return 'Password stored'\n```\n\n### Security Issues\n\n1. **Command Injection**:\n   - The `subprocess.run(user_input, shell=True, capture_output=True)` line allows an attacker to execute arbitrary commands on the server. If an attacker sends a crafted command, they can execute any command with the privileges of the user running the Flask application.\n\n2. **Storing Passwords in Plain Text**:\n   - The password is stored directly in a text file without any hashing or encryption. If an attacker gains access to this file, they will have access to all user passwords.\n\n### Recommendations for Mitigation\n\n1. **Prevent Command Injection**:\n   - Avoid using `shell=True` in `subprocess.run()`. Instead, pass the command and its arguments as a list. This way, the input is treated as arguments rather than a shell command.\n   - Validate and sanitize user input to ensure it only contains expected characters.\n\n   ```python\n   import shlex\n\n   @app.route('/execute', methods=['POST'])\n   def execute_command():\n       user_input = request.form['command']\n       # Sanitize and validate user input\n       command = shlex.split(user_input)  # Safely parse the command\n       result = subprocess.run(command, capture_output=True)\n       return result.stdout\n   ```\n\n2. **Hash Passwords**:\n   - Use a secure hashing algorithm (e.g., bcrypt, Argon2) to hash passwords before storing them. This ensures that even if the storage is compromised, the actual passwords are not exposed.\n\n   ```python\n   from werkzeug.security import generate_password_hash\n\n   @app.route('/store_password', methods=['POST'])\n   def store_password():\n       password = request.form['password']\n       hashed_password = generate_password_hash(password)\n       with open('passwords.txt', 'a') as f:\n           f.write(hashed_password + '\\n')\n       return 'Password stored'\n   ```\n\n### Conclusion\n\nThe provided Flask endpoint has significant security vulnerabilities related to command injection and password storage. By implementing the recommended changes, you can significantly improve the security posture of the application. \n\nTo further analyze the code, you can run the security tools mentioned in the workflow to identify any additional vulnerabilities.",
           "tokenUsage": {
-            "total": 1264,
+            "total": 1227,
             "prompt": 543,
-            "completion": 721,
+            "completion": 684,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 17244,
+          "latencyMs": 14356,
           "finishReason": "stop",
-          "cost": 0.00051405,
+          "cost": 0.0004918500000000001,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442eda3cfbc8e5-IAH",
+                "cf-ray": "9e491bf6f9ab1284-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:56:28 GMT",
+                "date": "Mon, 30 Mar 2026 18:17:20 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "17061",
+                "openai-processing-ms": "14154",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=NiXInnG716GfTq08LNE3XINCLUd8kklr9q1RidLhrB0-1774842971.2328813-1.0.1.1-g7h8Em.j5miGd7sumcn0ZzkFWvGksOzbjE87ZGXruHSAfuZT5jofyHo6dYBTVwWCP7zST236eaLpTJhU2KXWAQY2bYoX8Dsg_NUbldItOrT7KXcEKOpqX7pYGTOBKzk7; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:26:28 GMT",
+                "set-cookie": "__cf_bm=gfWoWd7DOEvPtAen6qBKLvYrU1Q7Q8YEvNddIxY88Zo-1774894626.398364-1.0.1.1-sFUMBhataJn7LWCVqaAY.bK_FyPsRmlWN2Dmc7l6S1qyEK.yN9QhG0DiXuh9SBp4NoOB5bcayFnjEnjMznNx9Lceiz9CeEGr82UWTOUVvxxAGe4vcZBvOeNteuaXLH9N; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:20 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9544",
+                "x-ratelimit-remaining-requests": "9090",
                 "x-ratelimit-remaining-tokens": "199462",
-                "x-ratelimit-reset-requests": "1h5m35.686s",
+                "x-ratelimit-reset-requests": "2h10m54.833s",
                 "x-ratelimit-reset-tokens": "161ms",
-                "x-request-id": "req_ba189ab481dc41b1857d7e95c9579850"
+                "x-request-id": "req_c94e1bd06afa404a87e92eff234dcf8d"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442eda3cfbc8e5-IAH",
+              "cf-ray": "9e491bf6f9ab1284-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:56:28 GMT",
+              "date": "Mon, 30 Mar 2026 18:17:20 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "17061",
+              "openai-processing-ms": "14154",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=NiXInnG716GfTq08LNE3XINCLUd8kklr9q1RidLhrB0-1774842971.2328813-1.0.1.1-g7h8Em.j5miGd7sumcn0ZzkFWvGksOzbjE87ZGXruHSAfuZT5jofyHo6dYBTVwWCP7zST236eaLpTJhU2KXWAQY2bYoX8Dsg_NUbldItOrT7KXcEKOpqX7pYGTOBKzk7; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:26:28 GMT",
+              "set-cookie": "__cf_bm=gfWoWd7DOEvPtAen6qBKLvYrU1Q7Q8YEvNddIxY88Zo-1774894626.398364-1.0.1.1-sFUMBhataJn7LWCVqaAY.bK_FyPsRmlWN2Dmc7l6S1qyEK.yN9QhG0DiXuh9SBp4NoOB5bcayFnjEnjMznNx9Lceiz9CeEGr82UWTOUVvxxAGe4vcZBvOeNteuaXLH9N; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:20 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9544",
+              "x-ratelimit-remaining-requests": "9090",
               "x-ratelimit-remaining-tokens": "199462",
-              "x-ratelimit-reset-requests": "1h5m35.686s",
+              "x-ratelimit-reset-requests": "2h10m54.833s",
               "x-ratelimit-reset-tokens": "161ms",
-              "x-request-id": "req_ba189ab481dc41b1857d7e95c9579850"
+              "x-request-id": "req_c94e1bd06afa404a87e92eff234dcf8d"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 543,
-        "completion": 721,
+        "completion": 684,
         "cached": 0,
-        "total": 1264,
+        "total": 1227,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 960,
-          "prompt": 917,
+          "total": 923,
+          "prompt": 880,
           "completion": 43,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 18410,
-      "evaluationDurationMs": 18410
+      "durationMs": 15691,
+      "evaluationDurationMs": 15691
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:56:29.629Z",
-    "evaluationCreatedAt": "2026-03-30T03:56:11.172Z"
+    "exportedAt": "2026-03-30T18:17:22.064Z",
+    "evaluationCreatedAt": "2026-03-30T18:17:06.337Z"
   }
 }

@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-6Ff-2026-03-30T03:59:39",
+  "evalId": "eval-o0K-2026-03-30T18:20:35",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:59:39.648Z",
+    "timestamp": "2026-03-30T18:20:35.514Z",
     "prompts": [
       {
         "id": "6a7e644e96b774ffba83625222efaf43660b7ed8b82a0a546348dd3537e6b7c2",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 2,
           "assertFailCount": 0,
-          "totalLatencyMs": 21733,
+          "totalLatencyMs": 20765,
           "tokenUsage": {
             "prompt": 508,
-            "completion": 1186,
+            "completion": 1086,
             "cached": 0,
-            "total": 1694,
+            "total": 1594,
             "numRequests": 2,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1692,
-              "prompt": 1582,
-              "completion": 110,
+              "total": 1597,
+              "prompt": 1482,
+              "completion": 115,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "typescript-pro_quality": 2
           },
-          "cost": 0.0007878
+          "cost": 0.0007278
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00026264999999999996,
+        "cost": 0.00026205,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "typescript-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 629,
-            "prompt": 573,
-            "completion": 56,
+            "total": 633,
+            "prompt": 572,
+            "completion": 61,
             "cached": 0,
             "numRequests": 1
           },
@@ -80,9 +80,9 @@
               "score": 1,
               "reason": "The output provides a detailed explanation of a TypeScript utility type that makes all properties of an object optional, including nested properties, demonstrating a strong understanding of TypeScript's type system and generics.",
               "tokensUsed": {
-                "total": 629,
-                "prompt": 573,
-                "completion": 56,
+                "total": 633,
+                "prompt": 572,
+                "completion": 61,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create a TypeScript generic utility type that makes all nested object properties optional, you can use a recursive mapped type. This utility type will traverse through each property of the object and apply the optional modifier (`?`) to each property, including nested objects.\\n\\nHere's how you can implement this:\\n\\n```typescript\\n/**\\n * A utility type that makes all properties of an object optional, including nested properties.\\n * \\n * @template T - The object type to make properties optional.\\n */\\ntype DeepPartial<T> = {\\n    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];\\n};\\n\\n// Example usage:\\n\\ninterface User {\\n    id: number;\\n    name: string;\\n    address: {\\n        street: string;\\n        city: string;\\n        country: string;\\n    };\\n    hobbies: string[];\\n}\\n\\n// Using DeepPartial to create a type where all properties are optional\\ntype PartialUser = DeepPartial<User>;\\n\\nconst user: PartialUser = {\\n    // All properties are optional\\n    name: \\\"John Doe\\\",\\n    address: {\\n        city: \\\"New York\\\"\\n    }\\n};\\n```\\n\\n### Explanation:\\n1. **Mapped Type**: The `DeepPartial` type uses a mapped type to iterate over each key `K` in the object type `T`.\\n2. **Conditional Type**: The conditional type checks if the property type `T[K]` is an object. If it is, it recursively applies `DeepPartial` to that property. If not, it simply retains the original type.\\n3. **Optional Modifier**: The `?` makes each property optional.\\n\\n### Usage:\\nYou can use the `DeepPartial` type to create a new type where all properties of the original type are optional, which is particularly useful for scenarios like form handling or API responses where not all data may be present.\\n</Output>\\n<Rubric>\\nResponse demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create a TypeScript generic utility type that makes all nested object properties optional, you can use a recursive mapped type. This type will traverse through each property of the object and apply the optional modifier (`?`) to each property, including nested objects.\\n\\nHere's how you can implement this utility type:\\n\\n```typescript\\n/**\\n * A utility type that makes all properties of an object optional, including nested properties.\\n * \\n * @template T - The object type to make properties optional.\\n */\\ntype DeepPartial<T> = {\\n    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];\\n};\\n\\n// Example usage:\\n\\ninterface User {\\n    id: number;\\n    name: string;\\n    address: {\\n        street: string;\\n        city: string;\\n        country: string;\\n    };\\n    hobbies: string[];\\n}\\n\\n// Using DeepPartial to create a type where all properties are optional\\ntype PartialUser = DeepPartial<User>;\\n\\nconst user: PartialUser = {\\n    name: \\\"Alice\\\",\\n    address: {\\n        city: \\\"Wonderland\\\"\\n    }\\n};\\n```\\n\\n### Explanation:\\n1. **Mapped Type**: The `DeepPartial` type uses a mapped type to iterate over each key `K` in the object type `T`.\\n2. **Conditional Type**: The conditional type checks if `T[K]` is an object. If it is, it recursively applies `DeepPartial` to that property. If not, it simply retains the original type.\\n3. **Optional Modifier**: The `?` makes each property optional.\\n\\n### Example Usage:\\nIn the example provided, the `PartialUser` type allows you to create a `user` object where all properties, including nested properties, can be omitted. This is particularly useful for scenarios like form handling or API responses where not all data may be present.\\n</Output>\\n<Rubric>\\nResponse demonstrates deep TypeScript type system knowledge, uses proper generic constraints, and the type works correctly\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "db730f18-560c-4a77-acaa-93140279e529",
-        "latencyMs": 6820,
+        "id": "3c19c01c-bf65-4450-9326-6ff03192fb05",
+        "latencyMs": 7961,
         "namedScores": {
           "typescript-pro_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To create a TypeScript generic utility type that makes all nested object properties optional, you can use a recursive mapped type. This utility type will traverse through each property of the object and apply the optional modifier (`?`) to each property, including nested objects.\n\nHere's how you can implement this:\n\n```typescript\n/**\n * A utility type that makes all properties of an object optional, including nested properties.\n * \n * @template T - The object type to make properties optional.\n */\ntype DeepPartial<T> = {\n    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];\n};\n\n// Example usage:\n\ninterface User {\n    id: number;\n    name: string;\n    address: {\n        street: string;\n        city: string;\n        country: string;\n    };\n    hobbies: string[];\n}\n\n// Using DeepPartial to create a type where all properties are optional\ntype PartialUser = DeepPartial<User>;\n\nconst user: PartialUser = {\n    // All properties are optional\n    name: \"John Doe\",\n    address: {\n        city: \"New York\"\n    }\n};\n```\n\n### Explanation:\n1. **Mapped Type**: The `DeepPartial` type uses a mapped type to iterate over each key `K` in the object type `T`.\n2. **Conditional Type**: The conditional type checks if the property type `T[K]` is an object. If it is, it recursively applies `DeepPartial` to that property. If not, it simply retains the original type.\n3. **Optional Modifier**: The `?` makes each property optional.\n\n### Usage:\nYou can use the `DeepPartial` type to create a new type where all properties of the original type are optional, which is particularly useful for scenarios like form handling or API responses where not all data may be present.",
+          "output": "To create a TypeScript generic utility type that makes all nested object properties optional, you can use a recursive mapped type. This type will traverse through each property of the object and apply the optional modifier (`?`) to each property, including nested objects.\n\nHere's how you can implement this utility type:\n\n```typescript\n/**\n * A utility type that makes all properties of an object optional, including nested properties.\n * \n * @template T - The object type to make properties optional.\n */\ntype DeepPartial<T> = {\n    [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];\n};\n\n// Example usage:\n\ninterface User {\n    id: number;\n    name: string;\n    address: {\n        street: string;\n        city: string;\n        country: string;\n    };\n    hobbies: string[];\n}\n\n// Using DeepPartial to create a type where all properties are optional\ntype PartialUser = DeepPartial<User>;\n\nconst user: PartialUser = {\n    name: \"Alice\",\n    address: {\n        city: \"Wonderland\"\n    }\n};\n```\n\n### Explanation:\n1. **Mapped Type**: The `DeepPartial` type uses a mapped type to iterate over each key `K` in the object type `T`.\n2. **Conditional Type**: The conditional type checks if `T[K]` is an object. If it is, it recursively applies `DeepPartial` to that property. If not, it simply retains the original type.\n3. **Optional Modifier**: The `?` makes each property optional.\n\n### Example Usage:\nIn the example provided, the `PartialUser` type allows you to create a `user` object where all properties, including nested properties, can be omitted. This is particularly useful for scenarios like form handling or API responses where not all data may be present.",
           "tokenUsage": {
-            "total": 629,
+            "total": 628,
             "prompt": 255,
-            "completion": 374,
+            "completion": 373,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 6820,
+          "latencyMs": 7961,
           "finishReason": "stop",
-          "cost": 0.00026264999999999996,
+          "cost": 0.00026205,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4433f158d08c80-IAH",
+                "cf-ray": "9e4921128cf0c300-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:59:46 GMT",
+                "date": "Mon, 30 Mar 2026 18:20:43 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "6492",
+                "openai-processing-ms": "7786",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=btfRXwuqbIYzks559E0y.1r26gvPuP4xbt_sGvodG20-1774843179.73395-1.0.1.1-0qaplR12NNQTYnQ_eVrYBx2GRCQOmNKAyKlp76R9wIVIG4f8MG1QShtSudEe0WzRKKHpTY5YvUMUiPDGPzq3McqbU8Nsl_DTVjA6258kP_QBpAdMooxRhJSHtvMMO6rP; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:46 GMT",
+                "set-cookie": "__cf_bm=IW67Eo0blZZD2u9UEN92hGCdZigyuhqrsMrT3lVIzQE-1774894835.6016192-1.0.1.1-mUgSa6j1cV0LoaOUAV4euAYjAQWib9Ex8pFzkyZJyxouZ4DEAywxkkrwL_SX_Hb_GfJzbgdf79pjCjCtEMrzvpUMdFjG6VQ_fyHEqfzzwm29RBDQIi51E2z1w3Eul70n; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:43 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9540",
+                "x-ratelimit-remaining-requests": "9087",
                 "x-ratelimit-remaining-tokens": "199658",
-                "x-ratelimit-reset-requests": "1h6m9.045s",
+                "x-ratelimit-reset-requests": "2h11m27.347s",
                 "x-ratelimit-reset-tokens": "102ms",
-                "x-request-id": "req_776e2c65907d4b539a681cc4f1711cc7"
+                "x-request-id": "req_44001a6c54f94eb0b3a6deaf005fe4c8"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4433f158d08c80-IAH",
+              "cf-ray": "9e4921128cf0c300-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:59:46 GMT",
+              "date": "Mon, 30 Mar 2026 18:20:43 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "6492",
+              "openai-processing-ms": "7786",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=btfRXwuqbIYzks559E0y.1r26gvPuP4xbt_sGvodG20-1774843179.73395-1.0.1.1-0qaplR12NNQTYnQ_eVrYBx2GRCQOmNKAyKlp76R9wIVIG4f8MG1QShtSudEe0WzRKKHpTY5YvUMUiPDGPzq3McqbU8Nsl_DTVjA6258kP_QBpAdMooxRhJSHtvMMO6rP; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:46 GMT",
+              "set-cookie": "__cf_bm=IW67Eo0blZZD2u9UEN92hGCdZigyuhqrsMrT3lVIzQE-1774894835.6016192-1.0.1.1-mUgSa6j1cV0LoaOUAV4euAYjAQWib9Ex8pFzkyZJyxouZ4DEAywxkkrwL_SX_Hb_GfJzbgdf79pjCjCtEMrzvpUMdFjG6VQ_fyHEqfzzwm29RBDQIi51E2z1w3Eul70n; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:43 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9540",
+              "x-ratelimit-remaining-requests": "9087",
               "x-ratelimit-remaining-tokens": "199658",
-              "x-ratelimit-reset-requests": "1h6m9.045s",
+              "x-ratelimit-reset-requests": "2h11m27.347s",
               "x-ratelimit-reset-tokens": "102ms",
-              "x-request-id": "req_776e2c65907d4b539a681cc4f1711cc7"
+              "x-request-id": "req_44001a6c54f94eb0b3a6deaf005fe4c8"
             }
           },
           "_promptfooFileMetadata": {}
@@ -240,7 +240,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0.0005251499999999999,
+        "cost": 0.00046575,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -249,8 +249,8 @@
             "typescript-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1063,
-            "prompt": 1009,
+            "total": 964,
+            "prompt": 910,
             "completion": 54,
             "cached": 0,
             "numRequests": 1
@@ -265,10 +265,10 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output correctly implements a TypeScript decorator using proper syntax, handles method metadata through the descriptor, and is compatible with TypeScript strict mode by using type annotations.",
+              "reason": "The output correctly implements a TypeScript decorator using the proper syntax, modifies the method's descriptor, and is compatible with TypeScript strict mode by using appropriate types.",
               "tokensUsed": {
-                "total": 1063,
-                "prompt": 1009,
+                "total": 964,
+                "prompt": 910,
                 "completion": 54,
                 "cached": 0,
                 "numRequests": 1,
@@ -279,13 +279,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a TypeScript decorator for method memoization with Time-To-Live (TTL) support involves a few steps. The decorator will cache the results of method calls and invalidate the cache after a specified duration. Below is a complete implementation of such a decorator.\\n\\n### Memoization Decorator with TTL\\n\\n```typescript\\nfunction MemoizeWithTTL(ttl: number) {\\n    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {\\n        const originalMethod = descriptor.value;\\n        const cache: Map<string, { value: any; expiry: number }> = new Map();\\n\\n        descriptor.value = function (...args: any[]) {\\n            const key = JSON.stringify(args); // Create a unique key based on arguments\\n            const now = Date.now();\\n\\n            // Check if the cache has the value and if it is still valid\\n            if (cache.has(key)) {\\n                const cached = cache.get(key)!;\\n                if (now < cached.expiry) {\\n                    return cached.value; // Return cached value if not expired\\n                }\\n                cache.delete(key); // Remove expired cache\\n            }\\n\\n            // Call the original method and cache the result\\n            const result = originalMethod.apply(this, args);\\n            cache.set(key, { value: result, expiry: now + ttl });\\n            return result;\\n        };\\n\\n        return descriptor;\\n    };\\n}\\n\\n// Example usage\\nclass Example {\\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\\n    expensiveCalculation(num: number): number {\\n        console.log('Calculating...');\\n        return num * 2; // Simulate an expensive operation\\n    }\\n}\\n\\n// Testing the decorator\\nconst example = new Example();\\n\\nconsole.log(example.expensiveCalculation(5)); // Calculating... 10\\nconsole.log(example.expensiveCalculation(5)); // 10 (cached result)\\nsetTimeout(() => {\\n    console.log(example.expensiveCalculation(5)); // Calculating... 10 (cache expired)\\n}, 6000);\\n```\\n\\n### Explanation\\n\\n1. **Decorator Function**: The `MemoizeWithTTL` function takes a `ttl` parameter, which specifies the time-to-live for the cached results.\\n\\n2. **Cache Structure**: A `Map` is used to store cached values along with their expiry timestamps. The key is generated by serializing the method arguments.\\n\\n3. **Method Replacement**: The original method is replaced with a new function that checks the cache before executing the original method. If the cached value is still valid (not expired), it returns the cached value. If it has expired, it removes the entry from the cache.\\n\\n4. **Example Class**: An example class `Example` demonstrates how to use the decorator. The `expensiveCalculation` method simulates an expensive operation.\\n\\n5. **Testing**: The testing code shows how the decorator works, including the caching behavior and TTL expiration.\\n\\n### Type Safety and TSDoc Comments\\n\\nYou can enhance the type safety and documentation by adding TSDoc comments to the decorator and the example class:\\n\\n```typescript\\n/**\\n * A method decorator that memoizes the result of a method call with a specified TTL.\\n * \\n * @param ttl - The time-to-live in milliseconds for the cached result.\\n */\\nfunction MemoizeWithTTL(ttl: number) {\\n    // ... (implementation remains the same)\\n}\\n\\n/**\\n * Example class demonstrating the use of the MemoizeWithTTL decorator.\\n */\\nclass Example {\\n    /**\\n     * An expensive calculation that is memoized.\\n     * \\n     * @param num - The number to be processed.\\n     * @returns The result of the calculation.\\n     */\\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\\n    expensiveCalculation(num: number): number {\\n        console.log('Calculating...');\\n        return num * 2; // Simulate an expensive operation\\n    }\\n}\\n```\\n\\nThis implementation provides a robust and type-safe way to memoize method calls with TTL support in TypeScript.\\n</Output>\\n<Rubric>\\nUses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a TypeScript decorator for method memoization with Time-To-Live (TTL) support involves several steps. The decorator will cache the results of method calls and invalidate the cache after a specified duration. Below is a complete implementation of such a decorator.\\n\\n### Memoization Decorator with TTL\\n\\n```typescript\\nfunction MemoizeWithTTL(ttl: number) {\\n    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {\\n        const originalMethod = descriptor.value;\\n        const cache: Map<string, { value: any; expiry: number }> = new Map();\\n\\n        descriptor.value = function (...args: any[]) {\\n            const key = JSON.stringify(args); // Create a unique key based on arguments\\n            const now = Date.now();\\n\\n            // Check if the cache has the value and if it is still valid\\n            if (cache.has(key)) {\\n                const cached = cache.get(key)!;\\n                if (now < cached.expiry) {\\n                    return cached.value; // Return cached value if not expired\\n                }\\n                cache.delete(key); // Remove expired cache\\n            }\\n\\n            // Call the original method and cache the result\\n            const result = originalMethod.apply(this, args);\\n            cache.set(key, { value: result, expiry: now + ttl });\\n            return result;\\n        };\\n\\n        return descriptor;\\n    };\\n}\\n\\n// Example usage\\nclass Example {\\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\\n    expensiveCalculation(num: number): number {\\n        console.log('Calculating...');\\n        return num * 2; // Simulate an expensive operation\\n    }\\n}\\n\\n// Testing the decorator\\nconst example = new Example();\\nconsole.log(example.expensiveCalculation(5)); // Calculating... 10\\nconsole.log(example.expensiveCalculation(5)); // 10 (cached)\\nsetTimeout(() => {\\n    console.log(example.expensiveCalculation(5)); // Calculating... 10 (cache expired)\\n}, 6000);\\n```\\n\\n### Explanation\\n\\n1. **Decorator Function**: The `MemoizeWithTTL` function takes a `ttl` parameter, which specifies the time-to-live for cached results.\\n\\n2. **Property Descriptor**: The decorator modifies the method's descriptor to wrap the original method. It uses a `Map` to store cached results along with their expiry times.\\n\\n3. **Cache Key**: The cache key is generated by serializing the method arguments using `JSON.stringify`. This ensures that different argument combinations are treated as separate cache entries.\\n\\n4. **Cache Check**: Before executing the original method, the decorator checks if the result is already cached and whether it has expired. If the cache is valid, it returns the cached value.\\n\\n5. **Cache Invalidation**: If the cache has expired, it removes the entry from the cache and proceeds to call the original method.\\n\\n6. **Result Caching**: After calling the original method, it caches the result along with the expiry time.\\n\\n### Usage\\n\\nYou can apply the `@MemoizeWithTTL` decorator to any method in a class. In the example provided, the `expensiveCalculation` method is decorated to cache its results for 5 seconds. The console logs demonstrate how the method behaves with and without caching.\\n\\n### Type Safety\\n\\nThe decorator is designed to work with any method signature, and TypeScript's type inference will ensure that the types of the arguments and return values are preserved. You can further enhance type safety by adding constraints or using generics if needed.\\n</Output>\\n<Rubric>\\nUses proper TypeScript decorator syntax, handles method metadata correctly, TypeScript strict mode compatible\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "ff0f7c7a-dbd3-4556-a6e7-a2578ee4b285",
-        "latencyMs": 14913,
+        "id": "5e2dd2d3-ef5b-4a07-aec2-46d46a8f6d1b",
+        "latencyMs": 12804,
         "namedScores": {
           "typescript-pro_quality": 1
         },
@@ -308,11 +308,11 @@
           "label": ""
         },
         "response": {
-          "output": "Creating a TypeScript decorator for method memoization with Time-To-Live (TTL) support involves a few steps. The decorator will cache the results of method calls and invalidate the cache after a specified duration. Below is a complete implementation of such a decorator.\n\n### Memoization Decorator with TTL\n\n```typescript\nfunction MemoizeWithTTL(ttl: number) {\n    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {\n        const originalMethod = descriptor.value;\n        const cache: Map<string, { value: any; expiry: number }> = new Map();\n\n        descriptor.value = function (...args: any[]) {\n            const key = JSON.stringify(args); // Create a unique key based on arguments\n            const now = Date.now();\n\n            // Check if the cache has the value and if it is still valid\n            if (cache.has(key)) {\n                const cached = cache.get(key)!;\n                if (now < cached.expiry) {\n                    return cached.value; // Return cached value if not expired\n                }\n                cache.delete(key); // Remove expired cache\n            }\n\n            // Call the original method and cache the result\n            const result = originalMethod.apply(this, args);\n            cache.set(key, { value: result, expiry: now + ttl });\n            return result;\n        };\n\n        return descriptor;\n    };\n}\n\n// Example usage\nclass Example {\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\n    expensiveCalculation(num: number): number {\n        console.log('Calculating...');\n        return num * 2; // Simulate an expensive operation\n    }\n}\n\n// Testing the decorator\nconst example = new Example();\n\nconsole.log(example.expensiveCalculation(5)); // Calculating... 10\nconsole.log(example.expensiveCalculation(5)); // 10 (cached result)\nsetTimeout(() => {\n    console.log(example.expensiveCalculation(5)); // Calculating... 10 (cache expired)\n}, 6000);\n```\n\n### Explanation\n\n1. **Decorator Function**: The `MemoizeWithTTL` function takes a `ttl` parameter, which specifies the time-to-live for the cached results.\n\n2. **Cache Structure**: A `Map` is used to store cached values along with their expiry timestamps. The key is generated by serializing the method arguments.\n\n3. **Method Replacement**: The original method is replaced with a new function that checks the cache before executing the original method. If the cached value is still valid (not expired), it returns the cached value. If it has expired, it removes the entry from the cache.\n\n4. **Example Class**: An example class `Example` demonstrates how to use the decorator. The `expensiveCalculation` method simulates an expensive operation.\n\n5. **Testing**: The testing code shows how the decorator works, including the caching behavior and TTL expiration.\n\n### Type Safety and TSDoc Comments\n\nYou can enhance the type safety and documentation by adding TSDoc comments to the decorator and the example class:\n\n```typescript\n/**\n * A method decorator that memoizes the result of a method call with a specified TTL.\n * \n * @param ttl - The time-to-live in milliseconds for the cached result.\n */\nfunction MemoizeWithTTL(ttl: number) {\n    // ... (implementation remains the same)\n}\n\n/**\n * Example class demonstrating the use of the MemoizeWithTTL decorator.\n */\nclass Example {\n    /**\n     * An expensive calculation that is memoized.\n     * \n     * @param num - The number to be processed.\n     * @returns The result of the calculation.\n     */\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\n    expensiveCalculation(num: number): number {\n        console.log('Calculating...');\n        return num * 2; // Simulate an expensive operation\n    }\n}\n```\n\nThis implementation provides a robust and type-safe way to memoize method calls with TTL support in TypeScript.",
+          "output": "Creating a TypeScript decorator for method memoization with Time-To-Live (TTL) support involves several steps. The decorator will cache the results of method calls and invalidate the cache after a specified duration. Below is a complete implementation of such a decorator.\n\n### Memoization Decorator with TTL\n\n```typescript\nfunction MemoizeWithTTL(ttl: number) {\n    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {\n        const originalMethod = descriptor.value;\n        const cache: Map<string, { value: any; expiry: number }> = new Map();\n\n        descriptor.value = function (...args: any[]) {\n            const key = JSON.stringify(args); // Create a unique key based on arguments\n            const now = Date.now();\n\n            // Check if the cache has the value and if it is still valid\n            if (cache.has(key)) {\n                const cached = cache.get(key)!;\n                if (now < cached.expiry) {\n                    return cached.value; // Return cached value if not expired\n                }\n                cache.delete(key); // Remove expired cache\n            }\n\n            // Call the original method and cache the result\n            const result = originalMethod.apply(this, args);\n            cache.set(key, { value: result, expiry: now + ttl });\n            return result;\n        };\n\n        return descriptor;\n    };\n}\n\n// Example usage\nclass Example {\n    @MemoizeWithTTL(5000) // Cache for 5 seconds\n    expensiveCalculation(num: number): number {\n        console.log('Calculating...');\n        return num * 2; // Simulate an expensive operation\n    }\n}\n\n// Testing the decorator\nconst example = new Example();\nconsole.log(example.expensiveCalculation(5)); // Calculating... 10\nconsole.log(example.expensiveCalculation(5)); // 10 (cached)\nsetTimeout(() => {\n    console.log(example.expensiveCalculation(5)); // Calculating... 10 (cache expired)\n}, 6000);\n```\n\n### Explanation\n\n1. **Decorator Function**: The `MemoizeWithTTL` function takes a `ttl` parameter, which specifies the time-to-live for cached results.\n\n2. **Property Descriptor**: The decorator modifies the method's descriptor to wrap the original method. It uses a `Map` to store cached results along with their expiry times.\n\n3. **Cache Key**: The cache key is generated by serializing the method arguments using `JSON.stringify`. This ensures that different argument combinations are treated as separate cache entries.\n\n4. **Cache Check**: Before executing the original method, the decorator checks if the result is already cached and whether it has expired. If the cache is valid, it returns the cached value.\n\n5. **Cache Invalidation**: If the cache has expired, it removes the entry from the cache and proceeds to call the original method.\n\n6. **Result Caching**: After calling the original method, it caches the result along with the expiry time.\n\n### Usage\n\nYou can apply the `@MemoizeWithTTL` decorator to any method in a class. In the example provided, the `expensiveCalculation` method is decorated to cache its results for 5 seconds. The console logs demonstrate how the method behaves with and without caching.\n\n### Type Safety\n\nThe decorator is designed to work with any method signature, and TypeScript's type inference will ensure that the types of the arguments and return values are preserved. You can further enhance type safety by adding constraints or using generics if needed.",
           "tokenUsage": {
-            "total": 1065,
+            "total": 966,
             "prompt": 253,
-            "completion": 812,
+            "completion": 713,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -321,9 +321,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 14913,
+          "latencyMs": 12804,
           "finishReason": "stop",
-          "cost": 0.0005251499999999999,
+          "cost": 0.00046575,
           "guardrails": {
             "flagged": false
           },
@@ -335,28 +335,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4433f14d51cbf9-IAH",
+                "cf-ray": "9e4921129a9870e1-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:59:54 GMT",
+                "date": "Mon, 30 Mar 2026 18:20:48 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "14711",
+                "openai-processing-ms": "12630",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=wmVronMwTcRp8UW5I4fJfWm00eSBihvA2PutUaNaHNg-1774843179.7261755-1.0.1.1-qEddb1CWBnQ_.BNG_CN2zVPl6oakYqLStlYhmgQTa.o8aDIAuu.9l7kvX.BSYYDGxDK6otHvu.sWDESK18XmBX.myidoMG_KqSZL0JFK_bgqTNvX1j76lsqTmSUGJZNS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:54 GMT",
+                "set-cookie": "__cf_bm=Lx1Ul3knPc20J.KNjt7ObKQ7._ImCpTfykvim8ja5eE-1774894835.615336-1.0.1.1-pOUEidwQbS2nk2RqRUYhH.8s9r._1I4uC0zn.atFk.ZR1_1ndAlF5czNWgPl0jTsVwhLWpUaqpR6hg1smk9ga3TYqpka6uX5mibZu3_ygYTndjBoKBRPpMuquIFiDDKW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:48 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9540",
+                "x-ratelimit-remaining-requests": "9087",
                 "x-ratelimit-remaining-tokens": "199663",
-                "x-ratelimit-reset-requests": "1h6m9.113s",
+                "x-ratelimit-reset-requests": "2h11m27.54s",
                 "x-ratelimit-reset-tokens": "101ms",
-                "x-request-id": "req_a5334b4e60d147b4b1857d63608111b8"
+                "x-request-id": "req_22c14534babf4acd94a5f687a2dad9fd"
               }
             }
           }
@@ -398,28 +398,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4433f14d51cbf9-IAH",
+              "cf-ray": "9e4921129a9870e1-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:59:54 GMT",
+              "date": "Mon, 30 Mar 2026 18:20:48 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "14711",
+              "openai-processing-ms": "12630",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=wmVronMwTcRp8UW5I4fJfWm00eSBihvA2PutUaNaHNg-1774843179.7261755-1.0.1.1-qEddb1CWBnQ_.BNG_CN2zVPl6oakYqLStlYhmgQTa.o8aDIAuu.9l7kvX.BSYYDGxDK6otHvu.sWDESK18XmBX.myidoMG_KqSZL0JFK_bgqTNvX1j76lsqTmSUGJZNS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:29:54 GMT",
+              "set-cookie": "__cf_bm=Lx1Ul3knPc20J.KNjt7ObKQ7._ImCpTfykvim8ja5eE-1774894835.615336-1.0.1.1-pOUEidwQbS2nk2RqRUYhH.8s9r._1I4uC0zn.atFk.ZR1_1ndAlF5czNWgPl0jTsVwhLWpUaqpR6hg1smk9ga3TYqpka6uX5mibZu3_ygYTndjBoKBRPpMuquIFiDDKW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:50:48 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9540",
+              "x-ratelimit-remaining-requests": "9087",
               "x-ratelimit-remaining-tokens": "199663",
-              "x-ratelimit-reset-requests": "1h6m9.113s",
+              "x-ratelimit-reset-requests": "2h11m27.54s",
               "x-ratelimit-reset-tokens": "101ms",
-              "x-request-id": "req_a5334b4e60d147b4b1857d63608111b8"
+              "x-request-id": "req_22c14534babf4acd94a5f687a2dad9fd"
             }
           },
           "_promptfooFileMetadata": {}
@@ -433,9 +433,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 508,
-        "completion": 1186,
+        "completion": 1086,
         "cached": 0,
-        "total": 1694,
+        "total": 1594,
         "numRequests": 2,
         "completionDetails": {
           "reasoning": 0,
@@ -443,9 +443,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1692,
-          "prompt": 1582,
-          "completion": 110,
+          "total": 1597,
+          "prompt": 1482,
+          "completion": 115,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -455,8 +455,8 @@
           }
         }
       },
-      "durationMs": 16361,
-      "evaluationDurationMs": 16361
+      "durationMs": 14123,
+      "evaluationDurationMs": 14123
     }
   },
   "config": {
@@ -536,7 +536,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:59:56.050Z",
-    "evaluationCreatedAt": "2026-03-30T03:59:39.648Z"
+    "exportedAt": "2026-03-30T18:20:49.671Z",
+    "evaluationCreatedAt": "2026-03-30T18:20:35.514Z"
   }
 }

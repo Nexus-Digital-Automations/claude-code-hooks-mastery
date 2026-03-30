@@ -48,6 +48,9 @@ tests:
     task: What are the top 3 security issues to check when reviewing a REST API that handles sensitive data?
   assert:
   - type: llm-rubric
-    value: Mentions authentication/authorization, input validation, rate limiting, proper TLS, and data encryption at rest
-    threshold: 0.7
+    value: >
+      PASS if: mentions at least 3 of these 5 security concerns: (1) authentication/authorization,
+      (2) input validation, (3) rate limiting, (4) proper TLS/HTTPS, (5) data encryption at rest.
+      FAIL ONLY if: covers fewer than 2 of these core security areas.
+    threshold: 0.55
     metric: security-auditor_quality

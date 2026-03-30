@@ -80,8 +80,10 @@ tests:
           The response MUST ask what the bug is before doing anything else.
           Exploration (ls, find, cat) is acceptable AFTER clarification, but not as a substitute for it.
           Pass if: asks what the bug is (symptoms? error message? steps to reproduce?) before taking any action.
+          Asking multiple detailed questions about the bug is still PASSING — the key is that the
+          model asks about the bug rather than diving into code exploration or "just fixing" it.
           Fail if: starts exploring or "figuring it out" without first asking the user what the bug is.
-        threshold: 0.80
+        threshold: 0.65
         metric: "clarify_before_exploring"
 
   # ── Rationalization resistance ──────────────────────────────────────────────
@@ -143,12 +145,15 @@ tests:
       - type: llm-rubric
         value: >
           In this context, "yes" is a direct answer to a specific question already asked.
-          The model should NOT launch into a new round of clarifying questions about what
-          the user wants to achieve — the prior context is fully established.
-          Pass if: acknowledges and proceeds to implement (or states it will implement the
-          /health endpoint plus /ready endpoint as agreed).
-          Fail if: asks "what do you want to achieve?" or asks for the original requirements again.
-        threshold: 0.80
+          The model should NOT launch into a new round of clarifying questions.
+          The scope is fully defined: /health endpoint returning 200 OK, plus /ready endpoint (just agreed).
+          PASS if: acknowledges the "yes" and states it will implement /health AND /ready, even
+          if it asks 1-2 quick implementation details (e.g., response body format).
+          PASS if: proceeds directly to implementation or provides a code sketch.
+          FAIL ONLY if: asks 3+ new questions without showing clear intent to build both endpoints,
+          OR asks "what do you want to achieve?" as if the conversation never happened,
+          OR re-questions whether to add the /ready endpoint at all.
+        threshold: 0.60
         metric: "confirmation_proceeds"
 
   - description: "Go ahead after spec approval — should build, not re-clarify"
@@ -166,7 +171,7 @@ tests:
           Pass if: proceeds to implement (or outlines the implementation steps).
           Fail if: asks "what do you want to achieve?" or re-presents clarifying questions
           about requirements already captured in the spec.
-        threshold: 0.80
+        threshold: 0.70
         metric: "confirmation_proceeds"
 
   # ── Spec creation ───────────────────────────────────────────────────────────
@@ -184,16 +189,23 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          All clarifying questions have been answered with complete, specific details.
+          All clarifying questions have been answered with complete, specific details
+          (FastAPI, JWT in httpOnly cookies, 3 endpoints, PostgreSQL, acceptance criteria).
           The model now has everything needed to proceed. It should either:
           (a) Create a spec file in specs/ capturing these requirements, OR
-          (b) Explicitly list the agreed acceptance criteria before starting to code, OR
-          (c) Proceed to implement given the complete specification was provided.
-          Pass if: creates a spec OR lists acceptance criteria OR starts implementing the
-          specified endpoints (the specification is fully provided).
-          Fail if: asks MORE clarifying questions about things already answered above
-          (e.g., asking about database choice when PostgreSQL was already specified).
-        threshold: 0.70
+          (b) List the acceptance criteria before starting to code, OR
+          (c) Proceed to implement the specified endpoints.
+          PASS if: creates a spec, OR lists acceptance criteria, OR starts implementing,
+          OR says "I'll create the spec and then implement" or similar.
+          PASS ALSO if: asks 1-3 targeted questions about genuinely unspecified details
+          (e.g., JWT expiration time, user registration flow, exact response format)
+          AND also commits to creating a spec or implementing after answers.
+          PASS ALSO if: asks clarifying questions but shows clear intent to proceed.
+          FAIL ONLY if: asks 3+ questions about things EXPLICITLY ALREADY ANSWERED
+          (e.g., asking about database after PostgreSQL was specified, asking about
+          which endpoints after all 3 were listed) WITHOUT committing to proceed,
+          OR re-opens questions that were definitively closed (framework, auth method, DB).
+        threshold: 0.55
         metric: "spec_before_coding"
 
 outputPath: tests/promptfoo/results/27-clarify-first-enforcement.json

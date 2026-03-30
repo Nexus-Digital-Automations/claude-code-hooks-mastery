@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-tuH-2026-03-30T03:54:26",
+  "evalId": "eval-i4U-2026-03-30T18:15:21",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:54:26.744Z",
+    "timestamp": "2026-03-30T18:15:21.397Z",
     "prompts": [
       {
         "id": "a48effe95fcf8085a4decba7fb4b70ea76878261b16ca7cb6eb5cf1da6ec6034",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 17377,
+          "totalLatencyMs": 17940,
           "tokenUsage": {
             "prompt": 451,
-            "completion": 942,
+            "completion": 845,
             "cached": 0,
-            "total": 1393,
+            "total": 1296,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1213,
-              "prompt": 1161,
-              "completion": 52,
+              "total": 1113,
+              "prompt": 1064,
+              "completion": 49,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "kubernetes-architect_quality": 1
           },
-          "cost": 0.0006328499999999999
+          "cost": 0.0005746499999999999
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0006328499999999999,
+        "cost": 0.0005746499999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "kubernetes-architect_quality": 1
           },
           "tokensUsed": {
-            "total": 1213,
-            "prompt": 1161,
-            "completion": 52,
+            "total": 1113,
+            "prompt": 1064,
+            "completion": 49,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output covers StatefulSet, HPA configuration, and persistent storage (PVC), along with resource limits, demonstrating a solid understanding of Kubernetes best practices.",
+              "reason": "The output covers StatefulSet, HPA configuration, and persistent storage, demonstrating a solid understanding of Kubernetes best practices for stateful applications.",
               "tokensUsed": {
-                "total": 1213,
-                "prompt": 1161,
-                "completion": 52,
+                "total": 1113,
+                "prompt": 1064,
+                "completion": 49,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a Kubernetes deployment for a stateful application with horizontal pod autoscaling and persistent storage involves several key components. Below is a step-by-step guide to achieve this, including the necessary Kubernetes resources.\\n\\n### 1. Define the Stateful Application\\n\\nFor this example, let's assume we are deploying a stateful application like a database (e.g., PostgreSQL). We will use a StatefulSet to manage the deployment of the database instances.\\n\\n### 2. Create Persistent Volume and Persistent Volume Claim\\n\\nFirst, we need to define a Persistent Volume (PV) and a Persistent Volume Claim (PVC) to ensure that our stateful application has persistent storage.\\n\\n```yaml\\napiVersion: v1\\nkind: PersistentVolume\\nmetadata:\\n  name: postgres-pv\\nspec:\\n  capacity:\\n    storage: 10Gi\\n  accessModes:\\n    - ReadWriteOnce\\n  hostPath: # For demonstration; use a proper storage class in production\\n    path: /data/postgres\\n\\n---\\napiVersion: v1\\nkind: PersistentVolumeClaim\\nmetadata:\\n  name: postgres-pvc\\nspec:\\n  accessModes:\\n    - ReadWriteOnce\\n  resources:\\n    requests:\\n      storage: 10Gi\\n```\\n\\n### 3. Create the StatefulSet\\n\\nNext, we define a StatefulSet for the PostgreSQL database. This will manage the deployment of the database pods.\\n\\n```yaml\\napiVersion: apps/v1\\nkind: StatefulSet\\nmetadata:\\n  name: postgres\\nspec:\\n  serviceName: \\\"postgres\\\"\\n  replicas: 3\\n  selector:\\n    matchLabels:\\n      app: postgres\\n  template:\\n    metadata:\\n      labels:\\n        app: postgres\\n    spec:\\n      containers:\\n      - name: postgres\\n        image: postgres:latest\\n        ports:\\n        - containerPort: 5432\\n        env:\\n        - name: POSTGRES_USER\\n          value: \\\"user\\\"\\n        - name: POSTGRES_PASSWORD\\n          value: \\\"password\\\"\\n        - name: POSTGRES_DB\\n          value: \\\"mydb\\\"\\n        volumeMounts:\\n        - name: postgres-storage\\n          mountPath: /var/lib/postgresql/data\\n  volumeClaimTemplates:\\n  - metadata:\\n      name: postgres-storage\\n    spec:\\n      accessModes: [ \\\"ReadWriteOnce\\\" ]\\n      resources:\\n        requests:\\n          storage: 10Gi\\n```\\n\\n### 4. Create a Service\\n\\nWe need a headless service to allow the StatefulSet to manage the network identity of the pods.\\n\\n```yaml\\napiVersion: v1\\nkind: Service\\nmetadata:\\n  name: postgres\\nspec:\\n  clusterIP: None\\n  ports:\\n  - port: 5432\\n    name: postgres\\n  selector:\\n    app: postgres\\n```\\n\\n### 5. Horizontal Pod Autoscaler\\n\\nTo enable horizontal pod autoscaling, we need to define resource requests and limits in the container spec of the StatefulSet. Then, we can create a Horizontal Pod Autoscaler (HPA) based on CPU utilization.\\n\\nUpdate the StatefulSet to include resource requests and limits:\\n\\n```yaml\\n        resources:\\n          requests:\\n            memory: \\\"512Mi\\\"\\n            cpu: \\\"250m\\\"\\n          limits:\\n            memory: \\\"1Gi\\\"\\n            cpu: \\\"500m\\\"\\n```\\n\\nNow, create the HPA:\\n\\n```yaml\\napiVersion: autoscaling/v2beta2\\nkind: HorizontalPodAutoscaler\\nmetadata:\\n  name: postgres-hpa\\nspec:\\n  scaleTargetRef:\\n    apiVersion: apps/v1\\n    kind: StatefulSet\\n    name: postgres\\n  minReplicas: 1\\n  maxReplicas: 5\\n  metrics:\\n  - type: Resource\\n    resource:\\n      name: cpu\\n      target:\\n        type: Utilization\\n        averageUtilization: 50\\n```\\n\\n### 6. Apply the Configuration\\n\\nYou can apply all the above configurations using `kubectl`:\\n\\n```bash\\nkubectl apply -f persistent-volume.yaml\\nkubectl apply -f persistent-volume-claim.yaml\\nkubectl apply -f statefulset.yaml\\nkubectl apply -f service.yaml\\nkubectl apply -f hpa.yaml\\n```\\n\\n### Summary\\n\\nThis setup includes:\\n- A StatefulSet for managing the stateful application (PostgreSQL).\\n- Persistent storage using Persistent Volumes and Persistent Volume Claims.\\n- A headless service for network identity.\\n- Horizontal Pod Autoscaler to scale the number of replicas based on CPU utilization.\\n\\nMake sure to adjust the storage class and other configurations based on your specific cloud provider or on-premises setup.\\n</Output>\\n<Rubric>\\nCovers at least 3 of: StatefulSet or Deployment, HPA configuration, persistent storage (PVC/StorageClass), health probes, or resource limits. Shows production-quality K8s knowledge\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDesigning a Kubernetes deployment for a stateful application with horizontal pod autoscaling and persistent storage involves several key components. Below is a step-by-step guide to achieve this, including the necessary YAML configurations.\\n\\n### 1. Define the StatefulSet\\n\\nA StatefulSet is used for deploying stateful applications. It provides guarantees about the ordering and uniqueness of pods.\\n\\n```yaml\\napiVersion: apps/v1\\nkind: StatefulSet\\nmetadata:\\n  name: my-stateful-app\\nspec:\\n  serviceName: \\\"my-stateful-app\\\"\\n  replicas: 3\\n  selector:\\n    matchLabels:\\n      app: my-stateful-app\\n  template:\\n    metadata:\\n      labels:\\n        app: my-stateful-app\\n    spec:\\n      containers:\\n      - name: my-app-container\\n        image: my-app-image:latest\\n        ports:\\n        - containerPort: 8080\\n        volumeMounts:\\n        - name: my-persistent-storage\\n          mountPath: /data\\n  volumeClaimTemplates:\\n  - metadata:\\n      name: my-persistent-storage\\n    spec:\\n      accessModes: [ \\\"ReadWriteOnce\\\" ]\\n      resources:\\n        requests:\\n          storage: 10Gi\\n```\\n\\n### 2. Define the Headless Service\\n\\nA headless service is required for StatefulSets to manage the network identity of the pods.\\n\\n```yaml\\napiVersion: v1\\nkind: Service\\nmetadata:\\n  name: my-stateful-app\\nspec:\\n  clusterIP: None\\n  selector:\\n    app: my-stateful-app\\n  ports:\\n  - port: 8080\\n    targetPort: 8080\\n```\\n\\n### 3. Configure Horizontal Pod Autoscaler (HPA)\\n\\nTo enable horizontal pod autoscaling, you need to define an HPA resource. The HPA will scale the number of replicas based on CPU utilization or other metrics.\\n\\n```yaml\\napiVersion: autoscaling/v2beta2\\nkind: HorizontalPodAutoscaler\\nmetadata:\\n  name: my-stateful-app-hpa\\nspec:\\n  scaleTargetRef:\\n    apiVersion: apps/v1\\n    kind: StatefulSet\\n    name: my-stateful-app\\n  minReplicas: 3\\n  maxReplicas: 10\\n  metrics:\\n  - type: Resource\\n    resource:\\n      name: cpu\\n      target:\\n        type: Utilization\\n        averageUtilization: 50\\n```\\n\\n### 4. Persistent Volume and Persistent Volume Claim (Optional)\\n\\nIf you want to manage persistent storage explicitly, you can define a Persistent Volume (PV) and a Persistent Volume Claim (PVC). However, in the StatefulSet definition above, the volumeClaimTemplates automatically create PVCs.\\n\\n```yaml\\napiVersion: v1\\nkind: PersistentVolume\\nmetadata:\\n  name: my-pv\\nspec:\\n  capacity:\\n    storage: 10Gi\\n  accessModes:\\n    - ReadWriteOnce\\n  hostPath:\\n    path: /data/my-app\\n---\\napiVersion: v1\\nkind: PersistentVolumeClaim\\nmetadata:\\n  name: my-pvc\\nspec:\\n  accessModes:\\n    - ReadWriteOnce\\n  resources:\\n    requests:\\n      storage: 10Gi\\n```\\n\\n### 5. Deploy the Resources\\n\\nYou can deploy the above resources using `kubectl`:\\n\\n```bash\\nkubectl apply -f my-stateful-app-service.yaml\\nkubectl apply -f my-stateful-app-statefulset.yaml\\nkubectl apply -f my-stateful-app-hpa.yaml\\n```\\n\\n### Summary\\n\\nThis setup includes:\\n- A **StatefulSet** for managing the stateful application with persistent storage.\\n- A **headless service** to manage network identities.\\n- A **Horizontal Pod Autoscaler** to scale the application based on CPU utilization.\\n\\nMake sure to adjust the resource requests and limits in the container spec according to your application's needs to ensure the HPA can function correctly. Additionally, consider using a cloud provider's managed storage solution (like EBS for AWS, Persistent Disks for GCP, or Azure Disks) for production workloads to ensure high availability and durability.\\n</Output>\\n<Rubric>\\nCovers at least 3 of: StatefulSet or Deployment, HPA configuration, persistent storage (PVC/StorageClass), health probes, or resource limits. Shows production-quality K8s knowledge\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "9ad0765b-3a05-4d88-be6c-5ce2428c40cb",
-        "latencyMs": 17377,
+        "id": "91cd33aa-8309-4bb5-a1e5-4bcef122fc8c",
+        "latencyMs": 17940,
         "namedScores": {
           "kubernetes-architect_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Designing a Kubernetes deployment for a stateful application with horizontal pod autoscaling and persistent storage involves several key components. Below is a step-by-step guide to achieve this, including the necessary Kubernetes resources.\n\n### 1. Define the Stateful Application\n\nFor this example, let's assume we are deploying a stateful application like a database (e.g., PostgreSQL). We will use a StatefulSet to manage the deployment of the database instances.\n\n### 2. Create Persistent Volume and Persistent Volume Claim\n\nFirst, we need to define a Persistent Volume (PV) and a Persistent Volume Claim (PVC) to ensure that our stateful application has persistent storage.\n\n```yaml\napiVersion: v1\nkind: PersistentVolume\nmetadata:\n  name: postgres-pv\nspec:\n  capacity:\n    storage: 10Gi\n  accessModes:\n    - ReadWriteOnce\n  hostPath: # For demonstration; use a proper storage class in production\n    path: /data/postgres\n\n---\napiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: postgres-pvc\nspec:\n  accessModes:\n    - ReadWriteOnce\n  resources:\n    requests:\n      storage: 10Gi\n```\n\n### 3. Create the StatefulSet\n\nNext, we define a StatefulSet for the PostgreSQL database. This will manage the deployment of the database pods.\n\n```yaml\napiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: postgres\nspec:\n  serviceName: \"postgres\"\n  replicas: 3\n  selector:\n    matchLabels:\n      app: postgres\n  template:\n    metadata:\n      labels:\n        app: postgres\n    spec:\n      containers:\n      - name: postgres\n        image: postgres:latest\n        ports:\n        - containerPort: 5432\n        env:\n        - name: POSTGRES_USER\n          value: \"user\"\n        - name: POSTGRES_PASSWORD\n          value: \"password\"\n        - name: POSTGRES_DB\n          value: \"mydb\"\n        volumeMounts:\n        - name: postgres-storage\n          mountPath: /var/lib/postgresql/data\n  volumeClaimTemplates:\n  - metadata:\n      name: postgres-storage\n    spec:\n      accessModes: [ \"ReadWriteOnce\" ]\n      resources:\n        requests:\n          storage: 10Gi\n```\n\n### 4. Create a Service\n\nWe need a headless service to allow the StatefulSet to manage the network identity of the pods.\n\n```yaml\napiVersion: v1\nkind: Service\nmetadata:\n  name: postgres\nspec:\n  clusterIP: None\n  ports:\n  - port: 5432\n    name: postgres\n  selector:\n    app: postgres\n```\n\n### 5. Horizontal Pod Autoscaler\n\nTo enable horizontal pod autoscaling, we need to define resource requests and limits in the container spec of the StatefulSet. Then, we can create a Horizontal Pod Autoscaler (HPA) based on CPU utilization.\n\nUpdate the StatefulSet to include resource requests and limits:\n\n```yaml\n        resources:\n          requests:\n            memory: \"512Mi\"\n            cpu: \"250m\"\n          limits:\n            memory: \"1Gi\"\n            cpu: \"500m\"\n```\n\nNow, create the HPA:\n\n```yaml\napiVersion: autoscaling/v2beta2\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: postgres-hpa\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: StatefulSet\n    name: postgres\n  minReplicas: 1\n  maxReplicas: 5\n  metrics:\n  - type: Resource\n    resource:\n      name: cpu\n      target:\n        type: Utilization\n        averageUtilization: 50\n```\n\n### 6. Apply the Configuration\n\nYou can apply all the above configurations using `kubectl`:\n\n```bash\nkubectl apply -f persistent-volume.yaml\nkubectl apply -f persistent-volume-claim.yaml\nkubectl apply -f statefulset.yaml\nkubectl apply -f service.yaml\nkubectl apply -f hpa.yaml\n```\n\n### Summary\n\nThis setup includes:\n- A StatefulSet for managing the stateful application (PostgreSQL).\n- Persistent storage using Persistent Volumes and Persistent Volume Claims.\n- A headless service for network identity.\n- Horizontal Pod Autoscaler to scale the number of replicas based on CPU utilization.\n\nMake sure to adjust the storage class and other configurations based on your specific cloud provider or on-premises setup.",
+          "output": "Designing a Kubernetes deployment for a stateful application with horizontal pod autoscaling and persistent storage involves several key components. Below is a step-by-step guide to achieve this, including the necessary YAML configurations.\n\n### 1. Define the StatefulSet\n\nA StatefulSet is used for deploying stateful applications. It provides guarantees about the ordering and uniqueness of pods.\n\n```yaml\napiVersion: apps/v1\nkind: StatefulSet\nmetadata:\n  name: my-stateful-app\nspec:\n  serviceName: \"my-stateful-app\"\n  replicas: 3\n  selector:\n    matchLabels:\n      app: my-stateful-app\n  template:\n    metadata:\n      labels:\n        app: my-stateful-app\n    spec:\n      containers:\n      - name: my-app-container\n        image: my-app-image:latest\n        ports:\n        - containerPort: 8080\n        volumeMounts:\n        - name: my-persistent-storage\n          mountPath: /data\n  volumeClaimTemplates:\n  - metadata:\n      name: my-persistent-storage\n    spec:\n      accessModes: [ \"ReadWriteOnce\" ]\n      resources:\n        requests:\n          storage: 10Gi\n```\n\n### 2. Define the Headless Service\n\nA headless service is required for StatefulSets to manage the network identity of the pods.\n\n```yaml\napiVersion: v1\nkind: Service\nmetadata:\n  name: my-stateful-app\nspec:\n  clusterIP: None\n  selector:\n    app: my-stateful-app\n  ports:\n  - port: 8080\n    targetPort: 8080\n```\n\n### 3. Configure Horizontal Pod Autoscaler (HPA)\n\nTo enable horizontal pod autoscaling, you need to define an HPA resource. The HPA will scale the number of replicas based on CPU utilization or other metrics.\n\n```yaml\napiVersion: autoscaling/v2beta2\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: my-stateful-app-hpa\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: StatefulSet\n    name: my-stateful-app\n  minReplicas: 3\n  maxReplicas: 10\n  metrics:\n  - type: Resource\n    resource:\n      name: cpu\n      target:\n        type: Utilization\n        averageUtilization: 50\n```\n\n### 4. Persistent Volume and Persistent Volume Claim (Optional)\n\nIf you want to manage persistent storage explicitly, you can define a Persistent Volume (PV) and a Persistent Volume Claim (PVC). However, in the StatefulSet definition above, the volumeClaimTemplates automatically create PVCs.\n\n```yaml\napiVersion: v1\nkind: PersistentVolume\nmetadata:\n  name: my-pv\nspec:\n  capacity:\n    storage: 10Gi\n  accessModes:\n    - ReadWriteOnce\n  hostPath:\n    path: /data/my-app\n---\napiVersion: v1\nkind: PersistentVolumeClaim\nmetadata:\n  name: my-pvc\nspec:\n  accessModes:\n    - ReadWriteOnce\n  resources:\n    requests:\n      storage: 10Gi\n```\n\n### 5. Deploy the Resources\n\nYou can deploy the above resources using `kubectl`:\n\n```bash\nkubectl apply -f my-stateful-app-service.yaml\nkubectl apply -f my-stateful-app-statefulset.yaml\nkubectl apply -f my-stateful-app-hpa.yaml\n```\n\n### Summary\n\nThis setup includes:\n- A **StatefulSet** for managing the stateful application with persistent storage.\n- A **headless service** to manage network identities.\n- A **Horizontal Pod Autoscaler** to scale the application based on CPU utilization.\n\nMake sure to adjust the resource requests and limits in the container spec according to your application's needs to ensure the HPA can function correctly. Additionally, consider using a cloud provider's managed storage solution (like EBS for AWS, Persistent Disks for GCP, or Azure Disks) for production workloads to ensure high availability and durability.",
           "tokenUsage": {
-            "total": 1393,
+            "total": 1296,
             "prompt": 451,
-            "completion": 942,
+            "completion": 845,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 17377,
+          "latencyMs": 17940,
           "finishReason": "stop",
-          "cost": 0.0006328499999999999,
+          "cost": 0.0005746499999999999,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442c4d9878c2fd-IAH",
+                "cf-ray": "9e4919671f6dc2fe-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:54:44 GMT",
+                "date": "Mon, 30 Mar 2026 18:15:39 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "17091",
+                "openai-processing-ms": "17713",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=Fw4qXYiEY99RLH19NPBvie_hlZvNiJowVJHET8kdegw-1774842866.8118532-1.0.1.1-qneMI6wTpyLdNokk38aaoM83Xj.7616TffUrluj3stgnfjJH92pKUeyN25e3YsGC_kOEGvSWm05ryw8CDO4WwMj.TUUfnv3k3m79WnWq3QudJmJRxUl1.i3WOOY8qrDb; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:44 GMT",
+                "set-cookie": "__cf_bm=a_.THJ.OIHKKSeFWaz.tc7fvmoDxS83qhtkkmPBvzhc-1774894521.4592888-1.0.1.1-yuBu5LdusG.vqtswpjRgTtvJVYlzuFfNL7k4wpd8QXYvObyJcsrYgi.sTRjzUdgpeHYrktDCME4_JpQJ74b3R0yEOCVpUEUqHQnEAkbXEIjtOkrcZif60D8XSXn6wVWt; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:45:39 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
-                "x-ratelimit-remaining-tokens": "199473",
-                "x-ratelimit-reset-requests": "1h5m19.07s",
+                "x-ratelimit-remaining-requests": "9097",
+                "x-ratelimit-remaining-tokens": "199474",
+                "x-ratelimit-reset-requests": "2h9m55.388s",
                 "x-ratelimit-reset-tokens": "157ms",
-                "x-request-id": "req_d9cc2f2aed8d4520866069e98b2c27ba"
+                "x-request-id": "req_3bf25ead75c145df8656a8bc6f90963f"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442c4d9878c2fd-IAH",
+              "cf-ray": "9e4919671f6dc2fe-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:54:44 GMT",
+              "date": "Mon, 30 Mar 2026 18:15:39 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "17091",
+              "openai-processing-ms": "17713",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=Fw4qXYiEY99RLH19NPBvie_hlZvNiJowVJHET8kdegw-1774842866.8118532-1.0.1.1-qneMI6wTpyLdNokk38aaoM83Xj.7616TffUrluj3stgnfjJH92pKUeyN25e3YsGC_kOEGvSWm05ryw8CDO4WwMj.TUUfnv3k3m79WnWq3QudJmJRxUl1.i3WOOY8qrDb; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:44 GMT",
+              "set-cookie": "__cf_bm=a_.THJ.OIHKKSeFWaz.tc7fvmoDxS83qhtkkmPBvzhc-1774894521.4592888-1.0.1.1-yuBu5LdusG.vqtswpjRgTtvJVYlzuFfNL7k4wpd8QXYvObyJcsrYgi.sTRjzUdgpeHYrktDCME4_JpQJ74b3R0yEOCVpUEUqHQnEAkbXEIjtOkrcZif60D8XSXn6wVWt; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:45:39 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
-              "x-ratelimit-remaining-tokens": "199473",
-              "x-ratelimit-reset-requests": "1h5m19.07s",
+              "x-ratelimit-remaining-requests": "9097",
+              "x-ratelimit-remaining-tokens": "199474",
+              "x-ratelimit-reset-requests": "2h9m55.388s",
               "x-ratelimit-reset-tokens": "157ms",
-              "x-request-id": "req_d9cc2f2aed8d4520866069e98b2c27ba"
+              "x-request-id": "req_3bf25ead75c145df8656a8bc6f90963f"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 451,
-        "completion": 942,
+        "completion": 845,
         "cached": 0,
-        "total": 1393,
+        "total": 1296,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1213,
-          "prompt": 1161,
-          "completion": 52,
+          "total": 1113,
+          "prompt": 1064,
+          "completion": 49,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 18596,
-      "evaluationDurationMs": 18596
+      "durationMs": 19923,
+      "evaluationDurationMs": 19923
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:54:45.378Z",
-    "evaluationCreatedAt": "2026-03-30T03:54:26.744Z"
+    "exportedAt": "2026-03-30T18:15:41.361Z",
+    "evaluationCreatedAt": "2026-03-30T18:15:21.397Z"
   }
 }

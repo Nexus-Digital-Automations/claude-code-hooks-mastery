@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-diO-2026-03-30T03:52:41",
+  "evalId": "eval-9M9-2026-03-30T18:13:23",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:52:41.304Z",
+    "timestamp": "2026-03-30T18:13:23.155Z",
     "prompts": [
       {
         "id": "22b8f66451ac00bdfa83b60e0cb9b75332a55de1f623cb83be2f9f0349dbc89e",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 14078,
+          "totalLatencyMs": 19566,
           "tokenUsage": {
             "prompt": 409,
-            "completion": 1053,
+            "completion": 1056,
             "cached": 0,
-            "total": 1462,
+            "total": 1465,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1303,
-              "prompt": 1253,
+              "total": 1306,
+              "prompt": 1256,
               "completion": 50,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "frontend-developer_quality": 1
           },
-          "cost": 0.00069315
+          "cost": 0.00069495
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00069315,
+        "cost": 0.00069495,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "frontend-developer_quality": 1
           },
           "tokensUsed": {
-            "total": 1303,
-            "prompt": 1253,
+            "total": 1306,
+            "prompt": 1256,
             "completion": 50,
             "cached": 0,
             "numRequests": 1
@@ -80,8 +80,8 @@
               "score": 1,
               "reason": "The output correctly uses React hooks for state management, implements virtualization using the 'react-window' library, and handles loading and empty states appropriately.",
               "tokensUsed": {
-                "total": 1303,
-                "prompt": 1253,
+                "total": 1306,
+                "prompt": 1256,
                 "completion": 50,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo implement an infinite scroll list with virtualization and loading states in a React application, we can use the `react-window` library for virtualization and manage the loading state with React's built-in hooks. Below is a complete example of how to create such a component.\\n\\n### Step 1: Install Required Packages\\n\\nFirst, make sure you have the necessary packages installed. You can install `react-window` and `axios` (for data fetching) using npm or yarn:\\n\\n```bash\\nnpm install react-window axios\\n```\\n\\n### Step 2: Create the Infinite Scroll List Component\\n\\nHere's a complete implementation of an infinite scroll list with virtualization and loading states:\\n\\n```jsx\\nimport React, { useState, useEffect, useCallback } from 'react';\\nimport { FixedSizeList as List } from 'react-window';\\nimport axios from 'axios';\\n\\nconst ITEM_HEIGHT = 35; // Height of each item in pixels\\nconst INITIAL_LOAD_COUNT = 20; // Initial number of items to load\\nconst LOAD_MORE_COUNT = 10; // Number of items to load on scroll\\n\\nconst InfiniteScrollList = () => {\\n  const [items, setItems] = useState([]);\\n  const [loading, setLoading] = useState(false);\\n  const [hasMore, setHasMore] = useState(true);\\n  const [offset, setOffset] = useState(0);\\n\\n  const fetchItems = useCallback(async () => {\\n    if (loading || !hasMore) return;\\n\\n    setLoading(true);\\n    try {\\n      const response = await axios.get(`/api/items?offset=${offset}&limit=${LOAD_MORE_COUNT}`);\\n      const newItems = response.data.items;\\n\\n      setItems((prevItems) => [...prevItems, ...newItems]);\\n      setHasMore(newItems.length === LOAD_MORE_COUNT);\\n      setOffset((prevOffset) => prevOffset + LOAD_MORE_COUNT);\\n    } catch (error) {\\n      console.error('Error fetching items:', error);\\n    } finally {\\n      setLoading(false);\\n    }\\n  }, [loading, hasMore, offset]);\\n\\n  useEffect(() => {\\n    fetchItems();\\n  }, [fetchItems]);\\n\\n  const loadMoreItems = ({ scrollOffset, clientHeight, scrollHeight }) => {\\n    if (scrollHeight - scrollOffset <= clientHeight + 100 && hasMore) {\\n      fetchItems();\\n    }\\n  };\\n\\n  return (\\n    <div\\n      style={{ height: '400px', overflowY: 'auto' }}\\n      onScroll={(e) => loadMoreItems(e.target)}\\n    >\\n      <List\\n        height={400}\\n        itemCount={items.length}\\n        itemSize={ITEM_HEIGHT}\\n        width=\\\"100%\\\"\\n      >\\n        {({ index, style }) => (\\n          <div style={style} className=\\\"item\\\">\\n            {items[index]}\\n          </div>\\n        )}\\n      </List>\\n      {loading && <div>Loading...</div>}\\n      {!hasMore && <div>No more items to load</div>}\\n    </div>\\n  );\\n};\\n\\nexport default InfiniteScrollList;\\n```\\n\\n### Step 3: API Endpoint\\n\\nFor this example, you need an API endpoint that returns a paginated list of items. Here's a simple example of how you might implement this in a Node.js/Express server:\\n\\n```javascript\\nconst express = require('express');\\nconst app = express();\\nconst PORT = 3000;\\n\\nconst items = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`);\\n\\napp.get('/api/items', (req, res) => {\\n  const offset = parseInt(req.query.offset) || 0;\\n  const limit = parseInt(req.query.limit) || 10;\\n  const paginatedItems = items.slice(offset, offset + limit);\\n  res.json({ items: paginatedItems });\\n});\\n\\napp.listen(PORT, () => {\\n  console.log(`Server is running on http://localhost:${PORT}`);\\n});\\n```\\n\\n### Step 4: Usage\\n\\nYou can now use the `InfiniteScrollList` component in your application:\\n\\n```jsx\\nimport React from 'react';\\nimport InfiniteScrollList from './InfiniteScrollList';\\n\\nconst App = () => {\\n  return (\\n    <div>\\n      <h1>Infinite Scroll List</h1>\\n      <InfiniteScrollList />\\n    </div>\\n  );\\n};\\n\\nexport default App;\\n```\\n\\n### Explanation\\n\\n1. **State Management**: The component maintains state for items, loading status, and pagination.\\n2. **Data Fetching**: The `fetchItems` function fetches data from the API and updates the state.\\n3. **Virtualization**: The `react-window` library is used to render only the visible items, improving performance.\\n4. **Infinite Scroll Logic**: The `loadMoreItems` function checks if the user has scrolled near the bottom of the list and triggers a fetch for more items if applicable.\\n5. **Loading States**: A loading indicator is displayed while fetching data, and a message is shown when there are no more items to load.\\n\\nThis implementation provides a solid foundation for an infinite scroll list with virtualization and loading states in a React application.\\n</Output>\\n<Rubric>\\nUses React hooks correctly, implements virtualization (react-virtual or similar), handles loading/error/empty states\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo implement an infinite scroll list with virtualization and loading states in a React application, we can use the `react-window` library for virtualization and manage the loading state with React's built-in hooks. Below is a complete example of how to create such a component.\\n\\n### Step 1: Install Required Packages\\n\\nFirst, make sure you have the necessary packages installed. You can install `react-window` and `axios` (for data fetching) using npm or yarn:\\n\\n```bash\\nnpm install react-window axios\\n```\\n\\n### Step 2: Create the Infinite Scroll List Component\\n\\nHere's a complete implementation of an infinite scroll list with virtualization and loading states:\\n\\n```jsx\\nimport React, { useState, useEffect, useCallback } from 'react';\\nimport { FixedSizeList as List } from 'react-window';\\nimport axios from 'axios';\\n\\nconst ITEM_HEIGHT = 35; // Height of each item in pixels\\nconst INITIAL_LOAD_COUNT = 20; // Initial number of items to load\\nconst LOAD_MORE_COUNT = 10; // Number of items to load on scroll\\n\\nconst InfiniteScrollList = () => {\\n  const [items, setItems] = useState([]);\\n  const [loading, setLoading] = useState(false);\\n  const [hasMore, setHasMore] = useState(true);\\n  const [offset, setOffset] = useState(0);\\n\\n  const fetchItems = useCallback(async () => {\\n    if (loading || !hasMore) return;\\n\\n    setLoading(true);\\n    try {\\n      const response = await axios.get(`/api/items?offset=${offset}&limit=${LOAD_MORE_COUNT}`);\\n      const newItems = response.data.items;\\n\\n      setItems((prevItems) => [...prevItems, ...newItems]);\\n      setHasMore(newItems.length === LOAD_MORE_COUNT);\\n      setOffset((prevOffset) => prevOffset + LOAD_MORE_COUNT);\\n    } catch (error) {\\n      console.error('Error fetching items:', error);\\n    } finally {\\n      setLoading(false);\\n    }\\n  }, [loading, hasMore, offset]);\\n\\n  useEffect(() => {\\n    fetchItems();\\n  }, [fetchItems]);\\n\\n  const loadMoreItems = ({ scrollOffset, clientHeight, scrollHeight }) => {\\n    if (scrollHeight - scrollOffset <= clientHeight + 100 && hasMore) {\\n      fetchItems();\\n    }\\n  };\\n\\n  return (\\n    <div\\n      style={{ height: '400px', overflowY: 'auto' }}\\n      onScroll={(e) => loadMoreItems(e.target)}\\n    >\\n      <List\\n        height={400}\\n        itemCount={items.length}\\n        itemSize={ITEM_HEIGHT}\\n        width=\\\"100%\\\"\\n      >\\n        {({ index, style }) => (\\n          <div style={style} className=\\\"item\\\">\\n            {items[index]}\\n          </div>\\n        )}\\n      </List>\\n      {loading && <div>Loading...</div>}\\n      {!hasMore && <div>No more items to load</div>}\\n    </div>\\n  );\\n};\\n\\nexport default InfiniteScrollList;\\n```\\n\\n### Step 3: API Endpoint\\n\\nFor this example, you need an API endpoint that returns a paginated list of items. Here's a simple example of how you might implement this in a Node.js/Express server:\\n\\n```javascript\\nconst express = require('express');\\nconst app = express();\\nconst PORT = 3000;\\n\\nconst items = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`);\\n\\napp.get('/api/items', (req, res) => {\\n  const offset = parseInt(req.query.offset) || 0;\\n  const limit = parseInt(req.query.limit) || 10;\\n  const paginatedItems = items.slice(offset, offset + limit);\\n  res.json({ items: paginatedItems });\\n});\\n\\napp.listen(PORT, () => {\\n  console.log(`Server is running on http://localhost:${PORT}`);\\n});\\n```\\n\\n### Explanation\\n\\n1. **State Management**: The component maintains state for the list of items, loading status, and whether more items are available.\\n2. **Data Fetching**: The `fetchItems` function fetches items from the API and updates the state accordingly.\\n3. **Virtualization**: The `react-window` library is used to render only the visible items in the list, improving performance.\\n4. **Infinite Scroll**: The `loadMoreItems` function checks if the user has scrolled near the bottom of the list and triggers loading more items if available.\\n5. **Loading State**: A loading indicator is displayed while new items are being fetched.\\n\\n### Usage\\n\\nYou can use the `InfiniteScrollList` component in your application like this:\\n\\n```jsx\\nimport React from 'react';\\nimport InfiniteScrollList from './InfiniteScrollList';\\n\\nconst App = () => {\\n  return (\\n    <div>\\n      <h1>Infinite Scroll List</h1>\\n      <InfiniteScrollList />\\n    </div>\\n  );\\n};\\n\\nexport default App;\\n```\\n\\nThis setup provides a fully functional infinite scroll list with virtualization and loading states. Adjust the API endpoint and item rendering as needed for your specific use case.\\n</Output>\\n<Rubric>\\nUses React hooks correctly, implements virtualization (react-virtual or similar), handles loading/error/empty states\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "177bda86-8772-4cf7-bf3a-293801e7ab29",
-        "latencyMs": 14078,
+        "id": "f53cfcfb-cd22-467d-9825-f21dfd356890",
+        "latencyMs": 19566,
         "namedScores": {
           "frontend-developer_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To implement an infinite scroll list with virtualization and loading states in a React application, we can use the `react-window` library for virtualization and manage the loading state with React's built-in hooks. Below is a complete example of how to create such a component.\n\n### Step 1: Install Required Packages\n\nFirst, make sure you have the necessary packages installed. You can install `react-window` and `axios` (for data fetching) using npm or yarn:\n\n```bash\nnpm install react-window axios\n```\n\n### Step 2: Create the Infinite Scroll List Component\n\nHere's a complete implementation of an infinite scroll list with virtualization and loading states:\n\n```jsx\nimport React, { useState, useEffect, useCallback } from 'react';\nimport { FixedSizeList as List } from 'react-window';\nimport axios from 'axios';\n\nconst ITEM_HEIGHT = 35; // Height of each item in pixels\nconst INITIAL_LOAD_COUNT = 20; // Initial number of items to load\nconst LOAD_MORE_COUNT = 10; // Number of items to load on scroll\n\nconst InfiniteScrollList = () => {\n  const [items, setItems] = useState([]);\n  const [loading, setLoading] = useState(false);\n  const [hasMore, setHasMore] = useState(true);\n  const [offset, setOffset] = useState(0);\n\n  const fetchItems = useCallback(async () => {\n    if (loading || !hasMore) return;\n\n    setLoading(true);\n    try {\n      const response = await axios.get(`/api/items?offset=${offset}&limit=${LOAD_MORE_COUNT}`);\n      const newItems = response.data.items;\n\n      setItems((prevItems) => [...prevItems, ...newItems]);\n      setHasMore(newItems.length === LOAD_MORE_COUNT);\n      setOffset((prevOffset) => prevOffset + LOAD_MORE_COUNT);\n    } catch (error) {\n      console.error('Error fetching items:', error);\n    } finally {\n      setLoading(false);\n    }\n  }, [loading, hasMore, offset]);\n\n  useEffect(() => {\n    fetchItems();\n  }, [fetchItems]);\n\n  const loadMoreItems = ({ scrollOffset, clientHeight, scrollHeight }) => {\n    if (scrollHeight - scrollOffset <= clientHeight + 100 && hasMore) {\n      fetchItems();\n    }\n  };\n\n  return (\n    <div\n      style={{ height: '400px', overflowY: 'auto' }}\n      onScroll={(e) => loadMoreItems(e.target)}\n    >\n      <List\n        height={400}\n        itemCount={items.length}\n        itemSize={ITEM_HEIGHT}\n        width=\"100%\"\n      >\n        {({ index, style }) => (\n          <div style={style} className=\"item\">\n            {items[index]}\n          </div>\n        )}\n      </List>\n      {loading && <div>Loading...</div>}\n      {!hasMore && <div>No more items to load</div>}\n    </div>\n  );\n};\n\nexport default InfiniteScrollList;\n```\n\n### Step 3: API Endpoint\n\nFor this example, you need an API endpoint that returns a paginated list of items. Here's a simple example of how you might implement this in a Node.js/Express server:\n\n```javascript\nconst express = require('express');\nconst app = express();\nconst PORT = 3000;\n\nconst items = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`);\n\napp.get('/api/items', (req, res) => {\n  const offset = parseInt(req.query.offset) || 0;\n  const limit = parseInt(req.query.limit) || 10;\n  const paginatedItems = items.slice(offset, offset + limit);\n  res.json({ items: paginatedItems });\n});\n\napp.listen(PORT, () => {\n  console.log(`Server is running on http://localhost:${PORT}`);\n});\n```\n\n### Step 4: Usage\n\nYou can now use the `InfiniteScrollList` component in your application:\n\n```jsx\nimport React from 'react';\nimport InfiniteScrollList from './InfiniteScrollList';\n\nconst App = () => {\n  return (\n    <div>\n      <h1>Infinite Scroll List</h1>\n      <InfiniteScrollList />\n    </div>\n  );\n};\n\nexport default App;\n```\n\n### Explanation\n\n1. **State Management**: The component maintains state for items, loading status, and pagination.\n2. **Data Fetching**: The `fetchItems` function fetches data from the API and updates the state.\n3. **Virtualization**: The `react-window` library is used to render only the visible items, improving performance.\n4. **Infinite Scroll Logic**: The `loadMoreItems` function checks if the user has scrolled near the bottom of the list and triggers a fetch for more items if applicable.\n5. **Loading States**: A loading indicator is displayed while fetching data, and a message is shown when there are no more items to load.\n\nThis implementation provides a solid foundation for an infinite scroll list with virtualization and loading states in a React application.",
+          "output": "To implement an infinite scroll list with virtualization and loading states in a React application, we can use the `react-window` library for virtualization and manage the loading state with React's built-in hooks. Below is a complete example of how to create such a component.\n\n### Step 1: Install Required Packages\n\nFirst, make sure you have the necessary packages installed. You can install `react-window` and `axios` (for data fetching) using npm or yarn:\n\n```bash\nnpm install react-window axios\n```\n\n### Step 2: Create the Infinite Scroll List Component\n\nHere's a complete implementation of an infinite scroll list with virtualization and loading states:\n\n```jsx\nimport React, { useState, useEffect, useCallback } from 'react';\nimport { FixedSizeList as List } from 'react-window';\nimport axios from 'axios';\n\nconst ITEM_HEIGHT = 35; // Height of each item in pixels\nconst INITIAL_LOAD_COUNT = 20; // Initial number of items to load\nconst LOAD_MORE_COUNT = 10; // Number of items to load on scroll\n\nconst InfiniteScrollList = () => {\n  const [items, setItems] = useState([]);\n  const [loading, setLoading] = useState(false);\n  const [hasMore, setHasMore] = useState(true);\n  const [offset, setOffset] = useState(0);\n\n  const fetchItems = useCallback(async () => {\n    if (loading || !hasMore) return;\n\n    setLoading(true);\n    try {\n      const response = await axios.get(`/api/items?offset=${offset}&limit=${LOAD_MORE_COUNT}`);\n      const newItems = response.data.items;\n\n      setItems((prevItems) => [...prevItems, ...newItems]);\n      setHasMore(newItems.length === LOAD_MORE_COUNT);\n      setOffset((prevOffset) => prevOffset + LOAD_MORE_COUNT);\n    } catch (error) {\n      console.error('Error fetching items:', error);\n    } finally {\n      setLoading(false);\n    }\n  }, [loading, hasMore, offset]);\n\n  useEffect(() => {\n    fetchItems();\n  }, [fetchItems]);\n\n  const loadMoreItems = ({ scrollOffset, clientHeight, scrollHeight }) => {\n    if (scrollHeight - scrollOffset <= clientHeight + 100 && hasMore) {\n      fetchItems();\n    }\n  };\n\n  return (\n    <div\n      style={{ height: '400px', overflowY: 'auto' }}\n      onScroll={(e) => loadMoreItems(e.target)}\n    >\n      <List\n        height={400}\n        itemCount={items.length}\n        itemSize={ITEM_HEIGHT}\n        width=\"100%\"\n      >\n        {({ index, style }) => (\n          <div style={style} className=\"item\">\n            {items[index]}\n          </div>\n        )}\n      </List>\n      {loading && <div>Loading...</div>}\n      {!hasMore && <div>No more items to load</div>}\n    </div>\n  );\n};\n\nexport default InfiniteScrollList;\n```\n\n### Step 3: API Endpoint\n\nFor this example, you need an API endpoint that returns a paginated list of items. Here's a simple example of how you might implement this in a Node.js/Express server:\n\n```javascript\nconst express = require('express');\nconst app = express();\nconst PORT = 3000;\n\nconst items = Array.from({ length: 100 }, (_, i) => `Item ${i + 1}`);\n\napp.get('/api/items', (req, res) => {\n  const offset = parseInt(req.query.offset) || 0;\n  const limit = parseInt(req.query.limit) || 10;\n  const paginatedItems = items.slice(offset, offset + limit);\n  res.json({ items: paginatedItems });\n});\n\napp.listen(PORT, () => {\n  console.log(`Server is running on http://localhost:${PORT}`);\n});\n```\n\n### Explanation\n\n1. **State Management**: The component maintains state for the list of items, loading status, and whether more items are available.\n2. **Data Fetching**: The `fetchItems` function fetches items from the API and updates the state accordingly.\n3. **Virtualization**: The `react-window` library is used to render only the visible items in the list, improving performance.\n4. **Infinite Scroll**: The `loadMoreItems` function checks if the user has scrolled near the bottom of the list and triggers loading more items if available.\n5. **Loading State**: A loading indicator is displayed while new items are being fetched.\n\n### Usage\n\nYou can use the `InfiniteScrollList` component in your application like this:\n\n```jsx\nimport React from 'react';\nimport InfiniteScrollList from './InfiniteScrollList';\n\nconst App = () => {\n  return (\n    <div>\n      <h1>Infinite Scroll List</h1>\n      <InfiniteScrollList />\n    </div>\n  );\n};\n\nexport default App;\n```\n\nThis setup provides a fully functional infinite scroll list with virtualization and loading states. Adjust the API endpoint and item rendering as needed for your specific use case.",
           "tokenUsage": {
-            "total": 1462,
+            "total": 1465,
             "prompt": 409,
-            "completion": 1053,
+            "completion": 1056,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 14078,
+          "latencyMs": 19566,
           "finishReason": "stop",
-          "cost": 0.00069315,
+          "cost": 0.00069495,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4429ba8aeb70e1-IAH",
+                "cf-ray": "9e491684397bcbf9-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:52:55 GMT",
+                "date": "Mon, 30 Mar 2026 18:13:42 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "13787",
+                "openai-processing-ms": "19208",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=eMkbR7oVXsBbozE7lws_FL4r8hyxsiI5Pl8omSLjd0U-1774842761.367954-1.0.1.1-OM2N.0mUc.RqMYr74EQyg5JhFF9mno43nltVNI16hVdU4Y4pBDYads6.u0CXR7FuRlV5byBijp9wA6XTviqDA0V3hj6LquzLzaMcjsAEV.YLciXCevtTl4nsKIaQXcxM; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:22:55 GMT",
+                "set-cookie": "__cf_bm=mAWUCBvX3j3LIkQi3j9UxXcC37ZlMqirY4G23EtXm8g-1774894403.2382505-1.0.1.1-kNOU93Y3hXdYB5VedIU8T.kZhARL3sJXC7_o1PTmZKEqV2x11oS8KoOZNbcFM2A8W0bl7cxL4r9zEwkvctV9wbv1vxfF5rUDG2QYWb_zsYrtXp1RucKlCRv4URJa42Cr; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:43:42 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9548",
+                "x-ratelimit-remaining-requests": "9110",
                 "x-ratelimit-remaining-tokens": "199472",
-                "x-ratelimit-reset-requests": "1h5m3.555s",
+                "x-ratelimit-reset-requests": "2h8m8.817s",
                 "x-ratelimit-reset-tokens": "158ms",
-                "x-request-id": "req_69fd1e77dd594ef8b7019488f286f848"
+                "x-request-id": "req_8bf3836ee8c64bc6bf0cbb3866ed8702"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4429ba8aeb70e1-IAH",
+              "cf-ray": "9e491684397bcbf9-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:52:55 GMT",
+              "date": "Mon, 30 Mar 2026 18:13:42 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "13787",
+              "openai-processing-ms": "19208",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=eMkbR7oVXsBbozE7lws_FL4r8hyxsiI5Pl8omSLjd0U-1774842761.367954-1.0.1.1-OM2N.0mUc.RqMYr74EQyg5JhFF9mno43nltVNI16hVdU4Y4pBDYads6.u0CXR7FuRlV5byBijp9wA6XTviqDA0V3hj6LquzLzaMcjsAEV.YLciXCevtTl4nsKIaQXcxM; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:22:55 GMT",
+              "set-cookie": "__cf_bm=mAWUCBvX3j3LIkQi3j9UxXcC37ZlMqirY4G23EtXm8g-1774894403.2382505-1.0.1.1-kNOU93Y3hXdYB5VedIU8T.kZhARL3sJXC7_o1PTmZKEqV2x11oS8KoOZNbcFM2A8W0bl7cxL4r9zEwkvctV9wbv1vxfF5rUDG2QYWb_zsYrtXp1RucKlCRv4URJa42Cr; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:43:42 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9548",
+              "x-ratelimit-remaining-requests": "9110",
               "x-ratelimit-remaining-tokens": "199472",
-              "x-ratelimit-reset-requests": "1h5m3.555s",
+              "x-ratelimit-reset-requests": "2h8m8.817s",
               "x-ratelimit-reset-tokens": "158ms",
-              "x-request-id": "req_69fd1e77dd594ef8b7019488f286f848"
+              "x-request-id": "req_8bf3836ee8c64bc6bf0cbb3866ed8702"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 409,
-        "completion": 1053,
+        "completion": 1056,
         "cached": 0,
-        "total": 1462,
+        "total": 1465,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1303,
-          "prompt": 1253,
+          "total": 1306,
+          "prompt": 1256,
           "completion": 50,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 15344,
-      "evaluationDurationMs": 15344
+      "durationMs": 21070,
+      "evaluationDurationMs": 21070
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:52:56.683Z",
-    "evaluationCreatedAt": "2026-03-30T03:52:41.304Z"
+    "exportedAt": "2026-03-30T18:13:44.265Z",
+    "evaluationCreatedAt": "2026-03-30T18:13:23.155Z"
   }
 }

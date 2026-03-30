@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-aQR-2026-03-30T03:53:36",
+  "evalId": "eval-M9n-2026-03-30T18:14:22",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:53:36.493Z",
+    "timestamp": "2026-03-30T18:14:22.087Z",
     "prompts": [
       {
         "id": "902fe187bb1c0dd6729426e009778d6fdda0ea045ec624dceb693738b147ec3d",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 11186,
+          "totalLatencyMs": 14553,
           "tokenUsage": {
             "prompt": 412,
-            "completion": 779,
+            "completion": 691,
             "cached": 0,
-            "total": 1191,
+            "total": 1103,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1029,
-              "prompt": 976,
-              "completion": 53,
+              "total": 940,
+              "prompt": 888,
+              "completion": 52,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "incident-responder_quality": 1
           },
-          "cost": 0.0005292
+          "cost": 0.0004764
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0005292,
+        "cost": 0.0004764,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "incident-responder_quality": 1
           },
           "tokensUsed": {
-            "total": 1029,
-            "prompt": 976,
-            "completion": 53,
+            "total": 940,
+            "prompt": 888,
+            "completion": 52,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output outlines a clear incident command structure, immediate mitigation steps, a communication plan, and an investigation protocol, all of which align with the rubric requirements.",
+              "reason": "The output outlines a clear incident command structure, immediate mitigation steps, a communication plan, and a structured investigation process, fulfilling all aspects of the rubric.",
               "tokensUsed": {
-                "total": 1029,
-                "prompt": 976,
-                "completion": 53,
+                "total": 940,
+                "prompt": 888,
+                "completion": 52,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n### Immediate Actions (First 5 minutes)\\n\\n#### 1. Assess Severity & Impact\\n- **User Impact**: \\n  - 20% of transactions are failing with 500 errors.\\n  - Estimate the affected user count based on transaction volume (e.g., if 1,000 transactions are processed per minute, approximately 200 users are impacted every minute).\\n  - Geographic distribution: Identify if the issue is localized or widespread.\\n  - User journey disruption: Determine at which point in the transaction the errors occur.\\n\\n- **Business Impact**: \\n  - Calculate potential revenue loss based on average transaction value and failure rate.\\n  - Identify any SLA violations that may occur due to this incident.\\n  - Assess customer experience degradation and potential churn.\\n\\n- **System Scope**: \\n  - Identify the payment service and any dependent services (e.g., user authentication, inventory management).\\n  - Assess the blast radius to understand which parts of the system are affected.\\n\\n- **External Factors**: \\n  - Check for peak usage times or scheduled events that may exacerbate the issue.\\n\\n#### 2. Establish Incident Command\\n- **Incident Commander**: Assign a single decision-maker (e.g., a senior SRE or engineering manager).\\n- **Communication Lead**: Designate someone to manage stakeholder updates and external communication (e.g., a product manager).\\n- **Technical Lead**: Appoint a technical lead to coordinate the investigation and resolution (e.g., a senior engineer from the payment service team).\\n- **War Room Setup**: \\n  - Create a dedicated communication channel (e.g., Slack or Microsoft Teams).\\n  - Set up a video call for real-time collaboration.\\n  - Prepare shared documents for tracking actions and findings.\\n\\n#### 3. Immediate Stabilization\\n- **Quick Wins**: \\n  - Consider implementing traffic throttling to reduce load on the payment service.\\n  - Evaluate the use of feature flags to disable non-critical features that may be contributing to the issue.\\n  - Check for circuit breakers that can be activated to prevent further strain on the service.\\n\\n- **Rollback Assessment**: \\n  - Review recent deployments or configuration changes that may have introduced the issue.\\n  - Prepare to roll back any recent changes if they are identified as the cause.\\n\\n- **Resource Scaling**: \\n  - Check auto-scaling configurations and trigger scaling if necessary.\\n  - Consider manual scaling or load redistribution to alleviate pressure on the payment service.\\n\\n- **Communication**: \\n  - Update the status page with initial findings and estimated impact.\\n  - Send internal notifications to relevant teams to keep them informed of the situation.\\n\\n### Modern Investigation Protocol\\n\\n#### Observability-Driven Investigation\\n- **Distributed Tracing**: \\n  - Use tools like OpenTelemetry, Jaeger, or Zipkin to analyze request flows and identify where the failures are occurring.\\n  \\n- **Metrics Correlation**: \\n  - Utilize Prometheus, Grafana, or DataDog to correlate metrics and identify patterns related to the 500 errors (e.g., CPU usage, memory consumption, request latency).\\n\\n- **Log Aggregation**: \\n  - Analyze logs using ELK, Splunk, or Loki to identify error patterns and stack traces associated with the 500 errors.\\n\\n### Next Steps\\n1. **Gather Data**: Collect relevant metrics, logs, and traces to understand the root cause.\\n2. **Communicate Findings**: Regularly update stakeholders on progress and findings.\\n3. **Implement Fixes**: Once the root cause is identified, implement fixes and monitor the system for stability.\\n4. **Post-Incident Review**: After resolution, conduct a post-incident analysis to identify lessons learned and improve future incident response capabilities.\\n\\nLet’s proceed with the investigation and stabilization steps immediately. Please provide any available metrics, logs, or recent deployment information to expedite the process.\\n</Output>\\n<Rubric>\\nFollows incident command structure, immediate mitigation steps, communication plan, investigation, escalation criteria\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n### Immediate Actions (First 5 minutes)\\n\\n#### 1. Assess Severity & Impact\\n- **User Impact**: \\n  - 20% of transactions are failing with 500 errors.\\n  - Estimate the affected user count based on transaction volume.\\n  - Identify geographic distribution of affected users to prioritize response.\\n  - Determine the user journey disruption (e.g., checkout failures).\\n\\n- **Business Impact**: \\n  - Calculate potential revenue loss based on transaction volume and average transaction value.\\n  - Identify any SLA violations that may occur due to payment failures.\\n  - Assess customer experience degradation and potential churn.\\n\\n- **System Scope**: \\n  - Identify the payment service and any dependent services (e.g., user authentication, order processing).\\n  - Assess the blast radius to understand the extent of the issue.\\n\\n- **External Factors**: \\n  - Check for peak usage times (e.g., holiday sales, promotions).\\n  - Identify any scheduled events that may exacerbate the issue.\\n\\n#### 2. Establish Incident Command\\n- **Incident Commander**: Assign a single decision-maker to coordinate the response.\\n- **Communication Lead**: Designate someone to manage stakeholder updates and external communication.\\n- **Technical Lead**: Appoint a technical lead to coordinate the investigation and resolution efforts.\\n- **War Room Setup**: \\n  - Create a dedicated communication channel (e.g., Slack, Microsoft Teams).\\n  - Set up a video call for real-time collaboration.\\n  - Prepare shared documents for tracking actions and findings.\\n\\n#### 3. Immediate Stabilization\\n- **Quick Wins**: \\n  - Consider implementing traffic throttling to reduce load on the payment service.\\n  - Evaluate the use of feature flags to disable non-critical features that may be causing issues.\\n  - Implement circuit breakers to prevent cascading failures.\\n\\n- **Rollback Assessment**: \\n  - Review recent deployments or configuration changes that may have introduced the issue.\\n  - Prepare to roll back any changes if necessary.\\n\\n- **Resource Scaling**: \\n  - Check auto-scaling triggers and manually scale resources if needed.\\n  - Redistribute load across available instances of the payment service.\\n\\n- **Communication**: \\n  - Update the status page with initial findings and estimated impact.\\n  - Send internal notifications to relevant teams about the incident.\\n\\n### Modern Investigation Protocol\\n\\n#### Observability-Driven Investigation\\n- **Distributed Tracing**: \\n  - Use tools like OpenTelemetry, Jaeger, or Zipkin to analyze request flows and identify where failures are occurring.\\n\\n- **Metrics Correlation**: \\n  - Utilize Prometheus, Grafana, or DataDog to correlate metrics and identify patterns related to the 500 errors (e.g., CPU usage, memory, response times).\\n\\n- **Log Aggregation**: \\n  - Analyze logs using ELK, Splunk, or Loki to identify error patterns and stack traces associated with the 500 errors.\\n\\n### Next Steps\\n1. **Gather Data**: Collect relevant metrics, logs, and traces to understand the root cause.\\n2. **Communicate Findings**: Regularly update stakeholders on progress and findings.\\n3. **Implement Fixes**: Based on investigation results, implement necessary fixes or rollbacks.\\n4. **Post-Incident Review**: Once resolved, conduct a thorough post-incident analysis to identify improvements for future incidents.\\n\\nLet’s proceed with gathering data and assigning roles for the incident response team.\\n</Output>\\n<Rubric>\\nFollows incident command structure, immediate mitigation steps, communication plan, investigation, escalation criteria\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "79d35264-ef25-4315-be52-ed89458ca82d",
-        "latencyMs": 11186,
+        "id": "e39f677a-f84b-4a61-bd0c-63e736f219d4",
+        "latencyMs": 14553,
         "namedScores": {
           "incident-responder_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "### Immediate Actions (First 5 minutes)\n\n#### 1. Assess Severity & Impact\n- **User Impact**: \n  - 20% of transactions are failing with 500 errors.\n  - Estimate the affected user count based on transaction volume (e.g., if 1,000 transactions are processed per minute, approximately 200 users are impacted every minute).\n  - Geographic distribution: Identify if the issue is localized or widespread.\n  - User journey disruption: Determine at which point in the transaction the errors occur.\n\n- **Business Impact**: \n  - Calculate potential revenue loss based on average transaction value and failure rate.\n  - Identify any SLA violations that may occur due to this incident.\n  - Assess customer experience degradation and potential churn.\n\n- **System Scope**: \n  - Identify the payment service and any dependent services (e.g., user authentication, inventory management).\n  - Assess the blast radius to understand which parts of the system are affected.\n\n- **External Factors**: \n  - Check for peak usage times or scheduled events that may exacerbate the issue.\n\n#### 2. Establish Incident Command\n- **Incident Commander**: Assign a single decision-maker (e.g., a senior SRE or engineering manager).\n- **Communication Lead**: Designate someone to manage stakeholder updates and external communication (e.g., a product manager).\n- **Technical Lead**: Appoint a technical lead to coordinate the investigation and resolution (e.g., a senior engineer from the payment service team).\n- **War Room Setup**: \n  - Create a dedicated communication channel (e.g., Slack or Microsoft Teams).\n  - Set up a video call for real-time collaboration.\n  - Prepare shared documents for tracking actions and findings.\n\n#### 3. Immediate Stabilization\n- **Quick Wins**: \n  - Consider implementing traffic throttling to reduce load on the payment service.\n  - Evaluate the use of feature flags to disable non-critical features that may be contributing to the issue.\n  - Check for circuit breakers that can be activated to prevent further strain on the service.\n\n- **Rollback Assessment**: \n  - Review recent deployments or configuration changes that may have introduced the issue.\n  - Prepare to roll back any recent changes if they are identified as the cause.\n\n- **Resource Scaling**: \n  - Check auto-scaling configurations and trigger scaling if necessary.\n  - Consider manual scaling or load redistribution to alleviate pressure on the payment service.\n\n- **Communication**: \n  - Update the status page with initial findings and estimated impact.\n  - Send internal notifications to relevant teams to keep them informed of the situation.\n\n### Modern Investigation Protocol\n\n#### Observability-Driven Investigation\n- **Distributed Tracing**: \n  - Use tools like OpenTelemetry, Jaeger, or Zipkin to analyze request flows and identify where the failures are occurring.\n  \n- **Metrics Correlation**: \n  - Utilize Prometheus, Grafana, or DataDog to correlate metrics and identify patterns related to the 500 errors (e.g., CPU usage, memory consumption, request latency).\n\n- **Log Aggregation**: \n  - Analyze logs using ELK, Splunk, or Loki to identify error patterns and stack traces associated with the 500 errors.\n\n### Next Steps\n1. **Gather Data**: Collect relevant metrics, logs, and traces to understand the root cause.\n2. **Communicate Findings**: Regularly update stakeholders on progress and findings.\n3. **Implement Fixes**: Once the root cause is identified, implement fixes and monitor the system for stability.\n4. **Post-Incident Review**: After resolution, conduct a post-incident analysis to identify lessons learned and improve future incident response capabilities.\n\nLet’s proceed with the investigation and stabilization steps immediately. Please provide any available metrics, logs, or recent deployment information to expedite the process.",
+          "output": "### Immediate Actions (First 5 minutes)\n\n#### 1. Assess Severity & Impact\n- **User Impact**: \n  - 20% of transactions are failing with 500 errors.\n  - Estimate the affected user count based on transaction volume.\n  - Identify geographic distribution of affected users to prioritize response.\n  - Determine the user journey disruption (e.g., checkout failures).\n\n- **Business Impact**: \n  - Calculate potential revenue loss based on transaction volume and average transaction value.\n  - Identify any SLA violations that may occur due to payment failures.\n  - Assess customer experience degradation and potential churn.\n\n- **System Scope**: \n  - Identify the payment service and any dependent services (e.g., user authentication, order processing).\n  - Assess the blast radius to understand the extent of the issue.\n\n- **External Factors**: \n  - Check for peak usage times (e.g., holiday sales, promotions).\n  - Identify any scheduled events that may exacerbate the issue.\n\n#### 2. Establish Incident Command\n- **Incident Commander**: Assign a single decision-maker to coordinate the response.\n- **Communication Lead**: Designate someone to manage stakeholder updates and external communication.\n- **Technical Lead**: Appoint a technical lead to coordinate the investigation and resolution efforts.\n- **War Room Setup**: \n  - Create a dedicated communication channel (e.g., Slack, Microsoft Teams).\n  - Set up a video call for real-time collaboration.\n  - Prepare shared documents for tracking actions and findings.\n\n#### 3. Immediate Stabilization\n- **Quick Wins**: \n  - Consider implementing traffic throttling to reduce load on the payment service.\n  - Evaluate the use of feature flags to disable non-critical features that may be causing issues.\n  - Implement circuit breakers to prevent cascading failures.\n\n- **Rollback Assessment**: \n  - Review recent deployments or configuration changes that may have introduced the issue.\n  - Prepare to roll back any changes if necessary.\n\n- **Resource Scaling**: \n  - Check auto-scaling triggers and manually scale resources if needed.\n  - Redistribute load across available instances of the payment service.\n\n- **Communication**: \n  - Update the status page with initial findings and estimated impact.\n  - Send internal notifications to relevant teams about the incident.\n\n### Modern Investigation Protocol\n\n#### Observability-Driven Investigation\n- **Distributed Tracing**: \n  - Use tools like OpenTelemetry, Jaeger, or Zipkin to analyze request flows and identify where failures are occurring.\n\n- **Metrics Correlation**: \n  - Utilize Prometheus, Grafana, or DataDog to correlate metrics and identify patterns related to the 500 errors (e.g., CPU usage, memory, response times).\n\n- **Log Aggregation**: \n  - Analyze logs using ELK, Splunk, or Loki to identify error patterns and stack traces associated with the 500 errors.\n\n### Next Steps\n1. **Gather Data**: Collect relevant metrics, logs, and traces to understand the root cause.\n2. **Communicate Findings**: Regularly update stakeholders on progress and findings.\n3. **Implement Fixes**: Based on investigation results, implement necessary fixes or rollbacks.\n4. **Post-Incident Review**: Once resolved, conduct a thorough post-incident analysis to identify improvements for future incidents.\n\nLet’s proceed with gathering data and assigning roles for the incident response team.",
           "tokenUsage": {
-            "total": 1191,
+            "total": 1103,
             "prompt": 412,
-            "completion": 779,
+            "completion": 691,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 11186,
+          "latencyMs": 14553,
           "finishReason": "stop",
-          "cost": 0.0005292,
+          "cost": 0.0004764,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442b138d6790ed-IAH",
+                "cf-ray": "9e4917f47b3f16b8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:53:47 GMT",
+                "date": "Mon, 30 Mar 2026 18:14:36 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "10976",
+                "openai-processing-ms": "14317",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=cufz1YHJCy2RJDaoEa4vf1v3vEeCSnJHNuoRonqYZ4c-1774842816.5719094-1.0.1.1-fuu3Kh_RWeaCbfpkX00UFu3MCnvOyige4UNwfSxV_Rm_bTkawdfDlOqn6R1dpsOEUa0T1micZd.zJ2r1pgyQha6i14OfHbD0T.rd07mZPppKrlaRqzP1bW73aazwJgCl; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:47 GMT",
+                "set-cookie": "__cf_bm=TZzV.B6uoCZdA3lzxrYupUBmnQVoOVPv7Gjd1YTFl7s-1774894462.1609688-1.0.1.1-jyS9wz5w.io_vjmFaDmEqyITg84WEr5vtm_TVguzMax_QVfP9fYMDVS2sNPb_c2b24T8r1ZsXjvy_nRDilNq1xQacEwwyegWk03vx481_6csfOIe_laemflni7XszMiZ; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:44:36 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-requests": "9104",
                 "x-ratelimit-remaining-tokens": "199469",
-                "x-ratelimit-reset-requests": "1h5m17.729s",
+                "x-ratelimit-reset-requests": "2h8m53.948s",
                 "x-ratelimit-reset-tokens": "159ms",
-                "x-request-id": "req_d00210794b35402ea3b72c9c8763e2fa"
+                "x-request-id": "req_180fdb756d6a4d088bf25fe08bf8e7bc"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442b138d6790ed-IAH",
+              "cf-ray": "9e4917f47b3f16b8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:53:47 GMT",
+              "date": "Mon, 30 Mar 2026 18:14:36 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "10976",
+              "openai-processing-ms": "14317",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=cufz1YHJCy2RJDaoEa4vf1v3vEeCSnJHNuoRonqYZ4c-1774842816.5719094-1.0.1.1-fuu3Kh_RWeaCbfpkX00UFu3MCnvOyige4UNwfSxV_Rm_bTkawdfDlOqn6R1dpsOEUa0T1micZd.zJ2r1pgyQha6i14OfHbD0T.rd07mZPppKrlaRqzP1bW73aazwJgCl; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:23:47 GMT",
+              "set-cookie": "__cf_bm=TZzV.B6uoCZdA3lzxrYupUBmnQVoOVPv7Gjd1YTFl7s-1774894462.1609688-1.0.1.1-jyS9wz5w.io_vjmFaDmEqyITg84WEr5vtm_TVguzMax_QVfP9fYMDVS2sNPb_c2b24T8r1ZsXjvy_nRDilNq1xQacEwwyegWk03vx481_6csfOIe_laemflni7XszMiZ; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:44:36 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-requests": "9104",
               "x-ratelimit-remaining-tokens": "199469",
-              "x-ratelimit-reset-requests": "1h5m17.729s",
+              "x-ratelimit-reset-requests": "2h8m53.948s",
               "x-ratelimit-reset-tokens": "159ms",
-              "x-request-id": "req_d00210794b35402ea3b72c9c8763e2fa"
+              "x-request-id": "req_180fdb756d6a4d088bf25fe08bf8e7bc"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 412,
-        "completion": 779,
+        "completion": 691,
         "cached": 0,
-        "total": 1191,
+        "total": 1103,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1029,
-          "prompt": 976,
-          "completion": 53,
+          "total": 940,
+          "prompt": 888,
+          "completion": 52,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 12442,
-      "evaluationDurationMs": 12442
+      "durationMs": 15755,
+      "evaluationDurationMs": 15755
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:53:48.984Z",
-    "evaluationCreatedAt": "2026-03-30T03:53:36.493Z"
+    "exportedAt": "2026-03-30T18:14:37.888Z",
+    "evaluationCreatedAt": "2026-03-30T18:14:22.087Z"
   }
 }

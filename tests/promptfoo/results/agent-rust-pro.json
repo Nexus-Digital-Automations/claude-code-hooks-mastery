@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-ZKn-2026-03-30T03:56:40",
+  "evalId": "eval-Ad2-2026-03-30T18:17:34",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:56:40.666Z",
+    "timestamp": "2026-03-30T18:17:34.145Z",
     "prompts": [
       {
         "id": "fd8224e4e7e6d1adcdb3b64f36f5f31bc4272a91f7ca6c7f4eb93e248d120f71",
@@ -10,18 +10,18 @@
         "label": "rust-pro",
         "provider": "openai:chat:gpt-4o-mini",
         "metrics": {
-          "score": 1.8,
-          "testPassCount": 1,
-          "testFailCount": 1,
+          "score": 2,
+          "testPassCount": 2,
+          "testFailCount": 0,
           "testErrorCount": 0,
-          "assertPassCount": 1,
-          "assertFailCount": 1,
-          "totalLatencyMs": 34634,
+          "assertPassCount": 2,
+          "assertFailCount": 0,
+          "totalLatencyMs": 29589,
           "tokenUsage": {
             "prompt": 840,
-            "completion": 1708,
+            "completion": 1609,
             "cached": 0,
-            "total": 2548,
+            "total": 2449,
             "numRequests": 2,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 2244,
-              "prompt": 2117,
-              "completion": 127,
+              "total": 2128,
+              "prompt": 2018,
+              "completion": 110,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -42,30 +42,29 @@
             }
           },
           "namedScores": {
-            "rust-pro_quality": 1.8
+            "rust-pro_quality": 2
           },
           "namedScoresCount": {
             "rust-pro_quality": 2
           },
-          "cost": 0.0011508
+          "cost": 0.0010913999999999997
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0006674999999999999,
-        "error": "The output demonstrates modern tokio async/await patterns, uses Arc and Mutex for shared state management, and handles potential connection overflow appropriately. However, it does not explicitly show error handling using anyhow/thiserror or custom errors.",
+        "cost": 0.0006098999999999999,
         "gradingResult": {
-          "pass": false,
-          "score": 0.8,
-          "reason": "The output demonstrates modern tokio async/await patterns, uses Arc and Mutex for shared state management, and handles potential connection overflow appropriately. However, it does not explicitly show error handling using anyhow/thiserror or custom errors.",
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
           "namedScores": {
-            "rust-pro_quality": 0.8
+            "rust-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 1287,
-            "prompt": 1220,
-            "completion": 67,
+            "total": 1177,
+            "prompt": 1124,
+            "completion": 53,
             "cached": 0,
             "numRequests": 1
           },
@@ -77,13 +76,13 @@
                 "threshold": 0.6,
                 "metric": "rust-pro_quality"
               },
-              "pass": false,
-              "score": 0.8,
-              "reason": "The output demonstrates modern tokio async/await patterns, uses Arc and Mutex for shared state management, and handles potential connection overflow appropriately. However, it does not explicitly show error handling using anyhow/thiserror or custom errors.",
+              "pass": true,
+              "score": 1,
+              "reason": "The output demonstrates modern tokio async/await patterns, uses Arc and Mutex for shared ownership and synchronization, and includes proper error handling for I/O operations.",
               "tokensUsed": {
-                "total": 1287,
-                "prompt": 1220,
-                "completion": 67,
+                "total": 1177,
+                "prompt": 1124,
+                "completion": 53,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -93,15 +92,15 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating an async TCP server using Tokio with connection pooling and graceful shutdown involves several steps. Below is a complete example that demonstrates how to set up such a server. This example uses `tokio` for asynchronous operations and `tokio::sync::Mutex` for managing shared state.\\n\\n### Dependencies\\n\\nFirst, ensure you have the necessary dependencies in your `Cargo.toml`:\\n\\n```toml\\n[dependencies]\\ntokio = { version = \\\"1\\\", features = [\\\"full\\\"] }\\ntokio-util = \\\"0.7\\\"\\nfutures = \\\"0.3\\\"\\n```\\n\\n### TCP Server Implementation\\n\\nHere's a simple implementation of an async TCP server with connection pooling and graceful shutdown:\\n\\n```rust\\nuse std::sync::Arc;\\nuse std::net::SocketAddr;\\nuse tokio::net::{TcpListener, TcpStream};\\nuse tokio::sync::{Mutex, Notify};\\nuse std::collections::VecDeque;\\nuse std::time::Duration;\\nuse tokio::time::sleep;\\n\\nconst MAX_CONNECTIONS: usize = 10;\\n\\nstruct ConnectionPool {\\n    connections: Mutex<VecDeque<TcpStream>>,\\n    notify: Notify,\\n}\\n\\nimpl ConnectionPool {\\n    fn new() -> Self {\\n        Self {\\n            connections: Mutex::new(VecDeque::new()),\\n            notify: Notify::new(),\\n        }\\n    }\\n\\n    async fn add_connection(&self, stream: TcpStream) {\\n        let mut connections = self.connections.lock().await;\\n        if connections.len() < MAX_CONNECTIONS {\\n            connections.push_back(stream);\\n            self.notify.notify_one();\\n        } else {\\n            // Handle overflow, e.g., close the connection or wait\\n            println!(\\\"Connection pool is full, closing the connection.\\\");\\n            drop(stream); // Close the stream\\n        }\\n    }\\n\\n    async fn get_connection(&self) -> Option<TcpStream> {\\n        let mut connections = self.connections.lock().await;\\n        if let Some(stream) = connections.pop_front() {\\n            Some(stream)\\n        } else {\\n            None\\n        }\\n    }\\n}\\n\\nasync fn handle_connection(mut stream: TcpStream) {\\n    // Handle the connection (e.g., read/write data)\\n    println!(\\\"New connection: {:?}\\\", stream.peer_addr());\\n    // Simulate some work\\n    sleep(Duration::from_secs(2)).await;\\n    println!(\\\"Closing connection: {:?}\\\", stream.peer_addr());\\n}\\n\\nasync fn run_server(addr: SocketAddr, pool: Arc<ConnectionPool>, shutdown: Arc<Notify>) {\\n    let listener = TcpListener::bind(addr).await.unwrap();\\n    println!(\\\"Server listening on {}\\\", addr);\\n\\n    loop {\\n        tokio::select! {\\n            Ok((stream, _)) = listener.accept() => {\\n                let pool_clone = pool.clone();\\n                tokio::spawn(async move {\\n                    pool_clone.add_connection(stream).await;\\n                    if let Some(conn) = pool_clone.get_connection().await {\\n                        handle_connection(conn).await;\\n                    }\\n                });\\n            }\\n            _ = shutdown.notified() => {\\n                println!(\\\"Shutting down server...\\\");\\n                break;\\n            }\\n        }\\n    }\\n}\\n\\n#[tokio::main]\\nasync fn main() {\\n    let addr = \\\"127.0.0.1:8080\\\".parse::<SocketAddr>().unwrap();\\n    let pool = Arc::new(ConnectionPool::new());\\n    let shutdown = Arc::new(Notify::new());\\n\\n    let server_task = {\\n        let pool_clone = pool.clone();\\n        let shutdown_clone = shutdown.clone();\\n        tokio::spawn(async move {\\n            run_server(addr, pool_clone, shutdown_clone).await;\\n        })\\n    };\\n\\n    // Simulate a graceful shutdown after 10 seconds\\n    tokio::spawn(async move {\\n        sleep(Duration::from_secs(10)).await;\\n        shutdown.notify_one();\\n    });\\n\\n    // Wait for the server task to complete\\n    server_task.await.unwrap();\\n}\\n```\\n\\n### Explanation\\n\\n1. **Connection Pool**: The `ConnectionPool` struct manages a pool of TCP connections using a `VecDeque` wrapped in a `Mutex` for safe concurrent access. It has methods to add and retrieve connections.\\n\\n2. **Handling Connections**: The `handle_connection` function simulates handling a TCP connection. You can replace the sleep with actual read/write operations.\\n\\n3. **Server Loop**: The `run_server` function listens for incoming connections and spawns a new task for each connection. It uses `tokio::select!` to handle both incoming connections and shutdown notifications.\\n\\n4. **Graceful Shutdown**: The main function spawns a task that waits for 10 seconds before notifying the server to shut down. The server will finish processing any active connections before exiting.\\n\\n### Running the Server\\n\\nTo run the server, simply execute:\\n\\n```bash\\ncargo run\\n```\\n\\nYou can connect to the server using a TCP client (like `telnet` or `netcat`) to test the connection handling. After 10 seconds, the server will shut down gracefully.\\n</Output>\\n<Rubric>\\nUses modern tokio async/await patterns, proper Rust error handling (anyhow/thiserror or custom errors), correct ownership semantics with Arc/Mutex where needed\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating an async TCP server using Tokio with connection pooling and graceful shutdown involves several steps. Below is a complete example that demonstrates how to set up such a server.\\n\\n### Dependencies\\n\\nFirst, ensure you have the necessary dependencies in your `Cargo.toml`:\\n\\n```toml\\n[dependencies]\\ntokio = { version = \\\"1\\\", features = [\\\"full\\\"] }\\ntokio-util = \\\"0.7\\\"\\nfutures = \\\"0.3\\\"\\n```\\n\\n### TCP Server with Connection Pooling and Graceful Shutdown\\n\\nHere's a simple implementation of an async TCP server with connection pooling and graceful shutdown:\\n\\n```rust\\nuse std::sync::{Arc, Mutex};\\nuse std::net::SocketAddr;\\nuse tokio::net::{TcpListener, TcpStream};\\nuse tokio::sync::Semaphore;\\nuse tokio::signal;\\nuse futures::prelude::*;\\n\\nconst MAX_CONNECTIONS: usize = 10;\\n\\n#[tokio::main]\\nasync fn main() {\\n    // Define the address to bind the server\\n    let addr = \\\"127.0.0.1:8080\\\".parse::<SocketAddr>().unwrap();\\n    \\n    // Create a TCP listener\\n    let listener = TcpListener::bind(&addr).await.unwrap();\\n    println!(\\\"Server listening on {}\\\", addr);\\n\\n    // Create a semaphore for connection pooling\\n    let semaphore = Arc::new(Semaphore::new(MAX_CONNECTIONS));\\n\\n    // Handle graceful shutdown\\n    let shutdown_signal = signal::ctrl_c().map(|_| {\\n        println!(\\\"Received shutdown signal\\\");\\n    });\\n\\n    // Accept connections in a loop\\n    loop {\\n        tokio::select! {\\n            // Accept a new connection\\n            Ok((socket, _)) = listener.accept() => {\\n                let permit = semaphore.clone().acquire_owned().await.unwrap();\\n                let socket = Arc::new(Mutex::new(socket));\\n                tokio::spawn(handle_connection(socket, permit));\\n            }\\n            // Handle shutdown signal\\n            _ = shutdown_signal => {\\n                println!(\\\"Shutting down server...\\\");\\n                break;\\n            }\\n        }\\n    }\\n}\\n\\nasync fn handle_connection(socket: Arc<Mutex<TcpStream>>, _permit: tokio::sync::OwnedSemaphorePermit) {\\n    let mut socket = socket.lock().unwrap();\\n    let mut buffer = [0; 1024];\\n\\n    match socket.read(&mut buffer).await {\\n        Ok(0) => {\\n            println!(\\\"Connection closed by client\\\");\\n            return;\\n        }\\n        Ok(n) => {\\n            println!(\\\"Received: {}\\\", String::from_utf8_lossy(&buffer[..n]));\\n            // Echo the data back to the client\\n            if let Err(e) = socket.write_all(&buffer[..n]).await {\\n                eprintln!(\\\"Failed to write to socket; err = {:?}\\\", e);\\n            }\\n        }\\n        Err(e) => {\\n            eprintln!(\\\"Failed to read from socket; err = {:?}\\\", e);\\n        }\\n    }\\n}\\n```\\n\\n### Explanation\\n\\n1. **Dependencies**: We use `tokio` for async I/O and `futures` for handling asynchronous operations.\\n\\n2. **Main Function**: \\n   - We bind a TCP listener to a specified address.\\n   - We create a semaphore to limit the number of concurrent connections to `MAX_CONNECTIONS`.\\n   - We set up a signal handler to listen for a shutdown signal (Ctrl+C).\\n\\n3. **Connection Handling**:\\n   - In a loop, we accept incoming connections.\\n   - For each connection, we acquire a permit from the semaphore, which ensures that we do not exceed the maximum number of concurrent connections.\\n   - We spawn a new task to handle each connection.\\n\\n4. **Handling Connections**:\\n   - The `handle_connection` function reads data from the socket and echoes it back to the client.\\n   - If the client closes the connection or an error occurs, we handle it gracefully.\\n\\n5. **Graceful Shutdown**: \\n   - The server listens for a shutdown signal and breaks the loop, allowing for a graceful shutdown.\\n\\n### Running the Server\\n\\nTo run the server, simply execute:\\n\\n```bash\\ncargo run\\n```\\n\\nYou can test the server using `telnet` or `netcat`:\\n\\n```bash\\ntelnet 127.0.0.1 8080\\n```\\n\\nor\\n\\n```bash\\nnc 127.0.0.1 8080\\n```\\n\\nType some text and press Enter to see the echo response. Use Ctrl+C to stop the server gracefully.\\n</Output>\\n<Rubric>\\nUses modern tokio async/await patterns, proper Rust error handling (anyhow/thiserror or custom errors), correct ownership semantics with Arc/Mutex where needed\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "72c3cc90-726b-429c-a235-1cffc23939aa",
-        "latencyMs": 20991,
+        "id": "efcf8bbf-0de9-44f2-b217-3d58459e239c",
+        "latencyMs": 16497,
         "namedScores": {
-          "rust-pro_quality": 0.8
+          "rust-pro_quality": 1
         },
         "prompt": {
           "raw": "[\n  {\n    \"role\": \"system\",\n    \"content\": \"You are a Rust expert specializing in modern Rust 1.75+ development with advanced async programming, systems-level performance, and production-ready applications.\\n\\n## Purpose\\nExpert Rust developer mastering Rust 1.75+ features, advanced type system usage, and building high-performance, memory-safe systems. Deep knowledge of async programming, modern web frameworks, and the evolving Rust ecosystem.\\n\\n## Capabilities\\n\\n### Modern Rust Language Features\\n- Rust 1.75+ features including const generics and improved type inference\\n- Advanced lifetime annotations and lifetime elision rules\\n- Generic associated types (GATs) and advanced trait system features\\n- Pattern matching with advanced destructuring and guards\\n- Const evaluation and compile-time computation\\n- Macro system with procedural and declarative macros\\n- Module system and visibility controls\\n- Advanced error handling with Result, Option, and custom error types\\n\\n### Ownership & Memory Management\\n- Ownership rules, borrowing, and move semantics mastery\\n- Reference counting with Rc, Arc, and weak references\\n- Smart pointers: Box, RefCell, Mutex, RwLock\\n- Memory layout optimization and zero-cost abstractions\\n- RAII patterns and automatic resource management\\n- Phantom types and zero-sized types (ZSTs)\\n- Memory safety without garbage collection\\n- Custom allocators and memory pool management\\n\\n### Async Programming & Concurrency\\n- Advanced async/await patterns with Tokio runtime\\n- Stream processing and async iterators\\n- Channel patterns: mpsc, broadcast, watch channels\\n- Tokio ecosystem: axum, tower, hyper for web services\\n- Select patterns and concurrent task management\\n- Backpressure handling and flow control\\n- Async trait objects and dynamic dispatch\\n- Performance optimization in async contexts\\n\\n### Type System & Traits\\n- Advanced trait implementations and trait bounds\\n- Associated types and generic associated types\\n- Higher-kinded types and type-level programming\\n- Phantom types and marker traits\\n\\n[... truncated ...]\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"Write a Rust async TCP server using tokio with connection pooling and graceful shutdown\"\n  }\n]",
@@ -122,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Creating an async TCP server using Tokio with connection pooling and graceful shutdown involves several steps. Below is a complete example that demonstrates how to set up such a server. This example uses `tokio` for asynchronous operations and `tokio::sync::Mutex` for managing shared state.\n\n### Dependencies\n\nFirst, ensure you have the necessary dependencies in your `Cargo.toml`:\n\n```toml\n[dependencies]\ntokio = { version = \"1\", features = [\"full\"] }\ntokio-util = \"0.7\"\nfutures = \"0.3\"\n```\n\n### TCP Server Implementation\n\nHere's a simple implementation of an async TCP server with connection pooling and graceful shutdown:\n\n```rust\nuse std::sync::Arc;\nuse std::net::SocketAddr;\nuse tokio::net::{TcpListener, TcpStream};\nuse tokio::sync::{Mutex, Notify};\nuse std::collections::VecDeque;\nuse std::time::Duration;\nuse tokio::time::sleep;\n\nconst MAX_CONNECTIONS: usize = 10;\n\nstruct ConnectionPool {\n    connections: Mutex<VecDeque<TcpStream>>,\n    notify: Notify,\n}\n\nimpl ConnectionPool {\n    fn new() -> Self {\n        Self {\n            connections: Mutex::new(VecDeque::new()),\n            notify: Notify::new(),\n        }\n    }\n\n    async fn add_connection(&self, stream: TcpStream) {\n        let mut connections = self.connections.lock().await;\n        if connections.len() < MAX_CONNECTIONS {\n            connections.push_back(stream);\n            self.notify.notify_one();\n        } else {\n            // Handle overflow, e.g., close the connection or wait\n            println!(\"Connection pool is full, closing the connection.\");\n            drop(stream); // Close the stream\n        }\n    }\n\n    async fn get_connection(&self) -> Option<TcpStream> {\n        let mut connections = self.connections.lock().await;\n        if let Some(stream) = connections.pop_front() {\n            Some(stream)\n        } else {\n            None\n        }\n    }\n}\n\nasync fn handle_connection(mut stream: TcpStream) {\n    // Handle the connection (e.g., read/write data)\n    println!(\"New connection: {:?}\", stream.peer_addr());\n    // Simulate some work\n    sleep(Duration::from_secs(2)).await;\n    println!(\"Closing connection: {:?}\", stream.peer_addr());\n}\n\nasync fn run_server(addr: SocketAddr, pool: Arc<ConnectionPool>, shutdown: Arc<Notify>) {\n    let listener = TcpListener::bind(addr).await.unwrap();\n    println!(\"Server listening on {}\", addr);\n\n    loop {\n        tokio::select! {\n            Ok((stream, _)) = listener.accept() => {\n                let pool_clone = pool.clone();\n                tokio::spawn(async move {\n                    pool_clone.add_connection(stream).await;\n                    if let Some(conn) = pool_clone.get_connection().await {\n                        handle_connection(conn).await;\n                    }\n                });\n            }\n            _ = shutdown.notified() => {\n                println!(\"Shutting down server...\");\n                break;\n            }\n        }\n    }\n}\n\n#[tokio::main]\nasync fn main() {\n    let addr = \"127.0.0.1:8080\".parse::<SocketAddr>().unwrap();\n    let pool = Arc::new(ConnectionPool::new());\n    let shutdown = Arc::new(Notify::new());\n\n    let server_task = {\n        let pool_clone = pool.clone();\n        let shutdown_clone = shutdown.clone();\n        tokio::spawn(async move {\n            run_server(addr, pool_clone, shutdown_clone).await;\n        })\n    };\n\n    // Simulate a graceful shutdown after 10 seconds\n    tokio::spawn(async move {\n        sleep(Duration::from_secs(10)).await;\n        shutdown.notify_one();\n    });\n\n    // Wait for the server task to complete\n    server_task.await.unwrap();\n}\n```\n\n### Explanation\n\n1. **Connection Pool**: The `ConnectionPool` struct manages a pool of TCP connections using a `VecDeque` wrapped in a `Mutex` for safe concurrent access. It has methods to add and retrieve connections.\n\n2. **Handling Connections**: The `handle_connection` function simulates handling a TCP connection. You can replace the sleep with actual read/write operations.\n\n3. **Server Loop**: The `run_server` function listens for incoming connections and spawns a new task for each connection. It uses `tokio::select!` to handle both incoming connections and shutdown notifications.\n\n4. **Graceful Shutdown**: The main function spawns a task that waits for 10 seconds before notifying the server to shut down. The server will finish processing any active connections before exiting.\n\n### Running the Server\n\nTo run the server, simply execute:\n\n```bash\ncargo run\n```\n\nYou can connect to the server using a TCP client (like `telnet` or `netcat`) to test the connection handling. After 10 seconds, the server will shut down gracefully.",
+          "output": "Creating an async TCP server using Tokio with connection pooling and graceful shutdown involves several steps. Below is a complete example that demonstrates how to set up such a server.\n\n### Dependencies\n\nFirst, ensure you have the necessary dependencies in your `Cargo.toml`:\n\n```toml\n[dependencies]\ntokio = { version = \"1\", features = [\"full\"] }\ntokio-util = \"0.7\"\nfutures = \"0.3\"\n```\n\n### TCP Server with Connection Pooling and Graceful Shutdown\n\nHere's a simple implementation of an async TCP server with connection pooling and graceful shutdown:\n\n```rust\nuse std::sync::{Arc, Mutex};\nuse std::net::SocketAddr;\nuse tokio::net::{TcpListener, TcpStream};\nuse tokio::sync::Semaphore;\nuse tokio::signal;\nuse futures::prelude::*;\n\nconst MAX_CONNECTIONS: usize = 10;\n\n#[tokio::main]\nasync fn main() {\n    // Define the address to bind the server\n    let addr = \"127.0.0.1:8080\".parse::<SocketAddr>().unwrap();\n    \n    // Create a TCP listener\n    let listener = TcpListener::bind(&addr).await.unwrap();\n    println!(\"Server listening on {}\", addr);\n\n    // Create a semaphore for connection pooling\n    let semaphore = Arc::new(Semaphore::new(MAX_CONNECTIONS));\n\n    // Handle graceful shutdown\n    let shutdown_signal = signal::ctrl_c().map(|_| {\n        println!(\"Received shutdown signal\");\n    });\n\n    // Accept connections in a loop\n    loop {\n        tokio::select! {\n            // Accept a new connection\n            Ok((socket, _)) = listener.accept() => {\n                let permit = semaphore.clone().acquire_owned().await.unwrap();\n                let socket = Arc::new(Mutex::new(socket));\n                tokio::spawn(handle_connection(socket, permit));\n            }\n            // Handle shutdown signal\n            _ = shutdown_signal => {\n                println!(\"Shutting down server...\");\n                break;\n            }\n        }\n    }\n}\n\nasync fn handle_connection(socket: Arc<Mutex<TcpStream>>, _permit: tokio::sync::OwnedSemaphorePermit) {\n    let mut socket = socket.lock().unwrap();\n    let mut buffer = [0; 1024];\n\n    match socket.read(&mut buffer).await {\n        Ok(0) => {\n            println!(\"Connection closed by client\");\n            return;\n        }\n        Ok(n) => {\n            println!(\"Received: {}\", String::from_utf8_lossy(&buffer[..n]));\n            // Echo the data back to the client\n            if let Err(e) = socket.write_all(&buffer[..n]).await {\n                eprintln!(\"Failed to write to socket; err = {:?}\", e);\n            }\n        }\n        Err(e) => {\n            eprintln!(\"Failed to read from socket; err = {:?}\", e);\n        }\n    }\n}\n```\n\n### Explanation\n\n1. **Dependencies**: We use `tokio` for async I/O and `futures` for handling asynchronous operations.\n\n2. **Main Function**: \n   - We bind a TCP listener to a specified address.\n   - We create a semaphore to limit the number of concurrent connections to `MAX_CONNECTIONS`.\n   - We set up a signal handler to listen for a shutdown signal (Ctrl+C).\n\n3. **Connection Handling**:\n   - In a loop, we accept incoming connections.\n   - For each connection, we acquire a permit from the semaphore, which ensures that we do not exceed the maximum number of concurrent connections.\n   - We spawn a new task to handle each connection.\n\n4. **Handling Connections**:\n   - The `handle_connection` function reads data from the socket and echoes it back to the client.\n   - If the client closes the connection or an error occurs, we handle it gracefully.\n\n5. **Graceful Shutdown**: \n   - The server listens for a shutdown signal and breaks the loop, allowing for a graceful shutdown.\n\n### Running the Server\n\nTo run the server, simply execute:\n\n```bash\ncargo run\n```\n\nYou can test the server using `telnet` or `netcat`:\n\n```bash\ntelnet 127.0.0.1 8080\n```\n\nor\n\n```bash\nnc 127.0.0.1 8080\n```\n\nType some text and press Enter to see the echo response. Use Ctrl+C to stop the server gracefully.",
           "tokenUsage": {
-            "total": 1426,
+            "total": 1330,
             "prompt": 418,
-            "completion": 1008,
+            "completion": 912,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -135,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 20991,
+          "latencyMs": 16497,
           "finishReason": "stop",
-          "cost": 0.0006674999999999999,
+          "cost": 0.0006098999999999999,
           "guardrails": {
             "flagged": false
           },
@@ -149,34 +148,34 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442f92a9aa16d2-IAH",
+                "cf-ray": "9e491ca4e9df391e-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:57:01 GMT",
+                "date": "Mon, 30 Mar 2026 18:17:50 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "20774",
+                "openai-processing-ms": "16191",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=7uQGidU1PugIuS8aaU2cAwo.SGyMuTQwJ3h31GuTZkM-1774843000.7417047-1.0.1.1-eajl9OI.Xx2dig_OH0yEJSEFN8ofpixYRZk3WfNqqUfRqRCiGdbxYuk6vllJSefOYRXVrYsyWVFS.vgIw4ZCO0XQhwLQ_6L9Ds9q9o7y32Ejgs297BZxc3p5TkiX8UTm; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:27:01 GMT",
+                "set-cookie": "__cf_bm=Uz6TMrKZdk0a.Q4dbVgO2lf1kgNSAzjtr0kXL532rpA-1774894654.228082-1.0.1.1-LR67kBhImjOpoLFg1zLAkebjoFNSKl5ggB82qQEaMNYnCSyZTqd.jug9Tda.N_nkaF.OXEuXC3ikRI0biZ6xSxltd1IpL2cf4.XVaKKVtj9G86Iqg54WDwzjL7Hi76rb; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:50 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9543",
+                "x-ratelimit-remaining-requests": "9090",
                 "x-ratelimit-remaining-tokens": "199475",
-                "x-ratelimit-reset-requests": "1h5m40.743s",
+                "x-ratelimit-reset-requests": "2h11m1.238s",
                 "x-ratelimit-reset-tokens": "157ms",
-                "x-request-id": "req_f55b7c53f21f4e8885420441efe38af5"
+                "x-request-id": "req_a4418621c538497b9d100eebde62fafa"
               }
             }
           }
         },
-        "score": 0.8,
-        "success": false,
+        "score": 1,
+        "success": true,
         "testCase": {
           "description": "[1] Write a Rust async TCP server using tokio with connection pooling and graceful s",
           "vars": {
@@ -212,36 +211,36 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442f92a9aa16d2-IAH",
+              "cf-ray": "9e491ca4e9df391e-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:57:01 GMT",
+              "date": "Mon, 30 Mar 2026 18:17:50 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "20774",
+              "openai-processing-ms": "16191",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=7uQGidU1PugIuS8aaU2cAwo.SGyMuTQwJ3h31GuTZkM-1774843000.7417047-1.0.1.1-eajl9OI.Xx2dig_OH0yEJSEFN8ofpixYRZk3WfNqqUfRqRCiGdbxYuk6vllJSefOYRXVrYsyWVFS.vgIw4ZCO0XQhwLQ_6L9Ds9q9o7y32Ejgs297BZxc3p5TkiX8UTm; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:27:01 GMT",
+              "set-cookie": "__cf_bm=Uz6TMrKZdk0a.Q4dbVgO2lf1kgNSAzjtr0kXL532rpA-1774894654.228082-1.0.1.1-LR67kBhImjOpoLFg1zLAkebjoFNSKl5ggB82qQEaMNYnCSyZTqd.jug9Tda.N_nkaF.OXEuXC3ikRI0biZ6xSxltd1IpL2cf4.XVaKKVtj9G86Iqg54WDwzjL7Hi76rb; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:50 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9543",
+              "x-ratelimit-remaining-requests": "9090",
               "x-ratelimit-remaining-tokens": "199475",
-              "x-ratelimit-reset-requests": "1h5m40.743s",
+              "x-ratelimit-reset-requests": "2h11m1.238s",
               "x-ratelimit-reset-tokens": "157ms",
-              "x-request-id": "req_f55b7c53f21f4e8885420441efe38af5"
+              "x-request-id": "req_a4418621c538497b9d100eebde62fafa"
             }
           },
           "_promptfooFileMetadata": {}
         },
-        "failureReason": 1
+        "failureReason": 0
       },
       {
-        "cost": 0.0004833,
+        "cost": 0.00048149999999999994,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -250,9 +249,9 @@
             "rust-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 957,
-            "prompt": 897,
-            "completion": 60,
+            "total": 951,
+            "prompt": 894,
+            "completion": 57,
             "cached": 0,
             "numRequests": 1
           },
@@ -266,11 +265,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides a clear explanation of thread safety with `Arc<Mutex<T>>` and runtime vs compile-time borrowing with `RefCell<T>`, along with concrete examples for both cases.",
+              "reason": "The output accurately explains thread safety with `Arc<Mutex<T>>` and runtime vs compile-time borrowing with `RefCell<T>`, and provides concrete examples for both cases.",
               "tokensUsed": {
-                "total": 957,
-                "prompt": 897,
-                "completion": 60,
+                "total": 951,
+                "prompt": 894,
+                "completion": 57,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -280,13 +279,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n`Arc<Mutex<T>>` and `RefCell<T>` are both used in Rust for managing shared state, but they serve different purposes and are used in different contexts. Here’s a breakdown of their differences and when to use each:\\n\\n### `Arc<Mutex<T>>`\\n\\n- **Definition**: `Arc` (Atomic Reference Counted) is a thread-safe reference-counting pointer. `Mutex` is a mutual exclusion primitive that provides safe access to shared data across threads. When combined as `Arc<Mutex<T>>`, it allows multiple threads to own and access the same data safely.\\n\\n- **Use Case**: Use `Arc<Mutex<T>>` when you need to share mutable state across multiple threads. The `Mutex` ensures that only one thread can access the data at a time, preventing data races. The `Arc` allows multiple threads to own the same `Mutex`, enabling shared ownership.\\n\\n- **Performance**: There is some overhead due to locking and unlocking the mutex, which can lead to contention if many threads are trying to access the data simultaneously. However, it is necessary for thread safety.\\n\\n- **Example**:\\n  ```rust\\n  use std::sync::{Arc, Mutex};\\n  use std::thread;\\n\\n  let data = Arc::new(Mutex::new(0));\\n  let mut handles = vec![];\\n\\n  for _ in 0..10 {\\n      let data_clone = Arc::clone(&data);\\n      let handle = thread::spawn(move || {\\n          let mut num = data_clone.lock().unwrap();\\n          *num += 1;\\n      });\\n      handles.push(handle);\\n  }\\n\\n  for handle in handles {\\n      handle.join().unwrap();\\n  }\\n\\n  println!(\\\"Result: {}\\\", *data.lock().unwrap());\\n  ```\\n\\n### `RefCell<T>`\\n\\n- **Definition**: `RefCell` is a single-threaded interior mutability type that allows you to mutate data even when there are immutable references to it. It uses Rust's borrowing rules at runtime instead of compile time, enforcing borrowing rules dynamically.\\n\\n- **Use Case**: Use `RefCell<T>` when you need to mutate data within a single thread and want to enforce borrowing rules at runtime. It is useful in scenarios where you have a complex data structure that needs to be modified, but you want to maintain the flexibility of having immutable references.\\n\\n- **Performance**: `RefCell` incurs some runtime overhead due to the dynamic checks for borrowing rules. If you try to borrow mutably while there are existing immutable borrows, it will panic at runtime.\\n\\n- **Example**:\\n  ```rust\\n  use std::cell::RefCell;\\n\\n  let data = RefCell::new(0);\\n  {\\n      let mut num = data.borrow_mut();\\n      *num += 1;\\n  }\\n  println!(\\\"Result: {}\\\", *data.borrow());\\n  ```\\n\\n### Summary\\n\\n- **Use `Arc<Mutex<T>>`** when you need to share mutable state across multiple threads safely. It provides thread safety through locking.\\n  \\n- **Use `RefCell<T>`** when you need interior mutability within a single thread and want to enforce borrowing rules at runtime. It allows for more flexible borrowing patterns but is not thread-safe.\\n\\nIn summary, choose `Arc<Mutex<T>>` for multi-threaded scenarios and `RefCell<T>` for single-threaded scenarios where you need to mutate data while maintaining the ability to have immutable references.\\n</Output>\\n<Rubric>\\nAccurately explains thread safety, runtime vs compile-time borrowing, and gives concrete examples\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\n`Arc<Mutex<T>>` and `RefCell<T>` are both used in Rust for managing shared state, but they serve different purposes and are used in different contexts. Here’s a breakdown of their differences and when to use each:\\n\\n### `Arc<Mutex<T>>`\\n\\n- **Definition**: `Arc` (Atomic Reference Counted) is a thread-safe reference-counting pointer. `Mutex` is a mutual exclusion primitive that provides safe access to shared data across threads. When combined as `Arc<Mutex<T>>`, it allows multiple threads to own and access the same data safely.\\n\\n- **Use Case**: Use `Arc<Mutex<T>>` when you need to share mutable state across multiple threads. The `Mutex` ensures that only one thread can access the data at a time, preventing data races. The `Arc` allows multiple threads to own the same `Mutex`, enabling shared ownership.\\n\\n- **Performance**: There is some overhead due to locking and unlocking the mutex, which can lead to contention if many threads are trying to access the data simultaneously. However, it is necessary for thread safety.\\n\\n- **Example**:\\n  ```rust\\n  use std::sync::{Arc, Mutex};\\n  use std::thread;\\n\\n  let data = Arc::new(Mutex::new(0));\\n  let mut handles = vec![];\\n\\n  for _ in 0..10 {\\n      let data_clone = Arc::clone(&data);\\n      let handle = thread::spawn(move || {\\n          let mut num = data_clone.lock().unwrap();\\n          *num += 1;\\n      });\\n      handles.push(handle);\\n  }\\n\\n  for handle in handles {\\n      handle.join().unwrap();\\n  }\\n\\n  println!(\\\"Result: {}\\\", *data.lock().unwrap());\\n  ```\\n\\n### `RefCell<T>`\\n\\n- **Definition**: `RefCell` is a single-threaded interior mutability type that allows you to mutate data even when there are immutable references to it. It uses Rust's borrowing rules at runtime instead of compile time, enforcing borrowing rules dynamically.\\n\\n- **Use Case**: Use `RefCell<T>` when you need to mutate data within a single thread and want to enforce borrowing rules at runtime. It is useful in scenarios where you have a complex data structure that needs to be modified, but you want to maintain the flexibility of having immutable references.\\n\\n- **Performance**: `RefCell` has a runtime cost due to the dynamic checks for borrowing rules. If you try to borrow mutably while there are active immutable borrows, it will panic at runtime.\\n\\n- **Example**:\\n  ```rust\\n  use std::cell::RefCell;\\n\\n  let data = RefCell::new(0);\\n  {\\n      let mut num = data.borrow_mut();\\n      *num += 1;\\n  }\\n  println!(\\\"Result: {}\\\", *data.borrow());\\n  ```\\n\\n### Summary\\n\\n- **Use `Arc<Mutex<T>>`** when you need to share mutable state across multiple threads safely. It provides thread safety through locking.\\n  \\n- **Use `RefCell<T>`** when you need interior mutability within a single thread and want to enforce borrowing rules at runtime. It allows for more flexible borrowing patterns but is not thread-safe.\\n\\nIn summary, choose `Arc<Mutex<T>>` for multi-threaded scenarios and `RefCell<T>` for single-threaded scenarios where you need to mutate data while maintaining the borrowing rules.\\n</Output>\\n<Rubric>\\nAccurately explains thread safety, runtime vs compile-time borrowing, and gives concrete examples\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "c2202f13-a7aa-47c8-a0b0-e36b2fcea690",
-        "latencyMs": 13643,
+        "id": "76092fd5-4d95-4543-841a-99e1ea042bb0",
+        "latencyMs": 13092,
         "namedScores": {
           "rust-pro_quality": 1
         },
@@ -309,11 +308,11 @@
           "label": ""
         },
         "response": {
-          "output": "`Arc<Mutex<T>>` and `RefCell<T>` are both used in Rust for managing shared state, but they serve different purposes and are used in different contexts. Here’s a breakdown of their differences and when to use each:\n\n### `Arc<Mutex<T>>`\n\n- **Definition**: `Arc` (Atomic Reference Counted) is a thread-safe reference-counting pointer. `Mutex` is a mutual exclusion primitive that provides safe access to shared data across threads. When combined as `Arc<Mutex<T>>`, it allows multiple threads to own and access the same data safely.\n\n- **Use Case**: Use `Arc<Mutex<T>>` when you need to share mutable state across multiple threads. The `Mutex` ensures that only one thread can access the data at a time, preventing data races. The `Arc` allows multiple threads to own the same `Mutex`, enabling shared ownership.\n\n- **Performance**: There is some overhead due to locking and unlocking the mutex, which can lead to contention if many threads are trying to access the data simultaneously. However, it is necessary for thread safety.\n\n- **Example**:\n  ```rust\n  use std::sync::{Arc, Mutex};\n  use std::thread;\n\n  let data = Arc::new(Mutex::new(0));\n  let mut handles = vec![];\n\n  for _ in 0..10 {\n      let data_clone = Arc::clone(&data);\n      let handle = thread::spawn(move || {\n          let mut num = data_clone.lock().unwrap();\n          *num += 1;\n      });\n      handles.push(handle);\n  }\n\n  for handle in handles {\n      handle.join().unwrap();\n  }\n\n  println!(\"Result: {}\", *data.lock().unwrap());\n  ```\n\n### `RefCell<T>`\n\n- **Definition**: `RefCell` is a single-threaded interior mutability type that allows you to mutate data even when there are immutable references to it. It uses Rust's borrowing rules at runtime instead of compile time, enforcing borrowing rules dynamically.\n\n- **Use Case**: Use `RefCell<T>` when you need to mutate data within a single thread and want to enforce borrowing rules at runtime. It is useful in scenarios where you have a complex data structure that needs to be modified, but you want to maintain the flexibility of having immutable references.\n\n- **Performance**: `RefCell` incurs some runtime overhead due to the dynamic checks for borrowing rules. If you try to borrow mutably while there are existing immutable borrows, it will panic at runtime.\n\n- **Example**:\n  ```rust\n  use std::cell::RefCell;\n\n  let data = RefCell::new(0);\n  {\n      let mut num = data.borrow_mut();\n      *num += 1;\n  }\n  println!(\"Result: {}\", *data.borrow());\n  ```\n\n### Summary\n\n- **Use `Arc<Mutex<T>>`** when you need to share mutable state across multiple threads safely. It provides thread safety through locking.\n  \n- **Use `RefCell<T>`** when you need interior mutability within a single thread and want to enforce borrowing rules at runtime. It allows for more flexible borrowing patterns but is not thread-safe.\n\nIn summary, choose `Arc<Mutex<T>>` for multi-threaded scenarios and `RefCell<T>` for single-threaded scenarios where you need to mutate data while maintaining the ability to have immutable references.",
+          "output": "`Arc<Mutex<T>>` and `RefCell<T>` are both used in Rust for managing shared state, but they serve different purposes and are used in different contexts. Here’s a breakdown of their differences and when to use each:\n\n### `Arc<Mutex<T>>`\n\n- **Definition**: `Arc` (Atomic Reference Counted) is a thread-safe reference-counting pointer. `Mutex` is a mutual exclusion primitive that provides safe access to shared data across threads. When combined as `Arc<Mutex<T>>`, it allows multiple threads to own and access the same data safely.\n\n- **Use Case**: Use `Arc<Mutex<T>>` when you need to share mutable state across multiple threads. The `Mutex` ensures that only one thread can access the data at a time, preventing data races. The `Arc` allows multiple threads to own the same `Mutex`, enabling shared ownership.\n\n- **Performance**: There is some overhead due to locking and unlocking the mutex, which can lead to contention if many threads are trying to access the data simultaneously. However, it is necessary for thread safety.\n\n- **Example**:\n  ```rust\n  use std::sync::{Arc, Mutex};\n  use std::thread;\n\n  let data = Arc::new(Mutex::new(0));\n  let mut handles = vec![];\n\n  for _ in 0..10 {\n      let data_clone = Arc::clone(&data);\n      let handle = thread::spawn(move || {\n          let mut num = data_clone.lock().unwrap();\n          *num += 1;\n      });\n      handles.push(handle);\n  }\n\n  for handle in handles {\n      handle.join().unwrap();\n  }\n\n  println!(\"Result: {}\", *data.lock().unwrap());\n  ```\n\n### `RefCell<T>`\n\n- **Definition**: `RefCell` is a single-threaded interior mutability type that allows you to mutate data even when there are immutable references to it. It uses Rust's borrowing rules at runtime instead of compile time, enforcing borrowing rules dynamically.\n\n- **Use Case**: Use `RefCell<T>` when you need to mutate data within a single thread and want to enforce borrowing rules at runtime. It is useful in scenarios where you have a complex data structure that needs to be modified, but you want to maintain the flexibility of having immutable references.\n\n- **Performance**: `RefCell` has a runtime cost due to the dynamic checks for borrowing rules. If you try to borrow mutably while there are active immutable borrows, it will panic at runtime.\n\n- **Example**:\n  ```rust\n  use std::cell::RefCell;\n\n  let data = RefCell::new(0);\n  {\n      let mut num = data.borrow_mut();\n      *num += 1;\n  }\n  println!(\"Result: {}\", *data.borrow());\n  ```\n\n### Summary\n\n- **Use `Arc<Mutex<T>>`** when you need to share mutable state across multiple threads safely. It provides thread safety through locking.\n  \n- **Use `RefCell<T>`** when you need interior mutability within a single thread and want to enforce borrowing rules at runtime. It allows for more flexible borrowing patterns but is not thread-safe.\n\nIn summary, choose `Arc<Mutex<T>>` for multi-threaded scenarios and `RefCell<T>` for single-threaded scenarios where you need to mutate data while maintaining the borrowing rules.",
           "tokenUsage": {
-            "total": 1122,
+            "total": 1119,
             "prompt": 422,
-            "completion": 700,
+            "completion": 697,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -322,9 +321,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 13643,
+          "latencyMs": 13092,
           "finishReason": "stop",
-          "cost": 0.0004833,
+          "cost": 0.00048149999999999994,
           "guardrails": {
             "flagged": false
           },
@@ -336,28 +335,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442f92af98c9ba-IAH",
+                "cf-ray": "9e491ca4dc8ec300-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:56:54 GMT",
+                "date": "Mon, 30 Mar 2026 18:17:47 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "13485",
+                "openai-processing-ms": "12849",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=LHw9MRA.EBHtsRESLpkAYhGlQ8XE8KLgWQIWMCYfsno-1774843000.7476535-1.0.1.1-6VQl2wxAg1HPIte4JlJJT718FynB1T9o6mAj2CHWEIFC_pdVMVdf3Ja479lRy8R7BaiwNzba1XEJgsndT_fwkscLm83J6b.K6ixghkf.xdIq_RlpECJYyhwAHuF_jMCF; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:26:54 GMT",
+                "set-cookie": "__cf_bm=6MAo0KSLoF1BCqgY.NOq0WX_a9yz.7RLZh_GJwW9UJo-1774894654.2172594-1.0.1.1-cfKrD04o1YNynRWbdkEAi9ds9CoH_2pzztwPqkRXDAKJqc_6p66Q5f3rq7WsWu.9DOi1hEOmidThEXGddONJ44_IYc2Itzy12NCMFBl7KYkNL2QHXUAsj6Y62LEKCpWW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:47 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9543",
+                "x-ratelimit-remaining-requests": "9090",
                 "x-ratelimit-remaining-tokens": "199477",
-                "x-ratelimit-reset-requests": "1h5m40.758s",
+                "x-ratelimit-reset-requests": "2h11m1.331s",
                 "x-ratelimit-reset-tokens": "156ms",
-                "x-request-id": "req_c18a73bb14a2486bb03ba52455b70c29"
+                "x-request-id": "req_937dded36d7e4bd787a59b362d5fb571"
               }
             }
           }
@@ -399,28 +398,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442f92af98c9ba-IAH",
+              "cf-ray": "9e491ca4dc8ec300-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:56:54 GMT",
+              "date": "Mon, 30 Mar 2026 18:17:47 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "13485",
+              "openai-processing-ms": "12849",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=LHw9MRA.EBHtsRESLpkAYhGlQ8XE8KLgWQIWMCYfsno-1774843000.7476535-1.0.1.1-6VQl2wxAg1HPIte4JlJJT718FynB1T9o6mAj2CHWEIFC_pdVMVdf3Ja479lRy8R7BaiwNzba1XEJgsndT_fwkscLm83J6b.K6ixghkf.xdIq_RlpECJYyhwAHuF_jMCF; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:26:54 GMT",
+              "set-cookie": "__cf_bm=6MAo0KSLoF1BCqgY.NOq0WX_a9yz.7RLZh_GJwW9UJo-1774894654.2172594-1.0.1.1-cfKrD04o1YNynRWbdkEAi9ds9CoH_2pzztwPqkRXDAKJqc_6p66Q5f3rq7WsWu.9DOi1hEOmidThEXGddONJ44_IYc2Itzy12NCMFBl7KYkNL2QHXUAsj6Y62LEKCpWW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:47:47 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9543",
+              "x-ratelimit-remaining-requests": "9090",
               "x-ratelimit-remaining-tokens": "199477",
-              "x-ratelimit-reset-requests": "1h5m40.758s",
+              "x-ratelimit-reset-requests": "2h11m1.331s",
               "x-ratelimit-reset-tokens": "156ms",
-              "x-request-id": "req_c18a73bb14a2486bb03ba52455b70c29"
+              "x-request-id": "req_937dded36d7e4bd787a59b362d5fb571"
             }
           },
           "_promptfooFileMetadata": {}
@@ -429,14 +428,14 @@
       }
     ],
     "stats": {
-      "successes": 1,
-      "failures": 1,
+      "successes": 2,
+      "failures": 0,
       "errors": 0,
       "tokenUsage": {
         "prompt": 840,
-        "completion": 1708,
+        "completion": 1609,
         "cached": 0,
-        "total": 2548,
+        "total": 2449,
         "numRequests": 2,
         "completionDetails": {
           "reasoning": 0,
@@ -444,9 +443,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 2244,
-          "prompt": 2117,
-          "completion": 127,
+          "total": 2128,
+          "prompt": 2018,
+          "completion": 110,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -456,8 +455,8 @@
           }
         }
       },
-      "durationMs": 22796,
-      "evaluationDurationMs": 22796
+      "durationMs": 17774,
+      "evaluationDurationMs": 17774
     }
   },
   "config": {
@@ -537,7 +536,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:57:03.513Z",
-    "evaluationCreatedAt": "2026-03-30T03:56:40.666Z"
+    "exportedAt": "2026-03-30T18:17:51.975Z",
+    "evaluationCreatedAt": "2026-03-30T18:17:34.145Z"
   }
 }

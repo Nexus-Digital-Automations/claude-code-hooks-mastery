@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-0Zn-2026-03-30T03:49:19",
+  "evalId": "eval-DpX-2026-03-30T18:09:30",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:49:19.999Z",
+    "timestamp": "2026-03-30T18:09:30.540Z",
     "prompts": [
       {
         "id": "a5388718092d8dea9d7bdb4d860da365388e8d705a04006a5ca6fec259cdf3b0",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 19877,
+          "totalLatencyMs": 25786,
           "tokenUsage": {
             "prompt": 404,
-            "completion": 1148,
+            "completion": 1153,
             "cached": 0,
-            "total": 1552,
+            "total": 1557,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1396,
-              "prompt": 1346,
+              "total": 1401,
+              "prompt": 1351,
               "completion": 50,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "c4-code_quality": 1
           },
-          "cost": 0.0007493999999999999
+          "cost": 0.0007524
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0007493999999999999,
+        "cost": 0.0007524,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "c4-code_quality": 1
           },
           "tokensUsed": {
-            "total": 1396,
-            "prompt": 1346,
+            "total": 1401,
+            "prompt": 1351,
             "completion": 50,
             "cached": 0,
             "numRequests": 1
@@ -80,8 +80,8 @@
               "score": 1,
               "reason": "The output thoroughly documents the code structure at the function and class level, clearly outlines dependencies and relationships between components, and is organized and readable.",
               "tokensUsed": {
-                "total": 1396,
-                "prompt": 1346,
+                "total": 1401,
+                "prompt": 1351,
                 "completion": 50,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create C4 Code-level documentation for a Python FastAPI authentication module that handles JWT (JSON Web Tokens), we will analyze the code structure, extract function signatures, and document the relationships and responsibilities of each component. Below is a structured documentation based on the C4 model principles.\\n\\n### Directory Structure\\nAssuming the following directory structure for the authentication module:\\n\\n```\\n/auth\\n    ├── __init__.py\\n    ├── auth.py\\n    ├── models.py\\n    ├── schemas.py\\n    ├── utils.py\\n    └── dependencies.py\\n```\\n\\n### Code Element Identification\\n\\n#### 1. `auth.py`\\nThis file contains the main authentication logic, including login and token generation.\\n\\n- **Classes:**\\n  - `AuthService`\\n    - **Responsibilities:** Handles user authentication, token creation, and validation.\\n\\n- **Functions:**\\n  - `login(username: str, password: str) -> str`\\n    - **Purpose:** Authenticates a user and returns a JWT token.\\n    - **Parameters:**\\n      - `username`: The username of the user.\\n      - `password`: The password of the user.\\n    - **Returns:** A JWT token as a string.\\n\\n  - `verify_token(token: str) -> dict`\\n    - **Purpose:** Verifies the provided JWT token and returns the payload.\\n    - **Parameters:**\\n      - `token`: The JWT token to verify.\\n    - **Returns:** A dictionary containing the token payload.\\n\\n#### 2. `models.py`\\nThis file defines the database models related to user authentication.\\n\\n- **Classes:**\\n  - `User`\\n    - **Attributes:**\\n      - `id: int`\\n      - `username: str`\\n      - `hashed_password: str`\\n    - **Purpose:** Represents a user in the database.\\n\\n#### 3. `schemas.py`\\nThis file contains Pydantic schemas for request and response validation.\\n\\n- **Classes:**\\n  - `UserCreate`\\n    - **Attributes:**\\n      - `username: str`\\n      - `password: str`\\n    - **Purpose:** Schema for creating a new user.\\n\\n  - `UserOut`\\n    - **Attributes:**\\n      - `id: int`\\n      - `username: str`\\n    - **Purpose:** Schema for returning user information.\\n\\n#### 4. `utils.py`\\nThis file contains utility functions for password hashing and JWT handling.\\n\\n- **Functions:**\\n  - `hash_password(password: str) -> str`\\n    - **Purpose:** Hashes a password for secure storage.\\n    - **Parameters:**\\n      - `password`: The plain text password to hash.\\n    - **Returns:** A hashed password as a string.\\n\\n  - `verify_password(plain_password: str, hashed_password: str) -> bool`\\n    - **Purpose:** Verifies a plain text password against a hashed password.\\n    - **Parameters:**\\n      - `plain_password`: The plain text password.\\n      - `hashed_password`: The hashed password to compare against.\\n    - **Returns:** `True` if the passwords match, `False` otherwise.\\n\\n#### 5. `dependencies.py`\\nThis file contains dependency injection functions for FastAPI routes.\\n\\n- **Functions:**\\n  - `get_current_user(token: str = Depends(oauth2_scheme)) -> User`\\n    - **Purpose:** Retrieves the current user based on the provided JWT token.\\n    - **Parameters:**\\n      - `token`: The JWT token from the request.\\n    - **Returns:** An instance of `User`.\\n\\n### Relationship Mapping\\n- **AuthService** depends on `User` from `models.py` for user data.\\n- `login` function in `auth.py` calls `hash_password` from `utils.py` to verify passwords.\\n- `verify_token` function in `auth.py` uses JWT utilities to decode and validate tokens.\\n- `get_current_user` in `dependencies.py` uses `verify_token` to validate the token and fetch user details.\\n\\n### Technology Identification\\n- **Programming Language:** Python\\n- **Framework:** FastAPI\\n- **Libraries:**\\n  - `pydantic` for data validation\\n  - `passlib` for password hashing\\n  - `pyjwt` for JWT handling\\n\\n### Purpose Documentation\\n- **auth.py**: Central module for handling authentication logic, including user login and JWT management.\\n- **models.py**: Defines the data structure for user entities in the database.\\n- **schemas.py**: Provides data validation schemas for user input and output.\\n- **utils.py**: Contains utility functions for password management and JWT operations.\\n- **dependencies.py**: Manages FastAPI dependencies for user authentication in routes.\\n\\n### Interface Documentation\\n- **Public APIs:**\\n  - `POST /login`: Authenticates a user and returns a JWT token.\\n  - `GET /users/me`: Retrieves the current authenticated user.\\n\\n### Data Structure Documentation\\n- **User Model:**\\n  - `id`: Integer, unique identifier for the user.\\n  - `username`: String, unique username for the user.\\n  - `hashed_password`: String, hashed password for secure storage.\\n\\n- **UserCreate Schema:**\\n  - `username`: String, required for user creation.\\n  - `password`: String, required for user creation.\\n\\n- **UserOut Schema:**\\n  - `id`: Integer, user identifier.\\n  - `username`: String, user’s username.\\n\\nThis documentation provides a comprehensive overview of the FastAPI authentication module, capturing the essential components, their relationships, and responsibilities, following the C4 model principles.\\n</Output>\\n<Rubric>\\nDocuments code structure at function/class level, shows dependencies and relationships between components, organized and readable\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create C4 Code-level documentation for a Python FastAPI authentication module that handles JWT (JSON Web Tokens), we will analyze the code structure, extract function signatures, and document the relationships and responsibilities of each component. Below is a structured documentation based on the C4 model principles.\\n\\n### Directory Structure\\nAssuming the following directory structure for the authentication module:\\n\\n```\\n/auth\\n    ├── __init__.py\\n    ├── auth.py\\n    ├── models.py\\n    ├── schemas.py\\n    ├── utils.py\\n    └── dependencies.py\\n```\\n\\n### Code Element Identification\\n\\n#### 1. `auth.py`\\nThis file contains the main authentication logic, including login and token generation.\\n\\n- **Functions:**\\n  - `login_user(username: str, password: str) -> str`\\n    - **Purpose**: Authenticates a user and returns a JWT token.\\n    - **Parameters**:\\n      - `username`: The username of the user.\\n      - `password`: The password of the user.\\n    - **Returns**: A JWT token as a string.\\n  \\n  - `get_current_user(token: str) -> User`\\n    - **Purpose**: Decodes the JWT token and retrieves the current user.\\n    - **Parameters**:\\n      - `token`: The JWT token as a string.\\n    - **Returns**: An instance of the `User` model.\\n\\n#### 2. `models.py`\\nThis file defines the data models used in the authentication process.\\n\\n- **Classes:**\\n  - `User`\\n    - **Attributes**:\\n      - `id: int`\\n      - `username: str`\\n      - `hashed_password: str`\\n    - **Purpose**: Represents a user in the system.\\n\\n#### 3. `schemas.py`\\nThis file contains Pydantic schemas for request and response validation.\\n\\n- **Classes:**\\n  - `UserCreate`\\n    - **Attributes**:\\n      - `username: str`\\n      - `password: str`\\n    - **Purpose**: Schema for creating a new user.\\n  \\n  - `Token`\\n    - **Attributes**:\\n      - `access_token: str`\\n      - `token_type: str`\\n    - **Purpose**: Schema for returning a JWT token.\\n\\n#### 4. `utils.py`\\nThis file contains utility functions for password hashing and JWT handling.\\n\\n- **Functions:**\\n  - `hash_password(password: str) -> str`\\n    - **Purpose**: Hashes a password using a secure hashing algorithm.\\n    - **Parameters**:\\n      - `password`: The plain text password.\\n    - **Returns**: The hashed password as a string.\\n\\n  - `verify_password(plain_password: str, hashed_password: str) -> bool`\\n    - **Purpose**: Verifies a plain text password against a hashed password.\\n    - **Parameters**:\\n      - `plain_password`: The plain text password.\\n      - `hashed_password`: The hashed password.\\n    - **Returns**: `True` if the password matches, `False` otherwise.\\n\\n  - `create_jwt_token(data: dict) -> str`\\n    - **Purpose**: Creates a JWT token from the provided data.\\n    - **Parameters**:\\n      - `data`: A dictionary containing user information.\\n    - **Returns**: A JWT token as a string.\\n\\n#### 5. `dependencies.py`\\nThis file contains dependency injection functions for FastAPI.\\n\\n- **Functions:**\\n  - `get_current_active_user(token: str = Depends(oauth2_scheme)) -> User`\\n    - **Purpose**: Dependency that retrieves the current active user from the JWT token.\\n    - **Parameters**:\\n      - `token`: The JWT token, injected by FastAPI.\\n    - **Returns**: An instance of the `User` model.\\n\\n### Relationship Mapping\\n- **Dependencies**:\\n  - `auth.py` depends on `utils.py` for password hashing and JWT handling.\\n  - `auth.py` uses `models.py` for user representation.\\n  - `auth.py` uses `schemas.py` for request and response validation.\\n  - `dependencies.py` uses `auth.py` to retrieve the current user.\\n\\n### Technology Identification\\n- **Programming Language**: Python\\n- **Framework**: FastAPI\\n- **Libraries**: \\n  - `pydantic` for data validation\\n  - `passlib` for password hashing\\n  - `pyjwt` for JWT handling\\n\\n### Purpose Documentation\\n- **`auth.py`**: Handles user authentication, including login and token generation.\\n- **`models.py`**: Defines the user data model.\\n- **`schemas.py`**: Provides schemas for user creation and token response.\\n- **`utils.py`**: Contains utility functions for password management and JWT creation.\\n- **`dependencies.py`**: Provides dependency injection for retrieving the current user.\\n\\n### Interface Documentation\\n- **Public APIs**:\\n  - `login_user`: Endpoint for user login.\\n  - `get_current_user`: Endpoint for retrieving the current user based on JWT.\\n\\n### Data Structure Documentation\\n- **User Model**:\\n  - `id`: Integer identifier for the user.\\n  - `username`: String representing the user's username.\\n  - `hashed_password`: String representing the user's hashed password.\\n\\n- **Schemas**:\\n  - `UserCreate`: Used for user registration.\\n  - `Token`: Used for returning JWT tokens.\\n\\nThis documentation provides a comprehensive overview of the FastAPI authentication module, capturing the essential components, their relationships, and their purposes, following the C4 model principles.\\n</Output>\\n<Rubric>\\nDocuments code structure at function/class level, shows dependencies and relationships between components, organized and readable\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "5d2490eb-492b-41b1-89de-0c47e20f032c",
-        "latencyMs": 19877,
+        "id": "76b62412-ebf1-43a0-b474-6fed7b81bb9b",
+        "latencyMs": 25786,
         "namedScores": {
           "c4-code_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To create C4 Code-level documentation for a Python FastAPI authentication module that handles JWT (JSON Web Tokens), we will analyze the code structure, extract function signatures, and document the relationships and responsibilities of each component. Below is a structured documentation based on the C4 model principles.\n\n### Directory Structure\nAssuming the following directory structure for the authentication module:\n\n```\n/auth\n    ├── __init__.py\n    ├── auth.py\n    ├── models.py\n    ├── schemas.py\n    ├── utils.py\n    └── dependencies.py\n```\n\n### Code Element Identification\n\n#### 1. `auth.py`\nThis file contains the main authentication logic, including login and token generation.\n\n- **Classes:**\n  - `AuthService`\n    - **Responsibilities:** Handles user authentication, token creation, and validation.\n\n- **Functions:**\n  - `login(username: str, password: str) -> str`\n    - **Purpose:** Authenticates a user and returns a JWT token.\n    - **Parameters:**\n      - `username`: The username of the user.\n      - `password`: The password of the user.\n    - **Returns:** A JWT token as a string.\n\n  - `verify_token(token: str) -> dict`\n    - **Purpose:** Verifies the provided JWT token and returns the payload.\n    - **Parameters:**\n      - `token`: The JWT token to verify.\n    - **Returns:** A dictionary containing the token payload.\n\n#### 2. `models.py`\nThis file defines the database models related to user authentication.\n\n- **Classes:**\n  - `User`\n    - **Attributes:**\n      - `id: int`\n      - `username: str`\n      - `hashed_password: str`\n    - **Purpose:** Represents a user in the database.\n\n#### 3. `schemas.py`\nThis file contains Pydantic schemas for request and response validation.\n\n- **Classes:**\n  - `UserCreate`\n    - **Attributes:**\n      - `username: str`\n      - `password: str`\n    - **Purpose:** Schema for creating a new user.\n\n  - `UserOut`\n    - **Attributes:**\n      - `id: int`\n      - `username: str`\n    - **Purpose:** Schema for returning user information.\n\n#### 4. `utils.py`\nThis file contains utility functions for password hashing and JWT handling.\n\n- **Functions:**\n  - `hash_password(password: str) -> str`\n    - **Purpose:** Hashes a password for secure storage.\n    - **Parameters:**\n      - `password`: The plain text password to hash.\n    - **Returns:** A hashed password as a string.\n\n  - `verify_password(plain_password: str, hashed_password: str) -> bool`\n    - **Purpose:** Verifies a plain text password against a hashed password.\n    - **Parameters:**\n      - `plain_password`: The plain text password.\n      - `hashed_password`: The hashed password to compare against.\n    - **Returns:** `True` if the passwords match, `False` otherwise.\n\n#### 5. `dependencies.py`\nThis file contains dependency injection functions for FastAPI routes.\n\n- **Functions:**\n  - `get_current_user(token: str = Depends(oauth2_scheme)) -> User`\n    - **Purpose:** Retrieves the current user based on the provided JWT token.\n    - **Parameters:**\n      - `token`: The JWT token from the request.\n    - **Returns:** An instance of `User`.\n\n### Relationship Mapping\n- **AuthService** depends on `User` from `models.py` for user data.\n- `login` function in `auth.py` calls `hash_password` from `utils.py` to verify passwords.\n- `verify_token` function in `auth.py` uses JWT utilities to decode and validate tokens.\n- `get_current_user` in `dependencies.py` uses `verify_token` to validate the token and fetch user details.\n\n### Technology Identification\n- **Programming Language:** Python\n- **Framework:** FastAPI\n- **Libraries:**\n  - `pydantic` for data validation\n  - `passlib` for password hashing\n  - `pyjwt` for JWT handling\n\n### Purpose Documentation\n- **auth.py**: Central module for handling authentication logic, including user login and JWT management.\n- **models.py**: Defines the data structure for user entities in the database.\n- **schemas.py**: Provides data validation schemas for user input and output.\n- **utils.py**: Contains utility functions for password management and JWT operations.\n- **dependencies.py**: Manages FastAPI dependencies for user authentication in routes.\n\n### Interface Documentation\n- **Public APIs:**\n  - `POST /login`: Authenticates a user and returns a JWT token.\n  - `GET /users/me`: Retrieves the current authenticated user.\n\n### Data Structure Documentation\n- **User Model:**\n  - `id`: Integer, unique identifier for the user.\n  - `username`: String, unique username for the user.\n  - `hashed_password`: String, hashed password for secure storage.\n\n- **UserCreate Schema:**\n  - `username`: String, required for user creation.\n  - `password`: String, required for user creation.\n\n- **UserOut Schema:**\n  - `id`: Integer, user identifier.\n  - `username`: String, user’s username.\n\nThis documentation provides a comprehensive overview of the FastAPI authentication module, capturing the essential components, their relationships, and responsibilities, following the C4 model principles.",
+          "output": "To create C4 Code-level documentation for a Python FastAPI authentication module that handles JWT (JSON Web Tokens), we will analyze the code structure, extract function signatures, and document the relationships and responsibilities of each component. Below is a structured documentation based on the C4 model principles.\n\n### Directory Structure\nAssuming the following directory structure for the authentication module:\n\n```\n/auth\n    ├── __init__.py\n    ├── auth.py\n    ├── models.py\n    ├── schemas.py\n    ├── utils.py\n    └── dependencies.py\n```\n\n### Code Element Identification\n\n#### 1. `auth.py`\nThis file contains the main authentication logic, including login and token generation.\n\n- **Functions:**\n  - `login_user(username: str, password: str) -> str`\n    - **Purpose**: Authenticates a user and returns a JWT token.\n    - **Parameters**:\n      - `username`: The username of the user.\n      - `password`: The password of the user.\n    - **Returns**: A JWT token as a string.\n  \n  - `get_current_user(token: str) -> User`\n    - **Purpose**: Decodes the JWT token and retrieves the current user.\n    - **Parameters**:\n      - `token`: The JWT token as a string.\n    - **Returns**: An instance of the `User` model.\n\n#### 2. `models.py`\nThis file defines the data models used in the authentication process.\n\n- **Classes:**\n  - `User`\n    - **Attributes**:\n      - `id: int`\n      - `username: str`\n      - `hashed_password: str`\n    - **Purpose**: Represents a user in the system.\n\n#### 3. `schemas.py`\nThis file contains Pydantic schemas for request and response validation.\n\n- **Classes:**\n  - `UserCreate`\n    - **Attributes**:\n      - `username: str`\n      - `password: str`\n    - **Purpose**: Schema for creating a new user.\n  \n  - `Token`\n    - **Attributes**:\n      - `access_token: str`\n      - `token_type: str`\n    - **Purpose**: Schema for returning a JWT token.\n\n#### 4. `utils.py`\nThis file contains utility functions for password hashing and JWT handling.\n\n- **Functions:**\n  - `hash_password(password: str) -> str`\n    - **Purpose**: Hashes a password using a secure hashing algorithm.\n    - **Parameters**:\n      - `password`: The plain text password.\n    - **Returns**: The hashed password as a string.\n\n  - `verify_password(plain_password: str, hashed_password: str) -> bool`\n    - **Purpose**: Verifies a plain text password against a hashed password.\n    - **Parameters**:\n      - `plain_password`: The plain text password.\n      - `hashed_password`: The hashed password.\n    - **Returns**: `True` if the password matches, `False` otherwise.\n\n  - `create_jwt_token(data: dict) -> str`\n    - **Purpose**: Creates a JWT token from the provided data.\n    - **Parameters**:\n      - `data`: A dictionary containing user information.\n    - **Returns**: A JWT token as a string.\n\n#### 5. `dependencies.py`\nThis file contains dependency injection functions for FastAPI.\n\n- **Functions:**\n  - `get_current_active_user(token: str = Depends(oauth2_scheme)) -> User`\n    - **Purpose**: Dependency that retrieves the current active user from the JWT token.\n    - **Parameters**:\n      - `token`: The JWT token, injected by FastAPI.\n    - **Returns**: An instance of the `User` model.\n\n### Relationship Mapping\n- **Dependencies**:\n  - `auth.py` depends on `utils.py` for password hashing and JWT handling.\n  - `auth.py` uses `models.py` for user representation.\n  - `auth.py` uses `schemas.py` for request and response validation.\n  - `dependencies.py` uses `auth.py` to retrieve the current user.\n\n### Technology Identification\n- **Programming Language**: Python\n- **Framework**: FastAPI\n- **Libraries**: \n  - `pydantic` for data validation\n  - `passlib` for password hashing\n  - `pyjwt` for JWT handling\n\n### Purpose Documentation\n- **`auth.py`**: Handles user authentication, including login and token generation.\n- **`models.py`**: Defines the user data model.\n- **`schemas.py`**: Provides schemas for user creation and token response.\n- **`utils.py`**: Contains utility functions for password management and JWT creation.\n- **`dependencies.py`**: Provides dependency injection for retrieving the current user.\n\n### Interface Documentation\n- **Public APIs**:\n  - `login_user`: Endpoint for user login.\n  - `get_current_user`: Endpoint for retrieving the current user based on JWT.\n\n### Data Structure Documentation\n- **User Model**:\n  - `id`: Integer identifier for the user.\n  - `username`: String representing the user's username.\n  - `hashed_password`: String representing the user's hashed password.\n\n- **Schemas**:\n  - `UserCreate`: Used for user registration.\n  - `Token`: Used for returning JWT tokens.\n\nThis documentation provides a comprehensive overview of the FastAPI authentication module, capturing the essential components, their relationships, and their purposes, following the C4 model principles.",
           "tokenUsage": {
-            "total": 1552,
+            "total": 1557,
             "prompt": 404,
-            "completion": 1148,
+            "completion": 1153,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 19877,
+          "latencyMs": 25786,
           "finishReason": "stop",
-          "cost": 0.0007493999999999999,
+          "cost": 0.0007524,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4424d09bc328d8-IAH",
+                "cf-ray": "9e4910d67c0f16b9-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:49:39 GMT",
+                "date": "Mon, 30 Mar 2026 18:09:56 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "19657",
+                "openai-processing-ms": "25479",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=COASRwaO6tcl9ZUxpxLTCoX_ZeQCEVYYhcqfo_BmzVk-1774842560.0990565-1.0.1.1-wWEWXcGYukE4ImAhrMcGP5yMBzTjxK8Zmgs4eLyB0GJLlzBVI8eiH9tkFPvVNAGOhRH0Ge1W0wjJidG95z4AL_bpdrno0YqNZSjTyIoWqkd13SjScVjRJEKHUCSCGpzg; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:19:39 GMT",
+                "set-cookie": "__cf_bm=5PLFh2rlZWe8GVg7wrSRrIVghzMfG3sZKxlrGDjDhDk-1774894170.6375763-1.0.1.1-yEb2IG4DBuPIu8GAEMJopiNozO1UfNkII62EAEe5ii7J8eHoBAkYNweMmaKuZ5FwtjZ57JYKQgahR8G1g8oCK9E0b1CcfBPE6yqGcmlHbHO8nr8ijPT.0JSdCP0K_wV0; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:39:56 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-requests": "9139",
                 "x-ratelimit-remaining-tokens": "199468",
-                "x-ratelimit-reset-requests": "1h5m14.856s",
+                "x-ratelimit-reset-requests": "2h3m57.693s",
                 "x-ratelimit-reset-tokens": "159ms",
-                "x-request-id": "req_62f09fbd42a246cfac11c1037a3517fd"
+                "x-request-id": "req_13b503f30ff04b81adaf72bc4bacb267"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4424d09bc328d8-IAH",
+              "cf-ray": "9e4910d67c0f16b9-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:49:39 GMT",
+              "date": "Mon, 30 Mar 2026 18:09:56 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "19657",
+              "openai-processing-ms": "25479",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=COASRwaO6tcl9ZUxpxLTCoX_ZeQCEVYYhcqfo_BmzVk-1774842560.0990565-1.0.1.1-wWEWXcGYukE4ImAhrMcGP5yMBzTjxK8Zmgs4eLyB0GJLlzBVI8eiH9tkFPvVNAGOhRH0Ge1W0wjJidG95z4AL_bpdrno0YqNZSjTyIoWqkd13SjScVjRJEKHUCSCGpzg; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:19:39 GMT",
+              "set-cookie": "__cf_bm=5PLFh2rlZWe8GVg7wrSRrIVghzMfG3sZKxlrGDjDhDk-1774894170.6375763-1.0.1.1-yEb2IG4DBuPIu8GAEMJopiNozO1UfNkII62EAEe5ii7J8eHoBAkYNweMmaKuZ5FwtjZ57JYKQgahR8G1g8oCK9E0b1CcfBPE6yqGcmlHbHO8nr8ijPT.0JSdCP0K_wV0; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:39:56 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-requests": "9139",
               "x-ratelimit-remaining-tokens": "199468",
-              "x-ratelimit-reset-requests": "1h5m14.856s",
+              "x-ratelimit-reset-requests": "2h3m57.693s",
               "x-ratelimit-reset-tokens": "159ms",
-              "x-request-id": "req_62f09fbd42a246cfac11c1037a3517fd"
+              "x-request-id": "req_13b503f30ff04b81adaf72bc4bacb267"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 404,
-        "completion": 1148,
+        "completion": 1153,
         "cached": 0,
-        "total": 1552,
+        "total": 1557,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1396,
-          "prompt": 1346,
+          "total": 1401,
+          "prompt": 1351,
           "completion": 50,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 21600,
-      "evaluationDurationMs": 21600
+      "durationMs": 27057,
+      "evaluationDurationMs": 27057
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:49:41.634Z",
-    "evaluationCreatedAt": "2026-03-30T03:49:19.999Z"
+    "exportedAt": "2026-03-30T18:09:57.672Z",
+    "evaluationCreatedAt": "2026-03-30T18:09:30.540Z"
   }
 }

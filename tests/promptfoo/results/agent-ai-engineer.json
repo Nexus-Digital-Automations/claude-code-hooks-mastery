@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-Slu-2026-03-30T03:47:20",
+  "evalId": "eval-YJn-2026-03-30T18:06:47",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:47:20.091Z",
+    "timestamp": "2026-03-30T18:06:47.078Z",
     "prompts": [
       {
         "id": "cb524c197cd490424b051737454296035087abbd43cb7c77074063d3de9a6ddc",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 15572,
+          "totalLatencyMs": 18062,
           "tokenUsage": {
             "prompt": 487,
-            "completion": 951,
+            "completion": 1004,
             "cached": 0,
-            "total": 1438,
+            "total": 1491,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1211,
-              "prompt": 1158,
-              "completion": 53,
+              "total": 1279,
+              "prompt": 1211,
+              "completion": 68,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "ai-engineer_quality": 1
           },
-          "cost": 0.00064365
+          "cost": 0.00067545
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00064365,
+        "cost": 0.00067545,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "ai-engineer_quality": 1
           },
           "tokensUsed": {
-            "total": 1211,
-            "prompt": 1158,
-            "completion": 53,
+            "total": 1279,
+            "prompt": 1211,
+            "completion": 68,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output mentions an embedding model, a vector database (document store), and retrieval mechanism, and it provides a practical implementation example of a RAG pipeline.",
+              "reason": "The output mentions embedding model (Step 2), vector database (Step 3), chunking (Step 1), and retrieval strategy (Step 4). It also includes a practical implementation example with code snippets demonstrating these concepts.",
               "tokensUsed": {
-                "total": 1211,
-                "prompt": 1158,
-                "completion": 53,
+                "total": 1279,
+                "prompt": 1211,
+                "completion": 68,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nBuilding a Retrieval Augmented Generation (RAG) pipeline for querying internal documentation involves several key components, including document retrieval, embedding generation, and response generation. Below is a step-by-step guide to creating a RAG pipeline tailored for internal documentation.\\n\\n### Step 1: Define the Architecture\\n\\nA typical RAG architecture consists of the following components:\\n\\n1. **Document Store**: A vector database to store and retrieve documents.\\n2. **Embedding Model**: To convert documents and queries into embeddings.\\n3. **Retrieval Mechanism**: To fetch relevant documents based on the query.\\n4. **LLM (Language Model)**: To generate responses based on retrieved documents.\\n5. **Query Processing**: To handle and preprocess user queries.\\n\\n### Step 2: Set Up the Document Store\\n\\n1. **Choose a Vector Database**: Select a vector database like Pinecone, Weaviate, or Chroma to store your internal documentation.\\n2. **Ingest Documents**: Convert your internal documentation into a suitable format (e.g., text files, PDFs) and ingest them into the vector database. You may need to preprocess the documents to ensure they are clean and structured.\\n\\n### Step 3: Generate Embeddings\\n\\n1. **Select an Embedding Model**: Use an embedding model like OpenAI's `text-embedding-3-large` or Cohere's `embed-v3` to generate embeddings for your documents.\\n2. **Embed Documents**: For each document, generate an embedding and store it alongside the document in the vector database.\\n\\n### Step 4: Implement the Retrieval Mechanism\\n\\n1. **Query Processing**: When a user submits a query, preprocess it (e.g., normalization, tokenization).\\n2. **Generate Query Embedding**: Use the same embedding model to convert the user query into an embedding.\\n3. **Retrieve Relevant Documents**: Query the vector database using the generated embedding to retrieve the top N relevant documents based on similarity (e.g., cosine similarity).\\n\\n### Step 5: Response Generation\\n\\n1. **Select an LLM**: Choose a language model like OpenAI's GPT-4 or an open-source model like Llama 3.1 for generating responses.\\n2. **Construct Input for LLM**: Combine the retrieved documents and the user query to create a prompt for the LLM. You can include context from the documents to guide the response.\\n3. **Generate Response**: Pass the constructed prompt to the LLM to generate a coherent and contextually relevant response.\\n\\n### Step 6: Post-Processing and Output\\n\\n1. **Response Formatting**: Format the response for clarity and usability. You may want to highlight key points or provide additional context.\\n2. **Return the Response**: Send the generated response back to the user.\\n\\n### Step 7: Optimization and Monitoring\\n\\n1. **Performance Monitoring**: Track the performance of the RAG pipeline, including retrieval accuracy and response quality.\\n2. **Feedback Loop**: Implement a feedback mechanism to improve the system over time based on user interactions and satisfaction.\\n3. **Cost Optimization**: Optimize the model selection and caching strategies to reduce costs, especially if using cloud-based services.\\n\\n### Example Implementation\\n\\nHere’s a simplified code snippet to illustrate the core components of the RAG pipeline:\\n\\n```python\\nfrom vector_database import VectorDB  # Placeholder for your vector database client\\nfrom embedding_model import EmbeddingModel  # Placeholder for your embedding model\\nfrom llm import LLM  # Placeholder for your language model\\n\\n# Initialize components\\nvector_db = VectorDB()\\nembedding_model = EmbeddingModel()\\nllm = LLM()\\n\\ndef rag_pipeline(query):\\n    # Step 1: Preprocess the query\\n    processed_query = preprocess_query(query)\\n    \\n    # Step 2: Generate query embedding\\n    query_embedding = embedding_model.embed(processed_query)\\n    \\n    # Step 3: Retrieve relevant documents\\n    retrieved_docs = vector_db.retrieve(query_embedding, top_n=5)\\n    \\n    # Step 4: Construct prompt for LLM\\n    prompt = construct_prompt(retrieved_docs, processed_query)\\n    \\n    # Step 5: Generate response\\n    response = llm.generate(prompt)\\n    \\n    return response\\n\\n# Example usage\\nuser_query = \\\"How do I reset my password?\\\"\\nresponse = rag_pipeline(user_query)\\nprint(response)\\n```\\n\\n### Conclusion\\n\\nThis RAG pipeline provides a robust framework for querying internal documentation, leveraging the strengths of retrieval and generation to deliver accurate and contextually relevant responses. You can further enhance the pipeline by incorporating advanced techniques like query expansion, reranking, and context compression based on your specific use case and requirements.\\n</Output>\\n<Rubric>\\nMentions at least 3 of: embedding model, vector store, chunking, retrieval strategy, prompt engineering. Shows practical implementation knowledge\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nBuilding a Retrieval Augmented Generation (RAG) pipeline for querying internal documentation involves several key components: document retrieval, embedding generation, and response generation. Below is a step-by-step guide to creating a RAG pipeline tailored for internal documentation.\\n\\n### Step 1: Data Preparation\\n\\n1. **Collect Internal Documentation**: Gather all relevant internal documents, such as manuals, FAQs, and knowledge base articles.\\n\\n2. **Preprocess Documents**: Clean and preprocess the text data. This may include:\\n   - Removing unnecessary formatting\\n   - Tokenization\\n   - Normalization (lowercasing, stemming, etc.)\\n\\n3. **Chunking**: Split documents into manageable chunks. This can be done using:\\n   - Semantic chunking (based on content)\\n   - Recursive chunking (breaking down larger chunks)\\n   - Document-structure aware chunking (preserving sections or paragraphs)\\n\\n### Step 2: Embedding Generation\\n\\n1. **Select an Embedding Model**: Choose an embedding model suitable for your use case. Options include:\\n   - OpenAI's `text-embedding-3-large`\\n   - Cohere's `embed-v3`\\n   - BGE-large\\n\\n2. **Generate Embeddings**: For each document chunk, generate embeddings using the selected model. Store these embeddings in a vector database.\\n\\n### Step 3: Vector Database Setup\\n\\n1. **Choose a Vector Database**: Select a vector database to store and query embeddings. Options include:\\n   - Pinecone\\n   - Qdrant\\n   - Weaviate\\n   - Chroma\\n   - Milvus\\n\\n2. **Index Embeddings**: Load the generated embeddings into the vector database, ensuring that each embedding is associated with its corresponding document chunk.\\n\\n### Step 4: Query Processing\\n\\n1. **User Query Input**: Capture user queries through a user interface or API.\\n\\n2. **Query Embedding**: Use the same embedding model to convert the user query into an embedding.\\n\\n3. **Retrieval**: Query the vector database to retrieve the top N relevant document chunks based on similarity to the query embedding. Use a hybrid search approach if necessary (combining vector similarity with keyword matching).\\n\\n### Step 5: Reranking (Optional)\\n\\n1. **Reranking**: If needed, apply a reranking model (e.g., Cohere rerank-3 or a cross-encoder model) to refine the list of retrieved chunks based on relevance.\\n\\n### Step 6: Response Generation\\n\\n1. **Select a Generative Model**: Choose a generative model for response generation. Options include:\\n   - OpenAI GPT-4\\n   - Anthropic Claude\\n   - Open-source models like Llama 3.1\\n\\n2. **Contextual Input**: Prepare the input for the generative model by combining the user query with the retrieved document chunks. You may want to include a prompt that instructs the model on how to respond.\\n\\n3. **Generate Response**: Use the generative model to produce a coherent response based on the provided context.\\n\\n### Step 7: Output\\n\\n1. **Return Response**: Send the generated response back to the user through the interface or API.\\n\\n### Step 8: Monitoring and Optimization\\n\\n1. **Monitor Performance**: Track the performance of the RAG pipeline, including retrieval accuracy and response quality.\\n\\n2. **Optimize**: Based on user feedback and performance metrics, refine the chunking strategy, embedding model, or generative model as needed.\\n\\n### Example Implementation\\n\\nHere’s a simplified code snippet to illustrate the core components of the RAG pipeline:\\n\\n```python\\nfrom your_vector_database import VectorDatabase\\nfrom your_embedding_model import EmbeddingModel\\nfrom your_generative_model import GenerativeModel\\n\\n# Step 1: Initialize models and database\\nembedding_model = EmbeddingModel('openai/text-embedding-3-large')\\ngenerative_model = GenerativeModel('openai/gpt-4')\\nvector_db = VectorDatabase('your_vector_db')\\n\\n# Step 2: User query\\nuser_query = \\\"How do I reset my password?\\\"\\n\\n# Step 3: Generate query embedding\\nquery_embedding = embedding_model.embed(user_query)\\n\\n# Step 4: Retrieve relevant chunks\\nretrieved_chunks = vector_db.query(query_embedding, top_n=5)\\n\\n# Step 5: Prepare context for generative model\\ncontext = \\\"\\\\n\\\".join(retrieved_chunks)\\ninput_for_model = f\\\"Based on the following information, answer the question: {user_query}\\\\n\\\\n{context}\\\"\\n\\n# Step 6: Generate response\\nresponse = generative_model.generate(input_for_model)\\n\\n# Step 7: Output response\\nprint(response)\\n```\\n\\n### Conclusion\\n\\nThis RAG pipeline allows for efficient querying of internal documentation, leveraging both retrieval and generative capabilities to provide accurate and contextually relevant responses. Adjust the components based on your specific requirements and the nature of your internal documentation.\\n</Output>\\n<Rubric>\\nMentions at least 3 of: embedding model, vector store, chunking, retrieval strategy, prompt engineering. Shows practical implementation knowledge\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "a0bdf900-f9b9-4f38-bff2-341f91ca64f2",
-        "latencyMs": 15572,
+        "id": "db5674ad-a033-4eae-8924-6bb4484207a1",
+        "latencyMs": 18062,
         "namedScores": {
           "ai-engineer_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Building a Retrieval Augmented Generation (RAG) pipeline for querying internal documentation involves several key components, including document retrieval, embedding generation, and response generation. Below is a step-by-step guide to creating a RAG pipeline tailored for internal documentation.\n\n### Step 1: Define the Architecture\n\nA typical RAG architecture consists of the following components:\n\n1. **Document Store**: A vector database to store and retrieve documents.\n2. **Embedding Model**: To convert documents and queries into embeddings.\n3. **Retrieval Mechanism**: To fetch relevant documents based on the query.\n4. **LLM (Language Model)**: To generate responses based on retrieved documents.\n5. **Query Processing**: To handle and preprocess user queries.\n\n### Step 2: Set Up the Document Store\n\n1. **Choose a Vector Database**: Select a vector database like Pinecone, Weaviate, or Chroma to store your internal documentation.\n2. **Ingest Documents**: Convert your internal documentation into a suitable format (e.g., text files, PDFs) and ingest them into the vector database. You may need to preprocess the documents to ensure they are clean and structured.\n\n### Step 3: Generate Embeddings\n\n1. **Select an Embedding Model**: Use an embedding model like OpenAI's `text-embedding-3-large` or Cohere's `embed-v3` to generate embeddings for your documents.\n2. **Embed Documents**: For each document, generate an embedding and store it alongside the document in the vector database.\n\n### Step 4: Implement the Retrieval Mechanism\n\n1. **Query Processing**: When a user submits a query, preprocess it (e.g., normalization, tokenization).\n2. **Generate Query Embedding**: Use the same embedding model to convert the user query into an embedding.\n3. **Retrieve Relevant Documents**: Query the vector database using the generated embedding to retrieve the top N relevant documents based on similarity (e.g., cosine similarity).\n\n### Step 5: Response Generation\n\n1. **Select an LLM**: Choose a language model like OpenAI's GPT-4 or an open-source model like Llama 3.1 for generating responses.\n2. **Construct Input for LLM**: Combine the retrieved documents and the user query to create a prompt for the LLM. You can include context from the documents to guide the response.\n3. **Generate Response**: Pass the constructed prompt to the LLM to generate a coherent and contextually relevant response.\n\n### Step 6: Post-Processing and Output\n\n1. **Response Formatting**: Format the response for clarity and usability. You may want to highlight key points or provide additional context.\n2. **Return the Response**: Send the generated response back to the user.\n\n### Step 7: Optimization and Monitoring\n\n1. **Performance Monitoring**: Track the performance of the RAG pipeline, including retrieval accuracy and response quality.\n2. **Feedback Loop**: Implement a feedback mechanism to improve the system over time based on user interactions and satisfaction.\n3. **Cost Optimization**: Optimize the model selection and caching strategies to reduce costs, especially if using cloud-based services.\n\n### Example Implementation\n\nHere’s a simplified code snippet to illustrate the core components of the RAG pipeline:\n\n```python\nfrom vector_database import VectorDB  # Placeholder for your vector database client\nfrom embedding_model import EmbeddingModel  # Placeholder for your embedding model\nfrom llm import LLM  # Placeholder for your language model\n\n# Initialize components\nvector_db = VectorDB()\nembedding_model = EmbeddingModel()\nllm = LLM()\n\ndef rag_pipeline(query):\n    # Step 1: Preprocess the query\n    processed_query = preprocess_query(query)\n    \n    # Step 2: Generate query embedding\n    query_embedding = embedding_model.embed(processed_query)\n    \n    # Step 3: Retrieve relevant documents\n    retrieved_docs = vector_db.retrieve(query_embedding, top_n=5)\n    \n    # Step 4: Construct prompt for LLM\n    prompt = construct_prompt(retrieved_docs, processed_query)\n    \n    # Step 5: Generate response\n    response = llm.generate(prompt)\n    \n    return response\n\n# Example usage\nuser_query = \"How do I reset my password?\"\nresponse = rag_pipeline(user_query)\nprint(response)\n```\n\n### Conclusion\n\nThis RAG pipeline provides a robust framework for querying internal documentation, leveraging the strengths of retrieval and generation to deliver accurate and contextually relevant responses. You can further enhance the pipeline by incorporating advanced techniques like query expansion, reranking, and context compression based on your specific use case and requirements.",
+          "output": "Building a Retrieval Augmented Generation (RAG) pipeline for querying internal documentation involves several key components: document retrieval, embedding generation, and response generation. Below is a step-by-step guide to creating a RAG pipeline tailored for internal documentation.\n\n### Step 1: Data Preparation\n\n1. **Collect Internal Documentation**: Gather all relevant internal documents, such as manuals, FAQs, and knowledge base articles.\n\n2. **Preprocess Documents**: Clean and preprocess the text data. This may include:\n   - Removing unnecessary formatting\n   - Tokenization\n   - Normalization (lowercasing, stemming, etc.)\n\n3. **Chunking**: Split documents into manageable chunks. This can be done using:\n   - Semantic chunking (based on content)\n   - Recursive chunking (breaking down larger chunks)\n   - Document-structure aware chunking (preserving sections or paragraphs)\n\n### Step 2: Embedding Generation\n\n1. **Select an Embedding Model**: Choose an embedding model suitable for your use case. Options include:\n   - OpenAI's `text-embedding-3-large`\n   - Cohere's `embed-v3`\n   - BGE-large\n\n2. **Generate Embeddings**: For each document chunk, generate embeddings using the selected model. Store these embeddings in a vector database.\n\n### Step 3: Vector Database Setup\n\n1. **Choose a Vector Database**: Select a vector database to store and query embeddings. Options include:\n   - Pinecone\n   - Qdrant\n   - Weaviate\n   - Chroma\n   - Milvus\n\n2. **Index Embeddings**: Load the generated embeddings into the vector database, ensuring that each embedding is associated with its corresponding document chunk.\n\n### Step 4: Query Processing\n\n1. **User Query Input**: Capture user queries through a user interface or API.\n\n2. **Query Embedding**: Use the same embedding model to convert the user query into an embedding.\n\n3. **Retrieval**: Query the vector database to retrieve the top N relevant document chunks based on similarity to the query embedding. Use a hybrid search approach if necessary (combining vector similarity with keyword matching).\n\n### Step 5: Reranking (Optional)\n\n1. **Reranking**: If needed, apply a reranking model (e.g., Cohere rerank-3 or a cross-encoder model) to refine the list of retrieved chunks based on relevance.\n\n### Step 6: Response Generation\n\n1. **Select a Generative Model**: Choose a generative model for response generation. Options include:\n   - OpenAI GPT-4\n   - Anthropic Claude\n   - Open-source models like Llama 3.1\n\n2. **Contextual Input**: Prepare the input for the generative model by combining the user query with the retrieved document chunks. You may want to include a prompt that instructs the model on how to respond.\n\n3. **Generate Response**: Use the generative model to produce a coherent response based on the provided context.\n\n### Step 7: Output\n\n1. **Return Response**: Send the generated response back to the user through the interface or API.\n\n### Step 8: Monitoring and Optimization\n\n1. **Monitor Performance**: Track the performance of the RAG pipeline, including retrieval accuracy and response quality.\n\n2. **Optimize**: Based on user feedback and performance metrics, refine the chunking strategy, embedding model, or generative model as needed.\n\n### Example Implementation\n\nHere’s a simplified code snippet to illustrate the core components of the RAG pipeline:\n\n```python\nfrom your_vector_database import VectorDatabase\nfrom your_embedding_model import EmbeddingModel\nfrom your_generative_model import GenerativeModel\n\n# Step 1: Initialize models and database\nembedding_model = EmbeddingModel('openai/text-embedding-3-large')\ngenerative_model = GenerativeModel('openai/gpt-4')\nvector_db = VectorDatabase('your_vector_db')\n\n# Step 2: User query\nuser_query = \"How do I reset my password?\"\n\n# Step 3: Generate query embedding\nquery_embedding = embedding_model.embed(user_query)\n\n# Step 4: Retrieve relevant chunks\nretrieved_chunks = vector_db.query(query_embedding, top_n=5)\n\n# Step 5: Prepare context for generative model\ncontext = \"\\n\".join(retrieved_chunks)\ninput_for_model = f\"Based on the following information, answer the question: {user_query}\\n\\n{context}\"\n\n# Step 6: Generate response\nresponse = generative_model.generate(input_for_model)\n\n# Step 7: Output response\nprint(response)\n```\n\n### Conclusion\n\nThis RAG pipeline allows for efficient querying of internal documentation, leveraging both retrieval and generative capabilities to provide accurate and contextually relevant responses. Adjust the components based on your specific requirements and the nature of your internal documentation.",
           "tokenUsage": {
-            "total": 1438,
+            "total": 1491,
             "prompt": 487,
-            "completion": 951,
+            "completion": 1004,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 15572,
+          "latencyMs": 18062,
           "finishReason": "stop",
-          "cost": 0.00064365,
+          "cost": 0.00067545,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4421e2fa91d470-IAH",
+                "cf-ray": "9e490cd93eb216c6-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:47:35 GMT",
+                "date": "Mon, 30 Mar 2026 18:07:05 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "15166",
+                "openai-processing-ms": "17798",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=fe5Fw_RTsfWY.y0J3VfpqpkMDa8YGuOoJWAoNdJDf.M-1774842440.1532018-1.0.1.1-fUqMkOddcAKuw96aFjr16.p3JH7XWGgWWVfy6jk1yy2HaArTtxgdOq.tb92q8KHjVXMnVhA7rZx9VPaOjTCbQsWj6jTT3vJhh4KrrJw4fVa2obX4OoBHmNpeL2EMd0fX; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:17:35 GMT",
+                "set-cookie": "__cf_bm=lQmnp_cN50kuJE2UFGpZPZWfROfjQLt.ir8AfZywhbk-1774894007.2341652-1.0.1.1-wfmpIXXMdNUBv5gU2K7rCPJkrrilWT8saSYPUGEnT5aqWkHRqRkIMW5CKWxqUvQRchm8PZdV6jJD.eOruKZjU.iyweODSLQcjACbnF0bRbLWR3t.SlwGE5uF5fuWKkjW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:37:05 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-requests": "9209",
                 "x-ratelimit-remaining-tokens": "199479",
-                "x-ratelimit-reset-requests": "1h5m13.731s",
+                "x-ratelimit-reset-requests": "1h53m52.39s",
                 "x-ratelimit-reset-tokens": "156ms",
-                "x-request-id": "req_05e57e226c8e4883b4b7ab13a2e0f001"
+                "x-request-id": "req_56de9d10c88b4095a45f5c9633863b83"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4421e2fa91d470-IAH",
+              "cf-ray": "9e490cd93eb216c6-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:47:35 GMT",
+              "date": "Mon, 30 Mar 2026 18:07:05 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "15166",
+              "openai-processing-ms": "17798",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=fe5Fw_RTsfWY.y0J3VfpqpkMDa8YGuOoJWAoNdJDf.M-1774842440.1532018-1.0.1.1-fUqMkOddcAKuw96aFjr16.p3JH7XWGgWWVfy6jk1yy2HaArTtxgdOq.tb92q8KHjVXMnVhA7rZx9VPaOjTCbQsWj6jTT3vJhh4KrrJw4fVa2obX4OoBHmNpeL2EMd0fX; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:17:35 GMT",
+              "set-cookie": "__cf_bm=lQmnp_cN50kuJE2UFGpZPZWfROfjQLt.ir8AfZywhbk-1774894007.2341652-1.0.1.1-wfmpIXXMdNUBv5gU2K7rCPJkrrilWT8saSYPUGEnT5aqWkHRqRkIMW5CKWxqUvQRchm8PZdV6jJD.eOruKZjU.iyweODSLQcjACbnF0bRbLWR3t.SlwGE5uF5fuWKkjW; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:37:05 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-requests": "9209",
               "x-ratelimit-remaining-tokens": "199479",
-              "x-ratelimit-reset-requests": "1h5m13.731s",
+              "x-ratelimit-reset-requests": "1h53m52.39s",
               "x-ratelimit-reset-tokens": "156ms",
-              "x-request-id": "req_05e57e226c8e4883b4b7ab13a2e0f001"
+              "x-request-id": "req_56de9d10c88b4095a45f5c9633863b83"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 487,
-        "completion": 951,
+        "completion": 1004,
         "cached": 0,
-        "total": 1438,
+        "total": 1491,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1211,
-          "prompt": 1158,
-          "completion": 53,
+          "total": 1279,
+          "prompt": 1211,
+          "completion": 68,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 16931,
-      "evaluationDurationMs": 16931
+      "durationMs": 20087,
+      "evaluationDurationMs": 20087
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:47:37.051Z",
-    "evaluationCreatedAt": "2026-03-30T03:47:20.091Z"
+    "exportedAt": "2026-03-30T18:07:07.244Z",
+    "evaluationCreatedAt": "2026-03-30T18:06:47.078Z"
   }
 }

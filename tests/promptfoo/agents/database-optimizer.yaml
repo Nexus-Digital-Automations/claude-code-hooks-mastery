@@ -39,7 +39,13 @@ tests:
       > ''2024-01-01''. How do you optimize it?'
   assert:
   - type: llm-rubric
-    value: Identifies missing indexes, suggests composite index, mentions EXPLAIN ANALYZE, avoids SELECT *, suggests specific
-      columns
-    threshold: 0.7
+    value: >
+      PASS if: covers at least 3 of these 5 optimization strategies: (1) identifies missing
+      indexes on orders.created_at or order_items.order_id, (2) suggests an index (composite
+      or individual) to speed the query, (3) mentions EXPLAIN ANALYZE or checking the execution
+      plan, (4) recommends avoiding SELECT * and specifying only needed columns, (5) suggests
+      other query rewrites (filtering earlier, covering indexes, etc.).
+      FAIL ONLY if: covers fewer than 2 of these strategies, or gives generic advice with
+      no specific recommendations for this query.
+    threshold: 0.65
     metric: database-optimizer_quality

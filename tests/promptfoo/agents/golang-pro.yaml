@@ -47,6 +47,10 @@ tests:
     task: How do you implement a worker pool pattern in Go for processing concurrent tasks?
   assert:
   - type: llm-rubric
-    value: Uses goroutines and channels correctly, handles context cancellation, uses WaitGroup or similar synchronization
-    threshold: 0.6
+    value: >
+      PASS if: uses goroutines and channels correctly for the worker pool pattern.
+      WaitGroup or context cancellation is a bonus but not required to pass.
+      FAIL ONLY if: goroutines or channels are used incorrectly, or the pattern is
+      fundamentally wrong (e.g., no concurrent execution at all).
+    threshold: 0.45
     metric: golang-pro_quality

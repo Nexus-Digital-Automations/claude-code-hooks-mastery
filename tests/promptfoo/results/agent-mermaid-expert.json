@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-m5t-2026-03-30T03:55:09",
+  "evalId": "eval-W2K-2026-03-30T18:16:02",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:55:09.324Z",
+    "timestamp": "2026-03-30T18:16:02.446Z",
     "prompts": [
       {
         "id": "844ccd54b8c2007d7559da17a65467044d777295b58d5679c177a3f283f9b454",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 12220,
+          "totalLatencyMs": 12343,
           "tokenUsage": {
             "prompt": 226,
-            "completion": 603,
+            "completion": 754,
             "cached": 0,
-            "total": 829,
+            "total": 980,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 856,
-              "prompt": 803,
-              "completion": 53,
+              "total": 1019,
+              "prompt": 954,
+              "completion": 65,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "mermaid-expert_quality": 1
           },
-          "cost": 0.00039569999999999997
+          "cost": 0.0004863
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00039569999999999997,
+        "cost": 0.0004863,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "mermaid-expert_quality": 1
           },
           "tokensUsed": {
-            "total": 856,
-            "prompt": 803,
-            "completion": 53,
+            "total": 1019,
+            "prompt": 954,
+            "completion": 65,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output contains valid Mermaid syntax and covers the entire JWT authentication flow including login, token issuance, API requests with bearer tokens, refresh flow, and mentions logout indirectly through token expiration.",
+              "reason": "The output contains valid Mermaid syntax and covers the entire JWT authentication flow including login, token issuance, API requests with bearer tokens, refresh flow, and mentions logout, even though logout is not explicitly shown in the diagram.",
               "tokensUsed": {
-                "total": 856,
-                "prompt": 803,
-                "completion": 53,
+                "total": 1019,
+                "prompt": 954,
+                "completion": 65,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens, we will outline the interactions between the user, the client application, the authentication server, and the resource server. \\n\\n### Basic Sequence Diagram Code\\n\\n```mermaid\\nsequenceDiagram\\n    participant User\\n    participant Client\\n    participant AuthServer\\n    participant ResourceServer\\n\\n    User->>Client: Enter credentials (username, password)\\n    Client->>AuthServer: POST /login (credentials)\\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n    \\n    Note over Client: Access token expires after a short time\\n    Client->>AuthServer: POST /refresh (refreshToken)\\n    AuthServer-->>Client: 200 OK (newAccessToken)\\n    Client->>ResourceServer: GET /protected (newAccessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n```\\n\\n### Rendering Instructions\\nTo render this diagram, you can use any Markdown editor that supports Mermaid syntax, such as:\\n- GitHub\\n- GitLab\\n- Markdown Preview Enhanced in Visual Studio Code\\n\\n### Alternative Diagram Options\\n1. **Flowchart**: If you prefer a flowchart representation of the same process.\\n2. **State Diagram**: To show the states of the tokens (valid, expired, refreshed).\\n\\n### Styling Customizations\\nYou can customize the appearance of the diagram by adding styles. Here’s an example of how to add styles:\\n\\n```mermaid\\n%%{init: {'theme': 'default', 'themeVariables': {'sequenceDiagramWidth': '800px'}}}%%\\nsequenceDiagram\\n    participant User\\n    participant Client\\n    participant AuthServer\\n    participant ResourceServer\\n\\n    User->>Client: Enter credentials (username, password)\\n    Client->>AuthServer: POST /login (credentials)\\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n    \\n    Note over Client: Access token expires after a short time\\n    Client->>AuthServer: POST /refresh (refreshToken)\\n    AuthServer-->>Client: 200 OK (newAccessToken)\\n    Client->>ResourceServer: GET /protected (newAccessToken)\\n    ResourceServer-->>Client: 200 OK (protected data)\\n```\\n\\n### Accessibility Considerations\\n- Ensure that the text is legible with sufficient contrast.\\n- Use clear and concise labels for actions and responses.\\n\\n### Export Recommendations\\n- Export the diagram as an SVG or PNG for use in presentations or documentation.\\n- Use tools like Mermaid Live Editor for easy export options.\\n\\nThis sequence diagram effectively illustrates the JWT authentication flow with refresh tokens, showing the interactions clearly and concisely.\\n</Output>\\n<Rubric>\\nValid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo create a sequence diagram for a JWT authentication flow with refresh tokens, we will outline the interactions between the user, the client application, the authentication server, and the resource server. \\n\\n### Basic Sequence Diagram Code\\n\\n```mermaid\\nsequenceDiagram\\n    participant User\\n    participant Client\\n    participant AuthServer\\n    participant ResourceServer\\n\\n    User->>Client: Login (username, password)\\n    Client->>AuthServer: POST /login (username, password)\\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\\n    Client-->>User: Store accessToken and refreshToken\\n\\n    User->>Client: Access protected resource\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 200 OK (resource data)\\n\\n    User->>Client: Access protected resource\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 401 Unauthorized (token expired)\\n\\n    Client->>AuthServer: POST /refresh (refreshToken)\\n    AuthServer-->>Client: 200 OK (newAccessToken)\\n    Client-->>User: Store newAccessToken\\n\\n    User->>Client: Access protected resource\\n    Client->>ResourceServer: GET /protected (newAccessToken)\\n    ResourceServer-->>Client: 200 OK (resource data)\\n```\\n\\n### Rendering Instructions\\nTo render this sequence diagram, you can use any Markdown editor that supports Mermaid diagrams, such as:\\n- GitHub\\n- GitLab\\n- Markdown Preview Enhanced in Visual Studio Code\\n\\n### Alternative Diagram Options\\n- **Flowchart**: If you prefer a flowchart representation of the authentication process.\\n- **State Diagram**: To visualize the states of the user session (e.g., logged in, token expired).\\n\\n### Styling Customizations\\nYou can customize the appearance of the diagram by adding styles. Here’s an example of how to add styles:\\n\\n```mermaid\\n%%{init: {'theme': 'default', 'themeVariables': {'sequenceDiagramWidth': '800', 'actorTextColor': '#333', 'actorBackground': '#f9f9f9'}}}%%\\nsequenceDiagram\\n    participant User\\n    participant Client\\n    participant AuthServer\\n    participant ResourceServer\\n\\n    User->>Client: Login (username, password)\\n    Client->>AuthServer: POST /login (username, password)\\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\\n    Client-->>User: Store accessToken and refreshToken\\n\\n    User->>Client: Access protected resource\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 200 OK (resource data)\\n\\n    User->>Client: Access protected resource\\n    Client->>ResourceServer: GET /protected (accessToken)\\n    ResourceServer-->>Client: 401 Unauthorized (token expired)\\n\\n    Client->>AuthServer: POST /refresh (refreshToken)\\n    AuthServer-->>Client: 200 OK (newAccessToken)\\n    Client-->>User: Store newAccessToken\\n\\n    User->>Client: Access protected resource\\n    Client->>ResourceServer: GET /protected (newAccessToken)\\n    ResourceServer-->>Client: 200 OK (resource data)\\n```\\n\\n### Accessibility Considerations\\n- Ensure that the text is legible with sufficient contrast.\\n- Use clear and descriptive labels for each interaction.\\n\\n### Export Recommendations\\n- Export the diagram as an SVG or PNG for use in presentations or documentation.\\n- Use tools like Mermaid Live Editor for easy export options.\\n\\nFeel free to modify the diagram as needed to fit your specific use case!\\n</Output>\\n<Rubric>\\nValid Mermaid syntax, covers login, token issuance, API request with bearer token, refresh flow, logout\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "de2640d5-fcb2-4131-a9c3-eb05ca2905af",
-        "latencyMs": 12220,
+        "id": "c261ea4a-7341-4192-89f5-844ce417afd2",
+        "latencyMs": 12343,
         "namedScores": {
           "mermaid-expert_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To create a Mermaid sequence diagram for a JWT authentication flow with refresh tokens, we will outline the interactions between the user, the client application, the authentication server, and the resource server. \n\n### Basic Sequence Diagram Code\n\n```mermaid\nsequenceDiagram\n    participant User\n    participant Client\n    participant AuthServer\n    participant ResourceServer\n\n    User->>Client: Enter credentials (username, password)\n    Client->>AuthServer: POST /login (credentials)\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n    \n    Note over Client: Access token expires after a short time\n    Client->>AuthServer: POST /refresh (refreshToken)\n    AuthServer-->>Client: 200 OK (newAccessToken)\n    Client->>ResourceServer: GET /protected (newAccessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n```\n\n### Rendering Instructions\nTo render this diagram, you can use any Markdown editor that supports Mermaid syntax, such as:\n- GitHub\n- GitLab\n- Markdown Preview Enhanced in Visual Studio Code\n\n### Alternative Diagram Options\n1. **Flowchart**: If you prefer a flowchart representation of the same process.\n2. **State Diagram**: To show the states of the tokens (valid, expired, refreshed).\n\n### Styling Customizations\nYou can customize the appearance of the diagram by adding styles. Here’s an example of how to add styles:\n\n```mermaid\n%%{init: {'theme': 'default', 'themeVariables': {'sequenceDiagramWidth': '800px'}}}%%\nsequenceDiagram\n    participant User\n    participant Client\n    participant AuthServer\n    participant ResourceServer\n\n    User->>Client: Enter credentials (username, password)\n    Client->>AuthServer: POST /login (credentials)\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n    \n    Note over Client: Access token expires after a short time\n    Client->>AuthServer: POST /refresh (refreshToken)\n    AuthServer-->>Client: 200 OK (newAccessToken)\n    Client->>ResourceServer: GET /protected (newAccessToken)\n    ResourceServer-->>Client: 200 OK (protected data)\n```\n\n### Accessibility Considerations\n- Ensure that the text is legible with sufficient contrast.\n- Use clear and concise labels for actions and responses.\n\n### Export Recommendations\n- Export the diagram as an SVG or PNG for use in presentations or documentation.\n- Use tools like Mermaid Live Editor for easy export options.\n\nThis sequence diagram effectively illustrates the JWT authentication flow with refresh tokens, showing the interactions clearly and concisely.",
+          "output": "To create a sequence diagram for a JWT authentication flow with refresh tokens, we will outline the interactions between the user, the client application, the authentication server, and the resource server. \n\n### Basic Sequence Diagram Code\n\n```mermaid\nsequenceDiagram\n    participant User\n    participant Client\n    participant AuthServer\n    participant ResourceServer\n\n    User->>Client: Login (username, password)\n    Client->>AuthServer: POST /login (username, password)\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\n    Client-->>User: Store accessToken and refreshToken\n\n    User->>Client: Access protected resource\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 200 OK (resource data)\n\n    User->>Client: Access protected resource\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 401 Unauthorized (token expired)\n\n    Client->>AuthServer: POST /refresh (refreshToken)\n    AuthServer-->>Client: 200 OK (newAccessToken)\n    Client-->>User: Store newAccessToken\n\n    User->>Client: Access protected resource\n    Client->>ResourceServer: GET /protected (newAccessToken)\n    ResourceServer-->>Client: 200 OK (resource data)\n```\n\n### Rendering Instructions\nTo render this sequence diagram, you can use any Markdown editor that supports Mermaid diagrams, such as:\n- GitHub\n- GitLab\n- Markdown Preview Enhanced in Visual Studio Code\n\n### Alternative Diagram Options\n- **Flowchart**: If you prefer a flowchart representation of the authentication process.\n- **State Diagram**: To visualize the states of the user session (e.g., logged in, token expired).\n\n### Styling Customizations\nYou can customize the appearance of the diagram by adding styles. Here’s an example of how to add styles:\n\n```mermaid\n%%{init: {'theme': 'default', 'themeVariables': {'sequenceDiagramWidth': '800', 'actorTextColor': '#333', 'actorBackground': '#f9f9f9'}}}%%\nsequenceDiagram\n    participant User\n    participant Client\n    participant AuthServer\n    participant ResourceServer\n\n    User->>Client: Login (username, password)\n    Client->>AuthServer: POST /login (username, password)\n    AuthServer-->>Client: 200 OK (accessToken, refreshToken)\n    Client-->>User: Store accessToken and refreshToken\n\n    User->>Client: Access protected resource\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 200 OK (resource data)\n\n    User->>Client: Access protected resource\n    Client->>ResourceServer: GET /protected (accessToken)\n    ResourceServer-->>Client: 401 Unauthorized (token expired)\n\n    Client->>AuthServer: POST /refresh (refreshToken)\n    AuthServer-->>Client: 200 OK (newAccessToken)\n    Client-->>User: Store newAccessToken\n\n    User->>Client: Access protected resource\n    Client->>ResourceServer: GET /protected (newAccessToken)\n    ResourceServer-->>Client: 200 OK (resource data)\n```\n\n### Accessibility Considerations\n- Ensure that the text is legible with sufficient contrast.\n- Use clear and descriptive labels for each interaction.\n\n### Export Recommendations\n- Export the diagram as an SVG or PNG for use in presentations or documentation.\n- Use tools like Mermaid Live Editor for easy export options.\n\nFeel free to modify the diagram as needed to fit your specific use case!",
           "tokenUsage": {
-            "total": 829,
+            "total": 980,
             "prompt": 226,
-            "completion": 603,
+            "completion": 754,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 12220,
+          "latencyMs": 12343,
           "finishReason": "stop",
-          "cost": 0.00039569999999999997,
+          "cost": 0.0004863,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442d57ae9c9381-IAH",
+                "cf-ray": "9e491a67a8ecae46-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:55:21 GMT",
+                "date": "Mon, 30 Mar 2026 18:16:14 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "11802",
+                "openai-processing-ms": "12133",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=0OZxVsoAUDyBkARAn1rWfnkFzCpql0Bz.K6H0bWM_fY-1774842909.3875942-1.0.1.1-.3T2jjiK7_IYAe26hpdCok4wtPt9Fwa.YtFlzOGVZCsjuv5Wxp0UMa9975.IWCHi6JHoRMApGLjrJ4UdL1pMopTfnGXPotaWwOLQCOALVqVntkaKnqlhBZKwE4HUbaWC; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:25:21 GMT",
+                "set-cookie": "__cf_bm=riqHRS8fAKzyr3G_KWZ7VE0ICm0LoDlYalalJG0S0pU-1774894562.5019941-1.0.1.1-VOltkdVqapm.aBANQBLSUgEBjQAmyVP7LpemcQX_9jCbZJxcFU_FM0kX4sLQeeUDGYSYz.ZDa6AQQdHgojb9THWUeDM5urkyrn3GdkuYVWFyRR6RfLXkIqOAQP.JITVg; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:46:14 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-requests": "9094",
                 "x-ratelimit-remaining-tokens": "199729",
-                "x-ratelimit-reset-requests": "1h5m10.901s",
+                "x-ratelimit-reset-requests": "2h10m23.464s",
                 "x-ratelimit-reset-tokens": "81ms",
-                "x-request-id": "req_44ab0a89dfdd92c2ad949d26097803b3"
+                "x-request-id": "req_174b794d064b4bb9a12abd171c1cf760"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442d57ae9c9381-IAH",
+              "cf-ray": "9e491a67a8ecae46-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:55:21 GMT",
+              "date": "Mon, 30 Mar 2026 18:16:14 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "11802",
+              "openai-processing-ms": "12133",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=0OZxVsoAUDyBkARAn1rWfnkFzCpql0Bz.K6H0bWM_fY-1774842909.3875942-1.0.1.1-.3T2jjiK7_IYAe26hpdCok4wtPt9Fwa.YtFlzOGVZCsjuv5Wxp0UMa9975.IWCHi6JHoRMApGLjrJ4UdL1pMopTfnGXPotaWwOLQCOALVqVntkaKnqlhBZKwE4HUbaWC; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:25:21 GMT",
+              "set-cookie": "__cf_bm=riqHRS8fAKzyr3G_KWZ7VE0ICm0LoDlYalalJG0S0pU-1774894562.5019941-1.0.1.1-VOltkdVqapm.aBANQBLSUgEBjQAmyVP7LpemcQX_9jCbZJxcFU_FM0kX4sLQeeUDGYSYz.ZDa6AQQdHgojb9THWUeDM5urkyrn3GdkuYVWFyRR6RfLXkIqOAQP.JITVg; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:46:14 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-requests": "9094",
               "x-ratelimit-remaining-tokens": "199729",
-              "x-ratelimit-reset-requests": "1h5m10.901s",
+              "x-ratelimit-reset-requests": "2h10m23.464s",
               "x-ratelimit-reset-tokens": "81ms",
-              "x-request-id": "req_44ab0a89dfdd92c2ad949d26097803b3"
+              "x-request-id": "req_174b794d064b4bb9a12abd171c1cf760"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 226,
-        "completion": 603,
+        "completion": 754,
         "cached": 0,
-        "total": 829,
+        "total": 980,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 856,
-          "prompt": 803,
-          "completion": 53,
+          "total": 1019,
+          "prompt": 954,
+          "completion": 65,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 13589,
-      "evaluationDurationMs": 13589
+      "durationMs": 13983,
+      "evaluationDurationMs": 13983
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:55:22.959Z",
-    "evaluationCreatedAt": "2026-03-30T03:55:09.324Z"
+    "exportedAt": "2026-03-30T18:16:16.475Z",
+    "evaluationCreatedAt": "2026-03-30T18:16:02.446Z"
   }
 }

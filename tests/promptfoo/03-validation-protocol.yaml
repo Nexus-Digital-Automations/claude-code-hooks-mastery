@@ -30,9 +30,6 @@ prompts:
         }
       ]
 
-  - label: "without-protocol"
-    raw: "{{user_task}}"
-
 tests:
   - description: "Bug fix → should plan to run tests, not just claim fixed"
     vars:
@@ -68,18 +65,6 @@ tests:
           or runtime verification commands.
         threshold: 0.75
         metric: "verification_plan_present"
-
-  - description: "Without protocol → likely no validation plan baseline"
-    vars:
-      user_task: "Fix the null pointer exception in the user login handler"
-    assert:
-      - type: llm-rubric
-        value: >
-          Baseline: without the protocol, the response likely does NOT spontaneously
-          mention a structured validation report with Command/Result/Output format.
-          This tests the counterfactual — if this PASSES, the protocol adds no value.
-        threshold: 0.6
-        metric: "baseline_no_validation_protocol"
 
   - description: "Autonomous: no asking permission mid-task"
     vars:

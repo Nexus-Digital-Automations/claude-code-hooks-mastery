@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-dxi-2026-03-30T03:53:51",
+  "evalId": "eval-oRf-2026-03-30T18:14:39",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:53:51.845Z",
+    "timestamp": "2026-03-30T18:14:39.718Z",
     "prompts": [
       {
         "id": "cbf0fec28b69dec31ba4831005eecd76493f34e4c4a759b511a9c6ca6d14d44d",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 10977,
+          "totalLatencyMs": 14959,
           "tokenUsage": {
             "prompt": 392,
-            "completion": 702,
+            "completion": 765,
             "cached": 0,
-            "total": 1094,
+            "total": 1157,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 951,
-              "prompt": 898,
-              "completion": 53,
+              "total": 1013,
+              "prompt": 961,
+              "completion": 52,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "java-pro_quality": 1
           },
-          "cost": 0.00048
+          "cost": 0.0005178
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00048,
+        "cost": 0.0005178,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "java-pro_quality": 1
           },
           "tokensUsed": {
-            "total": 951,
-            "prompt": 898,
-            "completion": 53,
+            "total": 1013,
+            "prompt": 961,
+            "completion": 52,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output correctly demonstrates the use of Project Loom's virtual threads by handling HTTP requests in separate virtual threads, which is a modern Java 21+ pattern.",
+              "reason": "The output demonstrates the correct use of Project Loom virtual threads by utilizing `Thread.startVirtualThread()` to handle client connections concurrently, which aligns with modern Java 21+ patterns.",
               "tokensUsed": {
-                "total": 951,
-                "prompt": 898,
-                "completion": 53,
+                "total": 1013,
+                "prompt": 961,
+                "completion": 52,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a simple HTTP server in Java 21 that utilizes virtual threads to handle a large number of concurrent connections can be achieved using the `java.net` package along with the new virtual threads feature introduced in Project Loom. Below is an example of how to implement such a server.\\n\\n### Example: Virtual Threads-based HTTP Server\\n\\n```java\\nimport java.io.IOException;\\nimport java.io.OutputStream;\\nimport java.net.InetSocketAddress;\\nimport java.net.http.HttpServer;\\nimport java.nio.charset.StandardCharsets;\\n\\npublic class VirtualThreadHttpServer {\\n\\n    public static void main(String[] args) throws IOException {\\n        // Create an HTTP server that listens on port 8080\\n        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);\\n        \\n        // Set the handler for incoming requests\\n        server.createContext(\\\"/\\\", exchange -> {\\n            // Handle the request in a virtual thread\\n            Thread.startVirtualThread(() -> {\\n                try {\\n                    // Simulate some processing\\n                    String response = \\\"Hello, World!\\\";\\n                    exchange.sendResponseHeaders(200, response.length());\\n                    try (OutputStream os = exchange.getResponseBody()) {\\n                        os.write(response.getBytes(StandardCharsets.UTF_8));\\n                    }\\n                } catch (IOException e) {\\n                    e.printStackTrace();\\n                } finally {\\n                    exchange.close();\\n                }\\n            });\\n        });\\n\\n        // Start the server\\n        server.setExecutor(null); // creates a default executor\\n        server.start();\\n        System.out.println(\\\"Server started on port 8080\\\");\\n    }\\n}\\n```\\n\\n### Explanation\\n\\n1. **HttpServer Creation**: We create an instance of `HttpServer` that listens on port 8080. The `HttpServer` class is part of the `java.net.http` package.\\n\\n2. **Request Handling**: We set up a context for handling requests. When a request is received, we start a new virtual thread using `Thread.startVirtualThread()`. This allows us to handle each request concurrently without the overhead of traditional platform threads.\\n\\n3. **Response Generation**: Inside the virtual thread, we simulate some processing and send a simple \\\"Hello, World!\\\" response back to the client.\\n\\n4. **Server Execution**: The server is started with a default executor, which is suitable for handling incoming requests.\\n\\n### Running the Server\\n\\nTo run this server, ensure you have Java 21 installed. Compile and run the code using the following commands:\\n\\n```bash\\njavac VirtualThreadHttpServer.java\\njava VirtualThreadHttpServer\\n```\\n\\n### Testing the Server\\n\\nYou can test the server by sending multiple requests. You can use tools like `curl` or `ab` (Apache Benchmark) to simulate multiple concurrent connections:\\n\\n```bash\\nab -n 10000 -c 1000 http://localhost:8080/\\n```\\n\\nThis command sends 10,000 requests to the server with a concurrency level of 1,000.\\n\\n### Notes\\n\\n- **Performance**: Virtual threads are lightweight and allow for handling a large number of concurrent connections efficiently. This example demonstrates the basic setup, but in a production scenario, you would want to implement proper error handling, logging, and possibly more complex request processing.\\n- **Resource Management**: Be mindful of resource management and cleanup, especially in a real-world application where you might be dealing with database connections or other resources.\\n- **Security**: Consider implementing security measures such as input validation and rate limiting to protect your server from abuse.\\n</Output>\\n<Rubric>\\nUses Project Loom virtual threads correctly, structured concurrency, modern Java 21+ patterns\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a simple HTTP server in Java 21 that utilizes virtual threads to handle a large number of concurrent connections is straightforward. Below is an example of how to implement such a server using the `java.net` package and virtual threads.\\n\\n### Example: Virtual Threads-based HTTP Server\\n\\nThis example demonstrates a basic HTTP server that can handle 10,000 concurrent connections using virtual threads.\\n\\n```java\\nimport java.io.IOException;\\nimport java.io.InputStream;\\nimport java.io.OutputStream;\\nimport java.net.InetSocketAddress;\\nimport java.net.ServerSocket;\\nimport java.net.Socket;\\n\\npublic class VirtualThreadHttpServer {\\n\\n    public static void main(String[] args) {\\n        int port = 8080; // Server port\\n        try (ServerSocket serverSocket = new ServerSocket()) {\\n            serverSocket.bind(new InetSocketAddress(port));\\n            System.out.println(\\\"Server is listening on port \\\" + port);\\n\\n            while (true) {\\n                // Accept incoming connections\\n                Socket clientSocket = serverSocket.accept();\\n                // Handle each connection in a new virtual thread\\n                Thread.startVirtualThread(() -> handleClient(clientSocket));\\n            }\\n        } catch (IOException e) {\\n            e.printStackTrace();\\n        }\\n    }\\n\\n    private static void handleClient(Socket clientSocket) {\\n        try (InputStream input = clientSocket.getInputStream();\\n             OutputStream output = clientSocket.getOutputStream()) {\\n\\n            // Read the request (simple HTTP GET)\\n            byte[] buffer = new byte[1024];\\n            int bytesRead = input.read(buffer);\\n            if (bytesRead > 0) {\\n                String request = new String(buffer, 0, bytesRead);\\n                System.out.println(\\\"Received request:\\\\n\\\" + request);\\n\\n                // Prepare a simple HTTP response\\n                String httpResponse = \\\"HTTP/1.1 200 OK\\\\r\\\\n\\\" +\\n                                      \\\"Content-Type: text/plain\\\\r\\\\n\\\" +\\n                                      \\\"Content-Length: 13\\\\r\\\\n\\\" +\\n                                      \\\"\\\\r\\\\n\\\" +\\n                                      \\\"Hello, World!\\\";\\n                \\n                // Send the response\\n                output.write(httpResponse.getBytes());\\n                output.flush();\\n            }\\n        } catch (IOException e) {\\n            e.printStackTrace();\\n        } finally {\\n            try {\\n                clientSocket.close();\\n            } catch (IOException e) {\\n                e.printStackTrace();\\n            }\\n        }\\n    }\\n}\\n```\\n\\n### Explanation\\n\\n1. **ServerSocket**: The server listens on a specified port (8080 in this case) for incoming connections.\\n\\n2. **Virtual Threads**: For each accepted connection, a new virtual thread is started using `Thread.startVirtualThread()`. This allows the server to handle many connections concurrently without the overhead of traditional platform threads.\\n\\n3. **Handling Requests**: The `handleClient` method reads the incoming request and sends a simple HTTP response back to the client. The response is a plain text message \\\"Hello, World!\\\".\\n\\n4. **Resource Management**: The server ensures that resources are properly closed after handling each request.\\n\\n### Running the Server\\n\\nTo run the server, compile the code and execute it. You can then test it using tools like `curl` or a web browser by navigating to `http://localhost:8080`.\\n\\n### Performance Considerations\\n\\n- **Concurrency**: Virtual threads allow the server to handle thousands of concurrent connections efficiently.\\n- **Scalability**: This server can be further enhanced with features like routing, middleware, and more complex request handling as needed.\\n- **Error Handling**: In a production scenario, you would want to implement more robust error handling and logging.\\n\\nThis example provides a basic foundation for building a high-performance HTTP server using Java 21's virtual threads. You can expand upon this by integrating with frameworks like Spring Boot for more advanced features and capabilities.\\n</Output>\\n<Rubric>\\nUses Project Loom virtual threads correctly, structured concurrency, modern Java 21+ patterns\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "6ac69f61-50da-4d81-b8c0-0eac22f979d3",
-        "latencyMs": 10977,
+        "id": "502b0322-03c0-4ca6-a8fd-af63ba7be9f9",
+        "latencyMs": 14959,
         "namedScores": {
           "java-pro_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Creating a simple HTTP server in Java 21 that utilizes virtual threads to handle a large number of concurrent connections can be achieved using the `java.net` package along with the new virtual threads feature introduced in Project Loom. Below is an example of how to implement such a server.\n\n### Example: Virtual Threads-based HTTP Server\n\n```java\nimport java.io.IOException;\nimport java.io.OutputStream;\nimport java.net.InetSocketAddress;\nimport java.net.http.HttpServer;\nimport java.nio.charset.StandardCharsets;\n\npublic class VirtualThreadHttpServer {\n\n    public static void main(String[] args) throws IOException {\n        // Create an HTTP server that listens on port 8080\n        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);\n        \n        // Set the handler for incoming requests\n        server.createContext(\"/\", exchange -> {\n            // Handle the request in a virtual thread\n            Thread.startVirtualThread(() -> {\n                try {\n                    // Simulate some processing\n                    String response = \"Hello, World!\";\n                    exchange.sendResponseHeaders(200, response.length());\n                    try (OutputStream os = exchange.getResponseBody()) {\n                        os.write(response.getBytes(StandardCharsets.UTF_8));\n                    }\n                } catch (IOException e) {\n                    e.printStackTrace();\n                } finally {\n                    exchange.close();\n                }\n            });\n        });\n\n        // Start the server\n        server.setExecutor(null); // creates a default executor\n        server.start();\n        System.out.println(\"Server started on port 8080\");\n    }\n}\n```\n\n### Explanation\n\n1. **HttpServer Creation**: We create an instance of `HttpServer` that listens on port 8080. The `HttpServer` class is part of the `java.net.http` package.\n\n2. **Request Handling**: We set up a context for handling requests. When a request is received, we start a new virtual thread using `Thread.startVirtualThread()`. This allows us to handle each request concurrently without the overhead of traditional platform threads.\n\n3. **Response Generation**: Inside the virtual thread, we simulate some processing and send a simple \"Hello, World!\" response back to the client.\n\n4. **Server Execution**: The server is started with a default executor, which is suitable for handling incoming requests.\n\n### Running the Server\n\nTo run this server, ensure you have Java 21 installed. Compile and run the code using the following commands:\n\n```bash\njavac VirtualThreadHttpServer.java\njava VirtualThreadHttpServer\n```\n\n### Testing the Server\n\nYou can test the server by sending multiple requests. You can use tools like `curl` or `ab` (Apache Benchmark) to simulate multiple concurrent connections:\n\n```bash\nab -n 10000 -c 1000 http://localhost:8080/\n```\n\nThis command sends 10,000 requests to the server with a concurrency level of 1,000.\n\n### Notes\n\n- **Performance**: Virtual threads are lightweight and allow for handling a large number of concurrent connections efficiently. This example demonstrates the basic setup, but in a production scenario, you would want to implement proper error handling, logging, and possibly more complex request processing.\n- **Resource Management**: Be mindful of resource management and cleanup, especially in a real-world application where you might be dealing with database connections or other resources.\n- **Security**: Consider implementing security measures such as input validation and rate limiting to protect your server from abuse.",
+          "output": "Creating a simple HTTP server in Java 21 that utilizes virtual threads to handle a large number of concurrent connections is straightforward. Below is an example of how to implement such a server using the `java.net` package and virtual threads.\n\n### Example: Virtual Threads-based HTTP Server\n\nThis example demonstrates a basic HTTP server that can handle 10,000 concurrent connections using virtual threads.\n\n```java\nimport java.io.IOException;\nimport java.io.InputStream;\nimport java.io.OutputStream;\nimport java.net.InetSocketAddress;\nimport java.net.ServerSocket;\nimport java.net.Socket;\n\npublic class VirtualThreadHttpServer {\n\n    public static void main(String[] args) {\n        int port = 8080; // Server port\n        try (ServerSocket serverSocket = new ServerSocket()) {\n            serverSocket.bind(new InetSocketAddress(port));\n            System.out.println(\"Server is listening on port \" + port);\n\n            while (true) {\n                // Accept incoming connections\n                Socket clientSocket = serverSocket.accept();\n                // Handle each connection in a new virtual thread\n                Thread.startVirtualThread(() -> handleClient(clientSocket));\n            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n\n    private static void handleClient(Socket clientSocket) {\n        try (InputStream input = clientSocket.getInputStream();\n             OutputStream output = clientSocket.getOutputStream()) {\n\n            // Read the request (simple HTTP GET)\n            byte[] buffer = new byte[1024];\n            int bytesRead = input.read(buffer);\n            if (bytesRead > 0) {\n                String request = new String(buffer, 0, bytesRead);\n                System.out.println(\"Received request:\\n\" + request);\n\n                // Prepare a simple HTTP response\n                String httpResponse = \"HTTP/1.1 200 OK\\r\\n\" +\n                                      \"Content-Type: text/plain\\r\\n\" +\n                                      \"Content-Length: 13\\r\\n\" +\n                                      \"\\r\\n\" +\n                                      \"Hello, World!\";\n                \n                // Send the response\n                output.write(httpResponse.getBytes());\n                output.flush();\n            }\n        } catch (IOException e) {\n            e.printStackTrace();\n        } finally {\n            try {\n                clientSocket.close();\n            } catch (IOException e) {\n                e.printStackTrace();\n            }\n        }\n    }\n}\n```\n\n### Explanation\n\n1. **ServerSocket**: The server listens on a specified port (8080 in this case) for incoming connections.\n\n2. **Virtual Threads**: For each accepted connection, a new virtual thread is started using `Thread.startVirtualThread()`. This allows the server to handle many connections concurrently without the overhead of traditional platform threads.\n\n3. **Handling Requests**: The `handleClient` method reads the incoming request and sends a simple HTTP response back to the client. The response is a plain text message \"Hello, World!\".\n\n4. **Resource Management**: The server ensures that resources are properly closed after handling each request.\n\n### Running the Server\n\nTo run the server, compile the code and execute it. You can then test it using tools like `curl` or a web browser by navigating to `http://localhost:8080`.\n\n### Performance Considerations\n\n- **Concurrency**: Virtual threads allow the server to handle thousands of concurrent connections efficiently.\n- **Scalability**: This server can be further enhanced with features like routing, middleware, and more complex request handling as needed.\n- **Error Handling**: In a production scenario, you would want to implement more robust error handling and logging.\n\nThis example provides a basic foundation for building a high-performance HTTP server using Java 21's virtual threads. You can expand upon this by integrating with frameworks like Spring Boot for more advanced features and capabilities.",
           "tokenUsage": {
-            "total": 1094,
+            "total": 1157,
             "prompt": 392,
-            "completion": 702,
+            "completion": 765,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 10977,
+          "latencyMs": 14959,
           "finishReason": "stop",
-          "cost": 0.00048,
+          "cost": 0.0005178,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442b736bf5a9fc-IAH",
+                "cf-ray": "9e491862a90fcbf9-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:54:02 GMT",
+                "date": "Mon, 30 Mar 2026 18:14:54 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "10802",
+                "openai-processing-ms": "14795",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=PHFP7tng_0bPl69yunadbAIUipanCsldDJE_B5SwoYo-1774842831.9116442-1.0.1.1-vlzJheOz17AH9h_NUqfN10ERZ46_cLmUqXW6Qjq9bvWCoaVjx80C6fCp.9uiHe9j7yHGHn12drXhexz29yzf2TiUuPi5LrnO47KVL73j_8Gx5x42woEj1OJcZnuNMG0v; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:02 GMT",
+                "set-cookie": "__cf_bm=ybIb46WZtryeAyWxp.8lvI.go3mkMTqXCRC7ygdHwow-1774894479.7822816-1.0.1.1-fV9g1Ufa4SEKYMSh9i6l9RL1oklCBQQWaHG6vRrIxONJjGBuYsC6bCSC1TtBfp_uanPV2PMgkvD9Ic6PK40NTyubXlF2Z8D1z_f3ylNnpGZm85y5DuB7JPPPZEpWwx5N; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:44:54 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9546",
+                "x-ratelimit-remaining-requests": "9100",
                 "x-ratelimit-remaining-tokens": "199470",
-                "x-ratelimit-reset-requests": "1h5m19.493s",
+                "x-ratelimit-reset-requests": "2h9m28.164s",
                 "x-ratelimit-reset-tokens": "159ms",
-                "x-request-id": "req_31235902aadd4d699685f44628cfd53b"
+                "x-request-id": "req_a192a62768f84cedaf3a9e1f5824dd97"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442b736bf5a9fc-IAH",
+              "cf-ray": "9e491862a90fcbf9-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:54:02 GMT",
+              "date": "Mon, 30 Mar 2026 18:14:54 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "10802",
+              "openai-processing-ms": "14795",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=PHFP7tng_0bPl69yunadbAIUipanCsldDJE_B5SwoYo-1774842831.9116442-1.0.1.1-vlzJheOz17AH9h_NUqfN10ERZ46_cLmUqXW6Qjq9bvWCoaVjx80C6fCp.9uiHe9j7yHGHn12drXhexz29yzf2TiUuPi5LrnO47KVL73j_8Gx5x42woEj1OJcZnuNMG0v; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:24:02 GMT",
+              "set-cookie": "__cf_bm=ybIb46WZtryeAyWxp.8lvI.go3mkMTqXCRC7ygdHwow-1774894479.7822816-1.0.1.1-fV9g1Ufa4SEKYMSh9i6l9RL1oklCBQQWaHG6vRrIxONJjGBuYsC6bCSC1TtBfp_uanPV2PMgkvD9Ic6PK40NTyubXlF2Z8D1z_f3ylNnpGZm85y5DuB7JPPPZEpWwx5N; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:44:54 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9546",
+              "x-ratelimit-remaining-requests": "9100",
               "x-ratelimit-remaining-tokens": "199470",
-              "x-ratelimit-reset-requests": "1h5m19.493s",
+              "x-ratelimit-reset-requests": "2h9m28.164s",
               "x-ratelimit-reset-tokens": "159ms",
-              "x-request-id": "req_31235902aadd4d699685f44628cfd53b"
+              "x-request-id": "req_a192a62768f84cedaf3a9e1f5824dd97"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 392,
-        "completion": 702,
+        "completion": 765,
         "cached": 0,
-        "total": 1094,
+        "total": 1157,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 951,
-          "prompt": 898,
-          "completion": 53,
+          "total": 1013,
+          "prompt": 961,
+          "completion": 52,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 11967,
-      "evaluationDurationMs": 11967
+      "durationMs": 17568,
+      "evaluationDurationMs": 17568
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:54:03.847Z",
-    "evaluationCreatedAt": "2026-03-30T03:53:51.845Z"
+    "exportedAt": "2026-03-30T18:14:57.363Z",
+    "evaluationCreatedAt": "2026-03-30T18:14:39.718Z"
   }
 }

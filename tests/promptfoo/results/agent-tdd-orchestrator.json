@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-1OL-2026-03-30T03:58:06",
+  "evalId": "eval-7bG-2026-03-30T18:18:42",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:58:06.218Z",
+    "timestamp": "2026-03-30T18:18:42.162Z",
     "prompts": [
       {
         "id": "82e815b5bdb1b20be44464996dfdaa7d83e3e3d3d0643bb6d07a5c09a3ef89da",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 11432,
+          "totalLatencyMs": 14339,
           "tokenUsage": {
             "prompt": 389,
-            "completion": 742,
+            "completion": 737,
             "cached": 0,
-            "total": 1131,
+            "total": 1126,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -30,8 +30,8 @@
             },
             "assertions": {
               "total": 1013,
-              "prompt": 945,
-              "completion": 68,
+              "prompt": 940,
+              "completion": 73,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "tdd-orchestrator_quality": 1
           },
-          "cost": 0.00050355
+          "cost": 0.00050055
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00050355,
+        "cost": 0.00050055,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -63,8 +63,8 @@
           },
           "tokensUsed": {
             "total": 1013,
-            "prompt": 945,
-            "completion": 68,
+            "prompt": 940,
+            "completion": 73,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output clearly demonstrates the red-green-refactor cycle by outlining the steps of defining requirements, writing failing tests, implementing the functionality to pass the tests, and then refactoring the code while ensuring proper assertions are used in the tests.",
+              "reason": "The output clearly demonstrates the red-green-refactor cycle by starting with writing tests that initially fail, implementing the minimum code to pass those tests, and then refactoring the code while ensuring all tests still pass. It also includes proper assertions in the test cases.",
               "tokensUsed": {
                 "total": 1013,
-                "prompt": 945,
-                "completion": 68,
+                "prompt": 940,
+                "completion": 73,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nImplementing a shopping cart with add, remove, and total functionality using Test-Driven Development (TDD) involves following the red-green-refactor cycle. Below is a step-by-step guide to this process in Python.\\n\\n### Step 1: Define Requirements\\nBefore starting, clarify the requirements for the shopping cart:\\n- **Add an item**: Add an item with a name and price to the cart.\\n- **Remove an item**: Remove an item from the cart by name.\\n- **Calculate total**: Calculate the total price of items in the cart.\\n\\n### Step 2: Write Tests (Red Phase)\\nStart by writing tests for the desired functionality. These tests will initially fail since the implementation does not exist yet.\\n\\n```python\\nimport unittest\\n\\nclass TestShoppingCart(unittest.TestCase):\\n    def setUp(self):\\n        self.cart = ShoppingCart()\\n\\n    def test_add_item(self):\\n        self.cart.add_item(\\\"apple\\\", 1.0)\\n        self.assertEqual(self.cart.items, {\\\"apple\\\": 1.0})\\n\\n    def test_remove_item(self):\\n        self.cart.add_item(\\\"apple\\\", 1.0)\\n        self.cart.remove_item(\\\"apple\\\")\\n        self.assertEqual(self.cart.items, {})\\n\\n    def test_total_price(self):\\n        self.cart.add_item(\\\"apple\\\", 1.0)\\n        self.cart.add_item(\\\"banana\\\", 0.5)\\n        self.assertEqual(self.cart.total(), 1.5)\\n\\nif __name__ == \\\"__main__\\\":\\n    unittest.main()\\n```\\n\\n### Step 3: Run Tests (Red Phase)\\nRun the tests. They should fail because the `ShoppingCart` class and its methods do not exist yet.\\n\\n### Step 4: Implement Functionality (Green Phase)\\nNow, implement the `ShoppingCart` class to make the tests pass.\\n\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self.items = {}\\n\\n    def add_item(self, name, price):\\n        self.items[name] = price\\n\\n    def remove_item(self, name):\\n        if name in self.items:\\n            del self.items[name]\\n\\n    def total(self):\\n        return sum(self.items.values())\\n```\\n\\n### Step 5: Run Tests (Green Phase)\\nRun the tests again. This time, they should pass, indicating that the implementation meets the requirements.\\n\\n### Step 6: Refactor (Refactor Phase)\\nReview the code for any improvements. In this case, the implementation is straightforward, but you might want to ensure that the code adheres to best practices.\\n\\nFor example, you could add error handling for removing items that do not exist:\\n\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self.items = {}\\n\\n    def add_item(self, name, price):\\n        self.items[name] = price\\n\\n    def remove_item(self, name):\\n        if name in self.items:\\n            del self.items[name]\\n        else:\\n            raise ValueError(f\\\"Item '{name}' not found in cart.\\\")\\n\\n    def total(self):\\n        return sum(self.items.values())\\n```\\n\\n### Step 7: Run Tests Again\\nAfter refactoring, run the tests again to ensure everything still works as expected.\\n\\n### Step 8: Repeat\\nContinue this cycle for any additional functionality or edge cases you want to implement, such as:\\n- Handling duplicate items (e.g., adding the same item multiple times).\\n- Adding quantities for each item.\\n- Implementing discounts or promotions.\\n\\n### Conclusion\\nBy following the TDD cycle of red-green-refactor, you ensure that your shopping cart implementation is thoroughly tested and meets the specified requirements. This approach also helps maintain code quality and facilitates future enhancements.\\n</Output>\\n<Rubric>\\nDemonstrates red-green-refactor cycle, starts with failing test, implements minimum code, refactors, proper assertions\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nImplementing a shopping cart with add, remove, and total functionality using Test-Driven Development (TDD) involves following the red-green-refactor cycle. Below is a step-by-step guide to this process in Python.\\n\\n### Step 1: Write the Tests (Red Phase)\\n\\nFirst, we will write tests for the shopping cart functionality. We will use the `unittest` framework for this example.\\n\\n```python\\nimport unittest\\n\\nclass TestShoppingCart(unittest.TestCase):\\n    def setUp(self):\\n        self.cart = ShoppingCart()\\n\\n    def test_add_item(self):\\n        self.cart.add_item(\\\"apple\\\", 1.0)\\n        self.assertEqual(self.cart.total(), 1.0)\\n\\n    def test_remove_item(self):\\n        self.cart.add_item(\\\"apple\\\", 1.0)\\n        self.cart.remove_item(\\\"apple\\\")\\n        self.assertEqual(self.cart.total(), 0.0)\\n\\n    def test_total_with_multiple_items(self):\\n        self.cart.add_item(\\\"apple\\\", 1.0)\\n        self.cart.add_item(\\\"banana\\\", 0.5)\\n        self.assertEqual(self.cart.total(), 1.5)\\n\\n    def test_remove_nonexistent_item(self):\\n        self.cart.remove_item(\\\"apple\\\")  # Should not raise an error\\n        self.assertEqual(self.cart.total(), 0.0)\\n\\nif __name__ == '__main__':\\n    unittest.main()\\n```\\n\\n### Step 2: Run the Tests (Red Phase)\\n\\nAt this point, if you run the tests, they will fail because the `ShoppingCart` class does not exist yet.\\n\\n### Step 3: Implement the Code (Green Phase)\\n\\nNow, we will implement the `ShoppingCart` class to make the tests pass.\\n\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self.items = {}\\n\\n    def add_item(self, name, price):\\n        if name in self.items:\\n            self.items[name] += price\\n        else:\\n            self.items[name] = price\\n\\n    def remove_item(self, name):\\n        if name in self.items:\\n            del self.items[name]\\n\\n    def total(self):\\n        return sum(self.items.values())\\n```\\n\\n### Step 4: Run the Tests Again (Green Phase)\\n\\nRun the tests again. This time, they should pass, indicating that the implementation meets the requirements defined by the tests.\\n\\n### Step 5: Refactor (Refactor Phase)\\n\\nNow that the tests are passing, we can look for opportunities to refactor the code for clarity or efficiency. In this case, the implementation is quite straightforward, but we can improve the `add_item` method to handle cases where the item already exists more clearly.\\n\\n```python\\nclass ShoppingCart:\\n    def __init__(self):\\n        self.items = {}\\n\\n    def add_item(self, name, price):\\n        self.items[name] = self.items.get(name, 0) + price\\n\\n    def remove_item(self, name):\\n        self.items.pop(name, None)  # Safely remove item if it exists\\n\\n    def total(self):\\n        return sum(self.items.values())\\n```\\n\\n### Step 6: Run the Tests Again (Refactor Phase)\\n\\nAfter refactoring, run the tests again to ensure that everything still works as expected.\\n\\n### Summary\\n\\n1. **Red Phase**: Write tests for the shopping cart functionality.\\n2. **Green Phase**: Implement the `ShoppingCart` class to pass the tests.\\n3. **Refactor Phase**: Clean up the code while ensuring all tests still pass.\\n\\nBy following this TDD cycle, you ensure that your shopping cart implementation is robust, maintainable, and thoroughly tested.\\n</Output>\\n<Rubric>\\nDemonstrates red-green-refactor cycle, starts with failing test, implements minimum code, refactors, proper assertions\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "be584477-5069-4217-9c90-06407ef442ed",
-        "latencyMs": 11432,
+        "id": "f7dafd84-0628-439c-bc79-c21b8a9a5111",
+        "latencyMs": 14339,
         "namedScores": {
           "tdd-orchestrator_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Implementing a shopping cart with add, remove, and total functionality using Test-Driven Development (TDD) involves following the red-green-refactor cycle. Below is a step-by-step guide to this process in Python.\n\n### Step 1: Define Requirements\nBefore starting, clarify the requirements for the shopping cart:\n- **Add an item**: Add an item with a name and price to the cart.\n- **Remove an item**: Remove an item from the cart by name.\n- **Calculate total**: Calculate the total price of items in the cart.\n\n### Step 2: Write Tests (Red Phase)\nStart by writing tests for the desired functionality. These tests will initially fail since the implementation does not exist yet.\n\n```python\nimport unittest\n\nclass TestShoppingCart(unittest.TestCase):\n    def setUp(self):\n        self.cart = ShoppingCart()\n\n    def test_add_item(self):\n        self.cart.add_item(\"apple\", 1.0)\n        self.assertEqual(self.cart.items, {\"apple\": 1.0})\n\n    def test_remove_item(self):\n        self.cart.add_item(\"apple\", 1.0)\n        self.cart.remove_item(\"apple\")\n        self.assertEqual(self.cart.items, {})\n\n    def test_total_price(self):\n        self.cart.add_item(\"apple\", 1.0)\n        self.cart.add_item(\"banana\", 0.5)\n        self.assertEqual(self.cart.total(), 1.5)\n\nif __name__ == \"__main__\":\n    unittest.main()\n```\n\n### Step 3: Run Tests (Red Phase)\nRun the tests. They should fail because the `ShoppingCart` class and its methods do not exist yet.\n\n### Step 4: Implement Functionality (Green Phase)\nNow, implement the `ShoppingCart` class to make the tests pass.\n\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self.items = {}\n\n    def add_item(self, name, price):\n        self.items[name] = price\n\n    def remove_item(self, name):\n        if name in self.items:\n            del self.items[name]\n\n    def total(self):\n        return sum(self.items.values())\n```\n\n### Step 5: Run Tests (Green Phase)\nRun the tests again. This time, they should pass, indicating that the implementation meets the requirements.\n\n### Step 6: Refactor (Refactor Phase)\nReview the code for any improvements. In this case, the implementation is straightforward, but you might want to ensure that the code adheres to best practices.\n\nFor example, you could add error handling for removing items that do not exist:\n\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self.items = {}\n\n    def add_item(self, name, price):\n        self.items[name] = price\n\n    def remove_item(self, name):\n        if name in self.items:\n            del self.items[name]\n        else:\n            raise ValueError(f\"Item '{name}' not found in cart.\")\n\n    def total(self):\n        return sum(self.items.values())\n```\n\n### Step 7: Run Tests Again\nAfter refactoring, run the tests again to ensure everything still works as expected.\n\n### Step 8: Repeat\nContinue this cycle for any additional functionality or edge cases you want to implement, such as:\n- Handling duplicate items (e.g., adding the same item multiple times).\n- Adding quantities for each item.\n- Implementing discounts or promotions.\n\n### Conclusion\nBy following the TDD cycle of red-green-refactor, you ensure that your shopping cart implementation is thoroughly tested and meets the specified requirements. This approach also helps maintain code quality and facilitates future enhancements.",
+          "output": "Implementing a shopping cart with add, remove, and total functionality using Test-Driven Development (TDD) involves following the red-green-refactor cycle. Below is a step-by-step guide to this process in Python.\n\n### Step 1: Write the Tests (Red Phase)\n\nFirst, we will write tests for the shopping cart functionality. We will use the `unittest` framework for this example.\n\n```python\nimport unittest\n\nclass TestShoppingCart(unittest.TestCase):\n    def setUp(self):\n        self.cart = ShoppingCart()\n\n    def test_add_item(self):\n        self.cart.add_item(\"apple\", 1.0)\n        self.assertEqual(self.cart.total(), 1.0)\n\n    def test_remove_item(self):\n        self.cart.add_item(\"apple\", 1.0)\n        self.cart.remove_item(\"apple\")\n        self.assertEqual(self.cart.total(), 0.0)\n\n    def test_total_with_multiple_items(self):\n        self.cart.add_item(\"apple\", 1.0)\n        self.cart.add_item(\"banana\", 0.5)\n        self.assertEqual(self.cart.total(), 1.5)\n\n    def test_remove_nonexistent_item(self):\n        self.cart.remove_item(\"apple\")  # Should not raise an error\n        self.assertEqual(self.cart.total(), 0.0)\n\nif __name__ == '__main__':\n    unittest.main()\n```\n\n### Step 2: Run the Tests (Red Phase)\n\nAt this point, if you run the tests, they will fail because the `ShoppingCart` class does not exist yet.\n\n### Step 3: Implement the Code (Green Phase)\n\nNow, we will implement the `ShoppingCart` class to make the tests pass.\n\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self.items = {}\n\n    def add_item(self, name, price):\n        if name in self.items:\n            self.items[name] += price\n        else:\n            self.items[name] = price\n\n    def remove_item(self, name):\n        if name in self.items:\n            del self.items[name]\n\n    def total(self):\n        return sum(self.items.values())\n```\n\n### Step 4: Run the Tests Again (Green Phase)\n\nRun the tests again. This time, they should pass, indicating that the implementation meets the requirements defined by the tests.\n\n### Step 5: Refactor (Refactor Phase)\n\nNow that the tests are passing, we can look for opportunities to refactor the code for clarity or efficiency. In this case, the implementation is quite straightforward, but we can improve the `add_item` method to handle cases where the item already exists more clearly.\n\n```python\nclass ShoppingCart:\n    def __init__(self):\n        self.items = {}\n\n    def add_item(self, name, price):\n        self.items[name] = self.items.get(name, 0) + price\n\n    def remove_item(self, name):\n        self.items.pop(name, None)  # Safely remove item if it exists\n\n    def total(self):\n        return sum(self.items.values())\n```\n\n### Step 6: Run the Tests Again (Refactor Phase)\n\nAfter refactoring, run the tests again to ensure that everything still works as expected.\n\n### Summary\n\n1. **Red Phase**: Write tests for the shopping cart functionality.\n2. **Green Phase**: Implement the `ShoppingCart` class to pass the tests.\n3. **Refactor Phase**: Clean up the code while ensuring all tests still pass.\n\nBy following this TDD cycle, you ensure that your shopping cart implementation is robust, maintainable, and thoroughly tested.",
           "tokenUsage": {
-            "total": 1131,
+            "total": 1126,
             "prompt": 389,
-            "completion": 742,
+            "completion": 737,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 11432,
+          "latencyMs": 14339,
           "finishReason": "stop",
-          "cost": 0.00050355,
+          "cost": 0.00050055,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4431a93eeb6103-IAH",
+                "cf-ray": "9e491e4deeeb37b8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:58:17 GMT",
+                "date": "Mon, 30 Mar 2026 18:18:56 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "11194",
+                "openai-processing-ms": "14180",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=qhKd._IGLJG6276Gt7j.9Q.Vd7q6lYVWICH5JZPxD1Q-1774843086.2758026-1.0.1.1-WTP7yR7HYCYg4PCnMrtJbktPC29WDVy7XxICGE0d8CmYb7CNqK.zuSw7sYLi21EtzaIKDj8B8B71zY.mQtZblbvEwB1dOeTjn_4djw7UTmSr10XX_KxfQLcsrZPQqGkz; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:28:17 GMT",
+                "set-cookie": "__cf_bm=43oWOhMYPhfREVC2XwKAR4taU8Ls_94mgsFoYSuJlAY-1774894722.224128-1.0.1.1-FyU.YTGgGKW16B16h2k_b7pLB2K62GjdtTmxA5Mx92KSPlF5Wo6NsxgmrJKxR_t0na_GIXbUHJ2TYpC1WV7c6eOZZ0ZLVkTKp61GiXIcYIFpg6G0rgqk3oK1cIxwSyLI; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:48:56 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9537",
+                "x-ratelimit-remaining-requests": "9081",
                 "x-ratelimit-remaining-tokens": "199468",
-                "x-ratelimit-reset-requests": "1h6m33.395s",
+                "x-ratelimit-reset-requests": "2h12m11.814s",
                 "x-ratelimit-reset-tokens": "159ms",
-                "x-request-id": "req_f806af55e67a466983e920168f42ca36"
+                "x-request-id": "req_9f77d5ab0e3c4697b3fa77f14d2ea378"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4431a93eeb6103-IAH",
+              "cf-ray": "9e491e4deeeb37b8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:58:17 GMT",
+              "date": "Mon, 30 Mar 2026 18:18:56 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "11194",
+              "openai-processing-ms": "14180",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=qhKd._IGLJG6276Gt7j.9Q.Vd7q6lYVWICH5JZPxD1Q-1774843086.2758026-1.0.1.1-WTP7yR7HYCYg4PCnMrtJbktPC29WDVy7XxICGE0d8CmYb7CNqK.zuSw7sYLi21EtzaIKDj8B8B71zY.mQtZblbvEwB1dOeTjn_4djw7UTmSr10XX_KxfQLcsrZPQqGkz; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:28:17 GMT",
+              "set-cookie": "__cf_bm=43oWOhMYPhfREVC2XwKAR4taU8Ls_94mgsFoYSuJlAY-1774894722.224128-1.0.1.1-FyU.YTGgGKW16B16h2k_b7pLB2K62GjdtTmxA5Mx92KSPlF5Wo6NsxgmrJKxR_t0na_GIXbUHJ2TYpC1WV7c6eOZZ0ZLVkTKp61GiXIcYIFpg6G0rgqk3oK1cIxwSyLI; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:48:56 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9537",
+              "x-ratelimit-remaining-requests": "9081",
               "x-ratelimit-remaining-tokens": "199468",
-              "x-ratelimit-reset-requests": "1h6m33.395s",
+              "x-ratelimit-reset-requests": "2h12m11.814s",
               "x-ratelimit-reset-tokens": "159ms",
-              "x-request-id": "req_f806af55e67a466983e920168f42ca36"
+              "x-request-id": "req_9f77d5ab0e3c4697b3fa77f14d2ea378"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 389,
-        "completion": 742,
+        "completion": 737,
         "cached": 0,
-        "total": 1131,
+        "total": 1126,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -257,8 +257,8 @@
         },
         "assertions": {
           "total": 1013,
-          "prompt": 945,
-          "completion": 68,
+          "prompt": 940,
+          "completion": 73,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 13220,
-      "evaluationDurationMs": 13220
+      "durationMs": 16585,
+      "evaluationDurationMs": 16585
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:58:19.471Z",
-    "evaluationCreatedAt": "2026-03-30T03:58:06.218Z"
+    "exportedAt": "2026-03-30T18:18:58.787Z",
+    "evaluationCreatedAt": "2026-03-30T18:18:42.162Z"
   }
 }

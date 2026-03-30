@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-9v1-2026-03-30T03:35:24",
+  "evalId": "eval-4T1-2026-03-30T16:28:43",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:35:24.741Z",
+    "timestamp": "2026-03-30T16:28:43.561Z",
     "prompts": [
       {
         "id": "c82018cbc55ae816a039cb54455bbbf5def403a9819a34196204184f02df76d6",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 7,
           "assertFailCount": 0,
-          "totalLatencyMs": 17271,
+          "totalLatencyMs": 20873,
           "tokenUsage": {
             "prompt": 2772,
-            "completion": 755,
+            "completion": 757,
             "cached": 0,
-            "total": 3527,
+            "total": 3529,
             "numRequests": 7,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 2464,
-              "prompt": 2218,
-              "completion": 246,
+              "total": 2455,
+              "prompt": 2220,
+              "completion": 235,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -49,247 +49,11 @@
             "correct_agent_dispatch": 4,
             "avoids_unnecessary_dispatch": 3
           },
-          "cost": 0.0008688
-        }
-      },
-      {
-        "id": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "raw": "{{user_task}}",
-        "label": "without-routing-directive",
-        "provider": "openai:chat:gpt-4o-mini",
-        "metrics": {
-          "score": 3,
-          "testPassCount": 3,
-          "testFailCount": 4,
-          "testErrorCount": 0,
-          "assertPassCount": 3,
-          "assertFailCount": 4,
-          "totalLatencyMs": 38778,
-          "tokenUsage": {
-            "prompt": 133,
-            "completion": 1872,
-            "cached": 0,
-            "total": 2005,
-            "numRequests": 7,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            },
-            "assertions": {
-              "total": 3631,
-              "prompt": 3338,
-              "completion": 293,
-              "cached": 0,
-              "numRequests": 0,
-              "completionDetails": {
-                "reasoning": 0,
-                "acceptedPrediction": 0,
-                "rejectedPrediction": 0
-              }
-            }
-          },
-          "namedScores": {
-            "correct_agent_dispatch": 0,
-            "avoids_unnecessary_dispatch": 3
-          },
-          "namedScoresCount": {
-            "correct_agent_dispatch": 4,
-            "avoids_unnecessary_dispatch": 3
-          },
-          "cost": 0.00114315
+          "cost": 0.0008699999999999999
         }
       }
     ],
     "results": [
-      {
-        "cost": 0.00018284999999999997,
-        "error": "The output dives directly into writing code for a FastAPI application without mentioning any specific agent or routing.",
-        "gradingResult": {
-          "pass": false,
-          "score": 0,
-          "reason": "The output dives directly into writing code for a FastAPI application without mentioning any specific agent or routing.",
-          "namedScores": {
-            "correct_agent_dispatch": 0
-          },
-          "tokensUsed": {
-            "total": 557,
-            "prompt": 520,
-            "completion": 37,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
-                "threshold": 0.8,
-                "metric": "correct_agent_dispatch"
-              },
-              "pass": false,
-              "score": 0,
-              "reason": "The output dives directly into writing code for a FastAPI application without mentioning any specific agent or routing.",
-              "tokensUsed": {
-                "total": 557,
-                "prompt": 520,
-                "completion": 37,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a FastAPI application with JWT authentication and refresh token rotation involves several steps. Below is a complete example that demonstrates how to set up such an application.\\n\\n### Prerequisites\\n\\nMake sure you have the following installed:\\n\\n- Python 3.7 or higher\\n- FastAPI\\n- Uvicorn (for serving the app)\\n- PyJWT (for handling JWT tokens)\\n- Passlib (for password hashing)\\n- SQLAlchemy (for database interactions, optional)\\n\\nYou can install the required packages using pip:\\n\\n```bash\\npip install fastapi uvicorn pyjwt passlib[bcrypt] sqlalchemy\\n```\\n\\n### Project Structure\\n\\nHere's a simple structure for your FastAPI application:\\n\\n```\\n/fastapi_jwt_app\\n    ├── main.py\\n    ├── models.py\\n    ├── schemas.py\\n    ├── auth.py\\n    ├── database.py\\n```\\n\\n### Step 1: Database Setup (Optional)\\n\\nIf you want to use a database, you can set up SQLAlchemy. Here’s a simple example using SQLite.\\n\\n**database.py**\\n\\n```python\\nfrom sqlalchemy import create_engine\\nfrom sqlalchemy.ext.declarative import declarative_base\\nfrom sqlalchemy.orm import sessionmaker\\n\\nDATABASE_URL = \\\"sqlite:///./test.db\\\"\\n\\nengine = create_engine(DATABASE_URL)\\nSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)\\nBase = declarative_base()\\n```\\n\\n### Step 2: Create User Model\\n</Output>\\n<Rubric>\\nThe response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "7d6c2b88-8cef-4dab-bdd5-b59f66340dba",
-        "latencyMs": 7766,
-        "namedScores": {
-          "correct_agent_dispatch": 0
-        },
-        "prompt": {
-          "raw": "Build a FastAPI application with JWT authentication and refresh token rotation",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "Creating a FastAPI application with JWT authentication and refresh token rotation involves several steps. Below is a complete example that demonstrates how to set up such an application.\n\n### Prerequisites\n\nMake sure you have the following installed:\n\n- Python 3.7 or higher\n- FastAPI\n- Uvicorn (for serving the app)\n- PyJWT (for handling JWT tokens)\n- Passlib (for password hashing)\n- SQLAlchemy (for database interactions, optional)\n\nYou can install the required packages using pip:\n\n```bash\npip install fastapi uvicorn pyjwt passlib[bcrypt] sqlalchemy\n```\n\n### Project Structure\n\nHere's a simple structure for your FastAPI application:\n\n```\n/fastapi_jwt_app\n    ├── main.py\n    ├── models.py\n    ├── schemas.py\n    ├── auth.py\n    ├── database.py\n```\n\n### Step 1: Database Setup (Optional)\n\nIf you want to use a database, you can set up SQLAlchemy. Here’s a simple example using SQLite.\n\n**database.py**\n\n```python\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.ext.declarative import declarative_base\nfrom sqlalchemy.orm import sessionmaker\n\nDATABASE_URL = \"sqlite:///./test.db\"\n\nengine = create_engine(DATABASE_URL)\nSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)\nBase = declarative_base()\n```\n\n### Step 2: Create User Model",
-          "tokenUsage": {
-            "total": 319,
-            "prompt": 19,
-            "completion": 300,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 7766,
-          "finishReason": "length",
-          "cost": 0.00018284999999999997,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44106d0c7bc2fb-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:32 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "7485",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=HpDXwCr6.uqV5HaZNY4nUizNbomv7fjgaU7JASOdZyA-1774841724.9649203-1.0.1.1-RzVnRPMK2UGUySoC21ekiZTpygU.gDTcbKY.PJfoKcOlRcFLbOvvczYxJyroSNCacKlVHX.wOVoccpimBVmMJu49f023.qytJi.9d4PznbwgVWoPsmGHCg.hrk9TRB.T; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:32 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9984",
-                "x-ratelimit-remaining-tokens": "199978",
-                "x-ratelimit-reset-requests": "2m16.175s",
-                "x-ratelimit-reset-tokens": "6ms",
-                "x-request-id": "req_e045dc2f26ac4edf9a598571fbeaf77d"
-              }
-            }
-          }
-        },
-        "score": 0,
-        "success": false,
-        "testCase": {
-          "description": "FastAPI + JWT auth → should mention fastapi-pro or backend-security-coder",
-          "vars": {
-            "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response explicitly mentions routing to or using a specific agent such as fastapi-pro, backend-architect, or backend-security-coder. It should NOT just dive into writing code without any routing mention.\n",
-              "threshold": 0.8,
-              "metric": "correct_agent_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 0,
-        "vars": {
-          "user_task": "Build a FastAPI application with JWT authentication and refresh token rotation"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44106d0c7bc2fb-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:32 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "7485",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=HpDXwCr6.uqV5HaZNY4nUizNbomv7fjgaU7JASOdZyA-1774841724.9649203-1.0.1.1-RzVnRPMK2UGUySoC21ekiZTpygU.gDTcbKY.PJfoKcOlRcFLbOvvczYxJyroSNCacKlVHX.wOVoccpimBVmMJu49f023.qytJi.9d4PznbwgVWoPsmGHCg.hrk9TRB.T; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:32 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9984",
-              "x-ratelimit-remaining-tokens": "199978",
-              "x-ratelimit-reset-requests": "2m16.175s",
-              "x-ratelimit-reset-tokens": "6ms",
-              "x-request-id": "req_e045dc2f26ac4edf9a598571fbeaf77d"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 1
-      },
       {
         "cost": 0.0000708,
         "gradingResult": {
@@ -335,8 +99,8 @@
             }
           ]
         },
-        "id": "6a63c97e-1ab0-4a1b-91c8-5a7516935246",
-        "latencyMs": 792,
+        "id": "fe5db3ed-3d50-4682-8a58-183e8aa24331",
+        "latencyMs": 768,
         "namedScores": {
           "correct_agent_dispatch": 1
         },
@@ -372,7 +136,7 @@
             }
           },
           "cached": false,
-          "latencyMs": 792,
+          "latencyMs": 768,
           "finishReason": "stop",
           "cost": 0.0000708,
           "guardrails": {
@@ -386,28 +150,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44106d09b190ed-IAH",
+                "cf-ray": "9e487d34bbaba9fc-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:25 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:44 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "486",
+                "openai-processing-ms": "594",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=HDXTHmTr6NyHK2Q2AfB_Bs3BrK_5MhWCSx6C9gXte1Y-1774841724.96335-1.0.1.1-496mIkFJb4eRhWGmBKXy_iZz6R6pJPhhAjpNeHDYmzSJAqEqnktIhveOv.xVlbsPvccNEEnoRraCPJ1ZdUsWjeE7SoXJbNrQN0t4SMRAnIBk8IUTYJkbbI3rgStUdvAm; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:25 GMT",
+                "set-cookie": "__cf_bm=HDK6xrSc.fbeTNIscxhPno0WpB3oZjPIfvbgcvDyFaA-1774888123.635986-1.0.1.1-FulEJnrl6_rtDM9t8gmISDFIhsqkGC9V2yGQQZ_kbQieesGgdcfts36.Mb_KKxRR9VuH1DTrFRY_5XNESoN_4EDirna5KTd7Ml3W.nc4i3U3u9Mzexk2t5IBxNxss8b9; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:44 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9984",
-                "x-ratelimit-remaining-tokens": "199612",
-                "x-ratelimit-reset-requests": "2m16.357s",
+                "x-ratelimit-remaining-requests": "9993",
+                "x-ratelimit-remaining-tokens": "199611",
+                "x-ratelimit-reset-requests": "58.176s",
                 "x-ratelimit-reset-tokens": "116ms",
-                "x-request-id": "req_5bd6f44cf797435e8a3a0036f30e21df"
+                "x-request-id": "req_e45470731a6a46028eca2120f1578cad"
               }
             }
           }
@@ -449,221 +213,33 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44106d09b190ed-IAH",
+              "cf-ray": "9e487d34bbaba9fc-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:25 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:44 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "486",
+              "openai-processing-ms": "594",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=HDXTHmTr6NyHK2Q2AfB_Bs3BrK_5MhWCSx6C9gXte1Y-1774841724.96335-1.0.1.1-496mIkFJb4eRhWGmBKXy_iZz6R6pJPhhAjpNeHDYmzSJAqEqnktIhveOv.xVlbsPvccNEEnoRraCPJ1ZdUsWjeE7SoXJbNrQN0t4SMRAnIBk8IUTYJkbbI3rgStUdvAm; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:25 GMT",
+              "set-cookie": "__cf_bm=HDK6xrSc.fbeTNIscxhPno0WpB3oZjPIfvbgcvDyFaA-1774888123.635986-1.0.1.1-FulEJnrl6_rtDM9t8gmISDFIhsqkGC9V2yGQQZ_kbQieesGgdcfts36.Mb_KKxRR9VuH1DTrFRY_5XNESoN_4EDirna5KTd7Ml3W.nc4i3U3u9Mzexk2t5IBxNxss8b9; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:44 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9984",
-              "x-ratelimit-remaining-tokens": "199612",
-              "x-ratelimit-reset-requests": "2m16.357s",
+              "x-ratelimit-remaining-requests": "9993",
+              "x-ratelimit-remaining-tokens": "199611",
+              "x-ratelimit-reset-requests": "58.176s",
               "x-ratelimit-reset-tokens": "116ms",
-              "x-request-id": "req_5bd6f44cf797435e8a3a0036f30e21df"
+              "x-request-id": "req_e45470731a6a46028eca2120f1578cad"
             }
           },
           "_promptfooFileMetadata": {}
         },
         "failureReason": 0
-      },
-      {
-        "cost": 0.00018314999999999998,
-        "error": "The output provides a complete Rust code example without mentioning routing to a Rust specialist or agent delegation.",
-        "gradingResult": {
-          "pass": false,
-          "score": 0,
-          "reason": "The output provides a complete Rust code example without mentioning routing to a Rust specialist or agent delegation.",
-          "namedScores": {
-            "correct_agent_dispatch": 0
-          },
-          "tokensUsed": {
-            "total": 546,
-            "prompt": 510,
-            "completion": 36,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
-                "threshold": 0.7,
-                "metric": "correct_agent_dispatch"
-              },
-              "pass": false,
-              "score": 0,
-              "reason": "The output provides a complete Rust code example without mentioning routing to a Rust specialist or agent delegation.",
-              "tokensUsed": {
-                "total": 546,
-                "prompt": 510,
-                "completion": 36,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nCreating a TCP server in Rust using the Tokio framework with connection pooling and graceful shutdown involves several steps. Below is a complete example that demonstrates how to set up such a server.\\n\\n### Dependencies\\n\\nFirst, you need to add the necessary dependencies to your `Cargo.toml` file:\\n\\n```toml\\n[dependencies]\\ntokio = { version = \\\"1\\\", features = [\\\"full\\\"] }\\ntokio-util = \\\"0.6\\\"\\nfutures = \\\"0.3\\\"\\n```\\n\\n### TCP Server Implementation\\n\\nHere is a simple implementation of a TCP server with connection pooling and graceful shutdown:\\n\\n```rust\\nuse std::sync::{Arc, Mutex};\\nuse std::net::SocketAddr;\\nuse tokio::net::{TcpListener, TcpStream};\\nuse tokio::sync::Notify;\\nuse tokio::task;\\nuse tokio::time::{self, Duration};\\n\\n#[derive(Clone)]\\nstruct ConnectionPool {\\n    connections: Arc<Mutex<Vec<TcpStream>>>,\\n}\\n\\nimpl ConnectionPool {\\n    fn new() -> Self {\\n        ConnectionPool {\\n            connections: Arc::new(Mutex::new(Vec::new())),\\n        }\\n    }\\n\\n    fn add_connection(&self, stream: TcpStream) {\\n        let mut connections = self.connections.lock().unwrap();\\n        connections.push(stream);\\n    }\\n\\n    fn remove_connection(&self, stream: &TcpStream) {\\n        let mut connections = self.connections.lock().unwrap();\\n        connections.retain(|s| s.peer_addr().unwrap() != stream.peer\\n</Output>\\n<Rubric>\\nThe response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "2dd72b69-5712-43e0-9ca1-dda601904927",
-        "latencyMs": 4725,
-        "namedScores": {
-          "correct_agent_dispatch": 0
-        },
-        "prompt": {
-          "raw": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "Creating a TCP server in Rust using the Tokio framework with connection pooling and graceful shutdown involves several steps. Below is a complete example that demonstrates how to set up such a server.\n\n### Dependencies\n\nFirst, you need to add the necessary dependencies to your `Cargo.toml` file:\n\n```toml\n[dependencies]\ntokio = { version = \"1\", features = [\"full\"] }\ntokio-util = \"0.6\"\nfutures = \"0.3\"\n```\n\n### TCP Server Implementation\n\nHere is a simple implementation of a TCP server with connection pooling and graceful shutdown:\n\n```rust\nuse std::sync::{Arc, Mutex};\nuse std::net::SocketAddr;\nuse tokio::net::{TcpListener, TcpStream};\nuse tokio::sync::Notify;\nuse tokio::task;\nuse tokio::time::{self, Duration};\n\n#[derive(Clone)]\nstruct ConnectionPool {\n    connections: Arc<Mutex<Vec<TcpStream>>>,\n}\n\nimpl ConnectionPool {\n    fn new() -> Self {\n        ConnectionPool {\n            connections: Arc::new(Mutex::new(Vec::new())),\n        }\n    }\n\n    fn add_connection(&self, stream: TcpStream) {\n        let mut connections = self.connections.lock().unwrap();\n        connections.push(stream);\n    }\n\n    fn remove_connection(&self, stream: &TcpStream) {\n        let mut connections = self.connections.lock().unwrap();\n        connections.retain(|s| s.peer_addr().unwrap() != stream.peer",
-          "tokenUsage": {
-            "total": 321,
-            "prompt": 21,
-            "completion": 300,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 4725,
-          "finishReason": "length",
-          "cost": 0.00018314999999999998,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44106d1a34b079-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:29 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "4336",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=kb1fUJqxqXEBalwS6Ec0q5D0hV77iTBXDbk8bsP8Qx8-1774841724.973888-1.0.1.1-uZ4_QPqMPywvGsBTqTr8yxGg23AIcg2hyVhhBgtkb9KetPWcBhuIBBVpr9CyWjJvoVV30Ydu5tRwMjhc29gLykhP.srncjtg8fBS7uEcfIw0ooQg96a_Igd3dKnfFE6F; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:29 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9984",
-                "x-ratelimit-remaining-tokens": "199977",
-                "x-ratelimit-reset-requests": "2m16.148s",
-                "x-ratelimit-reset-tokens": "6ms",
-                "x-request-id": "req_b5ef1f504d6e4e9b9974155397c9c7aa"
-              }
-            }
-          }
-        },
-        "score": 0,
-        "success": false,
-        "testCase": {
-          "description": "Rust TCP server → should route to rust-pro",
-          "vars": {
-            "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response explicitly mentions routing to rust-pro or a relevant Rust specialist. It should not attempt to write all the Rust code directly without mentioning agent delegation.\n",
-              "threshold": 0.7,
-              "metric": "correct_agent_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 1,
-        "vars": {
-          "user_task": "Write a Rust TCP server using tokio with connection pooling and graceful shutdown"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44106d1a34b079-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:29 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "4336",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=kb1fUJqxqXEBalwS6Ec0q5D0hV77iTBXDbk8bsP8Qx8-1774841724.973888-1.0.1.1-uZ4_QPqMPywvGsBTqTr8yxGg23AIcg2hyVhhBgtkb9KetPWcBhuIBBVpr9CyWjJvoVV30Ydu5tRwMjhc29gLykhP.srncjtg8fBS7uEcfIw0ooQg96a_Igd3dKnfFE6F; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:29 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9984",
-              "x-ratelimit-remaining-tokens": "199977",
-              "x-ratelimit-reset-requests": "2m16.148s",
-              "x-ratelimit-reset-tokens": "6ms",
-              "x-request-id": "req_b5ef1f504d6e4e9b9974155397c9c7aa"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 1
       },
       {
         "cost": 0.0000717,
@@ -675,9 +251,9 @@
             "correct_agent_dispatch": 1
           },
           "tokensUsed": {
-            "total": 265,
+            "total": 264,
             "prompt": 229,
-            "completion": 36,
+            "completion": 35,
             "cached": 0,
             "numRequests": 1
           },
@@ -691,11 +267,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output explicitly mentions 'Routing to rust-pro', which indicates agent delegation to a Rust specialist.",
+              "reason": "The content explicitly mentions 'Routing to rust-pro', which aligns with the rubric's requirement.",
               "tokensUsed": {
-                "total": 265,
+                "total": 264,
                 "prompt": 229,
-                "completion": 36,
+                "completion": 35,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -710,8 +286,8 @@
             }
           ]
         },
-        "id": "54ce80fe-be00-4b22-a6f1-c8dfa04a843c",
-        "latencyMs": 817,
+        "id": "7026334d-18ff-4260-9742-d8d02b4081f2",
+        "latencyMs": 764,
         "namedScores": {
           "correct_agent_dispatch": 1
         },
@@ -747,7 +323,7 @@
             }
           },
           "cached": false,
-          "latencyMs": 817,
+          "latencyMs": 764,
           "finishReason": "stop",
           "cost": 0.0000717,
           "guardrails": {
@@ -761,28 +337,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44106d0a14b079-IAH",
+                "cf-ray": "9e487d34cb2bc2f8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:25 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:44 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "488",
+                "openai-processing-ms": "587",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=lgCGI3MNWA41ntSMHOKFsINzEknAt4HEqXdp4zegy0U-1774841724.9718626-1.0.1.1-XNoPofZ.9dz9VHxzXpSySX4YzlDqxscaV5RlN1qoF6c7jTINc6mpAbbcubJi.fr5CuC_Ep0tBzdaEDbLeAMF9fxR9juQH8uHGoRtYNhs410xALAyPmnMqlAMWs22zab1; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:25 GMT",
+                "set-cookie": "__cf_bm=hnCzy68dLVYno7_SvPg3g65QDbXsu.Ng2phoDL.hwXs-1774888123.6441514-1.0.1.1-hURTT8C0KgnwHKwGeDLQEf6MwHxgU3MYtTxE3XqPJxwjX_3FXo0yh62Z8Z2Qhi5v7L0NcEVIjnJ5KSXgGFSXb8aV5cwtI1IdCn3uEYqAQGzLEZriYstPBp3kLFQm4f5D; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:44 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9983",
+                "x-ratelimit-remaining-requests": "9993",
                 "x-ratelimit-remaining-tokens": "199612",
-                "x-ratelimit-reset-requests": "2m24.781s",
+                "x-ratelimit-reset-requests": "58.184s",
                 "x-ratelimit-reset-tokens": "116ms",
-                "x-request-id": "req_4ac55c4dd7354641b9732b0414cabdf0"
+                "x-request-id": "req_5866b828731f4cdc89727c58058e1adb"
               }
             }
           }
@@ -824,221 +400,33 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44106d0a14b079-IAH",
+              "cf-ray": "9e487d34cb2bc2f8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:25 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:44 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "488",
+              "openai-processing-ms": "587",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=lgCGI3MNWA41ntSMHOKFsINzEknAt4HEqXdp4zegy0U-1774841724.9718626-1.0.1.1-XNoPofZ.9dz9VHxzXpSySX4YzlDqxscaV5RlN1qoF6c7jTINc6mpAbbcubJi.fr5CuC_Ep0tBzdaEDbLeAMF9fxR9juQH8uHGoRtYNhs410xALAyPmnMqlAMWs22zab1; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:25 GMT",
+              "set-cookie": "__cf_bm=hnCzy68dLVYno7_SvPg3g65QDbXsu.Ng2phoDL.hwXs-1774888123.6441514-1.0.1.1-hURTT8C0KgnwHKwGeDLQEf6MwHxgU3MYtTxE3XqPJxwjX_3FXo0yh62Z8Z2Qhi5v7L0NcEVIjnJ5KSXgGFSXb8aV5cwtI1IdCn3uEYqAQGzLEZriYstPBp3kLFQm4f5D; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:44 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9983",
+              "x-ratelimit-remaining-requests": "9993",
               "x-ratelimit-remaining-tokens": "199612",
-              "x-ratelimit-reset-requests": "2m24.781s",
+              "x-ratelimit-reset-requests": "58.184s",
               "x-ratelimit-reset-tokens": "116ms",
-              "x-request-id": "req_4ac55c4dd7354641b9732b0414cabdf0"
+              "x-request-id": "req_5866b828731f4cdc89727c58058e1adb"
             }
           },
           "_promptfooFileMetadata": {}
         },
         "failureReason": 0
-      },
-      {
-        "cost": 0.0001836,
-        "error": "The output provides a detailed guide on setting up a GitOps workflow with ArgoCD for Kubernetes, but it does not mention routing to specific roles like kubernetes-architect or deployment-engineer.",
-        "gradingResult": {
-          "pass": false,
-          "score": 0,
-          "reason": "The output provides a detailed guide on setting up a GitOps workflow with ArgoCD for Kubernetes, but it does not mention routing to specific roles like kubernetes-architect or deployment-engineer.",
-          "namedScores": {
-            "correct_agent_dispatch": 0
-          },
-          "tokensUsed": {
-            "total": 562,
-            "prompt": 505,
-            "completion": 57,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
-                "threshold": 0.7,
-                "metric": "correct_agent_dispatch"
-              },
-              "pass": false,
-              "score": 0,
-              "reason": "The output provides a detailed guide on setting up a GitOps workflow with ArgoCD for Kubernetes, but it does not mention routing to specific roles like kubernetes-architect or deployment-engineer.",
-              "tokensUsed": {
-                "total": 562,
-                "prompt": 505,
-                "completion": 57,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nSetting up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment involves several steps. Below is a comprehensive guide to help you get started.\\n\\n### Prerequisites\\n\\n1. **Kubernetes Cluster**: You need access to a Kubernetes cluster (e.g., Minikube, EKS, GKE, AKS).\\n2. **kubectl**: Ensure you have `kubectl` installed and configured to access your cluster.\\n3. **ArgoCD**: You need to install ArgoCD in your Kubernetes cluster.\\n4. **Git Repository**: A Git repository to store your Kubernetes manifests.\\n\\n### Step 1: Install ArgoCD\\n\\n1. **Install ArgoCD**:\\n   You can install ArgoCD using the following command:\\n\\n   ```bash\\n   kubectl create namespace argocd\\n   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml\\n   ```\\n\\n2. **Access the ArgoCD API Server**:\\n   Expose the ArgoCD API server using a LoadBalancer or port-forwarding for local access:\\n\\n   ```bash\\n   kubectl port-forward svc/argocd-server -n argocd 8080:443\\n   ```\\n\\n3. **Login to ArgoCD**:\\n   Get the initial admin password:\\n\\n   ```bash\\n   kubectl get pods -n argocd\\n\\n</Output>\\n<Rubric>\\nThe response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "2ff817de-0c41-4821-b512-05f710eb0d2b",
-        "latencyMs": 5260,
-        "namedScores": {
-          "correct_agent_dispatch": 0
-        },
-        "prompt": {
-          "raw": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "Setting up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment involves several steps. Below is a comprehensive guide to help you get started.\n\n### Prerequisites\n\n1. **Kubernetes Cluster**: You need access to a Kubernetes cluster (e.g., Minikube, EKS, GKE, AKS).\n2. **kubectl**: Ensure you have `kubectl` installed and configured to access your cluster.\n3. **ArgoCD**: You need to install ArgoCD in your Kubernetes cluster.\n4. **Git Repository**: A Git repository to store your Kubernetes manifests.\n\n### Step 1: Install ArgoCD\n\n1. **Install ArgoCD**:\n   You can install ArgoCD using the following command:\n\n   ```bash\n   kubectl create namespace argocd\n   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml\n   ```\n\n2. **Access the ArgoCD API Server**:\n   Expose the ArgoCD API server using a LoadBalancer or port-forwarding for local access:\n\n   ```bash\n   kubectl port-forward svc/argocd-server -n argocd 8080:443\n   ```\n\n3. **Login to ArgoCD**:\n   Get the initial admin password:\n\n   ```bash\n   kubectl get pods -n argocd\n",
-          "tokenUsage": {
-            "total": 324,
-            "prompt": 24,
-            "completion": 300,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 5260,
-          "finishReason": "length",
-          "cost": 0.0001836,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44107dfc80b079-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:32 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "5094",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=47SKEYcN0SWTd9aDvipOoHNNcP5JyTHWsBiZ619jGOw-1774841727.6805122-1.0.1.1-S.SFKqvxXw3rumTtTlaodXkqUn_02jDGLsh6WJwFWgAwYfqDTQoYz5kT.Mc1g9xfsA0ic_mQMRzaTHIEkgz3UWZuILgIL0Wya5LTxSRo7SRl5PQXNMjj7ngp0HNGeGMz; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:32 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9978",
-                "x-ratelimit-remaining-tokens": "199977",
-                "x-ratelimit-reset-requests": "3m5.505s",
-                "x-ratelimit-reset-tokens": "6ms",
-                "x-request-id": "req_01c925aca5cf452a8e8c886c7009ec95"
-              }
-            }
-          }
-        },
-        "score": 0,
-        "success": false,
-        "testCase": {
-          "description": "K8s GitOps → should route to kubernetes-architect",
-          "vars": {
-            "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response mentions routing to kubernetes-architect, deployment-engineer, or a related infrastructure agent. Not just generic advice.\n",
-              "threshold": 0.7,
-              "metric": "correct_agent_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 2,
-        "vars": {
-          "user_task": "Set up a GitOps workflow with ArgoCD for a multi-environment Kubernetes deployment"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44107dfc80b079-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:32 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "5094",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=47SKEYcN0SWTd9aDvipOoHNNcP5JyTHWsBiZ619jGOw-1774841727.6805122-1.0.1.1-S.SFKqvxXw3rumTtTlaodXkqUn_02jDGLsh6WJwFWgAwYfqDTQoYz5kT.Mc1g9xfsA0ic_mQMRzaTHIEkgz3UWZuILgIL0Wya5LTxSRo7SRl5PQXNMjj7ngp0HNGeGMz; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:32 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9978",
-              "x-ratelimit-remaining-tokens": "199977",
-              "x-ratelimit-reset-requests": "3m5.505s",
-              "x-ratelimit-reset-tokens": "6ms",
-              "x-request-id": "req_01c925aca5cf452a8e8c886c7009ec95"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 1
       },
       {
         "cost": 0.00007575,
@@ -1050,9 +438,9 @@
             "correct_agent_dispatch": 1
           },
           "tokensUsed": {
-            "total": 268,
+            "total": 260,
             "prompt": 231,
-            "completion": 37,
+            "completion": 29,
             "cached": 0,
             "numRequests": 1
           },
@@ -1066,11 +454,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "the content specifically mentions routing to 'kubernetes-architect' for setting up a GitOps workflow",
+              "reason": "the content specifically mentions routing to 'kubernetes-architect'",
               "tokensUsed": {
-                "total": 268,
+                "total": 260,
                 "prompt": 231,
-                "completion": 37,
+                "completion": 29,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -1085,8 +473,8 @@
             }
           ]
         },
-        "id": "bdf728bd-9ebd-4d81-8713-0dead9af9cd5",
-        "latencyMs": 786,
+        "id": "381f9899-d61c-44e4-9d9d-09fab2d88351",
+        "latencyMs": 2097,
         "namedScores": {
           "correct_agent_dispatch": 1
         },
@@ -1122,7 +510,7 @@
             }
           },
           "cached": false,
-          "latencyMs": 786,
+          "latencyMs": 2097,
           "finishReason": "stop",
           "cost": 0.00007575,
           "guardrails": {
@@ -1136,28 +524,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44107d391490ed-IAH",
+                "cf-ray": "9e487d34befe70e1-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:28 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:45 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "640",
+                "openai-processing-ms": "1131",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=WeNfaamNwjK35WCo3Z0_oWAM7JMVGXluhGcQm2CWBh0-1774841727.5524628-1.0.1.1-Abjug7fuU4fYpKCiG1n.HIAW2lko1Rxkchs7M0ikjtcdVYWsJwlFfYfcp7J4SSRaE4I41E4xHoqT8tjaXdvMDLJl2kkIO8JrYhnC42YUTgjianBaMhnIDpabdrviFFnO; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:28 GMT",
+                "set-cookie": "__cf_bm=im9gwwzCTMvBE.7VIhx2FBA8BlVg5drDrjKAd70ghUE-1774888123.6404893-1.0.1.1-mfx.6zxYvz.YL4Ht0zUp1GDNspyXV3DFF1cKXo0YQZLrPiIoknGk8N0f.xEUaK2MFJru65NqqbRg_0uFPUfMDbyQpkHLOAywhu2vHXNmttlJ1mG.bNZOxr.ZGrsc5BLV; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:45 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9978",
+                "x-ratelimit-remaining-requests": "9989",
                 "x-ratelimit-remaining-tokens": "199611",
-                "x-ratelimit-reset-requests": "3m5.649s",
+                "x-ratelimit-reset-requests": "1m31.975s",
                 "x-ratelimit-reset-tokens": "116ms",
-                "x-request-id": "req_a9a53236dc1446d395bfa18b11263329"
+                "x-request-id": "req_999f723635f4428eb11e487617e4b3ff"
               }
             }
           }
@@ -1199,221 +587,33 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44107d391490ed-IAH",
+              "cf-ray": "9e487d34befe70e1-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:28 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:45 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "640",
+              "openai-processing-ms": "1131",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=WeNfaamNwjK35WCo3Z0_oWAM7JMVGXluhGcQm2CWBh0-1774841727.5524628-1.0.1.1-Abjug7fuU4fYpKCiG1n.HIAW2lko1Rxkchs7M0ikjtcdVYWsJwlFfYfcp7J4SSRaE4I41E4xHoqT8tjaXdvMDLJl2kkIO8JrYhnC42YUTgjianBaMhnIDpabdrviFFnO; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:28 GMT",
+              "set-cookie": "__cf_bm=im9gwwzCTMvBE.7VIhx2FBA8BlVg5drDrjKAd70ghUE-1774888123.6404893-1.0.1.1-mfx.6zxYvz.YL4Ht0zUp1GDNspyXV3DFF1cKXo0YQZLrPiIoknGk8N0f.xEUaK2MFJru65NqqbRg_0uFPUfMDbyQpkHLOAywhu2vHXNmttlJ1mG.bNZOxr.ZGrsc5BLV; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:45 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9978",
+              "x-ratelimit-remaining-requests": "9989",
               "x-ratelimit-remaining-tokens": "199611",
-              "x-ratelimit-reset-requests": "3m5.649s",
+              "x-ratelimit-reset-requests": "1m31.975s",
               "x-ratelimit-reset-tokens": "116ms",
-              "x-request-id": "req_a9a53236dc1446d395bfa18b11263329"
+              "x-request-id": "req_999f723635f4428eb11e487617e4b3ff"
             }
           },
           "_promptfooFileMetadata": {}
         },
         "failureReason": 0
-      },
-      {
-        "cost": 0.00018345,
-        "error": "The output does not mention routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet, nor does it clearly identify a security specialization.",
-        "gradingResult": {
-          "pass": false,
-          "score": 0,
-          "reason": "The output does not mention routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet, nor does it clearly identify a security specialization.",
-          "namedScores": {
-            "correct_agent_dispatch": 0
-          },
-          "tokensUsed": {
-            "total": 566,
-            "prompt": 512,
-            "completion": 54,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
-                "threshold": 0.8,
-                "metric": "correct_agent_dispatch"
-              },
-              "pass": false,
-              "score": 0,
-              "reason": "The output does not mention routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet, nor does it clearly identify a security specialization.",
-              "tokensUsed": {
-                "total": 566,
-                "prompt": 512,
-                "completion": 54,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo provide a security report on a codebase for OWASP Top 10 vulnerabilities, I would need to analyze the actual code. However, since I cannot directly access or review code, I can guide you on how to perform this analysis and what to look for in your codebase. Below is a general outline of the OWASP Top 10 vulnerabilities and how to identify them in your codebase:\\n\\n### OWASP Top 10 Vulnerabilities\\n\\n1. **Injection**\\n   - **Description**: Attackers can inject malicious code into a program, often through SQL, NoSQL, OS commands, etc.\\n   - **How to Identify**: Look for places where user input is directly used in database queries or system commands without proper sanitization or parameterization.\\n\\n2. **Broken Authentication**\\n   - **Description**: Flaws in authentication mechanisms can allow attackers to compromise passwords, keys, or session tokens.\\n   - **How to Identify**: Check for weak password policies, lack of multi-factor authentication, and session management issues (e.g., session fixation, insecure cookie attributes).\\n\\n3. **Sensitive Data Exposure**\\n   - **Description**: Applications may not adequately protect sensitive data, leading to unauthorized access.\\n   - **How to Identify**: Look for hardcoded credentials, unencrypted sensitive data in transit or at rest, and improper use of cryptographic algorithms.\\n\\n4. **XML External Entities (XXE)**\\n   - **Description**: Vulnerabilities in XML parsers can\\n</Output>\\n<Rubric>\\nThe response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "cf20424b-7b9b-4de0-b6d1-51d855baafbd",
-        "latencyMs": 6862,
-        "namedScores": {
-          "correct_agent_dispatch": 0
-        },
-        "prompt": {
-          "raw": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "To provide a security report on a codebase for OWASP Top 10 vulnerabilities, I would need to analyze the actual code. However, since I cannot directly access or review code, I can guide you on how to perform this analysis and what to look for in your codebase. Below is a general outline of the OWASP Top 10 vulnerabilities and how to identify them in your codebase:\n\n### OWASP Top 10 Vulnerabilities\n\n1. **Injection**\n   - **Description**: Attackers can inject malicious code into a program, often through SQL, NoSQL, OS commands, etc.\n   - **How to Identify**: Look for places where user input is directly used in database queries or system commands without proper sanitization or parameterization.\n\n2. **Broken Authentication**\n   - **Description**: Flaws in authentication mechanisms can allow attackers to compromise passwords, keys, or session tokens.\n   - **How to Identify**: Check for weak password policies, lack of multi-factor authentication, and session management issues (e.g., session fixation, insecure cookie attributes).\n\n3. **Sensitive Data Exposure**\n   - **Description**: Applications may not adequately protect sensitive data, leading to unauthorized access.\n   - **How to Identify**: Look for hardcoded credentials, unencrypted sensitive data in transit or at rest, and improper use of cryptographic algorithms.\n\n4. **XML External Entities (XXE)**\n   - **Description**: Vulnerabilities in XML parsers can",
-          "tokenUsage": {
-            "total": 323,
-            "prompt": 23,
-            "completion": 300,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 6862,
-          "finishReason": "length",
-          "cost": 0.00018345,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410944becb079-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:38 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "6714",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=_4VqpICNAcwHNtoP9q1WxYqK2T2ANuVbTnya0u2ni6Q-1774841731.248398-1.0.1.1-YleLwZo.8Q.VFDud_pbQguB879EnNA4SZEIaVRpFqqLMIWBXASlJWgZBf0IEwdBlZL29dF0bNecM4b.5cfSNxrKGjXcpfGlUEBHjPnkhbTamJufwWfQZv9Sc95jbDkrS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:38 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9972",
-                "x-ratelimit-remaining-tokens": "199977",
-                "x-ratelimit-reset-requests": "3m53.614s",
-                "x-ratelimit-reset-tokens": "6ms",
-                "x-request-id": "req_f0eb602fb3ca4055badc83ff2b6f3be9"
-              }
-            }
-          }
-        },
-        "score": 0,
-        "success": false,
-        "testCase": {
-          "description": "OWASP audit → should route to security agent",
-          "vars": {
-            "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response mentions routing to owasp-guardian-sonnet, security-auditor, or sast-orchestrator-sonnet. Should clearly identify security specialization.\n",
-              "threshold": 0.8,
-              "metric": "correct_agent_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 3,
-        "vars": {
-          "user_task": "Review this codebase for OWASP Top 10 vulnerabilities and produce a security report"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410944becb079-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:38 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "6714",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=_4VqpICNAcwHNtoP9q1WxYqK2T2ANuVbTnya0u2ni6Q-1774841731.248398-1.0.1.1-YleLwZo.8Q.VFDud_pbQguB879EnNA4SZEIaVRpFqqLMIWBXASlJWgZBf0IEwdBlZL29dF0bNecM4b.5cfSNxrKGjXcpfGlUEBHjPnkhbTamJufwWfQZv9Sc95jbDkrS; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:38 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9972",
-              "x-ratelimit-remaining-tokens": "199977",
-              "x-ratelimit-reset-requests": "3m53.614s",
-              "x-ratelimit-reset-tokens": "6ms",
-              "x-request-id": "req_f0eb602fb3ca4055badc83ff2b6f3be9"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 1
       },
       {
         "cost": 0.00007259999999999999,
@@ -1441,7 +641,7 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "the content mentions 'security-auditor', which is part of the specified roles",
+              "reason": "the content mentions 'security-auditor', which is one of the specified roles",
               "tokensUsed": {
                 "total": 266,
                 "prompt": 232,
@@ -1460,8 +660,8 @@
             }
           ]
         },
-        "id": "b0da7dca-dbfe-401f-83b7-2f948344362a",
-        "latencyMs": 744,
+        "id": "5f583985-5722-4da8-aa22-835a1926e58f",
+        "latencyMs": 935,
         "namedScores": {
           "correct_agent_dispatch": 1
         },
@@ -1497,7 +697,7 @@
             }
           },
           "cached": false,
-          "latencyMs": 744,
+          "latencyMs": 935,
           "finishReason": "stop",
           "cost": 0.00007259999999999999,
           "guardrails": {
@@ -1511,28 +711,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44108ae91790ed-IAH",
+                "cf-ray": "9e487d34ca8ec308-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:30 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:44 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "507",
+                "openai-processing-ms": "786",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=cnrlkBCM_V0PkB_5rcxmHAoyClnC.w9Azz8bsQACZoA-1774841729.7477438-1.0.1.1-ps51pnzgtJSB7io6bkAG5kdbRRtobS20uaj2ssax.cV.7.ykLD.H10GZYI7zD04qy1E7j8WW3WzgSs6LEZD46aO43WYg_AWfrvYtx.4ob0RDkXUqPueYXNhIYoUW_pH2; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:30 GMT",
+                "set-cookie": "__cf_bm=elwENGyycI3JpfwV2fSCs.naOq.nTUEqRehO0rSZsrY-1774888123.6472294-1.0.1.1-ExqsQFo9wL_2g.f0qje1paMKiYUIfNutagvIn4HMNrFwOIyFkIsyHQLUvs4KMus1jyH576qDVcwA4sgqtlJIIt_y1uZrI74HBOagX0RpZK9_M4yscWw4mO0rdLslSJdT; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:44 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9975",
+                "x-ratelimit-remaining-requests": "9993",
                 "x-ratelimit-remaining-tokens": "199611",
-                "x-ratelimit-reset-requests": "3m29.369s",
+                "x-ratelimit-reset-requests": "58.184s",
                 "x-ratelimit-reset-tokens": "116ms",
-                "x-request-id": "req_85e58cdc17804dfe96a806ff555a405c"
+                "x-request-id": "req_b21f5a0828cf4329acbaf0bb13e08289"
               }
             }
           }
@@ -1574,28 +774,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44108ae91790ed-IAH",
+              "cf-ray": "9e487d34ca8ec308-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:30 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:44 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "507",
+              "openai-processing-ms": "786",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=cnrlkBCM_V0PkB_5rcxmHAoyClnC.w9Azz8bsQACZoA-1774841729.7477438-1.0.1.1-ps51pnzgtJSB7io6bkAG5kdbRRtobS20uaj2ssax.cV.7.ykLD.H10GZYI7zD04qy1E7j8WW3WzgSs6LEZD46aO43WYg_AWfrvYtx.4ob0RDkXUqPueYXNhIYoUW_pH2; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:30 GMT",
+              "set-cookie": "__cf_bm=elwENGyycI3JpfwV2fSCs.naOq.nTUEqRehO0rSZsrY-1774888123.6472294-1.0.1.1-ExqsQFo9wL_2g.f0qje1paMKiYUIfNutagvIn4HMNrFwOIyFkIsyHQLUvs4KMus1jyH576qDVcwA4sgqtlJIIt_y1uZrI74HBOagX0RpZK9_M4yscWw4mO0rdLslSJdT; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:44 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9975",
+              "x-ratelimit-remaining-requests": "9993",
               "x-ratelimit-remaining-tokens": "199611",
-              "x-ratelimit-reset-requests": "3m29.369s",
+              "x-ratelimit-reset-requests": "58.184s",
               "x-ratelimit-reset-tokens": "116ms",
-              "x-request-id": "req_85e58cdc17804dfe96a806ff555a405c"
+              "x-request-id": "req_b21f5a0828cf4329acbaf0bb13e08289"
             }
           },
           "_promptfooFileMetadata": {}
@@ -1603,7 +803,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0.00023175,
+        "cost": 0.00023114999999999998,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -1612,8 +812,8 @@
             "avoids_unnecessary_dispatch": 1
           },
           "tokensUsed": {
-            "total": 540,
-            "prompt": 500,
+            "total": 539,
+            "prompt": 499,
             "completion": 40,
             "cached": 0,
             "numRequests": 1
@@ -1628,10 +828,10 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides a detailed explanation of the SOLID principles, directly addressing the question without unnecessary routing to an agent.",
+              "reason": "The output provides a detailed explanation of the SOLID principles, directly addressing the question without suggesting routing to an agent.",
               "tokensUsed": {
-                "total": 540,
-                "prompt": 500,
+                "total": 539,
+                "prompt": 499,
                 "completion": 40,
                 "cached": 0,
                 "numRequests": 1,
@@ -1642,13 +842,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe SOLID principles are a set of five design principles in object-oriented programming that aim to make software designs more understandable, flexible, and maintainable. The acronym SOLID stands for:\\n\\n1. **S** - Single Responsibility Principle (SRP): A class should have only one reason to change, meaning it should have only one job or responsibility.\\n\\n2. **O** - Open/Closed Principle (OCP): Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.\\n\\n3. **L** - Liskov Substitution Principle (LSP): Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. This ensures that a subclass can stand in for its superclass.\\n\\n4. **I** - Interface Segregation Principle (ISP): No client should be forced to depend on methods it does not use. This principle advocates for creating smaller, more specific interfaces rather than a large, general-purpose one.\\n\\n5. **D** - Dependency Inversion Principle (DIP): High-level modules should not depend on low-level modules; both should depend on abstractions. Additionally, abstractions should not depend on details; details should depend on abstractions. This promotes loose coupling between components.\\n\\nThese principles help developers create systems that are easier to manage and adapt over time.\\n</Output>\\n<Rubric>\\nThe response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe SOLID principles are a set of five design principles in object-oriented programming that aim to make software designs more understandable, flexible, and maintainable. The acronym SOLID stands for:\\n\\n1. **S** - Single Responsibility Principle (SRP): A class should have only one reason to change, meaning it should have only one job or responsibility.\\n\\n2. **O** - Open/Closed Principle (OCP): Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.\\n\\n3. **L** - Liskov Substitution Principle (LSP): Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. This ensures that a subclass can stand in for its superclass.\\n\\n4. **I** - Interface Segregation Principle (ISP): Clients should not be forced to depend on interfaces they do not use. This principle advocates for creating smaller, more specific interfaces rather than a large, general-purpose one.\\n\\n5. **D** - Dependency Inversion Principle (DIP): High-level modules should not depend on low-level modules. Both should depend on abstractions (e.g., interfaces). Additionally, abstractions should not depend on details; details should depend on abstractions.\\n\\nThese principles help developers create more robust and maintainable code by promoting good design practices.\\n</Output>\\n<Rubric>\\nThe response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "da4c43b4-17e2-41ca-b1c3-c0b732fbeeff",
-        "latencyMs": 5350,
+        "id": "4a52c3e7-5d7a-4538-85b5-07ee7e7f0c16",
+        "latencyMs": 9222,
         "namedScores": {
           "avoids_unnecessary_dispatch": 1
         },
@@ -1671,11 +871,11 @@
           "label": ""
         },
         "response": {
-          "output": "The SOLID principles are a set of five design principles in object-oriented programming that aim to make software designs more understandable, flexible, and maintainable. The acronym SOLID stands for:\n\n1. **S** - Single Responsibility Principle (SRP): A class should have only one reason to change, meaning it should have only one job or responsibility.\n\n2. **O** - Open/Closed Principle (OCP): Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.\n\n3. **L** - Liskov Substitution Principle (LSP): Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. This ensures that a subclass can stand in for its superclass.\n\n4. **I** - Interface Segregation Principle (ISP): No client should be forced to depend on methods it does not use. This principle advocates for creating smaller, more specific interfaces rather than a large, general-purpose one.\n\n5. **D** - Dependency Inversion Principle (DIP): High-level modules should not depend on low-level modules; both should depend on abstractions. Additionally, abstractions should not depend on details; details should depend on abstractions. This promotes loose coupling between components.\n\nThese principles help developers create systems that are easier to manage and adapt over time.",
+          "output": "The SOLID principles are a set of five design principles in object-oriented programming that aim to make software designs more understandable, flexible, and maintainable. The acronym SOLID stands for:\n\n1. **S** - Single Responsibility Principle (SRP): A class should have only one reason to change, meaning it should have only one job or responsibility.\n\n2. **O** - Open/Closed Principle (OCP): Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.\n\n3. **L** - Liskov Substitution Principle (LSP): Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. This ensures that a subclass can stand in for its superclass.\n\n4. **I** - Interface Segregation Principle (ISP): Clients should not be forced to depend on interfaces they do not use. This principle advocates for creating smaller, more specific interfaces rather than a large, general-purpose one.\n\n5. **D** - Dependency Inversion Principle (DIP): High-level modules should not depend on low-level modules. Both should depend on abstractions (e.g., interfaces). Additionally, abstractions should not depend on details; details should depend on abstractions.\n\nThese principles help developers create more robust and maintainable code by promoting good design practices.",
           "tokenUsage": {
-            "total": 681,
+            "total": 680,
             "prompt": 393,
-            "completion": 288,
+            "completion": 287,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -1684,9 +884,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 5350,
+          "latencyMs": 9222,
           "finishReason": "stop",
-          "cost": 0.00023175,
+          "cost": 0.00023114999999999998,
           "guardrails": {
             "flagged": false
           },
@@ -1698,28 +898,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410991e2990ed-IAH",
+                "cf-ray": "9e487d3f8e8dc308-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:37 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:54 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "5234",
+                "openai-processing-ms": "9089",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=rxWk20p90abS3aMpeUk3qaSHX53cGFlgDVqj_jiHTBY-1774841732.0130284-1.0.1.1-zqrax3m.U31pwg6Kv06yih9lJa6Fs4pyHO8l93GpJechOcCaAsPQc58Vw5fIa8HS9aHc84AWykazyfo_hDaBTYsEfnzC5K8Jb0CpFVqpPNJgGjxmBta.2bghepxRt_Ou; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:37 GMT",
+                "set-cookie": "__cf_bm=fQ5Dj1fcRZNRTiq7FuZF17FIevpfWHgwNUhPIQU7TFw-1774888125.365281-1.0.1.1-lLM5ZjpJb1V3NcB2tDOpQuazhp4gfrgtjDtnH7p.0_ieA1pn5PxFGn5an_C5Sd22WUV8lNemr7J7JgX6sMs1c04G_TwuqlgOyKdG2li30_0RvVXzS8LRsSPgAiBHoIf.; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:54 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9972",
+                "x-ratelimit-remaining-requests": "9983",
                 "x-ratelimit-remaining-tokens": "199622",
-                "x-ratelimit-reset-requests": "4m1.514s",
+                "x-ratelimit-reset-requests": "2m22.857s",
                 "x-ratelimit-reset-tokens": "113ms",
-                "x-request-id": "req_5c5dc73a0d6d4b1db7b8d162dbfa4d17"
+                "x-request-id": "req_01e562282be09051a8adf2a287ecf737"
               }
             }
           }
@@ -1761,28 +961,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410991e2990ed-IAH",
+              "cf-ray": "9e487d3f8e8dc308-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:37 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:54 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "5234",
+              "openai-processing-ms": "9089",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=rxWk20p90abS3aMpeUk3qaSHX53cGFlgDVqj_jiHTBY-1774841732.0130284-1.0.1.1-zqrax3m.U31pwg6Kv06yih9lJa6Fs4pyHO8l93GpJechOcCaAsPQc58Vw5fIa8HS9aHc84AWykazyfo_hDaBTYsEfnzC5K8Jb0CpFVqpPNJgGjxmBta.2bghepxRt_Ou; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:37 GMT",
+              "set-cookie": "__cf_bm=fQ5Dj1fcRZNRTiq7FuZF17FIevpfWHgwNUhPIQU7TFw-1774888125.365281-1.0.1.1-lLM5ZjpJb1V3NcB2tDOpQuazhp4gfrgtjDtnH7p.0_ieA1pn5PxFGn5an_C5Sd22WUV8lNemr7J7JgX6sMs1c04G_TwuqlgOyKdG2li30_0RvVXzS8LRsSPgAiBHoIf.; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:54 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9972",
+              "x-ratelimit-remaining-requests": "9983",
               "x-ratelimit-remaining-tokens": "199622",
-              "x-ratelimit-reset-requests": "4m1.514s",
+              "x-ratelimit-reset-requests": "2m22.857s",
               "x-ratelimit-reset-tokens": "113ms",
-              "x-request-id": "req_5c5dc73a0d6d4b1db7b8d162dbfa4d17"
+              "x-request-id": "req_01e562282be09051a8adf2a287ecf737"
             }
           },
           "_promptfooFileMetadata": {}
@@ -1790,7 +990,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0.0001788,
+        "cost": 0.0001092,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -1799,196 +999,9 @@
             "avoids_unnecessary_dispatch": 1
           },
           "tokensUsed": {
-            "total": 546,
-            "prompt": 506,
-            "completion": 40,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
-                "threshold": 0.8,
-                "metric": "avoids_unnecessary_dispatch"
-              },
-              "pass": true,
-              "score": 1,
-              "reason": "The output provides a detailed explanation of the SOLID principles, directly addressing the question without unnecessary routing to an agent.",
-              "tokensUsed": {
-                "total": 546,
-                "prompt": 506,
-                "completion": 40,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe SOLID principles are a set of five design principles in object-oriented programming that aim to make software designs more understandable, flexible, and maintainable. The acronym SOLID stands for:\\n\\n1. **S** - **Single Responsibility Principle (SRP)**: A class should have only one reason to change, meaning it should have only one job or responsibility.\\n\\n2. **O** - **Open/Closed Principle (OCP)**: Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.\\n\\n3. **L** - **Liskov Substitution Principle (LSP)**: Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. This principle ensures that a subclass can stand in for its superclass.\\n\\n4. **I** - **Interface Segregation Principle (ISP)**: Clients should not be forced to depend on interfaces they do not use. This principle advocates for creating smaller, more specific interfaces rather than a large, general-purpose one.\\n\\n5. **D** - **Dependency Inversion Principle (DIP)**: High-level modules should not depend on low-level modules. Both should depend on abstractions (e.g., interfaces). Additionally, abstractions should not depend on details; details should depend on abstractions.\\n\\nThese principles help developers create more robust and maintainable software systems.\\n</Output>\\n<Rubric>\\nThe response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "b7c5024d-37a7-44b3-9578-0979a252e81e",
-        "latencyMs": 6649,
-        "namedScores": {
-          "avoids_unnecessary_dispatch": 1
-        },
-        "prompt": {
-          "raw": "What does the SOLID principle stand for?",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "The SOLID principles are a set of five design principles in object-oriented programming that aim to make software designs more understandable, flexible, and maintainable. The acronym SOLID stands for:\n\n1. **S** - **Single Responsibility Principle (SRP)**: A class should have only one reason to change, meaning it should have only one job or responsibility.\n\n2. **O** - **Open/Closed Principle (OCP)**: Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification. This means you should be able to add new functionality without changing existing code.\n\n3. **L** - **Liskov Substitution Principle (LSP)**: Objects of a superclass should be replaceable with objects of a subclass without affecting the correctness of the program. This principle ensures that a subclass can stand in for its superclass.\n\n4. **I** - **Interface Segregation Principle (ISP)**: Clients should not be forced to depend on interfaces they do not use. This principle advocates for creating smaller, more specific interfaces rather than a large, general-purpose one.\n\n5. **D** - **Dependency Inversion Principle (DIP)**: High-level modules should not depend on low-level modules. Both should depend on abstractions (e.g., interfaces). Additionally, abstractions should not depend on details; details should depend on abstractions.\n\nThese principles help developers create more robust and maintainable software systems.",
-          "tokenUsage": {
-            "total": 310,
-            "prompt": 16,
-            "completion": 294,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 6649,
-          "finishReason": "stop",
-          "cost": 0.0001788,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410a59a13c2fb-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:40 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "6510",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=KsXPPX_sUFZVAVZwL3.Ailtn2EGTF3mjNGqbMvFSpEU-1774841734.0231593-1.0.1.1-8oe_ZkmlnKmY6V8JtiIUi0wAcdC_XsBMV80BFMOK8UmEpPdv9.zX_VH9cOhafsC91Kli3IJnfurNKfNEmQl10_KPRh97l5W.sH2TiPqM9Vze9yRl9dhx8AmodrNftd3f; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:40 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9969",
-                "x-ratelimit-remaining-tokens": "199987",
-                "x-ratelimit-reset-requests": "4m25.398s",
-                "x-ratelimit-reset-tokens": "3ms",
-                "x-request-id": "req_4e442da70b5a4051bf45885d0404f865"
-              }
-            }
-          }
-        },
-        "score": 1,
-        "success": true,
-        "testCase": {
-          "description": "Simple question → no agent dispatch needed",
-          "vars": {
-            "user_task": "What does the SOLID principle stand for?"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response directly answers the question about SOLID principles. It does NOT claim to be routing to an agent — that would be overkill for a simple knowledge question.\n",
-              "threshold": 0.8,
-              "metric": "avoids_unnecessary_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 4,
-        "vars": {
-          "user_task": "What does the SOLID principle stand for?"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410a59a13c2fb-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:40 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "6510",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=KsXPPX_sUFZVAVZwL3.Ailtn2EGTF3mjNGqbMvFSpEU-1774841734.0231593-1.0.1.1-8oe_ZkmlnKmY6V8JtiIUi0wAcdC_XsBMV80BFMOK8UmEpPdv9.zX_VH9cOhafsC91Kli3IJnfurNKfNEmQl10_KPRh97l5W.sH2TiPqM9Vze9yRl9dhx8AmodrNftd3f; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:40 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9969",
-              "x-ratelimit-remaining-tokens": "199987",
-              "x-ratelimit-reset-requests": "4m25.398s",
-              "x-ratelimit-reset-tokens": "3ms",
-              "x-request-id": "req_4e442da70b5a4051bf45885d0404f865"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 0
-      },
-      {
-        "cost": 0.0001074,
-        "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
-          "namedScores": {
-            "avoids_unnecessary_dispatch": 1
-          },
-          "tokensUsed": {
-            "total": 314,
-            "prompt": 283,
-            "completion": 31,
+            "total": 318,
+            "prompt": 286,
+            "completion": 32,
             "cached": 0,
             "numRequests": 1
           },
@@ -2002,11 +1015,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The response directly addresses the print statement without routing to a specialized agent.",
+              "reason": "The response directly addresses the trivial print statement without routing to a specialized agent.",
               "tokensUsed": {
-                "total": 314,
-                "prompt": 283,
-                "completion": 31,
+                "total": 318,
+                "prompt": 286,
+                "completion": 32,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -2016,13 +1029,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe code you provided is already correct for printing \\\"hello world\\\" in Python. However, if you want to ensure it follows best practices, you might want to use parentheses for the print function in Python 3, which you already have. \\n\\nHere's the code again for clarity:\\n\\n```python\\nprint('hello world')\\n```\\n\\nIf you need any specific modifications or additional functionality, please let me know!\\n</Output>\\n<Rubric>\\nThe response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\\n\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe code you provided is already correct for printing \\\"hello world\\\" in Python. However, if you want to ensure it follows best practices, you might want to use parentheses for the print function in Python 3, which you already have. \\n\\nHere's the code again for clarity:\\n\\n```python\\nprint('hello world')\\n```\\n\\nIf you meant to ask for something else or a different context, please provide more details!\\n</Output>\\n<Rubric>\\nThe response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "aef397fd-b404-4fce-b2e3-6fa4ff197567",
-        "latencyMs": 1683,
+        "id": "17941450-3e58-4629-ac2e-26e5562443e1",
+        "latencyMs": 2081,
         "namedScores": {
           "avoids_unnecessary_dispatch": 1
         },
@@ -2045,11 +1058,11 @@
           "label": ""
         },
         "response": {
-          "output": "The code you provided is already correct for printing \"hello world\" in Python. However, if you want to ensure it follows best practices, you might want to use parentheses for the print function in Python 3, which you already have. \n\nHere's the code again for clarity:\n\n```python\nprint('hello world')\n```\n\nIf you need any specific modifications or additional functionality, please let me know!",
+          "output": "The code you provided is already correct for printing \"hello world\" in Python. However, if you want to ensure it follows best practices, you might want to use parentheses for the print function in Python 3, which you already have. \n\nHere's the code again for clarity:\n\n```python\nprint('hello world')\n```\n\nIf you meant to ask for something else or a different context, please provide more details!",
           "tokenUsage": {
-            "total": 473,
+            "total": 476,
             "prompt": 392,
-            "completion": 81,
+            "completion": 84,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -2058,9 +1071,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 1683,
+          "latencyMs": 2081,
           "finishReason": "stop",
-          "cost": 0.0001074,
+          "cost": 0.0001092,
           "guardrails": {
             "flagged": false
           },
@@ -2072,28 +1085,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410aa6b6ab079-IAH",
+                "cf-ray": "9e487d3fbc8aa9fc-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:36 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:47 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "1513",
+                "openai-processing-ms": "1972",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=iSe5MNtvIegNhWX666qBUd08dAseKWH8mTOwPlT5FPY-1774841734.7832055-1.0.1.1-jl4GfiL75GLc89VU.ZXPW.Ncm6E2xLDeC9kF7TSbAytdF9ElGABWC.c144zn_cRygxhbcG6.6PHeGk8uVkhdCHO1x.cUtLZjbSSLhsu6Y43_Oft_QkkUhDNCrGTWgIm4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:36 GMT",
+                "set-cookie": "__cf_bm=o3Tm_Ll0Rq.CSmfKNGKBVhAkNasi9fAzRcIMeJnOGK8-1774888125.3966324-1.0.1.1-qslf0YD_rmaallicZ8QdQKFJoIcaxuk5s1bnw8UcuIlllQPod5JDOnsxTuR_hKxAsQ6jP78dcaGiD5VTF2HlgpiHLE8GFQKfvJ7Ac3ZR.0q1jzRfUL4SIxxMDv8CKyXd; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:47 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9968",
+                "x-ratelimit-remaining-requests": "9983",
                 "x-ratelimit-remaining-tokens": "199624",
-                "x-ratelimit-reset-requests": "4m33.444s",
+                "x-ratelimit-reset-requests": "2m22.839s",
                 "x-ratelimit-reset-tokens": "112ms",
-                "x-request-id": "req_b0a51a71c103466fb37f0bb1d3a6327d"
+                "x-request-id": "req_d1112315237d49aaa42456ae6c8a39d6"
               }
             }
           }
@@ -2135,28 +1148,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410aa6b6ab079-IAH",
+              "cf-ray": "9e487d3fbc8aa9fc-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:36 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:47 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "1513",
+              "openai-processing-ms": "1972",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=iSe5MNtvIegNhWX666qBUd08dAseKWH8mTOwPlT5FPY-1774841734.7832055-1.0.1.1-jl4GfiL75GLc89VU.ZXPW.Ncm6E2xLDeC9kF7TSbAytdF9ElGABWC.c144zn_cRygxhbcG6.6PHeGk8uVkhdCHO1x.cUtLZjbSSLhsu6Y43_Oft_QkkUhDNCrGTWgIm4; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:36 GMT",
+              "set-cookie": "__cf_bm=o3Tm_Ll0Rq.CSmfKNGKBVhAkNasi9fAzRcIMeJnOGK8-1774888125.3966324-1.0.1.1-qslf0YD_rmaallicZ8QdQKFJoIcaxuk5s1bnw8UcuIlllQPod5JDOnsxTuR_hKxAsQ6jP78dcaGiD5VTF2HlgpiHLE8GFQKfvJ7Ac3ZR.0q1jzRfUL4SIxxMDv8CKyXd; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:47 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9968",
+              "x-ratelimit-remaining-requests": "9983",
               "x-ratelimit-remaining-tokens": "199624",
-              "x-ratelimit-reset-requests": "4m33.444s",
+              "x-ratelimit-reset-requests": "2m22.839s",
               "x-ratelimit-reset-tokens": "112ms",
-              "x-request-id": "req_b0a51a71c103466fb37f0bb1d3a6327d"
+              "x-request-id": "req_d1112315237d49aaa42456ae6c8a39d6"
             }
           },
           "_promptfooFileMetadata": {}
@@ -2164,194 +1177,7 @@
         "failureReason": 0
       },
       {
-        "cost": 0.00004905,
-        "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
-          "namedScores": {
-            "avoids_unnecessary_dispatch": 1
-          },
-          "tokensUsed": {
-            "total": 312,
-            "prompt": 280,
-            "completion": 32,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
-                "threshold": 0.8,
-                "metric": "avoids_unnecessary_dispatch"
-              },
-              "pass": true,
-              "score": 1,
-              "reason": "The response directly addresses the trivial print statement without routing to a specialized agent.",
-              "tokensUsed": {
-                "total": 312,
-                "prompt": 280,
-                "completion": 32,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe code you provided is already correct for printing \\\"hello world\\\" in Python. However, if you want to ensure it runs without any issues, make sure you are using a Python environment. Here’s the code again for clarity:\\n\\n```python\\nprint('hello world')\\n```\\n\\nIf you meant to fix something else or if you have a specific issue in mind, please provide more details!\\n</Output>\\n<Rubric>\\nThe response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "601c7ab6-b756-410a-b748-ecd57ef42292",
-        "latencyMs": 2035,
-        "namedScores": {
-          "avoids_unnecessary_dispatch": 1
-        },
-        "prompt": {
-          "raw": "Fix this: print('hello world')",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "The code you provided is already correct for printing \"hello world\" in Python. However, if you want to ensure it runs without any issues, make sure you are using a Python environment. Here’s the code again for clarity:\n\n```python\nprint('hello world')\n```\n\nIf you meant to fix something else or if you have a specific issue in mind, please provide more details!",
-          "tokenUsage": {
-            "total": 93,
-            "prompt": 15,
-            "completion": 78,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 2035,
-          "finishReason": "stop",
-          "cost": 0.00004905,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410be0a5fb079-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:39 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "1937",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=kGHmcS_I.lXty7QrL5SlgOpAT0pT62VG_nNlLUkBoZk-1774841737.922158-1.0.1.1-ZPQO5f0FVwDyGHV5qSz6czWZClQDyshom5RZHlqJl373X2FV_aWXWh70l31voDUi4JK0siwlzhNjsWQ77jCg9gkyjjCHX5dQFNuQvn3MyHojAE_.2ZWVKgF9PfyqvJRN; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:39 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9966",
-                "x-ratelimit-remaining-tokens": "199990",
-                "x-ratelimit-reset-requests": "4m47.446s",
-                "x-ratelimit-reset-tokens": "3ms",
-                "x-request-id": "req_ba66ef05ecdd4a98904716b01d40df3a"
-              }
-            }
-          }
-        },
-        "score": 1,
-        "success": true,
-        "testCase": {
-          "description": "One-line fix → no agent dispatch needed",
-          "vars": {
-            "user_task": "Fix this: print('hello world')"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response addresses the trivial print statement directly. It should NOT route to a specialized agent for such a simple request.\n",
-              "threshold": 0.8,
-              "metric": "avoids_unnecessary_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 5,
-        "vars": {
-          "user_task": "Fix this: print('hello world')"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410be0a5fb079-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:39 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "1937",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=kGHmcS_I.lXty7QrL5SlgOpAT0pT62VG_nNlLUkBoZk-1774841737.922158-1.0.1.1-ZPQO5f0FVwDyGHV5qSz6czWZClQDyshom5RZHlqJl373X2FV_aWXWh70l31voDUi4JK0siwlzhNjsWQ77jCg9gkyjjCHX5dQFNuQvn3MyHojAE_.2ZWVKgF9PfyqvJRN; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:39 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9966",
-              "x-ratelimit-remaining-tokens": "199990",
-              "x-ratelimit-reset-requests": "4m47.446s",
-              "x-ratelimit-reset-tokens": "3ms",
-              "x-request-id": "req_ba66ef05ecdd4a98904716b01d40df3a"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 0
-      },
-      {
-        "cost": 0.00018224999999999998,
+        "cost": 0.00023879999999999998,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -2390,200 +1216,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nIn Python, `async` and `await` are keywords used to define and work with asynchronous code, which allows for non-blocking execution of tasks. This is particularly useful for I/O-bound operations, such as network requests or file I/O, where waiting for a response can lead to inefficiencies if handled synchronously.\\n\\n### Key Concepts\\n\\n1. **Asynchronous Functions**: \\n   - An asynchronous function is defined using the `async def` syntax. This function will return a coroutine object when called, which can be awaited.\\n   - Example:\\n     ```python\\n     async def my_async_function():\\n         # Perform some asynchronous operation\\n         pass\\n     ```\\n\\n2. **Awaiting Coroutines**:\\n   - Inside an asynchronous function, you can use the `await` keyword to call another asynchronous function. This tells Python to pause the execution of the current function until the awaited function completes, allowing other tasks to run in the meantime.\\n   - Example:\\n     ```python\\n     async def main():\\n         result = await my_async_function()\\n     ```\\n\\n3. **Event Loop**:\\n   - The event loop is the core of asynchronous programming in Python. It manages the execution of asynchronous tasks and handles the scheduling of coroutines.\\n   - You can run an asynchronous function using `asyncio.run()` in Python 3.7 and later, which sets up the event loop, runs the coroutine, and closes the loop when done.\\n   - Example:\\n     ```python\\n</Output>\\n<Rubric>\\nThe response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\\n\\n</Rubric>\"}]"
-              }
-            }
-          ]
-        },
-        "id": "11823401-cb4d-4092-ad26-5dea805b8de0",
-        "latencyMs": 5481,
-        "namedScores": {
-          "avoids_unnecessary_dispatch": 1
-        },
-        "prompt": {
-          "raw": "Explain how async/await works in Python",
-          "label": "without-routing-directive",
-          "config": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          }
-        },
-        "promptId": "3decce143c42edcb9c4044a8b67f727c3126d2a63bc44357d07b4aaae04eb821",
-        "promptIdx": 1,
-        "provider": {
-          "id": "openai:chat:gpt-4o-mini",
-          "label": ""
-        },
-        "response": {
-          "output": "In Python, `async` and `await` are keywords used to define and work with asynchronous code, which allows for non-blocking execution of tasks. This is particularly useful for I/O-bound operations, such as network requests or file I/O, where waiting for a response can lead to inefficiencies if handled synchronously.\n\n### Key Concepts\n\n1. **Asynchronous Functions**: \n   - An asynchronous function is defined using the `async def` syntax. This function will return a coroutine object when called, which can be awaited.\n   - Example:\n     ```python\n     async def my_async_function():\n         # Perform some asynchronous operation\n         pass\n     ```\n\n2. **Awaiting Coroutines**:\n   - Inside an asynchronous function, you can use the `await` keyword to call another asynchronous function. This tells Python to pause the execution of the current function until the awaited function completes, allowing other tasks to run in the meantime.\n   - Example:\n     ```python\n     async def main():\n         result = await my_async_function()\n     ```\n\n3. **Event Loop**:\n   - The event loop is the core of asynchronous programming in Python. It manages the execution of asynchronous tasks and handles the scheduling of coroutines.\n   - You can run an asynchronous function using `asyncio.run()` in Python 3.7 and later, which sets up the event loop, runs the coroutine, and closes the loop when done.\n   - Example:\n     ```python",
-          "tokenUsage": {
-            "total": 315,
-            "prompt": 15,
-            "completion": 300,
-            "numRequests": 1,
-            "completionDetails": {
-              "reasoning": 0,
-              "acceptedPrediction": 0,
-              "rejectedPrediction": 0
-            }
-          },
-          "cached": false,
-          "latencyMs": 5481,
-          "finishReason": "length",
-          "cost": 0.00018224999999999998,
-          "guardrails": {
-            "flagged": false
-          },
-          "metadata": {
-            "http": {
-              "status": 200,
-              "statusText": "OK",
-              "headers": {
-                "access-control-expose-headers": "X-Request-ID",
-                "alt-svc": "h3=\":443\"; ma=86400",
-                "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410c90a38b079-IAH",
-                "connection": "keep-alive",
-                "content-encoding": "br",
-                "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:45 GMT",
-                "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "5221",
-                "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-                "openai-version": "2020-10-01",
-                "server": "cloudflare",
-                "set-cookie": "__cf_bm=DbtIB6607o0LLe6XU6WrQu4K8ygvSBelZyrQLocSjEs-1774841739.6881921-1.0.1.1-hOCFunuLpJYVtCbUGqgyHJnibiJ6Y5FpCstbk5N0fw7mZI9dx6vF7JLllto68wOhf9mDLAZ9o.WQjuv4wYXXhtPRDBzqYgM6gVxFd6L7cF19fBJljCd0jjGDBSrTVkp2; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:45 GMT",
-                "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-                "transfer-encoding": "chunked",
-                "x-content-type-options": "nosniff",
-                "x-openai-proxy-wasm": "v0.1",
-                "x-ratelimit-limit-requests": "10000",
-                "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9962",
-                "x-ratelimit-remaining-tokens": "199987",
-                "x-ratelimit-reset-requests": "5m20.38s",
-                "x-ratelimit-reset-tokens": "3ms",
-                "x-request-id": "req_e8fd352fd9d14313ad6126f8d329683b"
-              }
-            }
-          }
-        },
-        "score": 1,
-        "success": true,
-        "testCase": {
-          "description": "Explanation request → no agent dispatch needed",
-          "vars": {
-            "user_task": "Explain how async/await works in Python"
-          },
-          "assert": [
-            {
-              "type": "llm-rubric",
-              "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
-              "threshold": 0.75,
-              "metric": "avoids_unnecessary_dispatch"
-            }
-          ],
-          "options": {
-            "provider": {
-              "id": "openai:chat:gpt-4o-mini",
-              "config": {
-                "apiKeyEnvar": "OPENAI_API_KEY"
-              }
-            }
-          },
-          "metadata": {}
-        },
-        "testIdx": 6,
-        "vars": {
-          "user_task": "Explain how async/await works in Python"
-        },
-        "metadata": {
-          "http": {
-            "status": 200,
-            "statusText": "OK",
-            "headers": {
-              "access-control-expose-headers": "X-Request-ID",
-              "alt-svc": "h3=\":443\"; ma=86400",
-              "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410c90a38b079-IAH",
-              "connection": "keep-alive",
-              "content-encoding": "br",
-              "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:45 GMT",
-              "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "5221",
-              "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
-              "openai-version": "2020-10-01",
-              "server": "cloudflare",
-              "set-cookie": "__cf_bm=DbtIB6607o0LLe6XU6WrQu4K8ygvSBelZyrQLocSjEs-1774841739.6881921-1.0.1.1-hOCFunuLpJYVtCbUGqgyHJnibiJ6Y5FpCstbk5N0fw7mZI9dx6vF7JLllto68wOhf9mDLAZ9o.WQjuv4wYXXhtPRDBzqYgM6gVxFd6L7cF19fBJljCd0jjGDBSrTVkp2; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:45 GMT",
-              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-              "transfer-encoding": "chunked",
-              "x-content-type-options": "nosniff",
-              "x-openai-proxy-wasm": "v0.1",
-              "x-ratelimit-limit-requests": "10000",
-              "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9962",
-              "x-ratelimit-remaining-tokens": "199987",
-              "x-ratelimit-reset-requests": "5m20.38s",
-              "x-ratelimit-reset-tokens": "3ms",
-              "x-request-id": "req_e8fd352fd9d14313ad6126f8d329683b"
-            }
-          },
-          "_promptfooFileMetadata": {}
-        },
-        "failureReason": 0
-      },
-      {
-        "cost": 0.00023879999999999998,
-        "gradingResult": {
-          "pass": true,
-          "score": 1,
-          "reason": "All assertions passed",
-          "namedScores": {
-            "avoids_unnecessary_dispatch": 1
-          },
-          "tokensUsed": {
-            "total": 545,
-            "prompt": 505,
-            "completion": 40,
-            "cached": 0,
-            "numRequests": 1
-          },
-          "componentResults": [
-            {
-              "assertion": {
-                "type": "llm-rubric",
-                "value": "The response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\n",
-                "threshold": 0.75,
-                "metric": "avoids_unnecessary_dispatch"
-              },
-              "pass": true,
-              "score": 1,
-              "reason": "The output provides a detailed explanation of async/await in Python without referencing any external agents or delegating the question.",
-              "tokensUsed": {
-                "total": 545,
-                "prompt": 505,
-                "completion": 40,
-                "cached": 0,
-                "numRequests": 1,
-                "completionDetails": {
-                  "reasoning": 0,
-                  "acceptedPrediction": 0,
-                  "rejectedPrediction": 0
-                }
-              },
-              "metadata": {
                 "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nIn Python, `async` and `await` are keywords used to define and work with asynchronous code, allowing for non-blocking operations. This is particularly useful for I/O-bound tasks, such as network requests or file operations, where waiting for a response can be time-consuming.\\n\\n### How `async` and `await` Work:\\n\\n1. **Defining Asynchronous Functions**:\\n   - You define an asynchronous function using the `async def` syntax. This function will return a coroutine object when called, which can be awaited.\\n\\n   ```python\\n   async def my_async_function():\\n       # Asynchronous code here\\n       pass\\n   ```\\n\\n2. **Awaiting Coroutines**:\\n   - Inside an asynchronous function, you can use the `await` keyword to call another asynchronous function. This tells Python to pause the execution of the current function until the awaited function completes, without blocking the entire program.\\n\\n   ```python\\n   async def main():\\n       result = await my_async_function()\\n   ```\\n\\n3. **Event Loop**:\\n   - Asynchronous functions are executed within an event loop. The event loop manages the execution of asynchronous tasks, allowing other tasks to run while waiting for I/O operations to complete. You typically start the event loop using `asyncio.run()`.\\n\\n   ```python\\n   import asyncio\\n\\n   async def main():\\n       await my_async_function()\\n\\n   asyncio.run(main())\\n   ```\\n\\n4. **Concurrency**:\\n   - Using `async` and\\n</Output>\\n<Rubric>\\nThe response explains async/await directly without routing to python-pro or any other agent. An explanation question doesn't require agent delegation.\\n\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "23de49a3-9e15-4a79-b431-93e8cc7f449e",
-        "latencyMs": 7099,
+        "id": "33ff8abe-96b0-4689-962f-77cd5575d0f2",
+        "latencyMs": 5006,
         "namedScores": {
           "avoids_unnecessary_dispatch": 1
         },
@@ -2619,7 +1258,7 @@
             }
           },
           "cached": false,
-          "latencyMs": 7099,
+          "latencyMs": 5006,
           "finishReason": "length",
           "cost": 0.00023879999999999998,
           "guardrails": {
@@ -2633,28 +1272,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e4410c3fba290ed-IAH",
+                "cf-ray": "9e487d3fc8dec2f8-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:35:45 GMT",
+                "date": "Mon, 30 Mar 2026 16:28:50 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "6971",
+                "openai-processing-ms": "4865",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=1U6jiaOJapMQMcLNN67RTGZTUG5U50TG.QY5uwyGMkA-1774841738.8727806-1.0.1.1-lAF_qm663I5r4dDhdwJGEEjQWsxczFziSTCNLl28ZMIOH0mngW6I.9S1BKAk3ykT1HbgXDnecpG627E6Ri7SjUDbEPHWuyXq7C.Ny.qKPMUXVghwpnU3074PXQI.CW3E; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:45 GMT",
+                "set-cookie": "__cf_bm=1pzBy4vJNc8HJawSAKoyB.a5GkgeBbx3hyGAxfGkKIk-1774888125.403213-1.0.1.1-CO8Stm19IYnn5CeNQV5s_HfeiCRzf3ip2RBNGIC26OP8_ll5QlM9m5Zykq2pFxQbQVOTjfNVOQBKV0c_Y.riXm8Ip4SYmERD6T7kgozSXJqgOu7_ZNBsSQNfzkh7RQUp; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:50 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9963",
+                "x-ratelimit-remaining-requests": "9984",
                 "x-ratelimit-remaining-tokens": "199622",
-                "x-ratelimit-reset-requests": "5m12.409s",
+                "x-ratelimit-reset-requests": "2m14.425s",
                 "x-ratelimit-reset-tokens": "113ms",
-                "x-request-id": "req_4c5648bd122342e99a9145eb1d32585a"
+                "x-request-id": "req_efe62dab08c34e4796527804170cc83b"
               }
             }
           }
@@ -2696,28 +1335,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e4410c3fba290ed-IAH",
+              "cf-ray": "9e487d3fc8dec2f8-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:35:45 GMT",
+              "date": "Mon, 30 Mar 2026 16:28:50 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "6971",
+              "openai-processing-ms": "4865",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=1U6jiaOJapMQMcLNN67RTGZTUG5U50TG.QY5uwyGMkA-1774841738.8727806-1.0.1.1-lAF_qm663I5r4dDhdwJGEEjQWsxczFziSTCNLl28ZMIOH0mngW6I.9S1BKAk3ykT1HbgXDnecpG627E6Ri7SjUDbEPHWuyXq7C.Ny.qKPMUXVghwpnU3074PXQI.CW3E; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:05:45 GMT",
+              "set-cookie": "__cf_bm=1pzBy4vJNc8HJawSAKoyB.a5GkgeBbx3hyGAxfGkKIk-1774888125.403213-1.0.1.1-CO8Stm19IYnn5CeNQV5s_HfeiCRzf3ip2RBNGIC26OP8_ll5QlM9m5Zykq2pFxQbQVOTjfNVOQBKV0c_Y.riXm8Ip4SYmERD6T7kgozSXJqgOu7_ZNBsSQNfzkh7RQUp; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 16:58:50 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9963",
+              "x-ratelimit-remaining-requests": "9984",
               "x-ratelimit-remaining-tokens": "199622",
-              "x-ratelimit-reset-requests": "5m12.409s",
+              "x-ratelimit-reset-requests": "2m14.425s",
               "x-ratelimit-reset-tokens": "113ms",
-              "x-request-id": "req_4c5648bd122342e99a9145eb1d32585a"
+              "x-request-id": "req_efe62dab08c34e4796527804170cc83b"
             }
           },
           "_promptfooFileMetadata": {}
@@ -2726,24 +1365,24 @@
       }
     ],
     "stats": {
-      "successes": 10,
-      "failures": 4,
+      "successes": 7,
+      "failures": 0,
       "errors": 0,
       "tokenUsage": {
-        "prompt": 2905,
-        "completion": 2627,
+        "prompt": 2772,
+        "completion": 757,
         "cached": 0,
-        "total": 5532,
-        "numRequests": 14,
+        "total": 3529,
+        "numRequests": 7,
         "completionDetails": {
           "reasoning": 0,
           "acceptedPrediction": 0,
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 6095,
-          "prompt": 5556,
-          "completion": 539,
+          "total": 2455,
+          "prompt": 2220,
+          "completion": 235,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -2753,8 +1392,8 @@
           }
         }
       },
-      "durationMs": 24483,
-      "evaluationDurationMs": 24483
+      "durationMs": 12160,
+      "evaluationDurationMs": 12160
     }
   },
   "config": {
@@ -2764,10 +1403,6 @@
       {
         "label": "with-routing-directive",
         "raw": "[{\"role\":\"user\",\"content\":\"BEFORE ANSWERING: Does this task need a specialist agent?\\n\\nROUTE TO AGENT when the task requires BUILDING or IMPLEMENTING:\\n• Building features in a specific language/framework (Rust, Go, Python, FastAPI, React, etc.)\\n• Security audit or hardening of a codebase\\n• ML model training, evaluation, or deployment\\n• Infrastructure, cloud, or DevOps setup\\n• Database design, migration, or optimization\\n\\nIf routing: State \\\"Routing to <agent-name> for <reason>.\\\" BEFORE any code.\\n\\nDO NOT ROUTE — answer directly for:\\n• Questions and explanations (\\\"What is X?\\\", \\\"How does X work?\\\", \\\"Explain X\\\")\\n• One-line fixes and typos\\n• Git operations and quick edits\\n• Conceptual advice without implementation\\n\\nAGENTS:\\n[CODE] python-pro, typescript-pro, rust-pro, golang-pro, java-pro, csharp-pro, ruby-pro, cpp-pro, c-pro\\n[BACKEND] backend-architect, fastapi-pro, django-pro, graphql-architect\\n[FRONTEND] frontend-developer, mobile-developer, flutter-expert, ios-developer\\n[SECURITY] security-auditor, owasp-guardian-sonnet, backend-security-coder\\n[ML/DATA] data-scientist, ml-engineer, ai-engineer, data-engineer\\n[DATABASE] database-architect, database-optimizer, sql-pro\\n[INFRA] kubernetes-architect, terraform-specialist, cloud-architect, deployment-engineer\\n[TESTING] test-automator, tdd-orchestrator, code-reviewer\\n[OPS] incident-responder, devops-troubleshooter, debugger\\n[DOCS] docs-architect, mermaid-expert\\n\\nFull catalog: ~/.claude/agents/AGENT_INDEX.md\\n\\n{{user_task}}\"}]"
-      },
-      {
-        "label": "without-routing-directive",
-        "raw": "{{user_task}}"
       }
     ],
     "providers": [
@@ -2908,7 +1543,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:35:49.898Z",
-    "evaluationCreatedAt": "2026-03-30T03:35:24.741Z"
+    "exportedAt": "2026-03-30T16:28:55.778Z",
+    "evaluationCreatedAt": "2026-03-30T16:28:43.561Z"
   }
 }

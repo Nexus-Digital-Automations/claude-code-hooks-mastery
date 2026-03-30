@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-gvz-2026-03-30T04:00:41",
+  "evalId": "eval-sGC-2026-03-30T18:21:17",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T04:00:41.371Z",
+    "timestamp": "2026-03-30T18:21:17.258Z",
     "prompts": [
       {
         "id": "249c502115b492828f86f72eb91d0c993959945c35426e2fc645b4d14b636a85",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 18336,
+          "totalLatencyMs": 18800,
           "tokenUsage": {
             "prompt": 944,
-            "completion": 991,
+            "completion": 964,
             "cached": 0,
-            "total": 1935,
+            "total": 1908,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1251,
-              "prompt": 1192,
-              "completion": 59,
+              "total": 1223,
+              "prompt": 1165,
+              "completion": 58,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "skill_debugging-strategies_quality": 1
           },
-          "cost": 0.0007361999999999999
+          "cost": 0.0007199999999999999
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0007361999999999999,
+        "cost": 0.0007199999999999999,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "skill_debugging-strategies_quality": 1
           },
           "tokensUsed": {
-            "total": 1251,
-            "prompt": 1192,
-            "completion": 59,
+            "total": 1223,
+            "prompt": 1165,
+            "completion": 58,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides a detailed systematic approach to debugging memory leaks and mentions specific tools such as Chrome DevTools for memory profiling and the use of `process.memoryUsage()` for logging memory statistics.",
+              "reason": "The output provides a detailed systematic approach to debugging memory leaks and mentions specific tools such as 'Chrome DevTools' for taking heap snapshots and 'clinic.js' for profiling memory usage.",
               "tokensUsed": {
-                "total": 1251,
-                "prompt": 1192,
-                "completion": 59,
+                "total": 1223,
+                "prompt": 1165,
+                "completion": 58,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDebugging a memory leak in a Node.js production application can be a challenging task, but by following a systematic approach, you can identify and resolve the issue effectively. Here’s a step-by-step guide to help you through the process:\\n\\n## Phase 1: Reproduce\\n\\n### Reproduction Checklist\\n\\n1. **Can you reproduce it?**\\n   - Check if the memory leak occurs consistently or under specific conditions.\\n   - Try to identify the actions or requests that lead to increased memory usage.\\n   - Ask team members if they can reproduce the issue in their environments.\\n\\n2. **Create minimal reproduction**\\n   - If possible, create a simplified version of the application that still exhibits the memory leak.\\n   - Remove unrelated code and isolate the components that are likely causing the leak.\\n\\n3. **Document steps**\\n   - Write down the exact steps to reproduce the memory leak.\\n   - Note the environment details (Node.js version, OS, etc.).\\n   - Capture any error messages or logs that appear during the process.\\n\\n## Phase 2: Gather Information\\n\\n### Information Collection\\n\\n1. **Error Messages**\\n   - Check for any error messages in the logs that might indicate issues related to memory usage.\\n\\n2. **Environment**\\n   - Document the Node.js version, operating system, and any relevant dependencies.\\n   - Note any environment variables that might affect memory usage.\\n\\n3. **Recent Changes**\\n   - Review the Git history for recent changes that might have introduced the memory leak.\\n   - Check the deployment timeline for any updates that coincide with the start of the issue.\\n\\n4. **Scope**\\n   - Determine if the memory leak affects all users or specific ones.\\n   - Check if it occurs in production only or also in development/testing environments.\\n\\n## Phase 3: Form Hypothesis\\n\\n### Hypothesis Formation\\n\\n1. **What changed?**\\n   - Identify any recent code changes, dependency updates, or infrastructure changes that could be related to the memory leak.\\n\\n2. **What's different?**\\n   - Compare the working and broken environments to see if there are any discrepancies.\\n   - Look for differences in user behavior or data that might trigger the leak.\\n\\n3. **Where could this fail?**\\n   - Consider areas such as:\\n     - Event listeners that are not being removed.\\n     - Unbounded data structures (e.g., arrays, objects) that grow indefinitely.\\n     - Caching mechanisms that do not have eviction policies.\\n\\n## Phase 4: Test & Verify\\n\\n### Testing Strategies\\n\\n1. **Use Node.js Memory Profiling Tools**\\n   - Use tools like `node --inspect` or `node --inspect-brk` to start your application with the debugger enabled.\\n   - Open Chrome DevTools and connect to your Node.js application to monitor memory usage.\\n\\n2. **Take Heap Snapshots**\\n   - In Chrome DevTools, take heap snapshots at different intervals to compare memory usage over time.\\n   - Look for objects that are not being garbage collected and analyze their references.\\n\\n3. **Add Logging**\\n   - Add logging to track memory usage at various points in your application.\\n   - Use `process.memoryUsage()` to log memory statistics (heap total, heap used, RSS, etc.) periodically.\\n\\n4. **Isolate Components**\\n   - If possible, isolate components of your application to test them individually.\\n   - Mock dependencies to focus on the specific area where you suspect the leak.\\n\\n5. **Compare Working vs Broken**\\n   - If you have a working version of the application, compare configurations, dependencies, and data to identify differences.\\n\\n## Debugging Tools\\n\\n### Node.js Memory Profiling\\n\\n- **Chrome DevTools**: Use the built-in memory profiling tools to take heap snapshots and analyze memory usage.\\n- **Node.js built-in tools**: Use `process.memoryUsage()` to log memory statistics.\\n- **Third-party libraries**: Consider using libraries like `memwatch-next` or `heapdump` to help monitor and analyze memory usage.\\n\\n### Example Code for Memory Usage Logging\\n\\n```javascript\\nsetInterval(() => {\\n    const memoryUsage = process.memoryUsage();\\n    console.log(`Memory Usage: \\n        RSS: ${memoryUsage.rss / 1024 / 1024} MB,\\n        Heap Total: ${memoryUsage.heapTotal / 1024 / 1024} MB,\\n        Heap Used: ${memoryUsage.heapUsed / 1024 / 1024} MB,\\n        External: ${memoryUsage.external / 1024 / 1024} MB`);\\n}, 10000); // Log every 10 seconds\\n```\\n\\n## Conclusion\\n\\nBy following this systematic approach, you can effectively debug memory leaks in your Node.js production application. Remember to document your findings and hypotheses throughout the process, as this will help you track your progress and share insights with your team. If the issue persists, consider reaching out to the community or seeking help from experienced developers.\\n</Output>\\n<Rubric>\\nProvides systematic debugging steps, mentions at least 2 specific tools or techniques (heap snapshots, profiler, etc.)\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nDebugging a memory leak in a Node.js production application can be a challenging task, but by following a systematic approach, you can identify and resolve the issue effectively. Here’s a step-by-step guide to help you through the process:\\n\\n## Phase 1: Reproduce\\n\\n### Reproduction Checklist\\n\\n1. **Can you reproduce it?**\\n   - Check if the memory leak occurs consistently or under specific conditions.\\n   - Try to identify the actions or requests that lead to increased memory usage.\\n\\n2. **Create minimal reproduction**\\n   - If possible, create a simplified version of the application that still exhibits the memory leak.\\n   - Remove unrelated code and isolate the components involved in the memory leak.\\n\\n3. **Document steps**\\n   - Write down the exact steps to reproduce the memory leak.\\n   - Note the environment details (Node.js version, OS, etc.) and capture any error messages or logs.\\n\\n## Phase 2: Gather Information\\n\\n### Information Collection\\n\\n1. **Error Messages**\\n   - Check for any error messages or warnings in the logs that might indicate memory issues.\\n\\n2. **Environment**\\n   - Document the Node.js version, operating system, and any relevant dependencies.\\n\\n3. **Recent Changes**\\n   - Review the Git history for recent changes that might have introduced the memory leak.\\n   - Check deployment timelines for any updates that coincide with the onset of the issue.\\n\\n4. **Scope**\\n   - Determine if the memory leak affects all users or specific ones.\\n   - Identify if it occurs in production only or also in development.\\n\\n## Phase 3: Form Hypothesis\\n\\n### Hypothesis Formation\\n\\n1. **What changed?**\\n   - Look for recent code changes, especially in areas that manage memory (e.g., caching, event listeners).\\n\\n2. **What's different?**\\n   - Compare the working and broken environments to identify discrepancies.\\n\\n3. **Where could this fail?**\\n   - Consider areas like:\\n     - Unreleased event listeners\\n     - Global variables holding references\\n     - Caching mechanisms that grow indefinitely\\n     - Long-lived objects that are not being cleaned up\\n\\n## Phase 4: Test & Verify\\n\\n### Testing Strategies\\n\\n1. **Use Node.js Memory Profiling Tools**\\n   - Use tools like `node --inspect` or `node --inspect-brk` to start your application with debugging enabled.\\n   - Open Chrome DevTools and connect to your Node.js application.\\n\\n2. **Take Heap Snapshots**\\n   - In Chrome DevTools, go to the \\\"Memory\\\" tab and take heap snapshots at different intervals.\\n   - Compare snapshots to identify objects that are not being garbage collected.\\n\\n3. **Add Logging**\\n   - Add logging to track memory usage over time. Use `process.memoryUsage()` to log memory statistics at regular intervals.\\n   - Monitor the output to see if memory usage increases over time.\\n\\n4. **Isolate Components**\\n   - If possible, isolate components of your application to identify which part is causing the leak.\\n   - Test individual modules or services separately to narrow down the source.\\n\\n5. **Use Profiling Tools**\\n   - Use tools like `clinic.js`, `memwatch-next`, or `heapdump` to analyze memory usage and identify leaks.\\n   - `clinic.js` provides a visual representation of memory usage over time.\\n\\n## Example of Using `process.memoryUsage()`\\n\\nYou can add a simple logging mechanism to monitor memory usage:\\n\\n```javascript\\nsetInterval(() => {\\n    const memoryUsage = process.memoryUsage();\\n    console.log(`Memory Usage: RSS: ${memoryUsage.rss}, Heap Total: ${memoryUsage.heapTotal}, Heap Used: ${memoryUsage.heapUsed}`);\\n}, 10000); // Log every 10 seconds\\n```\\n\\n## Phase 5: Analyze and Fix\\n\\n1. **Analyze the Data**\\n   - Review the heap snapshots and memory logs to identify objects that are not being released.\\n   - Look for patterns in memory usage that correlate with specific actions or requests.\\n\\n2. **Identify the Root Cause**\\n   - Once you have identified the objects that are causing the leak, trace back to where they are being created and held in memory.\\n   - Check for event listeners that are not being removed, or closures that are holding onto references unnecessarily.\\n\\n3. **Implement Fixes**\\n   - Remove unnecessary references, clear caches, and ensure that event listeners are properly cleaned up.\\n   - Test the application after making changes to ensure that the memory leak is resolved.\\n\\n4. **Monitor After Deployment**\\n   - After deploying the fix, continue to monitor memory usage in production to ensure that the issue is resolved.\\n\\nBy following these steps, you can systematically identify and resolve memory leaks in your Node.js production application. Remember to document your findings and solutions for future reference.\\n</Output>\\n<Rubric>\\nProvides systematic debugging steps, mentions at least 2 specific tools or techniques (heap snapshots, profiler, etc.)\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "032547e4-a439-46c9-81f8-e75ac7048e71",
-        "latencyMs": 18336,
+        "id": "827f58bd-4105-431e-b71b-a6ee8eef4a91",
+        "latencyMs": 18800,
         "namedScores": {
           "skill_debugging-strategies_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "Debugging a memory leak in a Node.js production application can be a challenging task, but by following a systematic approach, you can identify and resolve the issue effectively. Here’s a step-by-step guide to help you through the process:\n\n## Phase 1: Reproduce\n\n### Reproduction Checklist\n\n1. **Can you reproduce it?**\n   - Check if the memory leak occurs consistently or under specific conditions.\n   - Try to identify the actions or requests that lead to increased memory usage.\n   - Ask team members if they can reproduce the issue in their environments.\n\n2. **Create minimal reproduction**\n   - If possible, create a simplified version of the application that still exhibits the memory leak.\n   - Remove unrelated code and isolate the components that are likely causing the leak.\n\n3. **Document steps**\n   - Write down the exact steps to reproduce the memory leak.\n   - Note the environment details (Node.js version, OS, etc.).\n   - Capture any error messages or logs that appear during the process.\n\n## Phase 2: Gather Information\n\n### Information Collection\n\n1. **Error Messages**\n   - Check for any error messages in the logs that might indicate issues related to memory usage.\n\n2. **Environment**\n   - Document the Node.js version, operating system, and any relevant dependencies.\n   - Note any environment variables that might affect memory usage.\n\n3. **Recent Changes**\n   - Review the Git history for recent changes that might have introduced the memory leak.\n   - Check the deployment timeline for any updates that coincide with the start of the issue.\n\n4. **Scope**\n   - Determine if the memory leak affects all users or specific ones.\n   - Check if it occurs in production only or also in development/testing environments.\n\n## Phase 3: Form Hypothesis\n\n### Hypothesis Formation\n\n1. **What changed?**\n   - Identify any recent code changes, dependency updates, or infrastructure changes that could be related to the memory leak.\n\n2. **What's different?**\n   - Compare the working and broken environments to see if there are any discrepancies.\n   - Look for differences in user behavior or data that might trigger the leak.\n\n3. **Where could this fail?**\n   - Consider areas such as:\n     - Event listeners that are not being removed.\n     - Unbounded data structures (e.g., arrays, objects) that grow indefinitely.\n     - Caching mechanisms that do not have eviction policies.\n\n## Phase 4: Test & Verify\n\n### Testing Strategies\n\n1. **Use Node.js Memory Profiling Tools**\n   - Use tools like `node --inspect` or `node --inspect-brk` to start your application with the debugger enabled.\n   - Open Chrome DevTools and connect to your Node.js application to monitor memory usage.\n\n2. **Take Heap Snapshots**\n   - In Chrome DevTools, take heap snapshots at different intervals to compare memory usage over time.\n   - Look for objects that are not being garbage collected and analyze their references.\n\n3. **Add Logging**\n   - Add logging to track memory usage at various points in your application.\n   - Use `process.memoryUsage()` to log memory statistics (heap total, heap used, RSS, etc.) periodically.\n\n4. **Isolate Components**\n   - If possible, isolate components of your application to test them individually.\n   - Mock dependencies to focus on the specific area where you suspect the leak.\n\n5. **Compare Working vs Broken**\n   - If you have a working version of the application, compare configurations, dependencies, and data to identify differences.\n\n## Debugging Tools\n\n### Node.js Memory Profiling\n\n- **Chrome DevTools**: Use the built-in memory profiling tools to take heap snapshots and analyze memory usage.\n- **Node.js built-in tools**: Use `process.memoryUsage()` to log memory statistics.\n- **Third-party libraries**: Consider using libraries like `memwatch-next` or `heapdump` to help monitor and analyze memory usage.\n\n### Example Code for Memory Usage Logging\n\n```javascript\nsetInterval(() => {\n    const memoryUsage = process.memoryUsage();\n    console.log(`Memory Usage: \n        RSS: ${memoryUsage.rss / 1024 / 1024} MB,\n        Heap Total: ${memoryUsage.heapTotal / 1024 / 1024} MB,\n        Heap Used: ${memoryUsage.heapUsed / 1024 / 1024} MB,\n        External: ${memoryUsage.external / 1024 / 1024} MB`);\n}, 10000); // Log every 10 seconds\n```\n\n## Conclusion\n\nBy following this systematic approach, you can effectively debug memory leaks in your Node.js production application. Remember to document your findings and hypotheses throughout the process, as this will help you track your progress and share insights with your team. If the issue persists, consider reaching out to the community or seeking help from experienced developers.",
+          "output": "Debugging a memory leak in a Node.js production application can be a challenging task, but by following a systematic approach, you can identify and resolve the issue effectively. Here’s a step-by-step guide to help you through the process:\n\n## Phase 1: Reproduce\n\n### Reproduction Checklist\n\n1. **Can you reproduce it?**\n   - Check if the memory leak occurs consistently or under specific conditions.\n   - Try to identify the actions or requests that lead to increased memory usage.\n\n2. **Create minimal reproduction**\n   - If possible, create a simplified version of the application that still exhibits the memory leak.\n   - Remove unrelated code and isolate the components involved in the memory leak.\n\n3. **Document steps**\n   - Write down the exact steps to reproduce the memory leak.\n   - Note the environment details (Node.js version, OS, etc.) and capture any error messages or logs.\n\n## Phase 2: Gather Information\n\n### Information Collection\n\n1. **Error Messages**\n   - Check for any error messages or warnings in the logs that might indicate memory issues.\n\n2. **Environment**\n   - Document the Node.js version, operating system, and any relevant dependencies.\n\n3. **Recent Changes**\n   - Review the Git history for recent changes that might have introduced the memory leak.\n   - Check deployment timelines for any updates that coincide with the onset of the issue.\n\n4. **Scope**\n   - Determine if the memory leak affects all users or specific ones.\n   - Identify if it occurs in production only or also in development.\n\n## Phase 3: Form Hypothesis\n\n### Hypothesis Formation\n\n1. **What changed?**\n   - Look for recent code changes, especially in areas that manage memory (e.g., caching, event listeners).\n\n2. **What's different?**\n   - Compare the working and broken environments to identify discrepancies.\n\n3. **Where could this fail?**\n   - Consider areas like:\n     - Unreleased event listeners\n     - Global variables holding references\n     - Caching mechanisms that grow indefinitely\n     - Long-lived objects that are not being cleaned up\n\n## Phase 4: Test & Verify\n\n### Testing Strategies\n\n1. **Use Node.js Memory Profiling Tools**\n   - Use tools like `node --inspect` or `node --inspect-brk` to start your application with debugging enabled.\n   - Open Chrome DevTools and connect to your Node.js application.\n\n2. **Take Heap Snapshots**\n   - In Chrome DevTools, go to the \"Memory\" tab and take heap snapshots at different intervals.\n   - Compare snapshots to identify objects that are not being garbage collected.\n\n3. **Add Logging**\n   - Add logging to track memory usage over time. Use `process.memoryUsage()` to log memory statistics at regular intervals.\n   - Monitor the output to see if memory usage increases over time.\n\n4. **Isolate Components**\n   - If possible, isolate components of your application to identify which part is causing the leak.\n   - Test individual modules or services separately to narrow down the source.\n\n5. **Use Profiling Tools**\n   - Use tools like `clinic.js`, `memwatch-next`, or `heapdump` to analyze memory usage and identify leaks.\n   - `clinic.js` provides a visual representation of memory usage over time.\n\n## Example of Using `process.memoryUsage()`\n\nYou can add a simple logging mechanism to monitor memory usage:\n\n```javascript\nsetInterval(() => {\n    const memoryUsage = process.memoryUsage();\n    console.log(`Memory Usage: RSS: ${memoryUsage.rss}, Heap Total: ${memoryUsage.heapTotal}, Heap Used: ${memoryUsage.heapUsed}`);\n}, 10000); // Log every 10 seconds\n```\n\n## Phase 5: Analyze and Fix\n\n1. **Analyze the Data**\n   - Review the heap snapshots and memory logs to identify objects that are not being released.\n   - Look for patterns in memory usage that correlate with specific actions or requests.\n\n2. **Identify the Root Cause**\n   - Once you have identified the objects that are causing the leak, trace back to where they are being created and held in memory.\n   - Check for event listeners that are not being removed, or closures that are holding onto references unnecessarily.\n\n3. **Implement Fixes**\n   - Remove unnecessary references, clear caches, and ensure that event listeners are properly cleaned up.\n   - Test the application after making changes to ensure that the memory leak is resolved.\n\n4. **Monitor After Deployment**\n   - After deploying the fix, continue to monitor memory usage in production to ensure that the issue is resolved.\n\nBy following these steps, you can systematically identify and resolve memory leaks in your Node.js production application. Remember to document your findings and solutions for future reference.",
           "tokenUsage": {
-            "total": 1935,
+            "total": 1908,
             "prompt": 944,
-            "completion": 991,
+            "completion": 964,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 18336,
+          "latencyMs": 18800,
           "finishReason": "stop",
-          "cost": 0.0007361999999999999,
+          "cost": 0.0007199999999999999,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e443572ead516d1-IAH",
+                "cf-ray": "9e49221738825324-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 04:00:59 GMT",
+                "date": "Mon, 30 Mar 2026 18:21:36 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "18157",
+                "openai-processing-ms": "18600",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=sDENLXHAAzEeEyTpW7MzVFf_QilJ3.dkggjDGWZTOqo-1774843241.4298196-1.0.1.1-cHQkwVjcNDUy9fISgmYqGd8NI6dtA5FymQ4ZrfNMw3xZkY8BanyP7B7QTcsEAOeoF28LgAIVdIkF6oGlSgTVQJeThHzNL_V7anbOXEhGRL_v.KpJBHvQxkp11rPYLM3Q; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:30:59 GMT",
+                "set-cookie": "__cf_bm=E_QDeibpMLcKwb.PRIAUMbftpD4FnBl8bElt24L7AjY-1774894877.3193486-1.0.1.1-RJfNX86nHUdBLR8WBxqF6DKva4MWE5Bx8jubeqF40cSGBrwsGCX5Nrlya4ozVMwTNSNSBCis7H.6DE8_xytT.sb0rQdUAXpMn_UtpmiG8qWrkt7ruFOSg4CcvT1ODCJI; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:51:36 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9539",
+                "x-ratelimit-remaining-requests": "9083",
                 "x-ratelimit-remaining-tokens": "198976",
-                "x-ratelimit-reset-requests": "1h6m16.536s",
+                "x-ratelimit-reset-requests": "2h11m54.74s",
                 "x-ratelimit-reset-tokens": "307ms",
-                "x-request-id": "req_a8dee5872d9c9d968ebbdbceb44ec888"
+                "x-request-id": "req_cacf8b566f32494786a3d684a644b0c3"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e443572ead516d1-IAH",
+              "cf-ray": "9e49221738825324-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 04:00:59 GMT",
+              "date": "Mon, 30 Mar 2026 18:21:36 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "18157",
+              "openai-processing-ms": "18600",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=sDENLXHAAzEeEyTpW7MzVFf_QilJ3.dkggjDGWZTOqo-1774843241.4298196-1.0.1.1-cHQkwVjcNDUy9fISgmYqGd8NI6dtA5FymQ4ZrfNMw3xZkY8BanyP7B7QTcsEAOeoF28LgAIVdIkF6oGlSgTVQJeThHzNL_V7anbOXEhGRL_v.KpJBHvQxkp11rPYLM3Q; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:30:59 GMT",
+              "set-cookie": "__cf_bm=E_QDeibpMLcKwb.PRIAUMbftpD4FnBl8bElt24L7AjY-1774894877.3193486-1.0.1.1-RJfNX86nHUdBLR8WBxqF6DKva4MWE5Bx8jubeqF40cSGBrwsGCX5Nrlya4ozVMwTNSNSBCis7H.6DE8_xytT.sb0rQdUAXpMn_UtpmiG8qWrkt7ruFOSg4CcvT1ODCJI; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:51:36 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9539",
+              "x-ratelimit-remaining-requests": "9083",
               "x-ratelimit-remaining-tokens": "198976",
-              "x-ratelimit-reset-requests": "1h6m16.536s",
+              "x-ratelimit-reset-requests": "2h11m54.74s",
               "x-ratelimit-reset-tokens": "307ms",
-              "x-request-id": "req_a8dee5872d9c9d968ebbdbceb44ec888"
+              "x-request-id": "req_cacf8b566f32494786a3d684a644b0c3"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 944,
-        "completion": 991,
+        "completion": 964,
         "cached": 0,
-        "total": 1935,
+        "total": 1908,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1251,
-          "prompt": 1192,
-          "completion": 59,
+          "total": 1223,
+          "prompt": 1165,
+          "completion": 58,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 20448,
-      "evaluationDurationMs": 20448
+      "durationMs": 20666,
+      "evaluationDurationMs": 20666
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T04:01:01.879Z",
-    "evaluationCreatedAt": "2026-03-30T04:00:41.371Z"
+    "exportedAt": "2026-03-30T18:21:37.976Z",
+    "evaluationCreatedAt": "2026-03-30T18:21:17.258Z"
   }
 }

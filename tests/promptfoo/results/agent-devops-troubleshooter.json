@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-YW6-2026-03-30T03:51:35",
+  "evalId": "eval-irB-2026-03-30T18:12:18",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:51:35.953Z",
+    "timestamp": "2026-03-30T18:12:18.033Z",
     "prompts": [
       {
         "id": "9d5ccf6c92ead65a7ff316ba5847de0d5c4b932d78cbc22da549983bd51d42e7",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 17849,
+          "totalLatencyMs": 17839,
           "tokenUsage": {
             "prompt": 463,
-            "completion": 891,
+            "completion": 855,
             "cached": 0,
-            "total": 1354,
+            "total": 1318,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,8 +29,8 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1160,
-              "prompt": 1099,
+              "total": 1124,
+              "prompt": 1063,
               "completion": 61,
               "cached": 0,
               "numRequests": 0,
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "devops-troubleshooter_quality": 1
           },
-          "cost": 0.00060405
+          "cost": 0.00058245
         }
       }
     ],
     "results": [
       {
-        "cost": 0.00060405,
+        "cost": 0.00058245,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,8 +62,8 @@
             "devops-troubleshooter_quality": 1
           },
           "tokensUsed": {
-            "total": 1160,
-            "prompt": 1099,
+            "total": 1124,
+            "prompt": 1063,
             "completion": 61,
             "cached": 0,
             "numRequests": 1
@@ -78,10 +78,10 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides a detailed systematic approach that includes checking metrics, logs, and traces, identifying bottlenecks, correlating with deployment changes, and suggests tools like Datadog and Jaeger.",
+              "reason": "The output provides a detailed systematic approach that includes checking metrics, logs, and traces, identifying bottlenecks, correlating issues with deployment changes, and suggests tools like DataDog and Jaeger.",
               "tokensUsed": {
-                "total": 1160,
-                "prompt": 1099,
+                "total": 1124,
+                "prompt": 1063,
                 "completion": 61,
                 "cached": 0,
                 "numRequests": 1,
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nWhen faced with a significant increase in API response times after a deployment, a systematic debugging process is essential. Here’s a step-by-step approach to identify and resolve the issue:\\n\\n### Step 1: Verify the Issue\\n1. **Confirm the Symptoms**: \\n   - Use monitoring tools (e.g., Datadog, New Relic) to check the API response times and confirm the increase from 50ms to 2000ms.\\n   - Look for patterns in the response times (e.g., specific endpoints, times of day, or user load).\\n\\n2. **Check Logs**:\\n   - Review application logs for any errors or warnings that may correlate with the deployment.\\n   - Use ELK Stack or Grafana Loki to filter logs by the time of the deployment.\\n\\n### Step 2: Analyze the Deployment\\n1. **Review Deployment Changes**:\\n   - Examine the release notes or commit history for the new version to identify any changes that could impact performance (e.g., new features, dependencies, or configuration changes).\\n\\n2. **Rollback if Necessary**:\\n   - If the issue is critical and immediate resolution is required, consider rolling back to the previous version to restore normal performance while investigating.\\n\\n### Step 3: Performance Profiling\\n1. **Use APM Tools**:\\n   - Utilize Application Performance Monitoring (APM) tools (e.g., Dynatrace, AppDynamics) to trace requests and identify bottlenecks in the code.\\n   - Look for slow database queries, external API calls, or resource-intensive operations.\\n\\n2. **Distributed Tracing**:\\n   - Implement distributed tracing (e.g., Jaeger, Zipkin) to visualize the request flow and pinpoint where delays are occurring in the service architecture.\\n\\n### Step 4: Resource Utilization\\n1. **Check Resource Metrics**:\\n   - Monitor CPU, memory, and I/O usage on the application servers using tools like Prometheus and Grafana.\\n   - Look for resource saturation that could lead to increased response times.\\n\\n2. **Kubernetes Resource Limits**:\\n   - If running in Kubernetes, verify that resource limits and requests are appropriately set for the pods. Check for throttling or OOM (Out of Memory) kills.\\n\\n### Step 5: Database Performance\\n1. **Database Query Analysis**:\\n   - Analyze database performance metrics and logs to identify slow queries or locks that may have been introduced with the new version.\\n   - Use tools like pgAdmin for PostgreSQL or MySQL Workbench for MySQL to profile queries.\\n\\n2. **Connection Pooling**:\\n   - Ensure that the application is correctly managing database connections and that the connection pool is not exhausted.\\n\\n### Step 6: Network and External Dependencies\\n1. **Network Latency**:\\n   - Use tools like tcpdump or Wireshark to analyze network traffic and identify any latency issues.\\n   - Check for any changes in network configuration or routing that could affect performance.\\n\\n2. **External API Calls**:\\n   - If the application relies on external services, monitor their response times and availability. Use synthetic monitoring tools to check their health.\\n\\n### Step 7: Load Testing\\n1. **Simulate Load**:\\n   - Conduct load testing on the new version to replicate the performance issue under controlled conditions. Tools like JMeter or Locust can be used for this purpose.\\n\\n2. **Analyze Results**:\\n   - Compare the performance metrics from the load tests with those from the previous version to identify specific areas of degradation.\\n\\n### Step 8: Implement Fixes and Monitor\\n1. **Apply Fixes**:\\n   - Based on the findings, implement necessary code optimizations, configuration changes, or infrastructure adjustments.\\n\\n2. **Monitor Post-Fix**:\\n   - After deploying fixes, closely monitor the API response times and other relevant metrics to ensure that performance has returned to expected levels.\\n\\n### Step 9: Document Findings\\n1. **Root Cause Analysis**:\\n   - Document the root cause of the performance degradation and the steps taken to resolve it. This will help in future incidents and improve the deployment process.\\n\\n2. **Post-Mortem Review**:\\n   - Conduct a post-mortem review with the team to discuss what went wrong, what was learned, and how to prevent similar issues in the future.\\n\\nBy following this structured approach, you can systematically identify and resolve the performance issues affecting your API after the deployment.\\n</Output>\\n<Rubric>\\nSystematic approach: check metrics, logs, traces; identify bottlenecks; correlate with deployment changes; suggests tools like Jaeger/DataDog\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nWhen faced with a significant increase in API response times after a deployment, a systematic debugging process is essential. Here’s a step-by-step approach to identify and resolve the issue:\\n\\n### Step 1: Verify the Issue\\n1. **Confirm the Symptoms**: \\n   - Use monitoring tools (e.g., DataDog, New Relic) to confirm the increase in response times.\\n   - Check if the issue is consistent across all endpoints or specific to certain ones.\\n\\n2. **Check Logs**: \\n   - Review application logs for any errors or warnings that may correlate with the deployment.\\n   - Use ELK Stack or Grafana Loki to filter logs by timestamp around the deployment time.\\n\\n### Step 2: Analyze the Deployment\\n1. **Review Deployment Changes**:\\n   - Examine the release notes or commit history for the new version to identify any changes that could impact performance (e.g., new features, dependencies, database queries).\\n\\n2. **Rollback if Necessary**:\\n   - If the issue is critical and you need immediate relief, consider rolling back to the previous version while you investigate.\\n\\n### Step 3: Performance Profiling\\n1. **Use APM Tools**:\\n   - Utilize APM solutions (e.g., Dynatrace, AppDynamics) to trace requests and identify bottlenecks in the application.\\n   - Look for slow database queries, external API calls, or resource-intensive operations.\\n\\n2. **Distributed Tracing**:\\n   - If implemented, use distributed tracing tools (e.g., Jaeger, Zipkin) to visualize the request flow and pinpoint where delays are occurring.\\n\\n### Step 4: Resource Utilization\\n1. **Check Resource Metrics**:\\n   - Monitor CPU, memory, and I/O usage on the application servers using Prometheus or Grafana.\\n   - Look for any resource constraints that may have arisen after the deployment.\\n\\n2. **Kubernetes Pod Status**:\\n   - If running in Kubernetes, check the status of the pods using `kubectl get pods` and inspect logs with `kubectl logs <pod-name>`.\\n   - Look for any restarts or crash loops that could indicate underlying issues.\\n\\n### Step 5: Database Performance\\n1. **Database Query Analysis**:\\n   - Analyze database performance metrics to identify slow queries or locks that may have been introduced with the new version.\\n   - Use tools like `EXPLAIN` in SQL to understand query performance.\\n\\n2. **Connection Pooling**:\\n   - Check if the connection pool settings have changed or if there are connection leaks that could be affecting performance.\\n\\n### Step 6: Network and External Dependencies\\n1. **Network Latency**:\\n   - Use tools like `tcpdump` or `Wireshark` to analyze network traffic and identify any latency issues.\\n   - Check for any changes in network configuration or load balancer settings.\\n\\n2. **External API Calls**:\\n   - If your API relies on external services, check their status and response times. Use synthetic monitoring tools to verify their performance.\\n\\n### Step 7: Load Testing\\n1. **Simulate Load**:\\n   - If possible, conduct load testing on the new version to replicate the issue in a controlled environment.\\n   - Use tools like JMeter or Locust to simulate traffic and observe how the application behaves under load.\\n\\n### Step 8: Review and Optimize\\n1. **Code Review**:\\n   - Conduct a code review focusing on the changes made in the new version. Look for inefficient algorithms, excessive logging, or blocking calls.\\n\\n2. **Caching**:\\n   - Consider implementing or optimizing caching strategies (e.g., in-memory caching, CDN) to reduce load on the backend.\\n\\n### Step 9: Document Findings\\n1. **Root Cause Analysis**:\\n   - Document the findings, including the root cause of the performance degradation and the steps taken to resolve it.\\n\\n2. **Preventive Measures**:\\n   - Implement monitoring alerts for response times and resource utilization to catch similar issues in the future.\\n\\n### Conclusion\\nBy following this structured approach, you can systematically identify and resolve the performance issues introduced by the new deployment. Always ensure to communicate findings and resolutions with your team to foster a culture of learning and improvement.\\n</Output>\\n<Rubric>\\nSystematic approach: check metrics, logs, traces; identify bottlenecks; correlate with deployment changes; suggests tools like Jaeger/DataDog\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "e6138c18-63c4-4ffa-9725-be15e1602a6a",
-        "latencyMs": 17849,
+        "id": "08c1ea38-e72f-418f-b817-b985c9bc874a",
+        "latencyMs": 17839,
         "namedScores": {
           "devops-troubleshooter_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "When faced with a significant increase in API response times after a deployment, a systematic debugging process is essential. Here’s a step-by-step approach to identify and resolve the issue:\n\n### Step 1: Verify the Issue\n1. **Confirm the Symptoms**: \n   - Use monitoring tools (e.g., Datadog, New Relic) to check the API response times and confirm the increase from 50ms to 2000ms.\n   - Look for patterns in the response times (e.g., specific endpoints, times of day, or user load).\n\n2. **Check Logs**:\n   - Review application logs for any errors or warnings that may correlate with the deployment.\n   - Use ELK Stack or Grafana Loki to filter logs by the time of the deployment.\n\n### Step 2: Analyze the Deployment\n1. **Review Deployment Changes**:\n   - Examine the release notes or commit history for the new version to identify any changes that could impact performance (e.g., new features, dependencies, or configuration changes).\n\n2. **Rollback if Necessary**:\n   - If the issue is critical and immediate resolution is required, consider rolling back to the previous version to restore normal performance while investigating.\n\n### Step 3: Performance Profiling\n1. **Use APM Tools**:\n   - Utilize Application Performance Monitoring (APM) tools (e.g., Dynatrace, AppDynamics) to trace requests and identify bottlenecks in the code.\n   - Look for slow database queries, external API calls, or resource-intensive operations.\n\n2. **Distributed Tracing**:\n   - Implement distributed tracing (e.g., Jaeger, Zipkin) to visualize the request flow and pinpoint where delays are occurring in the service architecture.\n\n### Step 4: Resource Utilization\n1. **Check Resource Metrics**:\n   - Monitor CPU, memory, and I/O usage on the application servers using tools like Prometheus and Grafana.\n   - Look for resource saturation that could lead to increased response times.\n\n2. **Kubernetes Resource Limits**:\n   - If running in Kubernetes, verify that resource limits and requests are appropriately set for the pods. Check for throttling or OOM (Out of Memory) kills.\n\n### Step 5: Database Performance\n1. **Database Query Analysis**:\n   - Analyze database performance metrics and logs to identify slow queries or locks that may have been introduced with the new version.\n   - Use tools like pgAdmin for PostgreSQL or MySQL Workbench for MySQL to profile queries.\n\n2. **Connection Pooling**:\n   - Ensure that the application is correctly managing database connections and that the connection pool is not exhausted.\n\n### Step 6: Network and External Dependencies\n1. **Network Latency**:\n   - Use tools like tcpdump or Wireshark to analyze network traffic and identify any latency issues.\n   - Check for any changes in network configuration or routing that could affect performance.\n\n2. **External API Calls**:\n   - If the application relies on external services, monitor their response times and availability. Use synthetic monitoring tools to check their health.\n\n### Step 7: Load Testing\n1. **Simulate Load**:\n   - Conduct load testing on the new version to replicate the performance issue under controlled conditions. Tools like JMeter or Locust can be used for this purpose.\n\n2. **Analyze Results**:\n   - Compare the performance metrics from the load tests with those from the previous version to identify specific areas of degradation.\n\n### Step 8: Implement Fixes and Monitor\n1. **Apply Fixes**:\n   - Based on the findings, implement necessary code optimizations, configuration changes, or infrastructure adjustments.\n\n2. **Monitor Post-Fix**:\n   - After deploying fixes, closely monitor the API response times and other relevant metrics to ensure that performance has returned to expected levels.\n\n### Step 9: Document Findings\n1. **Root Cause Analysis**:\n   - Document the root cause of the performance degradation and the steps taken to resolve it. This will help in future incidents and improve the deployment process.\n\n2. **Post-Mortem Review**:\n   - Conduct a post-mortem review with the team to discuss what went wrong, what was learned, and how to prevent similar issues in the future.\n\nBy following this structured approach, you can systematically identify and resolve the performance issues affecting your API after the deployment.",
+          "output": "When faced with a significant increase in API response times after a deployment, a systematic debugging process is essential. Here’s a step-by-step approach to identify and resolve the issue:\n\n### Step 1: Verify the Issue\n1. **Confirm the Symptoms**: \n   - Use monitoring tools (e.g., DataDog, New Relic) to confirm the increase in response times.\n   - Check if the issue is consistent across all endpoints or specific to certain ones.\n\n2. **Check Logs**: \n   - Review application logs for any errors or warnings that may correlate with the deployment.\n   - Use ELK Stack or Grafana Loki to filter logs by timestamp around the deployment time.\n\n### Step 2: Analyze the Deployment\n1. **Review Deployment Changes**:\n   - Examine the release notes or commit history for the new version to identify any changes that could impact performance (e.g., new features, dependencies, database queries).\n\n2. **Rollback if Necessary**:\n   - If the issue is critical and you need immediate relief, consider rolling back to the previous version while you investigate.\n\n### Step 3: Performance Profiling\n1. **Use APM Tools**:\n   - Utilize APM solutions (e.g., Dynatrace, AppDynamics) to trace requests and identify bottlenecks in the application.\n   - Look for slow database queries, external API calls, or resource-intensive operations.\n\n2. **Distributed Tracing**:\n   - If implemented, use distributed tracing tools (e.g., Jaeger, Zipkin) to visualize the request flow and pinpoint where delays are occurring.\n\n### Step 4: Resource Utilization\n1. **Check Resource Metrics**:\n   - Monitor CPU, memory, and I/O usage on the application servers using Prometheus or Grafana.\n   - Look for any resource constraints that may have arisen after the deployment.\n\n2. **Kubernetes Pod Status**:\n   - If running in Kubernetes, check the status of the pods using `kubectl get pods` and inspect logs with `kubectl logs <pod-name>`.\n   - Look for any restarts or crash loops that could indicate underlying issues.\n\n### Step 5: Database Performance\n1. **Database Query Analysis**:\n   - Analyze database performance metrics to identify slow queries or locks that may have been introduced with the new version.\n   - Use tools like `EXPLAIN` in SQL to understand query performance.\n\n2. **Connection Pooling**:\n   - Check if the connection pool settings have changed or if there are connection leaks that could be affecting performance.\n\n### Step 6: Network and External Dependencies\n1. **Network Latency**:\n   - Use tools like `tcpdump` or `Wireshark` to analyze network traffic and identify any latency issues.\n   - Check for any changes in network configuration or load balancer settings.\n\n2. **External API Calls**:\n   - If your API relies on external services, check their status and response times. Use synthetic monitoring tools to verify their performance.\n\n### Step 7: Load Testing\n1. **Simulate Load**:\n   - If possible, conduct load testing on the new version to replicate the issue in a controlled environment.\n   - Use tools like JMeter or Locust to simulate traffic and observe how the application behaves under load.\n\n### Step 8: Review and Optimize\n1. **Code Review**:\n   - Conduct a code review focusing on the changes made in the new version. Look for inefficient algorithms, excessive logging, or blocking calls.\n\n2. **Caching**:\n   - Consider implementing or optimizing caching strategies (e.g., in-memory caching, CDN) to reduce load on the backend.\n\n### Step 9: Document Findings\n1. **Root Cause Analysis**:\n   - Document the findings, including the root cause of the performance degradation and the steps taken to resolve it.\n\n2. **Preventive Measures**:\n   - Implement monitoring alerts for response times and resource utilization to catch similar issues in the future.\n\n### Conclusion\nBy following this structured approach, you can systematically identify and resolve the performance issues introduced by the new deployment. Always ensure to communicate findings and resolutions with your team to foster a culture of learning and improvement.",
           "tokenUsage": {
-            "total": 1354,
+            "total": 1318,
             "prompt": 463,
-            "completion": 891,
+            "completion": 855,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 17849,
+          "latencyMs": 17839,
           "finishReason": "stop",
-          "cost": 0.00060405,
+          "cost": 0.00058245,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e442822183175d5-IAH",
+                "cf-ray": "9e4914ed2e6e7038-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:51:53 GMT",
+                "date": "Mon, 30 Mar 2026 18:12:35 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "17664",
+                "openai-processing-ms": "17552",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=Ywifo0F9yO3OQ9sm700OhUhXodwWeBgayDWK8Lm1.yQ-1774842696.0201733-1.0.1.1-aggXTlMaCOXPsEaTXgSVw_BxXOz2hfsoAT9ooPr04P9Dca_2oT_1vA1JH.a_HQ1QicjRKX3J0aY_w5a7RCM0_Jgl07n7VscUgFxSP0J1NAzeerXzyHp.lhqCy_TDNs.Z; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:53 GMT",
+                "set-cookie": "__cf_bm=Tsx6LBsWEtHw4PmfI6rZJWMi7Xs5pVfbvhIe9tzeXfI-1774894338.1069062-1.0.1.1-JqJCrZ6jwe__EZ6yp5sXhPPCuEK_j.TwyMkqETZzO_3wjITddzsVytJda_jFK2oqAXyU1PFlrOyB0D4v1npftMKDYc3ywLFmeOadh0k4brmLOkyD3UrbLhaUe1Bxa4uH; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:42:35 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9552",
+                "x-ratelimit-remaining-requests": "9117",
                 "x-ratelimit-remaining-tokens": "199479",
-                "x-ratelimit-reset-requests": "1h4m25.323s",
+                "x-ratelimit-reset-requests": "2h7m4.414s",
                 "x-ratelimit-reset-tokens": "156ms",
-                "x-request-id": "req_6138236c9fe340a098a86fceb12b1cfb"
+                "x-request-id": "req_d2d512c2a44d4bdcae2dc36fff7cd2cf"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e442822183175d5-IAH",
+              "cf-ray": "9e4914ed2e6e7038-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:51:53 GMT",
+              "date": "Mon, 30 Mar 2026 18:12:35 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "17664",
+              "openai-processing-ms": "17552",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=Ywifo0F9yO3OQ9sm700OhUhXodwWeBgayDWK8Lm1.yQ-1774842696.0201733-1.0.1.1-aggXTlMaCOXPsEaTXgSVw_BxXOz2hfsoAT9ooPr04P9Dca_2oT_1vA1JH.a_HQ1QicjRKX3J0aY_w5a7RCM0_Jgl07n7VscUgFxSP0J1NAzeerXzyHp.lhqCy_TDNs.Z; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:21:53 GMT",
+              "set-cookie": "__cf_bm=Tsx6LBsWEtHw4PmfI6rZJWMi7Xs5pVfbvhIe9tzeXfI-1774894338.1069062-1.0.1.1-JqJCrZ6jwe__EZ6yp5sXhPPCuEK_j.TwyMkqETZzO_3wjITddzsVytJda_jFK2oqAXyU1PFlrOyB0D4v1npftMKDYc3ywLFmeOadh0k4brmLOkyD3UrbLhaUe1Bxa4uH; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:42:35 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9552",
+              "x-ratelimit-remaining-requests": "9117",
               "x-ratelimit-remaining-tokens": "199479",
-              "x-ratelimit-reset-requests": "1h4m25.323s",
+              "x-ratelimit-reset-requests": "2h7m4.414s",
               "x-ratelimit-reset-tokens": "156ms",
-              "x-request-id": "req_6138236c9fe340a098a86fceb12b1cfb"
+              "x-request-id": "req_d2d512c2a44d4bdcae2dc36fff7cd2cf"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 463,
-        "completion": 891,
+        "completion": 855,
         "cached": 0,
-        "total": 1354,
+        "total": 1318,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,8 +256,8 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1160,
-          "prompt": 1099,
+          "total": 1124,
+          "prompt": 1063,
           "completion": 61,
           "cached": 0,
           "numRequests": 0,
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 19277,
-      "evaluationDurationMs": 19277
+      "durationMs": 20563,
+      "evaluationDurationMs": 20563
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:51:55.269Z",
-    "evaluationCreatedAt": "2026-03-30T03:51:35.953Z"
+    "exportedAt": "2026-03-30T18:12:38.695Z",
+    "evaluationCreatedAt": "2026-03-30T18:12:18.033Z"
   }
 }

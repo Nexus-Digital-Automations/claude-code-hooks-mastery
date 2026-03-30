@@ -1,8 +1,8 @@
 {
-  "evalId": "eval-wJ1-2026-03-30T03:47:39",
+  "evalId": "eval-wxp-2026-03-30T18:07:12",
   "results": {
     "version": 3,
-    "timestamp": "2026-03-30T03:47:39.469Z",
+    "timestamp": "2026-03-30T18:07:12.435Z",
     "prompts": [
       {
         "id": "b7c9b8b147e2c9b1e2b93ff8fc6583b0657cfc42389ab565f352d5035e029839",
@@ -16,12 +16,12 @@
           "testErrorCount": 0,
           "assertPassCount": 1,
           "assertFailCount": 0,
-          "totalLatencyMs": 15542,
+          "totalLatencyMs": 16371,
           "tokenUsage": {
             "prompt": 402,
-            "completion": 751,
+            "completion": 720,
             "cached": 0,
-            "total": 1153,
+            "total": 1122,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -29,9 +29,9 @@
               "rejectedPrediction": 0
             },
             "assertions": {
-              "total": 1015,
-              "prompt": 955,
-              "completion": 60,
+              "total": 987,
+              "prompt": 924,
+              "completion": 63,
               "cached": 0,
               "numRequests": 0,
               "completionDetails": {
@@ -47,13 +47,13 @@
           "namedScoresCount": {
             "architect-review_quality": 1
           },
-          "cost": 0.0005109
+          "cost": 0.0004923
         }
       }
     ],
     "results": [
       {
-        "cost": 0.0005109,
+        "cost": 0.0004923,
         "gradingResult": {
           "pass": true,
           "score": 1,
@@ -62,9 +62,9 @@
             "architect-review_quality": 1
           },
           "tokensUsed": {
-            "total": 1015,
-            "prompt": 955,
-            "completion": 60,
+            "total": 987,
+            "prompt": 924,
+            "completion": 63,
             "cached": 0,
             "numRequests": 1
           },
@@ -78,11 +78,11 @@
               },
               "pass": true,
               "score": 1,
-              "reason": "The output provides a thorough analysis of the trade-offs between a monolithic architecture and microservices, discusses scalability and team structure, and offers conditional recommendations based on current pain points and maintainability.",
+              "reason": "The output provides a thorough analysis of the trade-offs between a monolithic architecture and microservices, discusses scalability and team structure, and offers conditional recommendations based on the evaluation of current pain points and optimization strategies.",
               "tokensUsed": {
-                "total": 1015,
-                "prompt": 955,
-                "completion": 60,
+                "total": 987,
+                "prompt": 924,
+                "completion": 63,
                 "cached": 0,
                 "numRequests": 1,
                 "completionDetails": {
@@ -92,13 +92,13 @@
                 }
               },
               "metadata": {
-                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo determine whether you should migrate from a Python Flask monolith to a microservices architecture, we need to evaluate several factors related to your current architecture, business needs, and future scalability requirements. Here’s a structured review of your current setup and considerations for migration:\\n\\n### Current Architecture Overview\\n1. **Flask Monolith**: \\n   - Flask is a lightweight framework suitable for building web applications. A monolithic architecture can be simpler to develop and deploy initially but may lead to challenges as the application grows.\\n   \\n2. **SQLAlchemy**: \\n   - SQLAlchemy is a powerful ORM for database interactions. In a monolithic setup, it can lead to tight coupling between your data access layer and business logic.\\n\\n3. **Celery for Async Tasks**: \\n   - Using Celery for background tasks is a good choice for handling asynchronous processing. However, it can add complexity to your architecture, especially if the tasks are tightly coupled with the monolith.\\n\\n4. **Redis for Caching**: \\n   - Redis is an excellent choice for caching and can improve performance. However, if your application grows, managing cache invalidation and consistency can become challenging.\\n\\n### Considerations for Migration to Microservices\\n1. **Scalability**:\\n   - If your application is experiencing performance bottlenecks or if you anticipate significant growth, microservices can help scale individual components independently.\\n\\n2. **Team Structure**:\\n   - If your team is growing and you have multiple teams working on different features, microservices can allow for parallel development and deployment, reducing bottlenecks.\\n\\n3. **Complexity**:\\n   - Microservices introduce additional complexity in terms of service communication, data management, and deployment. If your current monolith is manageable and meets your needs, it may not be worth the overhead of migrating.\\n\\n4. **Domain Boundaries**:\\n   - Evaluate whether your application has distinct domains that can be separated into microservices. If your application is tightly coupled and lacks clear boundaries, it may be challenging to migrate.\\n\\n5. **Deployment and DevOps**:\\n   - Consider your deployment strategy. Microservices require a robust CI/CD pipeline and orchestration (e.g., Kubernetes) to manage multiple services effectively.\\n\\n6. **Data Management**:\\n   - In a microservices architecture, each service typically manages its own database. This can lead to challenges in data consistency and transactions across services. Consider whether your application can handle eventual consistency.\\n\\n7. **Monitoring and Observability**:\\n   - Microservices require enhanced monitoring and observability to track interactions between services. Ensure you have the tools in place to manage this complexity.\\n\\n### Recommendations\\n- **Evaluate Current Pain Points**: If your monolith is causing significant pain points (e.g., slow deployments, difficulty in scaling, or challenges in team collaboration), it may be time to consider microservices.\\n  \\n- **Incremental Migration**: If you decide to migrate, consider an incremental approach. Identify specific components or features that can be extracted as microservices without a complete rewrite.\\n\\n- **Maintainability and Technical Debt**: Ensure that your current monolith is maintainable. If it has accumulated significant technical debt, it may be worth refactoring before considering a migration.\\n\\n- **Proof of Concept**: Before fully committing to a microservices architecture, consider building a small proof of concept to understand the challenges and benefits.\\n\\n### Conclusion\\nMigrating to microservices can provide benefits in scalability and team autonomy, but it also introduces complexity. Carefully assess your current architecture, business needs, and team capabilities before making a decision. If the monolith is still serving your needs effectively, it may be prudent to continue iterating on it while keeping microservices in mind for the future.\\n</Output>\\n<Rubric>\\nProvides balanced analysis of monolith vs microservices trade-offs, asks clarifying questions about scale/team size, gives conditional recommendation\\n</Rubric>\"}]"
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nTo determine whether you should migrate from a Python Flask monolith to a microservices architecture, we need to evaluate several factors related to your current architecture, business needs, and future scalability requirements. Here’s a structured review:\\n\\n### Current Architecture Overview\\n1. **Flask Monolith**: Flask is a lightweight web framework that is suitable for building monolithic applications. It allows for rapid development but can become challenging to manage as the application grows.\\n2. **SQLAlchemy**: This ORM provides a powerful way to interact with your database, but it can lead to tight coupling between your data access layer and business logic in a monolithic setup.\\n3. **Celery**: Using Celery for asynchronous tasks is a good choice for handling background jobs, but it can add complexity to your architecture, especially if the monolith grows.\\n4. **Redis**: Utilizing Redis for caching is effective for improving performance, but it may not be fully leveraged if the application is tightly coupled.\\n\\n### Considerations for Migration to Microservices\\n1. **Scalability**: If your application is experiencing performance bottlenecks or if you anticipate significant growth, microservices can help scale individual components independently. Evaluate your current load and future growth projections.\\n\\n2. **Team Structure**: If your development team is growing and you have multiple teams working on different features, microservices can allow for parallel development and deployment. However, if your team is small, the overhead of managing multiple services may outweigh the benefits.\\n\\n3. **Complexity**: Microservices introduce additional complexity in terms of service communication, data management, and deployment. If your current monolith is manageable and meets your needs, it may be more prudent to optimize the existing architecture rather than migrate.\\n\\n4. **Domain Boundaries**: If your application has distinct domains or bounded contexts that can be separated, this is a strong indicator for microservices. Evaluate whether your application can be logically divided into smaller, independent services.\\n\\n5. **Deployment Frequency**: If you need to deploy features frequently and independently, microservices can facilitate this. However, if your deployment cycle is already efficient, the migration may not provide significant benefits.\\n\\n6. **Resilience and Fault Isolation**: Microservices can improve resilience by isolating failures to individual services. If your monolith is prone to cascading failures, this could be a compelling reason to migrate.\\n\\n### Recommendations\\n- **Evaluate Current Pain Points**: Identify specific issues with your current architecture. Are you facing performance issues, deployment challenges, or difficulties in scaling? Addressing these can inform your decision.\\n  \\n- **Consider a Strangler Fig Pattern**: If you decide to migrate, consider using the Strangler Fig pattern, where you gradually extract services from the monolith rather than a complete rewrite. This allows for a smoother transition and reduces risk.\\n\\n- **Optimize the Monolith First**: Before migrating, consider optimizing your existing monolith. This could involve refactoring to improve modularity, implementing better caching strategies, or optimizing database access.\\n\\n- **Plan for Microservices**: If you choose to migrate, ensure you have a clear plan for service boundaries, data management (consider eventual consistency), and inter-service communication (e.g., REST, gRPC, or messaging).\\n\\n### Conclusion\\nMigrating to microservices can provide benefits in scalability, resilience, and team productivity, but it also introduces complexity. Carefully assess your current architecture, team capabilities, and business needs before making a decision. If the monolith is still serving your needs effectively, consider optimizing it first before committing to a full migration.\\n</Output>\\n<Rubric>\\nProvides balanced analysis of monolith vs microservices trade-offs, asks clarifying questions about scale/team size, gives conditional recommendation\\n</Rubric>\"}]"
               }
             }
           ]
         },
-        "id": "f5da8b58-4951-4b65-ae21-2f7a58ad4a66",
-        "latencyMs": 15542,
+        "id": "e3cb8b86-3f8a-4945-b411-58104d1c243a",
+        "latencyMs": 16371,
         "namedScores": {
           "architect-review_quality": 1
         },
@@ -121,11 +121,11 @@
           "label": ""
         },
         "response": {
-          "output": "To determine whether you should migrate from a Python Flask monolith to a microservices architecture, we need to evaluate several factors related to your current architecture, business needs, and future scalability requirements. Here’s a structured review of your current setup and considerations for migration:\n\n### Current Architecture Overview\n1. **Flask Monolith**: \n   - Flask is a lightweight framework suitable for building web applications. A monolithic architecture can be simpler to develop and deploy initially but may lead to challenges as the application grows.\n   \n2. **SQLAlchemy**: \n   - SQLAlchemy is a powerful ORM for database interactions. In a monolithic setup, it can lead to tight coupling between your data access layer and business logic.\n\n3. **Celery for Async Tasks**: \n   - Using Celery for background tasks is a good choice for handling asynchronous processing. However, it can add complexity to your architecture, especially if the tasks are tightly coupled with the monolith.\n\n4. **Redis for Caching**: \n   - Redis is an excellent choice for caching and can improve performance. However, if your application grows, managing cache invalidation and consistency can become challenging.\n\n### Considerations for Migration to Microservices\n1. **Scalability**:\n   - If your application is experiencing performance bottlenecks or if you anticipate significant growth, microservices can help scale individual components independently.\n\n2. **Team Structure**:\n   - If your team is growing and you have multiple teams working on different features, microservices can allow for parallel development and deployment, reducing bottlenecks.\n\n3. **Complexity**:\n   - Microservices introduce additional complexity in terms of service communication, data management, and deployment. If your current monolith is manageable and meets your needs, it may not be worth the overhead of migrating.\n\n4. **Domain Boundaries**:\n   - Evaluate whether your application has distinct domains that can be separated into microservices. If your application is tightly coupled and lacks clear boundaries, it may be challenging to migrate.\n\n5. **Deployment and DevOps**:\n   - Consider your deployment strategy. Microservices require a robust CI/CD pipeline and orchestration (e.g., Kubernetes) to manage multiple services effectively.\n\n6. **Data Management**:\n   - In a microservices architecture, each service typically manages its own database. This can lead to challenges in data consistency and transactions across services. Consider whether your application can handle eventual consistency.\n\n7. **Monitoring and Observability**:\n   - Microservices require enhanced monitoring and observability to track interactions between services. Ensure you have the tools in place to manage this complexity.\n\n### Recommendations\n- **Evaluate Current Pain Points**: If your monolith is causing significant pain points (e.g., slow deployments, difficulty in scaling, or challenges in team collaboration), it may be time to consider microservices.\n  \n- **Incremental Migration**: If you decide to migrate, consider an incremental approach. Identify specific components or features that can be extracted as microservices without a complete rewrite.\n\n- **Maintainability and Technical Debt**: Ensure that your current monolith is maintainable. If it has accumulated significant technical debt, it may be worth refactoring before considering a migration.\n\n- **Proof of Concept**: Before fully committing to a microservices architecture, consider building a small proof of concept to understand the challenges and benefits.\n\n### Conclusion\nMigrating to microservices can provide benefits in scalability and team autonomy, but it also introduces complexity. Carefully assess your current architecture, business needs, and team capabilities before making a decision. If the monolith is still serving your needs effectively, it may be prudent to continue iterating on it while keeping microservices in mind for the future.",
+          "output": "To determine whether you should migrate from a Python Flask monolith to a microservices architecture, we need to evaluate several factors related to your current architecture, business needs, and future scalability requirements. Here’s a structured review:\n\n### Current Architecture Overview\n1. **Flask Monolith**: Flask is a lightweight web framework that is suitable for building monolithic applications. It allows for rapid development but can become challenging to manage as the application grows.\n2. **SQLAlchemy**: This ORM provides a powerful way to interact with your database, but it can lead to tight coupling between your data access layer and business logic in a monolithic setup.\n3. **Celery**: Using Celery for asynchronous tasks is a good choice for handling background jobs, but it can add complexity to your architecture, especially if the monolith grows.\n4. **Redis**: Utilizing Redis for caching is effective for improving performance, but it may not be fully leveraged if the application is tightly coupled.\n\n### Considerations for Migration to Microservices\n1. **Scalability**: If your application is experiencing performance bottlenecks or if you anticipate significant growth, microservices can help scale individual components independently. Evaluate your current load and future growth projections.\n\n2. **Team Structure**: If your development team is growing and you have multiple teams working on different features, microservices can allow for parallel development and deployment. However, if your team is small, the overhead of managing multiple services may outweigh the benefits.\n\n3. **Complexity**: Microservices introduce additional complexity in terms of service communication, data management, and deployment. If your current monolith is manageable and meets your needs, it may be more prudent to optimize the existing architecture rather than migrate.\n\n4. **Domain Boundaries**: If your application has distinct domains or bounded contexts that can be separated, this is a strong indicator for microservices. Evaluate whether your application can be logically divided into smaller, independent services.\n\n5. **Deployment Frequency**: If you need to deploy features frequently and independently, microservices can facilitate this. However, if your deployment cycle is already efficient, the migration may not provide significant benefits.\n\n6. **Resilience and Fault Isolation**: Microservices can improve resilience by isolating failures to individual services. If your monolith is prone to cascading failures, this could be a compelling reason to migrate.\n\n### Recommendations\n- **Evaluate Current Pain Points**: Identify specific issues with your current architecture. Are you facing performance issues, deployment challenges, or difficulties in scaling? Addressing these can inform your decision.\n  \n- **Consider a Strangler Fig Pattern**: If you decide to migrate, consider using the Strangler Fig pattern, where you gradually extract services from the monolith rather than a complete rewrite. This allows for a smoother transition and reduces risk.\n\n- **Optimize the Monolith First**: Before migrating, consider optimizing your existing monolith. This could involve refactoring to improve modularity, implementing better caching strategies, or optimizing database access.\n\n- **Plan for Microservices**: If you choose to migrate, ensure you have a clear plan for service boundaries, data management (consider eventual consistency), and inter-service communication (e.g., REST, gRPC, or messaging).\n\n### Conclusion\nMigrating to microservices can provide benefits in scalability, resilience, and team productivity, but it also introduces complexity. Carefully assess your current architecture, team capabilities, and business needs before making a decision. If the monolith is still serving your needs effectively, consider optimizing it first before committing to a full migration.",
           "tokenUsage": {
-            "total": 1153,
+            "total": 1122,
             "prompt": 402,
-            "completion": 751,
+            "completion": 720,
             "numRequests": 1,
             "completionDetails": {
               "reasoning": 0,
@@ -134,9 +134,9 @@
             }
           },
           "cached": false,
-          "latencyMs": 15542,
+          "latencyMs": 16371,
           "finishReason": "stop",
-          "cost": 0.0005109,
+          "cost": 0.0004923,
           "guardrails": {
             "flagged": false
           },
@@ -148,28 +148,28 @@
                 "access-control-expose-headers": "X-Request-ID",
                 "alt-svc": "h3=\":443\"; ma=86400",
                 "cf-cache-status": "DYNAMIC",
-                "cf-ray": "9e44225c1f0fc2f6-IAH",
+                "cf-ray": "9e490d777e60c2f9-IAH",
                 "connection": "keep-alive",
                 "content-encoding": "br",
                 "content-type": "application/json",
-                "date": "Mon, 30 Mar 2026 03:47:55 GMT",
+                "date": "Mon, 30 Mar 2026 18:07:28 GMT",
                 "openai-organization": "nexus-digital-automations",
-                "openai-processing-ms": "15228",
+                "openai-processing-ms": "16138",
                 "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
                 "openai-version": "2020-10-01",
                 "server": "cloudflare",
-                "set-cookie": "__cf_bm=KHqdjHvwA0nRZE7Fys2wp0zlMgyuq8HUtRSv4r6cD44-1774842459.5346339-1.0.1.1-tD8qcMaWgzK6CA6yt4AUdXDVnEFAB86ly0fbRVGY.PaIhqHUNrqmz0JlI7_P23Q2RkmtsePQx5pH0_Z5p.kxv9U3bR8NPIWzJGZJMmUJp8p6SjNMZRL1yBTwUuovQF6O; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:17:55 GMT",
+                "set-cookie": "__cf_bm=qm_MjNrBtvapWWS36pYyF.7HFhrXBsX0EzVIjNrqMs4-1774894032.5568578-1.0.1.1-Bxb6rBvKYDhXbsEkB.wM_y4N.Ys9wkecbxL2Ir6uTlyizJRqSnJFiyU45v6P8REL0KeEiaa0UBaiculwuRjfO8oKJK67DEi73rQtBXzxFNa6jei0534YW_6yDapHTCBA; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:37:28 GMT",
                 "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
                 "transfer-encoding": "chunked",
                 "x-content-type-options": "nosniff",
                 "x-openai-proxy-wasm": "v0.1",
                 "x-ratelimit-limit-requests": "10000",
                 "x-ratelimit-limit-tokens": "200000",
-                "x-ratelimit-remaining-requests": "9547",
+                "x-ratelimit-remaining-requests": "9207",
                 "x-ratelimit-remaining-tokens": "199459",
-                "x-ratelimit-reset-requests": "1h5m11.59s",
+                "x-ratelimit-reset-requests": "1h54m10.053s",
                 "x-ratelimit-reset-tokens": "162ms",
-                "x-request-id": "req_129d5bdc753b435587f101ee2885bf3c"
+                "x-request-id": "req_30553a4a3a5547bd93cd8cafc30f762d"
               }
             }
           }
@@ -211,28 +211,28 @@
               "access-control-expose-headers": "X-Request-ID",
               "alt-svc": "h3=\":443\"; ma=86400",
               "cf-cache-status": "DYNAMIC",
-              "cf-ray": "9e44225c1f0fc2f6-IAH",
+              "cf-ray": "9e490d777e60c2f9-IAH",
               "connection": "keep-alive",
               "content-encoding": "br",
               "content-type": "application/json",
-              "date": "Mon, 30 Mar 2026 03:47:55 GMT",
+              "date": "Mon, 30 Mar 2026 18:07:28 GMT",
               "openai-organization": "nexus-digital-automations",
-              "openai-processing-ms": "15228",
+              "openai-processing-ms": "16138",
               "openai-project": "proj_PR8V385aTyiivShwF2h6TnBS",
               "openai-version": "2020-10-01",
               "server": "cloudflare",
-              "set-cookie": "__cf_bm=KHqdjHvwA0nRZE7Fys2wp0zlMgyuq8HUtRSv4r6cD44-1774842459.5346339-1.0.1.1-tD8qcMaWgzK6CA6yt4AUdXDVnEFAB86ly0fbRVGY.PaIhqHUNrqmz0JlI7_P23Q2RkmtsePQx5pH0_Z5p.kxv9U3bR8NPIWzJGZJMmUJp8p6SjNMZRL1yBTwUuovQF6O; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 04:17:55 GMT",
+              "set-cookie": "__cf_bm=qm_MjNrBtvapWWS36pYyF.7HFhrXBsX0EzVIjNrqMs4-1774894032.5568578-1.0.1.1-Bxb6rBvKYDhXbsEkB.wM_y4N.Ys9wkecbxL2Ir6uTlyizJRqSnJFiyU45v6P8REL0KeEiaa0UBaiculwuRjfO8oKJK67DEi73rQtBXzxFNa6jei0534YW_6yDapHTCBA; HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Mon, 30 Mar 2026 18:37:28 GMT",
               "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
               "transfer-encoding": "chunked",
               "x-content-type-options": "nosniff",
               "x-openai-proxy-wasm": "v0.1",
               "x-ratelimit-limit-requests": "10000",
               "x-ratelimit-limit-tokens": "200000",
-              "x-ratelimit-remaining-requests": "9547",
+              "x-ratelimit-remaining-requests": "9207",
               "x-ratelimit-remaining-tokens": "199459",
-              "x-ratelimit-reset-requests": "1h5m11.59s",
+              "x-ratelimit-reset-requests": "1h54m10.053s",
               "x-ratelimit-reset-tokens": "162ms",
-              "x-request-id": "req_129d5bdc753b435587f101ee2885bf3c"
+              "x-request-id": "req_30553a4a3a5547bd93cd8cafc30f762d"
             }
           },
           "_promptfooFileMetadata": {}
@@ -246,9 +246,9 @@
       "errors": 0,
       "tokenUsage": {
         "prompt": 402,
-        "completion": 751,
+        "completion": 720,
         "cached": 0,
-        "total": 1153,
+        "total": 1122,
         "numRequests": 1,
         "completionDetails": {
           "reasoning": 0,
@@ -256,9 +256,9 @@
           "rejectedPrediction": 0
         },
         "assertions": {
-          "total": 1015,
-          "prompt": 955,
-          "completion": 60,
+          "total": 987,
+          "prompt": 924,
+          "completion": 63,
           "cached": 0,
           "numRequests": 0,
           "completionDetails": {
@@ -268,8 +268,8 @@
           }
         }
       },
-      "durationMs": 17789,
-      "evaluationDurationMs": 17789
+      "durationMs": 18054,
+      "evaluationDurationMs": 18054
     }
   },
   "config": {
@@ -335,7 +335,7 @@
     "nodeVersion": "v22.22.0",
     "platform": "darwin",
     "arch": "arm64",
-    "exportedAt": "2026-03-30T03:47:57.286Z",
-    "evaluationCreatedAt": "2026-03-30T03:47:39.469Z"
+    "exportedAt": "2026-03-30T18:07:30.573Z",
+    "evaluationCreatedAt": "2026-03-30T18:07:12.435Z"
   }
 }
