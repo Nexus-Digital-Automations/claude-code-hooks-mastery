@@ -270,16 +270,37 @@ If `has_frontend` is `false` or not present: **SKIP this entire category entirel
 - Playwright or Cypress config file exists in the project
 - E2E test output is present in sandbox results
 - All E2E tests pass (zero failures)
+- Coverage is comprehensive: every page, every button, every interactive element has at least one test
+- Destructive operations are NOT skipped — they must be tested against test/non-user data
 
 **Pass criteria:**
 - E2E test framework is configured
 - E2E tests ran and all passed
 - Zero failures in Playwright/Cypress output
+- Every page and interactive UI element is covered by at least one test
+- Destructive operations (delete chat, delete item, etc.) are tested by: (1) creating test/non-user data first, (2) performing the destructive action on that test data, (3) verifying the deletion succeeded — NOT by skipping or commenting them out
+
+**Playwright Coverage Requirements:**
+
+Comprehensive coverage means:
+- **Every page/route** has at least one test that loads it and verifies core content
+- **Every button and interactive control** has at least one test that activates it and verifies the result
+- **Every form** has at least one test for the happy path (valid submission)
+- **Destructive operations** (delete chat, delete item, remove entry, etc.) should be tested using test data created specifically for that purpose:
+  - Create a test item first (e.g., create a test chat), then delete it in the test, then verify it's gone
+  - This is the preferred approach when test data can be safely created and destroyed
+- **Exception — irreversible user-data operations**: destructive actions that can only target real user data with no safe test path (e.g., "delete account", "wipe all user history") may be skipped. This exception is narrow — if test data can be created for the operation, it does not qualify for this exception.
+- **Error states** for key flows (invalid input, failed submission, empty states)
+
+**Severity:** Missing coverage for entire pages or major features is **blocking**. Skipping a destructive test that could safely use test data is **blocking**. Missing a single edge-case button or minor variation is **advisory**.
 
 **Common violations:**
 - Frontend project but no E2E tests configured
 - E2E tests exist but have failures
 - New frontend feature added without corresponding E2E test
+- Delete/remove buttons skipped entirely when test data could have been created and used
+- Tests exist but only cover one page while others are untested
+- Claiming a destructive operation is "unsafe to test" when the test could simply create and delete its own test data
 
 ---
 
@@ -572,3 +593,5 @@ When reviewing a follow-up round:
 15. **The stop hook already ran mechanical checks**: Don't re-flag lint/build/test failures as additional violations if the sandbox results show they passed. Trust the sandbox output you're given.
 
 16. **Assume good faith on partial packet data**: If user_requests is empty, the capturing hook may not have fired. Review what you have. Don't block solely because the packet is incomplete.
+
+17. **Playwright coverage must be comprehensive**: For frontend projects, Playwright tests must cover all pages, buttons, and interactive functionality. Skipping entire pages or leaving delete/remove buttons untested is **blocking**. Destructive operations (delete chat, delete item, etc.) should be tested using test data created for that purpose — create the test item, delete it, verify it's gone. The narrow exception is operations that can only target irreplaceable real user data with no safe test path (e.g., "delete account") — those may be skipped. If test data can be created for the operation, it is not exempt.
