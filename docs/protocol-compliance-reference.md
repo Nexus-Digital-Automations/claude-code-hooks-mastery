@@ -19,6 +19,37 @@ You do NOT trust Claude Code's self-reported status. The check commands were run
 
 ---
 
+## Rules Claude Code Must Follow
+
+These are the rules Claude Code operates under. You enforce them.
+
+**The Three Protocols:**
+1. **Clarify first** — First response to any build/change/design request must be clarifying questions, not code. Skip only for literal confirmations ("yes", "ok", "go ahead"). *(Hard to verify at stop time — check if the spec was created before coding began.)*
+2. **Spec before code** — A spec file in `specs/` must exist and be approved before any code is written. Spec must have acceptance criteria.
+3. **Validate before stopping** — Tests must be run and output shown. Every spec criterion must be verified with actual command output.
+
+**Working Standards:**
+- IDs must use `crypto.randomUUID()`, never `Date.now()` or `Math.random()`
+- Output files go in `output/`, logs in `logs/` — never bare at project root
+- JS/TS: ESLint + TypeScript strict + Prettier. 80-char lines. Semicolons. Single quotes.
+- Python: Black + Ruff + mypy strict. 88-char lines. snake_case files, PascalCase classes.
+- Never commit secrets: API keys, passwords, tokens, .env files, certs, PII
+
+**Prohibitions (things Claude Code must never do):**
+- Add unrequested features (YAGNI — build only what was asked)
+- Write code before spec approval
+- Skip error handling
+- Refactor code that isn't part of the task
+- Ship workarounds as fixes — root cause must be fixed, not bypassed
+- Add `TODO: remove later` or `HACK:` comments that disguise debt as progress
+- Claim completion without running tests and showing actual output
+- Edit `~/.claude/settings.json`
+- Commit secrets or credentials
+- Implement backend code directly when in deepseek mode and the task touches 5+ files (must delegate)
+- Trust delegated output without reading every modified file and re-running tests
+
+---
+
 ## Review Categories
 
 Evaluate each applicable category. Skip categories marked CONDITIONAL when their condition is false.
@@ -228,18 +259,31 @@ If agent mode is `claude`: SKIP this entire category entirely.
 ### 9. Code Quality Signals
 
 **What to check (from git diff if available):**
-- Empty catch blocks: `catch (e) {}` or `except Exception: pass` with no handling
-- TODO/FIXME added without context
-- Workarounds or hacks disguised as fixes
-- Resource cleanup: opened connections/files closed properly
+
+**Workarounds disguised as fixes:**
+- Code that bypasses a check instead of fixing why it fires (e.g., `if (skip_validation)`, `--no-verify`, removing a guard)
+- A flag added just to skip behavior in one case (`if (legacy_mode): ...`)
+- Comment says "temporary" or "quick fix" but the code will obviously stay
+
+**Prohibited TODO/hack patterns:**
+- `TODO: remove later`, `HACK:`, `FIXME: temporary`, `# temp fix` — these are blocked under the rules
+- Context-free `TODO` or `FIXME` without description of what's wrong and how to fix it
+- Commented-out code left in place "just in case"
+
+**ID generation:**
+- `Date.now()` used as an ID — **blocking**. Rule requires `crypto.randomUUID()`.
+- `Math.random()` used as an ID — **blocking** (not collision-resistant)
+- `uuid.uuid4()` or `crypto.randomUUID()` — correct
 
 **Pass criteria:**
-- No empty catch blocks
-- No unexplained TODOs
-- No obvious workarounds
-- Clean resource management
+- No bypass patterns or workarounds disguised as fixes
+- No `TODO: remove later` or `HACK:` comments
+- IDs use `crypto.randomUUID()` (JS/TS) or `uuid.uuid4()` (Python), not `Date.now()`
+- No commented-out code blocks
 
-**Note:** This is evaluated from the diff content in the review packet. If no diff content is provided, skip this category (advisory only).
+**Severity:** `Date.now()` as ID is **blocking**. `TODO: remove later` is **blocking**. Context-free TODOs are **advisory**.
+
+**Note:** Requires diff content in the review packet. If no diff is provided, skip this category.
 
 ---
 
