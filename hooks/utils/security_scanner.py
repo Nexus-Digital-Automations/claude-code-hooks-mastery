@@ -275,12 +275,18 @@ def scan_semgrep(cwd: Path, timeout: int) -> list:
 _SKIP_DIRS = frozenset({
     "node_modules", ".git", "__pycache__", "venv", ".venv",
     "dist", "build", "target", ".next", ".worktrees",
+    # Third-party upstream source (gitignored, not application code)
+    ".searxng",
 })
 _SKIP_PATH_FRAGMENTS = (
     "/.claude/agents/", "/.claude/skills/", "/.claude/commands/",
     # Promptfoo eval results contain LLM text outputs from security test scenarios;
     # fake credentials in those outputs are intentional test fixtures, not real secrets.
     "tests/promptfoo/results/",
+    # DeepSeek Agent MCP eval suite — YAML test fixtures and LLM result outputs;
+    # example credentials in test scenarios and code review tasks are intentional.
+    "/evals/results/",
+    "/evals/",
 )
 _TEXT_EXTS = frozenset({
     ".py", ".js", ".ts", ".jsx", ".tsx", ".rb", ".go", ".rs",
@@ -357,6 +363,9 @@ _WARNING_PATTERNS = [
 def _should_skip(path: Path) -> bool:
     for part in path.parts:
         if part in _SKIP_DIRS:
+            return True
+        # Skip any .venv-* variant (e.g. .venv-analysis, .venv-dev)
+        if part.startswith(".venv-") or part.startswith("venv-"):
             return True
     path_str = str(path)
     for fragment in _SKIP_PATH_FRAGMENTS:
