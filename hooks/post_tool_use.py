@@ -25,10 +25,10 @@ LINTER_MAP = {
     '.py': ['ruff', 'check', '--output-format=concise'],
 
     # JavaScript/TypeScript
-    '.js': ['eslint', '--format=compact'],
-    '.ts': ['eslint', '--format=compact'],
-    '.tsx': ['eslint', '--format=compact'],
-    '.jsx': ['eslint', '--format=compact'],
+    '.js': ['eslint', '--format=stylish'],
+    '.ts': ['eslint', '--format=stylish'],
+    '.tsx': ['eslint', '--format=stylish'],
+    '.jsx': ['eslint', '--format=stylish'],
 
     # Go
     '.go': ['go', 'vet'],
@@ -523,13 +523,15 @@ def lint_file(file_path):
         return False, None
 
     linter_cmd = LINTER_MAP[ext] + [file_path]
+    cwd = str(Path(file_path).parent)
 
     try:
         result = subprocess.run(
             linter_cmd,
             capture_output=True,
             text=True,
-            timeout=10
+            timeout=10,
+            cwd=cwd
         )
 
         output = result.stdout.strip() or result.stderr.strip()
