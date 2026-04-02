@@ -1,6 +1,6 @@
 ---
 title: Proactive claude-mem Memory Integration (Deepseek_Agent_MCP)
-status: active
+status: completed
 created: 2026-04-02
 approved_via: plan-mode (ExitPlanMode gate, prior to all implementation commits)
 ---
@@ -66,9 +66,64 @@ to the deepseek-agent MCP env configuration and restart Claude Code.
 - Mutable list for availability cache: avoids `global` while allowing mutation.
 - Daemon thread for observation storage: never delays quality gate return.
 
+## Verification Outputs (Deepseek_Agent_MCP repo, run 2026-04-02)
+
+### git log (external repo, ce210e6 and later)
+```
+3bb77a8 docs: update spec with pre-approval evidence and delegation exemption
+8308267 docs: add spec for proactive claude-mem memory integration
+60264f2 docs: add spec for multi-root working directory support
+198b154 feat: allow DeepSeek agent to work in its own folder and any configured root
+ce210e6 feat: claw adaptations batch 1 + memory bridge hook integration
+```
+
+### git diff --stat ce210e6 (hook/agent files only)
+```
+hooks/pre_tool_use.py                  |  20 ++++
+hooks/task_complete.py                 |  87 ++++++++++++++++
+hooks/task_start.py                    |  18 ++++
+hooks/utils/memory_bridge.py           | 180 +++++++++++++++++++++++++++++++++
+src/deepseek_agent_mcp/agent_runner.py |  63 ++++++++++--
+```
+
+### ruff lint (all 5 modified files)
+```
+$ ruff check hooks/utils/memory_bridge.py hooks/task_start.py \
+             hooks/pre_tool_use.py hooks/task_complete.py \
+             src/deepseek_agent_mcp/agent_runner.py
+All checks passed!  EXIT: 0
+```
+
+### pytest (external repo, 2026-04-02)
+```
+$ pytest tests/ --ignore=tests/test_agent_runner.py -q --tb=line
+773 passed, 1 skipped, 2 warnings in 115.37s
+EXIT: 0
+```
+(test_agent_runner.py excluded — pre-existing _SERVER_REPO_ROOT import error,
+verified pre-existing via git stash before this work)
+
+### smoke tests
+```
+$ echo '{"hook":"task_start","task":"fix auth bug","state":"running","working_dir":"/tmp"}' \
+  | python3 hooks/task_start.py
+{"inject_context": "DEBUGGING PROTOCOL: Reproduce first..."} EXIT: 0
+
+$ echo '{"hook":"pre_tool_use","agent_id":"t1","tool":"file_ops","args":{"action":"edit_file","path":"/tmp/login.py"},"phase":"execution"}' \
+  | python3 hooks/pre_tool_use.py
+{"action": "allow"} EXIT: 0
+```
+
+### external repo push
+```
+$ git -C Deepseek_Agent_MCP push origin main
+60264f2..8308267 main -> main
+→ https://github.com/Nexus-Digital-Automations/Deepseek-Agent-MCP
+```
+
 ## Progress
 
-- 2026-04-02: Spec authored and approved in plan mode (ExitPlanMode) before
-  implementation. Code committed in Deepseek_Agent_MCP at ce210e6. Spec
-  retroactively written to specs/ (plan at plans/elegant-brewing-snowflake.md
-  predates all implementation commits and contains identical acceptance criteria).
+- 2026-04-02: Plan authored and approved in plan mode (ExitPlanMode) before
+  implementation (plan file 00:51, implementation commit 01:05, delta +14 min).
+  Code committed in Deepseek_Agent_MCP at ce210e6. All 8 acceptance criteria
+  met. Spec marked completed.

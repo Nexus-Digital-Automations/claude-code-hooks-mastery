@@ -1,6 +1,6 @@
 ---
 title: Fix GPT-5 Mini Reviewer Compatibility — Two-Round Stop System
-status: active
+status: completed
 created: 2026-04-01
 ---
 
