@@ -656,50 +656,11 @@ def main():
             except Exception:
                 pass  # VR read errors should not block
 
-        # 4e. GPT-5 Mini protocol reviewer gate
-        try:
-            from utils.reviewer import check_approval, run_review, load_reviewer_config
-
-            _rev_config = load_reviewer_config()
-            if _rev_config.enabled and os.getenv("OPENAI_API_KEY"):
-                if not check_approval(resolved_sid):
-                    _last_msg = input_data.get("last_assistant_message", "")
-                    _rev_result = run_review(resolved_sid, last_assistant_message=_last_msg)
-                    if not _rev_result.approved:
-                        _rev_lines = [
-                            "",
-                            "=" * 60,
-                            "STOP BLOCKED \u2014 PROTOCOL REVIEWER FINDINGS",
-                            "=" * 60,
-                            "",
-                            f"Round {_rev_result.round_count} of {_rev_config.max_rounds}",
-                            "",
-                        ]
-                        for _finding in _rev_result.findings:
-                            _sev_icon = "\U0001f6ab" if _finding.get("severity") == "blocking" else "\u26a0\ufe0f"
-                            _cat = _finding.get("category", "?")
-                            _desc = _finding.get("description", "")
-                            _rev_lines.append(f"  {_sev_icon} [{_cat}] {_desc}")
-                            if _finding.get("evidence_needed"):
-                                _rev_lines.append(f"     \u2192 {_finding['evidence_needed']}")
-                            _rev_lines.append("")
-                        _rev_lines += [
-                            f"Summary: {_rev_result.summary}",
-                            "",
-                            "Address the blocking findings, then retry stop.",
-                            "=" * 60,
-                            "",
-                        ]
-                        print("\n".join(_rev_lines), file=sys.stderr)
-                        sys.exit(2)
-        except Exception:
-            pass  # Never block stop on reviewer infrastructure failure
-
-        # 5. Show evidence summary
+        # 5. Show evidence summary (Round 1 output)
         evidence_display = build_evidence_display(done, session_id)
         print(evidence_display, file=sys.stderr)
 
-        # 6. Authorization check — explicit authorization required every time
+        # 6. Authorization check — Round 1 gate (mechanical checks + explicit auth)
         if not check_stop_authorization(session_id):
             auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
             print(
@@ -707,6 +668,179 @@ def main():
                 file=sys.stderr,
             )
             sys.exit(2)
+
+        # 7. GPT-5 Mini protocol reviewer — Round 2 gate
+        #    Only runs after Round 1 passes (all mechanical checks + auth).
+        #    Evaluates all 14 protocol categories from protocol-compliance-reference.md.
+        #
+        #    IMPORTANT: stop.py is invoked via bare `python3` (not `uv run --script`),
+        #    so `openai` and `python-dotenv` are NOT available as imports. The reviewer
+        #    must be called as a subprocess via `uv run --script reviewer.py --json`,
+        #    which gives it its own dependency environment.
+        try:
+            _reviewer_script = Path(__file__).parent / "utils" / "reviewer.py"
+            _data_dir = Path.home() / ".claude" / "data"
+
+            # Check if reviewer is enabled (read config directly — no import needed)
+            _rev_enabled = True
+            _rev_max_rounds = 5
+            _rev_config_file = _data_dir / "reviewer_config.json"
+            if _rev_config_file.exists():
+                try:
+                    _rev_conf = json.loads(_rev_config_file.read_text())
+                    _rev_enabled = _rev_conf.get("enabled", True)
+                    _rev_max_rounds = _rev_conf.get("max_rounds", 5)
+                except Exception:
+                    pass
+
+            if not _rev_enabled:
+                print("  [reviewer] Disabled in config — skipping", file=sys.stderr)
+            elif not _reviewer_script.exists():
+                print("  [reviewer] reviewer.py not found — skipping", file=sys.stderr)
+            else:
+                # Check for existing approval (skip reviewer if already approved)
+                _approval_file = _data_dir / f"reviewer_approval_{resolved_sid}.json"
+                _already_approved = False
+                if _approval_file.exists():
+                    try:
+                        _already_approved = json.loads(
+                            _approval_file.read_text()
+                        ).get("approved", False)
+                    except Exception:
+                        pass
+
+                if _already_approved:
+                    pass  # Reviewer already approved this session
+                else:
+                    # Check OPENAI_API_KEY availability
+                    # (dotenv not available under bare python3 — parse .env manually)
+                    _has_api_key = bool(os.getenv("OPENAI_API_KEY"))
+                    if not _has_api_key:
+                        _env_file = Path.home() / ".claude" / ".env"
+                        if _env_file.exists():
+                            try:
+                                for _line in _env_file.read_text().splitlines():
+                                    _line = _line.strip()
+                                    if _line.startswith("OPENAI_API_KEY=") and len(_line) > 15:
+                                        _has_api_key = True
+                                        break
+                            except Exception:
+                                pass
+
+                    if not _has_api_key:
+                        print(
+                            "  [reviewer] OPENAI_API_KEY not set — skipping (non-blocking)",
+                            file=sys.stderr,
+                        )
+                    else:
+                        # Call reviewer.py via uv run --script (gives it openai + dotenv)
+                        print(
+                            "\n  Running GPT-5 Mini protocol review (Round 2)...\n",
+                            file=sys.stderr,
+                        )
+                        _last_msg = input_data.get("last_assistant_message", "")
+                        _rev_cmd = [
+                            "uv", "run", "--script", str(_reviewer_script),
+                            resolved_sid, "--json",
+                        ]
+                        if _last_msg:
+                            _rev_cmd.extend(["--last-message", _last_msg[:3000]])
+
+                        _rev_proc = subprocess.run(
+                            _rev_cmd,
+                            capture_output=True, text=True, timeout=180,
+                        )
+
+                        if _rev_proc.returncode == 1:
+                            # FINDINGS — reviewer returned blocking issues
+                            _rev_lines = [
+                                "",
+                                "=" * 60,
+                                "STOP BLOCKED \u2014 PROTOCOL REVIEWER FINDINGS",
+                                "=" * 60,
+                                "",
+                            ]
+                            try:
+                                _rev_data = json.loads(_rev_proc.stdout)
+                                _round = _rev_data.get("round_count", "?")
+                                _rev_lines.append(
+                                    f"Round {_round} of {_rev_max_rounds}"
+                                )
+                                _rev_lines.append("")
+                                for _finding in _rev_data.get("findings", []):
+                                    _sev_icon = (
+                                        "\U0001f6ab"
+                                        if _finding.get("severity") == "blocking"
+                                        else "\u26a0\ufe0f"
+                                    )
+                                    _cat = _finding.get("category", "?")
+                                    _desc = _finding.get("description", "")
+                                    _rev_lines.append(
+                                        f"  {_sev_icon} [{_cat}] {_desc}"
+                                    )
+                                    if _finding.get("evidence_needed"):
+                                        _rev_lines.append(
+                                            f"     \u2192 {_finding['evidence_needed']}"
+                                        )
+                                    _rev_lines.append("")
+                                _rev_lines.append(
+                                    f"Summary: {_rev_data.get('summary', '')}"
+                                )
+                            except (json.JSONDecodeError, Exception):
+                                _rev_lines.append(
+                                    "  (Could not parse reviewer output)"
+                                )
+                                if _rev_proc.stdout:
+                                    _rev_lines.append(
+                                        f"  stdout: {_rev_proc.stdout[:500]}"
+                                    )
+                            _rev_lines += [
+                                "",
+                                "Address the blocking findings, then retry stop.",
+                                "=" * 60,
+                                "",
+                            ]
+                            print("\n".join(_rev_lines), file=sys.stderr)
+                            sys.exit(2)
+
+                        elif _rev_proc.returncode == 0:
+                            # APPROVED — reviewer.py wrote the approval file
+                            try:
+                                _rev_data = json.loads(_rev_proc.stdout)
+                                _summary = _rev_data.get("summary", "Approved")
+                                print(
+                                    f"  [reviewer] APPROVED: {_summary}",
+                                    file=sys.stderr,
+                                )
+                            except Exception:
+                                print(
+                                    "  [reviewer] APPROVED",
+                                    file=sys.stderr,
+                                )
+                        else:
+                            # ERROR (exit 2+) — non-blocking
+                            _err = (_rev_proc.stderr or _rev_proc.stdout or "")[:300]
+                            print(
+                                f"  [reviewer] Error (non-blocking, exit {_rev_proc.returncode}): {_err}",
+                                file=sys.stderr,
+                            )
+        except subprocess.TimeoutExpired:
+            print(
+                "  [reviewer] Timed out after 120s (non-blocking)",
+                file=sys.stderr,
+            )
+        except FileNotFoundError:
+            print(
+                "  [reviewer] uv not found — skipping (non-blocking)",
+                file=sys.stderr,
+            )
+        except Exception as _rev_exc:
+            # Log but don't block — reviewer infra failure should not prevent stop
+            print(
+                f"  [reviewer] Error (non-blocking): {type(_rev_exc).__name__}: "
+                f"{str(_rev_exc)[:200]}",
+                file=sys.stderr,
+            )
 
         # 7. Final reset — one-time use
         auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"

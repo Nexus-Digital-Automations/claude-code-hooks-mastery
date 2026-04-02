@@ -182,17 +182,20 @@ def run_sandbox_checks(
     for git_key, git_cmd in [
         ("_git_status", "git status --porcelain"),
         ("_git_diff", "git diff --stat"),
+        ("_git_diff_content", "git diff HEAD"),
         ("_git_log", "git log --oneline -5"),
     ]:
         try:
+            # Actual diff content gets a larger truncation limit
+            stdout_limit = 5000 if git_key == "_git_diff_content" else 2000
             r = subprocess.run(
                 git_cmd, shell=True, capture_output=True, text=True,
-                timeout=10, cwd=str(project_root),
+                timeout=15, cwd=str(project_root),
             )
             results[git_key] = SandboxResult(
                 check_key=git_key, command=git_cmd,
                 exit_code=r.returncode,
-                stdout=(r.stdout or "")[:2000],
+                stdout=(r.stdout or "")[:stdout_limit],
                 stderr=(r.stderr or "")[:500],
                 passed=r.returncode == 0,
             )
@@ -213,6 +216,7 @@ class ReviewPacket:
     project_config: dict = field(default_factory=dict)
     git_status: str = ""
     git_diff: str = ""
+    git_diff_content: str = ""
     git_log: str = ""
     agent_mode: str = "claude"
     root_clean: bool = True
@@ -332,6 +336,8 @@ def build_review_packet(
             packet.git_status = sandbox["_git_status"].stdout
         if "_git_diff" in sandbox:
             packet.git_diff = sandbox["_git_diff"].stdout
+        if "_git_diff_content" in sandbox:
+            packet.git_diff_content = sandbox["_git_diff_content"].stdout
         if "_git_log" in sandbox:
             packet.git_log = sandbox["_git_log"].stdout
     except Exception:
@@ -422,6 +428,13 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
     sections.append(f"### git status --porcelain\n```\n{packet.git_status or '(clean)'}\n```")
     sections.append(f"### git diff --stat\n```\n{packet.git_diff or '(no changes)'}\n```")
     sections.append(f"### git log --oneline -5\n```\n{packet.git_log or '(no commits)'}\n```")
+
+    # Actual diff content for code quality review (categories 9-13)
+    sections.append("\n## GIT DIFF CONTENT (for code quality review)")
+    if packet.git_diff_content:
+        sections.append(f"```diff\n{packet.git_diff_content}\n```")
+    else:
+        sections.append("(No diff content available — skip categories 9-13)")
 
     # Agent mode
     sections.append(f"\n## AGENT MODE: {packet.agent_mode}")
@@ -526,9 +539,17 @@ def call_reviewer(
             model=config.model,
             messages=messages,
             max_completion_tokens=config.max_tokens,
+            response_format={"type": "json_object"},
             timeout=config.timeout_per_round,
         )
         content = (response.choices[0].message.content or "").strip()
+
+        # Detect empty responses (broken model — don't silently auto-approve)
+        if not content:
+            return {
+                "verdict": "ERROR",
+                "detail": f"Model '{config.model}' returned empty response",
+            }
 
         # Parse JSON from response
         json_str = _extract_json(content)
@@ -546,9 +567,15 @@ def call_reviewer(
                 model=config.model,
                 messages=messages,
                 max_completion_tokens=config.max_tokens,
+                response_format={"type": "json_object"},
                 timeout=config.timeout_per_round,
             )
             retry_content = (retry_response.choices[0].message.content or "").strip()
+            if not retry_content:
+                return {
+                    "verdict": "ERROR",
+                    "detail": f"Model '{config.model}' returned empty response on retry",
+                }
             retry_json = _extract_json(retry_content)
             parsed = json.loads(retry_json)
 
@@ -738,46 +765,73 @@ def run_review(
 
 def main():
     """Command line interface for manual review triggering."""
-    session_id = "default"
+    import argparse
 
-    # Try to resolve session ID
-    try:
-        sessions_file = _DATA_DIR / "active_sessions.json"
-        if sessions_file.exists():
-            sessions = json.loads(sessions_file.read_text())
-            cwd = os.getcwd()
-            session_id = sessions.get(cwd, session_id)
-    except Exception:
-        pass
+    parser = argparse.ArgumentParser(description="GPT-5 Mini Protocol Compliance Reviewer")
+    parser.add_argument("session_id", nargs="?", default=None,
+                        help="Session ID (auto-resolved from active_sessions if omitted)")
+    parser.add_argument("--last-message", default="",
+                        help="Last assistant message for category 14 review")
+    parser.add_argument("--json", action="store_true",
+                        help="Output structured JSON (exit 0=APPROVED, 1=FINDINGS, 2=ERROR)")
+    args = parser.parse_args()
 
-    if len(sys.argv) > 1:
-        session_id = sys.argv[1]
+    session_id = args.session_id or "default"
+
+    # Try to resolve session ID if not provided
+    if args.session_id is None:
+        try:
+            sessions_file = _DATA_DIR / "active_sessions.json"
+            if sessions_file.exists():
+                sessions = json.loads(sessions_file.read_text())
+                cwd = os.getcwd()
+                session_id = sessions.get(cwd, session_id)
+        except Exception:
+            pass
 
     config = load_reviewer_config()
-    print(f"Running protocol review (session: {session_id[:8]}...)")
-    print(f"Model: {config.model}")
-    print()
 
-    result = run_review(session_id)
-
-    if result.approved:
-        print(f"APPROVED (round {result.round_count})")
-        print(f"  {result.summary}")
-        if result.error:
-            print(f"  Note: {result.error}")
-    else:
-        print(f"FINDINGS (round {result.round_count}/{config.max_rounds})")
+    if not args.json:
+        print(f"Running protocol review (session: {session_id[:8]}...)")
+        print(f"Model: {config.model}")
         print()
-        for finding in result.findings:
-            sev = "BLOCK" if finding.get("severity") == "blocking" else "ADVSR"
-            print(f"  [{sev}] [{finding.get('category', '?')}]")
-            print(f"    {finding.get('description', '')}")
-            if finding.get("evidence"):
-                print(f"    Evidence: {finding['evidence'][:200]}")
-            if finding.get("evidence_needed"):
-                print(f"    Needed: {finding['evidence_needed']}")
+
+    result = run_review(session_id, last_assistant_message=args.last_message)
+
+    if args.json:
+        output = {
+            "approved": result.approved,
+            "round_count": result.round_count,
+            "summary": result.summary,
+            "error": result.error,
+            "findings": result.findings,
+        }
+        print(json.dumps(output))
+        if result.approved:
+            sys.exit(0)
+        elif result.error:
+            sys.exit(2)
+        else:
+            sys.exit(1)
+    else:
+        if result.approved:
+            print(f"APPROVED (round {result.round_count})")
+            print(f"  {result.summary}")
+            if result.error:
+                print(f"  Note: {result.error}")
+        else:
+            print(f"FINDINGS (round {result.round_count}/{config.max_rounds})")
             print()
-        print(f"Summary: {result.summary}")
+            for finding in result.findings:
+                sev = "BLOCK" if finding.get("severity") == "blocking" else "ADVSR"
+                print(f"  [{sev}] [{finding.get('category', '?')}]")
+                print(f"    {finding.get('description', '')}")
+                if finding.get("evidence"):
+                    print(f"    Evidence: {finding['evidence'][:200]}")
+                if finding.get("evidence_needed"):
+                    print(f"    Needed: {finding['evidence_needed']}")
+                print()
+            print(f"Summary: {result.summary}")
 
 
 if __name__ == "__main__":
