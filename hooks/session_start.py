@@ -199,11 +199,33 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         except Exception:
             pass
 
+    # Transfer active auth tokens to new session instead of deleting them.
+    # A compact changes session_id but not project context — if the user already
+    # authorized, that auth should carry forward so they don't have to re-run
+    # authorize-stop.sh after every compact.
+    if session_id != "unknown":
+        for _auth_str in _glob.glob(str(_claude_data / "stop_authorization_*.json")):
+            if session_id in _auth_str:
+                continue  # Already matches new session
+            try:
+                _auth_data = json.loads(Path(_auth_str).read_text())
+                if _auth_data.get("authorized", False):
+                    # Auth was granted before compact — carry it forward
+                    _new_auth = _claude_data / f"stop_authorization_{session_id}.json"
+                    Path(_auth_str).rename(_new_auth)
+                    continue
+            except Exception:
+                pass
+            try:
+                Path(_auth_str).unlink(missing_ok=True)
+            except Exception:
+                pass
+
     # Clean up stale session-scoped files (not matching current session)
     for _pattern in [
         "agent_identity_*.json",         # Session-scoped identity files
         "current_task_*.json",           # Session-scoped task files
-        "stop_authorization_*.json",     # Session-scoped auth files
+        # stop_authorization_*.json handled above (auth transfer logic)
         "reviewer_approval_*.json",      # Session-scoped reviewer approval
         "review_conversation_*.json",    # Session-scoped review conversation
         "user_requests_*.json",          # Session-scoped user request log
