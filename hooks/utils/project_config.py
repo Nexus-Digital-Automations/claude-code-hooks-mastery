@@ -113,6 +113,16 @@ def auto_detect_config(project_root: Path) -> dict:
     if _pyproject.exists() or (project_root / "setup.py").exists():
         config["project_type"] = "python"
         config["has_tests"] = (project_root / "tests").is_dir()
+        if config["has_tests"]:
+            # Use uv run pytest when the project is uv-managed, else python -m pytest
+            _uv_lock = (project_root / "uv.lock").exists()
+            _test_cmd = "uv run pytest tests/ -x -q" if _uv_lock else "python -m pytest tests/ -x -q"
+            config["checks"]["tests"] = {
+                "command_patterns": ["pytest", "python -m pytest", "uv run pytest"],
+                "pass_patterns": [r"\d+ passed"],
+                "fail_patterns": [r"\d+ failed", r"FAILED", r"ERROR"],
+                "run_command": _test_cmd,
+            }
         # Detect ruff linter
         _has_ruff = (project_root / ".ruff_cache").exists()
         if not _has_ruff and _pyproject.exists():

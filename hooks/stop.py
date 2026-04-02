@@ -565,8 +565,10 @@ def main():
             from project_config import auto_run_missing, get_git_root
             from vr_utils import write_vr as _write_vr
             _vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
-            # Reset lint to pending so auto_run_missing always re-runs it project-wide
+            # Reset lint + tests to pending so auto_run_missing always re-runs them.
+            # A failure captured mid-edit must not block a clean stop.
             _write_vr(_vr_file, "lint", "pending", "", session_id=None)
+            _write_vr(_vr_file, "tests", "pending", "", session_id=None)
             auto_run_missing(resolved_sid, config, _vr_file, Path(get_git_root()))
         except Exception:
             pass  # Never block on errors; check_verification will catch any failure
