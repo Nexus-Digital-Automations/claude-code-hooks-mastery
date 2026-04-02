@@ -62,12 +62,7 @@ class ConfigLoader:
                     "prefix": "mcp__ruv-swarm__",
                     "priority": 2
                 },
-                "flow-nexus": {
-                    "enabled": False,
-                    "prefix": "mcp__flow-nexus__",
-                    "priority": 3,
-                    "requires_auth": True
-                }
+
             }
         }
 
@@ -144,7 +139,7 @@ class ConfigLoader:
         Get MCP tool prefix for a server.
 
         Args:
-            server: Server name (claude-flow, ruv-swarm, flow-nexus)
+            server: Server name (claude-flow, ruv-swarm)
 
         Returns:
             Tool prefix string

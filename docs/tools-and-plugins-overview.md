@@ -27,7 +27,7 @@ External MCP servers that extend Claude with real-time data and specialized capa
 |--------|---------|
 | **claude-flow** | Swarm orchestration, task coordination, memory, neural pattern training |
 | **ruv-swarm** | Multi-agent swarm init/spawn, benchmarking, neural patterns, DAA agents |
-| **flow-nexus** | Cloud sandboxes, neural cluster training, workflow automation, marketplace |
+
 | **maverick-mcp** | Additional tool integrations |
 | **wrds-mcp** | Financial data — CRSP, Compustat, S&P 500, macro (FRED), Schwab trading, options analytics |
 | **ThetaData** | Real-time and historical US equity/options market data, Greeks, IV surfaces |
