@@ -11,7 +11,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List
 
 # Module-level cache
 _resolver_instance = None

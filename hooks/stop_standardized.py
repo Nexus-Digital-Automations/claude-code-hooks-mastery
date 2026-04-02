@@ -86,7 +86,7 @@ def check_tests_passing():
             log_path = log_to_validation_artifacts("test-results", result.stdout + result.stderr, "npm_test")
 
             if result.returncode == 0:
-                return True, f"Tests passed (npm test)", log_path
+                return True, "Tests passed (npm test)", log_path
             else:
                 return False, f"Tests failed (exit {result.returncode})", log_path
 
@@ -139,9 +139,9 @@ def check_linter_passing():
         error_count = result.stdout.lower().count(" error") + result.stderr.lower().count(" error")
 
         if result.returncode == 0:
-            return True, f"Linter clean (0 errors)", log_path, 0
+            return True, "Linter clean (0 errors)", log_path, 0
         elif error_count == 0:
-            return True, f"Linter warnings only (non-blocking)", log_path, 0
+            return True, "Linter warnings only (non-blocking)", log_path, 0
         else:
             return False, f"Linter has {error_count} errors", log_path, error_count
 
@@ -563,7 +563,7 @@ def run_validation_suite():
     all_passed = all(critical_checks) and confidence_score >= 95
 
     print("\n" + "="*70, file=sys.stderr)
-    print(f"📊 VALIDATION SUMMARY", file=sys.stderr)
+    print("📊 VALIDATION SUMMARY", file=sys.stderr)
     print("="*70, file=sys.stderr)
     print(f"Passed: {passed_count}/7 checks", file=sys.stderr)
     print(f"Confidence: {confidence_score}%", file=sys.stderr)

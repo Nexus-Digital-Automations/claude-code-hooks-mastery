@@ -225,7 +225,6 @@ def analyze_context(prompt_text, use_advanced=False):
 
 def main():
     """Command line interface for testing."""
-    import json
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "--completion":

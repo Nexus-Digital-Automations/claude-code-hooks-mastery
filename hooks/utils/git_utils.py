@@ -18,7 +18,7 @@ information about the project's git state.
 """
 
 import subprocess
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from pathlib import Path
 
 

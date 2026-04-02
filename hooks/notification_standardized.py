@@ -34,14 +34,12 @@ EXIT CODES:
 - Non-blocking: All errors logged but never block notifications
 """
 
-import argparse
 import json
-import os
 import sys
 import subprocess
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Tuple, Any
 
 try:
     from dotenv import load_dotenv
@@ -553,7 +551,7 @@ def main():
                 print(f"  {i}. {step}", file=sys.stderr)
             print("", file=sys.stderr)
 
-        print(f"Evidence archived to: logs/notifications.json", file=sys.stderr)
+        print("Evidence archived to: logs/notifications.json", file=sys.stderr)
         print("=" * 70, file=sys.stderr)
 
         # Output enhanced notification as JSON (for Claude Code to consume)
