@@ -184,10 +184,12 @@ def run_sandbox_checks(
         ("_git_diff", "git diff --stat"),
         ("_git_diff_content", "git diff HEAD"),
         ("_git_log", "git log --oneline -5"),
+        ("_git_show_stat", "git show HEAD --stat"),
+        ("_git_show_content", "git show HEAD"),
     ]:
         try:
             # Actual diff content gets a larger truncation limit
-            stdout_limit = 5000 if git_key == "_git_diff_content" else 2000
+            stdout_limit = 5000 if git_key in ("_git_diff_content", "_git_show_content") else 2000
             r = subprocess.run(
                 git_cmd, shell=True, capture_output=True, text=True,
                 timeout=15, cwd=str(project_root),
@@ -218,6 +220,8 @@ class ReviewPacket:
     git_diff: str = ""
     git_diff_content: str = ""
     git_log: str = ""
+    git_show_stat: str = ""
+    git_show_content: str = ""
     agent_mode: str = "claude"
     root_clean: bool = True
     root_violations: list[str] = field(default_factory=list)
@@ -340,6 +344,10 @@ def build_review_packet(
             packet.git_diff_content = sandbox["_git_diff_content"].stdout
         if "_git_log" in sandbox:
             packet.git_log = sandbox["_git_log"].stdout
+        if "_git_show_stat" in sandbox:
+            packet.git_show_stat = sandbox["_git_show_stat"].stdout
+        if "_git_show_content" in sandbox:
+            packet.git_show_content = sandbox["_git_show_content"].stdout
     except Exception:
         pass
 
@@ -428,11 +436,17 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
     sections.append(f"### git status --porcelain\n```\n{packet.git_status or '(clean)'}\n```")
     sections.append(f"### git diff --stat\n```\n{packet.git_diff or '(no changes)'}\n```")
     sections.append(f"### git log --oneline -5\n```\n{packet.git_log or '(no commits)'}\n```")
+    if packet.git_show_stat:
+        sections.append(f"### git show HEAD --stat\n```\n{packet.git_show_stat}\n```")
 
     # Actual diff content for code quality review (categories 9-13)
+    # Use working-tree diff if available; fall back to HEAD commit diff when all changes are committed
     sections.append("\n## GIT DIFF CONTENT (for code quality review)")
-    if packet.git_diff_content:
-        sections.append(f"```diff\n{packet.git_diff_content}\n```")
+    diff_content = packet.git_diff_content or packet.git_show_content
+    if diff_content:
+        label = "working tree diff" if packet.git_diff_content else "HEAD commit diff (all changes committed)"
+        sections.append(f"({label})")
+        sections.append(f"```diff\n{diff_content}\n```")
     else:
         sections.append("(No diff content available — skip categories 9-13)")
 
