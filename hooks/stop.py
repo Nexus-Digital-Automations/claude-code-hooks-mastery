@@ -712,16 +712,16 @@ def main():
                 if _already_approved:
                     pass  # Reviewer already approved this session
                 else:
-                    # Check OPENAI_API_KEY availability
+                    # Check DEEPSEEK_API_KEY availability
                     # (dotenv not available under bare python3 — parse .env manually)
-                    _has_api_key = bool(os.getenv("OPENAI_API_KEY"))
+                    _has_api_key = bool(os.getenv("DEEPSEEK_API_KEY"))
                     if not _has_api_key:
                         _env_file = Path.home() / ".claude" / ".env"
                         if _env_file.exists():
                             try:
                                 for _line in _env_file.read_text().splitlines():
                                     _line = _line.strip()
-                                    if _line.startswith("OPENAI_API_KEY=") and len(_line) > 15:
+                                    if _line.startswith("DEEPSEEK_API_KEY=") and len(_line) > 17:
                                         _has_api_key = True
                                         break
                             except Exception:
@@ -729,7 +729,7 @@ def main():
 
                     if not _has_api_key:
                         print(
-                            "  [reviewer] OPENAI_API_KEY not set — skipping (non-blocking)",
+                            "  [reviewer] DEEPSEEK_API_KEY not set — skipping (non-blocking)",
                             file=sys.stderr,
                         )
                     else:

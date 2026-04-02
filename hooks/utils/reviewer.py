@@ -207,6 +207,18 @@ def run_sandbox_checks(
     return results
 
 
+def find_nested_git_repos(project_root: Path) -> list[Path]:
+    """Return direct-child directories of project_root that are git repos."""
+    repos: list[Path] = []
+    try:
+        for child in sorted(project_root.iterdir()):
+            if child.is_dir() and not child.name.startswith(".") and (child / ".git").exists():
+                repos.append(child)
+    except Exception:
+        pass
+    return repos
+
+
 # ── Review Packet ─────────────────────────────────────────────────────
 
 @dataclass
@@ -222,6 +234,7 @@ class ReviewPacket:
     git_log: str = ""
     git_show_stat: str = ""
     git_show_content: str = ""
+    nested_repo_activity: list[dict] = field(default_factory=list)
     agent_mode: str = "claude"
     root_clean: bool = True
     root_violations: list[str] = field(default_factory=list)
@@ -370,6 +383,42 @@ def build_review_packet(
     except Exception:
         pass
 
+    # 6. Nested git repo activity
+    try:
+        for nested in find_nested_git_repos(project_root):
+            entry: dict = {"path": nested.name}
+            for key, cmd in [
+                ("log", "git log --oneline -5"),
+                ("diff_stat", "git diff --stat"),
+                ("show_stat", "git show HEAD --stat"),
+            ]:
+                try:
+                    r = subprocess.run(
+                        cmd, shell=True, capture_output=True,
+                        text=True, timeout=10, cwd=str(nested),
+                    )
+                    entry[key] = (r.stdout or "").strip()[:1500]
+                except Exception:
+                    entry[key] = ""
+            # Auto-detect lint command
+            lint_cmd: str | None = None
+            if (nested / "pyproject.toml").exists():
+                lint_cmd = "ruff check . --quiet 2>&1 | tail -3"
+            elif (nested / "package.json").exists():
+                lint_cmd = "npm run lint --silent 2>&1 | tail -5"
+            if lint_cmd:
+                try:
+                    r = subprocess.run(
+                        lint_cmd, shell=True, capture_output=True,
+                        text=True, timeout=30, cwd=str(nested),
+                    )
+                    entry["lint"] = f"exit={r.returncode} " + (r.stdout or "").strip()[:500]
+                except Exception:
+                    entry["lint"] = ""
+            packet.nested_repo_activity.append(entry)
+    except Exception:
+        pass
+
     return packet
 
 
@@ -453,6 +502,24 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
         sections.append(f"```diff\n{diff_content}\n```")
     else:
         sections.append("(No diff content available — skip categories 9-13)")
+
+    # Nested repo activity
+    if packet.nested_repo_activity:
+        sections.append("\n## NESTED REPO ACTIVITY")
+        sections.append(
+            "(These are separate git repositories inside the project root. "
+            "Their changes do not appear in the git diff above.)"
+        )
+        for repo in packet.nested_repo_activity:
+            sections.append(f"\n### {repo['path']}/")
+            if repo.get("log"):
+                sections.append(f"Recent commits:\n```\n{repo['log']}\n```")
+            if repo.get("show_stat"):
+                sections.append(f"HEAD commit:\n```\n{repo['show_stat']}\n```")
+            diff = repo.get("diff_stat") or "(clean — no uncommitted changes)"
+            sections.append(f"Uncommitted changes: {diff}")
+            if repo.get("lint"):
+                sections.append(f"Lint: `{repo['lint']}`")
 
     # Agent mode
     sections.append(f"\n## AGENT MODE: {packet.agent_mode}")
@@ -539,19 +606,19 @@ def call_reviewer(
     messages: list[dict],
     config: ReviewerConfig,
 ) -> dict:
-    """Call GPT-5 Mini with conversation history.
+    """Call DeepSeek Chat with conversation history.
 
     Returns parsed response: {"verdict": "APPROVED"|"FINDINGS", ...}
     On failure: returns {"verdict": "ERROR", "detail": "..."}.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("DEEPSEEK_API_KEY")
     if not api_key:
-        return {"verdict": "ERROR", "detail": "OPENAI_API_KEY not set"}
+        return {"verdict": "ERROR", "detail": "DEEPSEEK_API_KEY not set"}
 
     try:
         from openai import OpenAI
 
-        client = OpenAI(api_key=api_key)
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com/v1")
 
         response = client.chat.completions.create(
             model=config.model,
@@ -690,10 +757,10 @@ def run_review(
             approved=True, summary="Reviewer disabled in config",
         )
 
-    if not os.getenv("OPENAI_API_KEY"):
+    if not os.getenv("DEEPSEEK_API_KEY"):
         return ReviewResult(
             approved=True,
-            summary="Reviewer skipped — OPENAI_API_KEY not set",
+            summary="Reviewer skipped — DEEPSEEK_API_KEY not set",
             error="no_api_key",
         )
 
