@@ -314,6 +314,7 @@ def build_review_packet(
                         "checked": checked,
                         "unchecked": unchecked,
                         "total": checked + unchecked,
+                        "body": body[:3000],
                     })
                 except Exception:
                     continue
@@ -402,6 +403,9 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
                 f"- {spec['file']}: \"{spec['title']}\" "
                 f"[{spec['status']}] — {spec['checked']}/{spec['total']} criteria checked"
             )
+            body = spec.get("body", "").strip()
+            if body:
+                sections.append(f"\n```\n{body}\n```")
     else:
         sections.append("(No active specs found)")
 

@@ -1,6 +1,6 @@
 ---
 title: Proactive claude-mem Memory Integration (Deepseek_Agent_MCP)
-status: completed
+status: in-progress
 created: 2026-04-02
 approved_via: plan-mode (ExitPlanMode gate, prior to all implementation commits)
 ---
