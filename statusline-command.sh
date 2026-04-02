@@ -9,15 +9,65 @@ DIR=$(basename "$CWD")
 
 # Replace claude-code-flow with branded name
 if [ "$DIR" = "claude-code-flow" ]; then
-  DIR="🌊 Claude Flow"
+  DIR="Claude Flow"
 fi
 
-# Get git branch
-BRANCH=$(cd "$CWD" 2>/dev/null && git branch --show-current 2>/dev/null)
+# Get git branch (skip optional locks)
+BRANCH=$(cd "$CWD" 2>/dev/null && GIT_OPTIONAL_LOCKS=0 git branch --show-current 2>/dev/null)
 
-# Start building statusline
-printf "\033[1m$MODEL\033[0m in \033[36m$DIR\033[0m"
-[ -n "$BRANCH" ] && printf " on \033[33m⎇ $BRANCH\033[0m"
+# Context window stats
+CTX_USED=$(echo "$INPUT" | jq -r '.context_window.used_percentage // empty')
+INPUT_TOKENS=$(echo "$INPUT" | jq -r '.context_window.current_usage.input_tokens // empty')
+OUTPUT_TOKENS=$(echo "$INPUT" | jq -r '.context_window.current_usage.output_tokens // empty')
+CACHE_READ=$(echo "$INPUT" | jq -r '.context_window.current_usage.cache_read_input_tokens // 0')
+CACHE_WRITE=$(echo "$INPUT" | jq -r '.context_window.current_usage.cache_creation_input_tokens // 0')
+
+# Estimate cost (claude-sonnet-4 pricing: $3/$15 per M in/out, cache write $3.75/M, cache read $0.30/M)
+COST=""
+if [ -n "$INPUT_TOKENS" ] && [ -n "$OUTPUT_TOKENS" ]; then
+  COST=$(echo "$INPUT_TOKENS $OUTPUT_TOKENS $CACHE_READ $CACHE_WRITE" | awk '{
+    inp=$1; out=$2; cr=$3; cw=$4;
+    cost = (inp/1000000*3.00) + (out/1000000*15.00) + (cr/1000000*0.30) + (cw/1000000*3.75);
+    if (cost < 0.01) printf "$%.4f", cost;
+    else printf "$%.2f", cost;
+  }')
+fi
+
+# Total tokens used this session
+TOTAL_IN=$(echo "$INPUT" | jq -r '.context_window.total_input_tokens // empty')
+TOTAL_OUT=$(echo "$INPUT" | jq -r '.context_window.total_output_tokens // empty')
+TOTAL_TOKENS=""
+if [ -n "$TOTAL_IN" ] && [ -n "$TOTAL_OUT" ]; then
+  TOTAL_TOKENS=$(echo "$TOTAL_IN $TOTAL_OUT" | awk '{t=$1+$2; if(t>=1000) printf "%.1fk", t/1000; else printf "%d", t}')
+fi
+
+# Model name (shortened)
+printf "\033[1m%s\033[0m" "$MODEL"
+
+# Working directory
+printf "  \033[36m%s\033[0m" "$CWD"
+
+# Git branch
+[ -n "$BRANCH" ] && printf "  \033[33m(%s)\033[0m" "$BRANCH"
+
+# Context window usage
+if [ -n "$CTX_USED" ]; then
+  CTX_INT=$(printf "%.0f" "$CTX_USED")
+  if [ "$CTX_INT" -lt 50 ]; then
+    CTX_COLOR="\033[32m"
+  elif [ "$CTX_INT" -lt 75 ]; then
+    CTX_COLOR="\033[33m"
+  else
+    CTX_COLOR="\033[31m"
+  fi
+  printf "  ${CTX_COLOR}ctx:%s%%\033[0m" "$CTX_INT"
+fi
+
+# Tokens used
+[ -n "$TOTAL_TOKENS" ] && printf "  \033[90m%s tok\033[0m" "$TOTAL_TOKENS"
+
+# Cost
+[ -n "$COST" ] && printf "  \033[90m%s\033[0m" "$COST"
 
 # Claude-Flow integration
 FLOW_DIR="$CWD/.claude-flow"
