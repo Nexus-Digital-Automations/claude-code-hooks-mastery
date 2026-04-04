@@ -749,6 +749,7 @@ def main():
                         _rev_proc = subprocess.run(
                             _rev_cmd,
                             capture_output=True, text=True, timeout=180,
+                            cwd=os.getcwd(),
                         )
 
                         if _rev_proc.returncode == 1:

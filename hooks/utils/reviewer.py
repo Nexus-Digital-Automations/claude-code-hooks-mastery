@@ -517,22 +517,64 @@ def _conversation_file(session_id: str) -> Path:
 
 
 def load_conversation(session_id: str) -> list[dict]:
-    """Load conversation history."""
+    """Load conversation history, clearing it if the project root has changed.
+
+    Conversation files store the project root they were built for. If the
+    current get_git_root() differs from the stored root, the history is from
+    a different project and must be discarded — keeping it would inject stale
+    cross-project sandbox data into the LLM context.
+
+    Backward compat: files written in the old plain-list format are returned
+    as-is (no root check) and will be migrated to the wrapper format on the
+    next save_conversation() call.
+    """
     try:
         f = _conversation_file(session_id)
-        if f.exists():
-            return json.loads(f.read_text())
+        if not f.exists():
+            return []
+        raw = json.loads(f.read_text())
+        # Old format: plain list — return as-is, no root check possible
+        if isinstance(raw, list):
+            return raw
+        # New format: {"project_root": "...", "messages": [...]}
+        if isinstance(raw, dict) and "messages" in raw:
+            stored_root = raw.get("project_root", "")
+            if stored_root:
+                try:
+                    from project_config import get_git_root
+                    current_root = get_git_root()
+                    if current_root != stored_root:
+                        print(
+                            f"[reviewer] Clearing stale conversation — "
+                            f"project root changed ({stored_root!r} → {current_root!r})",
+                            file=sys.stderr,
+                        )
+                        f.unlink(missing_ok=True)
+                        return []
+                except Exception:
+                    pass  # Can't verify root — proceed with stored history
+            return raw["messages"]
     except Exception:
         pass
     return []
 
 
 def save_conversation(session_id: str, messages: list[dict]) -> None:
-    """Persist conversation history."""
+    """Persist conversation history with project root metadata.
+
+    Stores the current get_git_root() alongside the messages so that
+    load_conversation() can detect cross-project contamination on reload.
+    """
     try:
         _DATA_DIR.mkdir(parents=True, exist_ok=True)
+        project_root = ""
+        try:
+            from project_config import get_git_root
+            project_root = get_git_root()
+        except Exception:
+            pass
         _conversation_file(session_id).write_text(
-            json.dumps(messages, indent=2)
+            json.dumps({"project_root": project_root, "messages": messages}, indent=2)
         )
     except Exception:
         pass
