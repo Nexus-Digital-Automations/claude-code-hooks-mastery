@@ -488,48 +488,51 @@ Claude Code must run commands itself rather than telling the user to run them. C
 **What to check (from git diff):**
 
 **Architecture violations:**
-- Business logic leaking into UI or database layers (UI/DB should hold zero logic)
-- Core entities passed directly across architectural boundaries instead of DTOs
-- Long pass-through chains where a variable is threaded through 3+ function signatures just to reach a deep call site (use a context object instead)
+- Business logic in UI or DB layers — UI/DB classes should be "Humble Objects" with zero logic (advisory)
+- Core entities passed directly across architectural boundaries instead of DTOs (advisory)
+- Pass-through layers that only delegate with no added abstraction value (advisory)
+- Variables threaded through 3+ function signatures just to reach one deep call site — use a Context Object (advisory)
 
 **Function design violations:**
-- Boolean flag parameter: `def process(data, is_preview: bool)` — proves the function does two things (blocking)
-- Functions with conjunctions in the name that confirm dual responsibility: `validate_and_save`, `fetch_and_format`, `parse_or_default`
-- Functions clearly longer than ~50 lines doing multiple distinct operations (advisory)
-- Query function that also mutates state, or command that returns a meaningful value (CQS violation — advisory)
+- Boolean flag parameter: `def process(data, is_preview: bool)` — proves dual responsibility (**blocking**)
+- Conjunction names confirming dual responsibility: `validate_and_save`, `fetch_and_format`, `parse_or_default` (advisory)
+- Query that also mutates state, or command that returns a meaningful value — CQS violation (advisory)
+- Functions clearly >50 lines doing multiple distinct operations (advisory)
+- Functions with >3 parameters where a data class or context object would be cleaner (advisory)
 
 **Naming violations:**
-- Generic standalone names as class/function identifiers: `DataManager`, `RequestProcessor`, `BaseHandler`, `AbstractHelper` with no domain specificity (advisory)
-- Encoded or abbreviated names: `usr`, `tmp_val`, `mgr`, `dt` used as field/variable names (advisory)
+- Generic standalone identifiers: `DataManager`, `RequestProcessor`, `BaseHandler`, `AbstractHelper` with no domain noun (advisory)
+- Encoded/abbreviated names: `usr`, `tmp_val`, `mgr`, `dt` as field/variable names (advisory)
 
 **Comment violations:**
-- Mechanical comments that restate what the code does: `# increment counter`, `# set x to y`, `# return result` — these are noise and must be removed (advisory)
-- Comments that should be a well-named function or variable instead
+- Mechanical comments restating what the code does: `# increment counter`, `# set x to y`, `# return result` (advisory)
+- Comments that should be a well-named function or variable extraction instead (advisory)
 
 **Error handling violations:**
-- Returning error codes or sentinel values (`return -1`, `return None` on failure, `return {"error": ...}`) instead of raising exceptions (advisory)
-- `return null` / `return None` for failure cases where an exception is appropriate
-
-**Null/None violations:**
-- Function returning `None`/`null` as a signal (not as a legitimate empty value): `if result is None: # error occurred` (advisory)
-- Optional chaining through 3+ levels suggesting a missing abstraction
+- Returning error codes or sentinels on failure (`return -1`, `return {"error": ...}`) instead of raising (advisory)
+- `return None`/`return null` as a failure signal where an exception is appropriate (advisory)
 
 **Concurrency violations:**
-- Shared mutable state accessed from multiple threads without synchronization (blocking if obvious)
-- "Sporadic failures" dismissed with retry logic instead of fixing root cause
+- Shared mutable state accessed from multiple threads without synchronization (**blocking** if obvious)
+- Sporadic failures wrapped in retry logic without fixing root cause (advisory)
+
+**Testing violations:**
+- New functionality added with no corresponding test in the diff — "implementation without test" (advisory unless spec requires TDD)
+- Tests that only exercise the happy path with no boundary/edge-case coverage (advisory)
+- Test functions that depend on execution order or shared mutable state — violates Independence (advisory)
+- Preconditions and postconditions missing on complex algorithmic functions (advisory)
 
 **Pass criteria:**
 - No boolean flag parameters in new functions
-- No shared mutable state in concurrent code without synchronization
-- No mechanical comments that restate what code does
-- Error paths raise exceptions rather than returning error codes or null
+- No obvious shared mutable state races in concurrent code
+- New functionality has at least one corresponding test (when project has a test suite)
 
 **Severity:**
 - Boolean flag arguments: **blocking**
-- Obvious shared mutable state race condition: **blocking**
-- All others (generic names, CQS violations, null returns, mechanical comments, architectural leakage): **advisory**
+- Obvious concurrent shared-mutable-state race: **blocking**
+- All others: **advisory**
 
-**Important:** These standards apply to code the AI *wrote or modified*. Do not flag pre-existing code outside the diff scope. Mild violations in a large diff are advisory. Only block on egregious or pattern-level violations that indicate a systematic problem.
+**Important:** Apply only to code in the diff — never flag pre-existing code outside the task scope. Mild violations in a large diff are advisory. Category 15 alone cannot produce a FINDINGS verdict unless violations are systematic and pattern-level across the entire diff (see nuance 18).
 
 ---
 

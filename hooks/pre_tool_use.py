@@ -39,14 +39,14 @@ def get_current_focus(cwd):
 
 
 _CODING_STANDARDS = """\
-CODE STANDARDS (enforced):
-Architecture: dependencies point inward — UI/DB depend on business logic, never reverse. Cross boundaries with DTOs not entities.
-Functions: one thing, one abstraction level. ~40 lines max. No bool flag params. Commands change state OR return data, never both.
-Names: precise nouns (classes), strong verbs (methods). Never: data, manager, processor, handler as a full name.
-Comments: explain WHY (business rule, algorithmic choice). Never explain WHAT the code does mechanically — that's noise.
-Errors: throw exceptions, not error codes. Never swallow exceptions silently. Crash early on invalid state.
-Null: never return null/None. Use Optional, empty collection, or Special Case pattern.
-State: no shared mutable state in concurrent code. Prefer immutable data + pure transformations.\
+CODE STANDARDS (enforced at every Write/Edit):
+ARCHITECTURE: Dependencies point inward — UI/DB depend on business logic, never reverse. Cross boundaries with DTOs, not entities. Strip all logic out of UI/DB classes (Humble Objects). No pass-through layers that only delegate.
+FUNCTIONS: One thing, one abstraction level. ~40 lines max. No bool flag params (proves two responsibilities). Commands change state OR return data, never both (CQS). Prefer data-transformation pipelines over stateful class hierarchies.
+NAMES: Precise nouns (classes), strong verbs (methods). Generic names forbidden: data, manager, processor, handler, helper, util as the full identifier.
+COMMENTS: Explain WHY (business rule, algorithm choice). Never explain WHAT mechanically — delete those. No encoded/abbreviated names.
+ERRORS: Throw exceptions, not error codes. Never swallow exceptions silently. Crash early and loudly on invalid state. Never return null/None as an error signal — use Optional, empty collection, or Special Case.
+CONCURRENCY: No shared mutable state. Use actor models, immutable structures, or pure transformations. Sporadic failures indicate threading defects — fix root cause, never retry-loop.
+TESTING: Write the failing test first (Red-Green-Refactor). Tests must be Fast, Independent, Repeatable, Self-Validating (boolean pass/fail). Cover boundary conditions and data states, not just lines. Enforce preconditions and postconditions on complex logic.\
 """
 
 

@@ -849,6 +849,28 @@ STEP 3 — EXECUTE AUTONOMOUSLY (only after spec is approved):
 • Actions within your capability = execute them, don't say "I recommend you run X"."""
 
 
+_EXECUTION_RULES = """\
+EXECUTION RULES (apply to every implementation task):
+BOY SCOUT: When modifying a file, refactor adjacent broken windows (bad names, dead code) — leave it cleaner than found.
+DESIGN TWICE: For any complex feature, generate and compare at least 2 architectural approaches before writing implementation.
+TRACER CODE: For large tasks, write an end-to-end skeleton first to validate architecture before filling in detail.
+TDD: Write the failing test first. Minimal code to pass. Refactor. Never write implementation before the test exists.\
+"""
+
+
+def _build_execution_rules_context(prompt):
+    """Inject execution-mode rules for substantial implementation tasks."""
+    prompt_lower = prompt.lower().strip()
+    trivial = ['ok', 'yes', 'no', 'continue', 'thanks', 'got it', 'sounds good',
+               'perfect', 'great', 'nice', 'cool', 'done', 'good', 'fine',
+               'sure', 'proceed', 'go ahead', 'do it', 'approved', 'lgtm']
+    if prompt_lower in trivial or len(prompt_lower) < 20:
+        return None
+    if prompt_lower.startswith('/') or prompt_lower.startswith('@'):
+        return None
+    return _EXECUTION_RULES
+
+
 def _build_spec_context(cwd, prompt):
     """Inject spec-awareness context based on whether specs exist for this project.
 
@@ -1075,6 +1097,14 @@ def main():
                 context_parts.append(spec_context)
         except Exception:
             pass  # Graceful degradation
+
+        # Inject execution rules (Boy Scout, Design Twice, TDD, Tracer Code)
+        try:
+            exec_rules = _build_execution_rules_context(prompt)
+            if exec_rules:
+                context_parts.append(exec_rules)
+        except Exception:
+            pass
 
         # Add plugin suggestions from New Tools marketplace
         try:
