@@ -536,6 +536,58 @@ Claude Code must run commands itself rather than telling the user to run them. C
 
 ---
 
+### 16. AI-Agent Codebase Legibility
+
+**Condition:** Requires diff content. Skip if no git diff is in the packet.
+
+**Purpose:** Future AI agents must be able to navigate and safely modify this codebase. Check that new code leaves enough context for an agent with no prior session history to understand what to do and what NOT to do.
+
+**What to check (from git diff):**
+
+**Missing module boundary documentation:**
+- New file added with no opening docstring/comment stating what the module owns and what it does NOT own (advisory)
+- New class with significant state and no comment explaining its role in the system (advisory)
+
+**Missing failure mode documentation:**
+- New public function that raises exceptions with no `# Raises:` or docstring failure documentation (advisory)
+- New function that returns `None` as a legitimate value (not an error) with no comment clarifying this is intentional (advisory)
+- New function with a non-obvious precondition ("caller must check X first") not documented (advisory)
+
+**Missing state machine documentation:**
+- New class with a `status`, `state`, or `phase` field and no comment diagram of valid transitions (advisory)
+- New enum used to represent state with no documentation of valid transition sequences (advisory)
+
+**Missing cross-references:**
+- New function that is one side of a two-sided contract (event producer with no reference to its consumer, or vice versa) (advisory)
+- New class that writes data that another class reads, with no cross-reference comment (advisory)
+
+**Missing extension/stability signals:**
+- New abstract base class or Protocol with no `# EXTENSION POINT` or `# @stable` annotation indicating intent (advisory)
+- New public API surface (exported function, HTTP endpoint, MCP tool) with no stability signal (advisory)
+
+**Test name quality:**
+- New test functions named `test_<thing>` with no behavioral description — agents cannot infer the specification from the name (advisory)
+- Preferred pattern: `test_<returns/raises/updates/rejects>_<condition>_when_<state>`
+
+**Ubiquitous language violations:**
+- New code introduces a synonym for an existing domain concept (e.g., codebase uses `order` but new code uses `cart` for the same entity) (advisory)
+- New field/variable names that abbreviate or encode existing domain terms (advisory)
+
+**Inline decision records:**
+- Complex algorithmic choice, non-obvious library selection, or constraint-driven design decision with no inline `# WHY:` comment explaining the rationale (advisory)
+
+**Pass criteria (advisory-only category):**
+- New public files have boundary docstrings
+- New public functions document their failure modes
+- New stateful classes have transition documentation
+- Test names are behavioral specifications
+
+**Severity:** All findings in this category are **advisory**. Category 16 alone never blocks. It exists to accumulate advisory notes that collectively indicate a legibility debt problem.
+
+**Important:** Apply only to code newly added in the diff. Do not flag pre-existing files. A single missing docstring in a 500-line diff is noise — note it, don't list it as a finding.
+
+---
+
 ## Severity Rules
 
 - **blocking**: Must be fixed before approval. Any of: test failures, build failures, lint errors, type errors, security criticals, missing user-requested features, unchecked spec criteria (for substantial tasks), uncommitted changes to tracked files, empty catch blocks that swallow exceptions, resource leaks, unrequested features added (YAGNI), `Date.now()` as ID, workarounds bypassing root causes
@@ -652,3 +704,5 @@ When reviewing a follow-up round:
 17. **Playwright coverage must be comprehensive**: For frontend projects, Playwright tests must cover all pages, buttons, and interactive functionality. Skipping entire pages or leaving delete/remove buttons untested is **blocking**. Destructive operations (delete chat, delete item, etc.) should be tested using test data created for that purpose — create the test item, delete it, verify it's gone. The narrow exception is operations that can only target irreplaceable real user data with no safe test path (e.g., "delete account") — those may be skipped. If test data can be created for the operation, it is not exempt.
 
 18. **Category 15 (AI Coding Standards) is advisory-heavy**: Only block on boolean flag params and obvious concurrency races. Treat everything else as advisory. Do not let category 15 produce FINDINGS alone — it must combine with another blocking finding or be egregious enough to constitute a systematic code quality failure across the diff.
+
+19. **Category 16 (AI-Agent Codebase Legibility) is advisory-only**: Never block on category 16 findings. Its purpose is to surface legibility debt as advisory notes — missing docstrings, undocumented state machines, missing cross-references. A single missing annotation in a large diff is not worth noting. Flag only when the pattern is systemic (e.g., 5+ new public functions all missing failure mode docs).

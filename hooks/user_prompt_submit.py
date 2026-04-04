@@ -854,7 +854,8 @@ EXECUTION RULES (apply to every implementation task):
 BOY SCOUT: When modifying a file, refactor adjacent broken windows (bad names, dead code) — leave it cleaner than found.
 DESIGN TWICE: For any complex feature, generate and compare at least 2 architectural approaches before writing implementation.
 TRACER CODE: For large tasks, write an end-to-end skeleton first to validate architecture before filling in detail.
-TDD: Write the failing test first. Minimal code to pass. Refactor. Never write implementation before the test exists.\
+TDD: Write the failing test first. Minimal code to pass. Refactor. Never write implementation before the test exists.
+UBIQUITOUS LANGUAGE: Before naming anything, check what the codebase already calls this concept. One concept = one name everywhere. Never introduce a synonym (user/account/member, order/cart/basket) — pick the existing term or rename all occurrences.\
 """
 
 

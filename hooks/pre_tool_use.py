@@ -42,11 +42,20 @@ _CODING_STANDARDS = """\
 CODE STANDARDS (enforced at every Write/Edit):
 ARCHITECTURE: Dependencies point inward — UI/DB depend on business logic, never reverse. Cross boundaries with DTOs, not entities. Strip all logic out of UI/DB classes (Humble Objects). No pass-through layers that only delegate.
 FUNCTIONS: One thing, one abstraction level. ~40 lines max. No bool flag params (proves two responsibilities). Commands change state OR return data, never both (CQS). Prefer data-transformation pipelines over stateful class hierarchies.
-NAMES: Precise nouns (classes), strong verbs (methods). Generic names forbidden: data, manager, processor, handler, helper, util as the full identifier.
+NAMES: Precise nouns (classes), strong verbs (methods). Generic names forbidden: data, manager, processor, handler, helper, util as the full identifier. One concept = one name everywhere — never use synonyms for the same domain entity.
 COMMENTS: Explain WHY (business rule, algorithm choice). Never explain WHAT mechanically — delete those. No encoded/abbreviated names.
 ERRORS: Throw exceptions, not error codes. Never swallow exceptions silently. Crash early and loudly on invalid state. Never return null/None as an error signal — use Optional, empty collection, or Special Case.
 CONCURRENCY: No shared mutable state. Use actor models, immutable structures, or pure transformations. Sporadic failures indicate threading defects — fix root cause, never retry-loop.
-TESTING: Write the failing test first (Red-Green-Refactor). Tests must be Fast, Independent, Repeatable, Self-Validating (boolean pass/fail). Cover boundary conditions and data states, not just lines. Enforce preconditions and postconditions on complex logic.\
+TESTING: Write the failing test first (Red-Green-Refactor). Tests must be Fast, Independent, Repeatable, Self-Validating (boolean pass/fail). Cover boundary conditions and data states, not just lines. Enforce preconditions and postconditions on complex logic.
+DOCUMENTATION (AI-agent legibility — future agents must be able to navigate this codebase):
+  • Every new file: opening docstring stating what it owns, what it explicitly does NOT own, and what calls it vs. what it calls.
+  • Every public function with non-obvious failure modes: document raises, never-returns-null guarantees, and what callers must NOT assume.
+  • Every stateful class: comment diagram of valid states and transitions (even 3 lines of ASCII is enough).
+  • Inline decision records for non-obvious choices: WHY this approach, what was rejected, what would invalidate the decision.
+  • Cross-reference comments when one side of a contract is elsewhere: '# Counterpart: see X' or '# Also updates Y'.
+  • Extension points: mark with '# EXTENSION POINT' so agents know where to add vs. where not to modify.
+  • Stability signals: '# @stable' (external callers depend on this), '# @internal' (safe to refactor), '# @deprecated prefer X'.
+  • Test names must read as specifications: test_raises_when_order_is_not_pending, not test_apply_discount.\
 """
 
 
