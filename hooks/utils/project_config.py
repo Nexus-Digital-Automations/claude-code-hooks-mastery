@@ -407,19 +407,25 @@ def evaluate_output(stdout: str, stderr: str, check_conf: dict) -> str:
 
     Returns ``"passed"`` or ``"failed"``.
     Fail patterns are checked first — any match means failure regardless of pass patterns.
+
+    Fail patterns are matched case-sensitively (re.MULTILINE only) to prevent false
+    positives. For example, cargo test always emits "0 failed" in its passing summary
+    line; matching "FAILED" with IGNORECASE would incorrectly match that substring.
+    Pass patterns use IGNORECASE because tool output formats vary more widely.
     """
     combined = (stdout or "") + "\n" + (stderr or "")
 
-    # Check fail patterns first
+    # Check fail patterns first — case-sensitive to avoid false positives
+    # (e.g. "FAILED" must not match "0 failed" in cargo test's passing summary)
     for pattern in check_conf.get("fail_patterns", []):
         try:
-            if re.search(pattern, combined, re.MULTILINE | re.IGNORECASE):
+            if re.search(pattern, combined, re.MULTILINE):
                 return "failed"
         except re.error:
-            if pattern.lower() in combined.lower():
+            if pattern in combined:
                 return "failed"
 
-    # Check pass patterns
+    # Check pass patterns — case-insensitive since output formats vary
     for pattern in check_conf.get("pass_patterns", []):
         try:
             if re.search(pattern, combined, re.MULTILINE | re.IGNORECASE):
