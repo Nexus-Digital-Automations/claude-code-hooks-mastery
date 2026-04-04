@@ -1,0 +1,36 @@
+=== Deepseek_Agent_MCP Verification Artifacts ===
+Generated: 2026-04-04T06:25:49Z
+
+=== Git Log (last 5 commits) ===
+fbf2750 refactor: remove structural Protocol interfaces from agent_runner.py
+42b73e1 fix: mark transport and LSP specs completed; fix SSE pending-future test
+6657b04 feat: planning system fixes + claw-code features #7–#11
+97361a1 fix: make McpBridgeCapability concrete and fix SSE test off-by-one
+2269a62 feat: implement claw-code features #7–#11
+
+=== hooks/utils/ listing ===
+__init__.py
+__pycache__
+context_builder.py
+memory_bridge.py
+pattern_store.py
+security_checks.py
+task_classifier.py
+
+=== memory_bridge.py exists ===
+YES
+
+=== Smoke tests (claude-mem DOWN — graceful degradation) ===
+--- task_start ---
+{"inject_context": "DEBUGGING PROTOCOL: Reproduce first, isolate second, fix third.\nStart by running the failing code or test to confirm the error, then narrow scope.\n\nTool performance: file_ops 97% (447 calls), executor 100% (75 calls), code_gen 100% (19 calls)"}
+exit=0
+--- pre_tool_use ---
+{"action": "allow"}
+exit=0
+--- task_complete ---
+{"inject_context": "Quality gate: 2 critical issue(s) found:\n  - /tmp/login.py:1:1: E902 No such file or directory (os error 2)\n  - Found 1 error.\n\nFix these issues before completing the task."}
+(task_complete exit code intentionally not checked — it signals quality gate result)
+
+=== Lint ===
+All checks passed!
+exit=0
