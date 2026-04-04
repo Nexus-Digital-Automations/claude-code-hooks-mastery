@@ -611,19 +611,19 @@ def call_reviewer(
     Returns parsed response: {"verdict": "APPROVED"|"FINDINGS", ...}
     On failure: returns {"verdict": "ERROR", "detail": "..."}.
     """
-    api_key = os.getenv("DEEPSEEK_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        return {"verdict": "ERROR", "detail": "DEEPSEEK_API_KEY not set"}
+        return {"verdict": "ERROR", "detail": "OPENAI_API_KEY not set"}
 
     try:
         from openai import OpenAI
 
-        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com/v1")
+        client = OpenAI(api_key=api_key)
 
         response = client.chat.completions.create(
             model=config.model,
             messages=messages,
-            max_completion_tokens=config.max_tokens,
+            max_tokens=config.max_tokens,
             response_format={"type": "json_object"},
             timeout=config.timeout_per_round,
         )
@@ -651,7 +651,7 @@ def call_reviewer(
             retry_response = client.chat.completions.create(
                 model=config.model,
                 messages=messages,
-                max_completion_tokens=config.max_tokens,
+                max_tokens=config.max_tokens,
                 response_format={"type": "json_object"},
                 timeout=config.timeout_per_round,
             )
@@ -757,10 +757,10 @@ def run_review(
             approved=True, summary="Reviewer disabled in config",
         )
 
-    if not os.getenv("DEEPSEEK_API_KEY"):
+    if not os.getenv("OPENAI_API_KEY"):
         return ReviewResult(
             approved=True,
-            summary="Reviewer skipped — DEEPSEEK_API_KEY not set",
+            summary="Reviewer skipped — OPENAI_API_KEY not set",
             error="no_api_key",
         )
 
