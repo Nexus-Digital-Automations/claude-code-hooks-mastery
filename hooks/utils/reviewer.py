@@ -227,6 +227,7 @@ class ReviewPacket:
     root_violations: list[str] = field(default_factory=list)
     last_assistant_message: str = ""
     timestamp: str = ""
+    verification_artifacts: dict[str, str] = field(default_factory=dict)
 
 
 def _resolve_session_id(session_id: str) -> str:
@@ -370,6 +371,20 @@ def build_review_packet(
     except Exception:
         pass
 
+    # 6. Verification artifacts from output/ (committed .txt/.diff files)
+    try:
+        output_dir = project_root / "output"
+        if output_dir.is_dir():
+            for artifact in sorted(output_dir.glob("*.txt")) + sorted(output_dir.glob("*.diff")):
+                try:
+                    content = artifact.read_text(errors="replace")
+                    # Cap each artifact at 3000 chars to keep packet manageable
+                    packet.verification_artifacts[artifact.name] = content[:3000]
+                except Exception:
+                    continue
+    except Exception:
+        pass
+
     return packet
 
 
@@ -451,6 +466,15 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
             sections.append(f"stdout:\n```\n{stdout}\n```")
         if stderr.strip():
             sections.append(f"stderr:\n```\n{stderr}\n```")
+
+    # Verification artifacts (output/*.txt, output/*.diff committed to repo)
+    sections.append("\n## VERIFICATION ARTIFACTS (committed to output/)")
+    if packet.verification_artifacts:
+        for name, content in packet.verification_artifacts.items():
+            sections.append(f"\n### {name}")
+            sections.append(f"```\n{content}\n```")
+    else:
+        sections.append("(No artifacts found in output/)")
 
     # Git state
     sections.append("\n## GIT STATE")
