@@ -319,6 +319,28 @@
     "deepwiki"
   ],
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/jeremyparker/.claude/hooks/session_start.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/jeremyparker/.claude/hooks/user_prompt_submit.py",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "hooks": [
@@ -344,20 +366,22 @@
     ],
     "PreCompact": [
       {
-        "matcher": "manual",
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash -c 'INPUT=$(cat); CUSTOM=$(echo \"$INPUT\" | jq -r \".custom_instructions // \\\"\\\"\"); echo \"\ud83d\udd04 PreCompact Guidance:\"; echo \"\ud83d\udccb IMPORTANT: Review CLAUDE.md in project root for:\"; echo \"   \u2022 54 available agents and concurrent usage patterns\"; echo \"   \u2022 Swarm coordination strategies (hierarchical, mesh, adaptive)\"; echo \"   \u2022 SPARC methodology workflows with batchtools optimization\"; echo \"   \u2022 Critical concurrent execution rules (GOLDEN RULE: 1 MESSAGE = ALL OPERATIONS)\"; if [ -n \"$CUSTOM\" ]; then echo \"\ud83c\udfaf Custom compact instructions: $CUSTOM\"; fi; echo \"\u2705 Ready for compact operation\"'"
+            "command": "python3 /Users/jeremyparker/.claude/hooks/pre_compact.py",
+            "timeout": 15
           }
         ]
-      },
+      }
+    ],
+    "SubagentStop": [
       {
-        "matcher": "auto",
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/bash -c 'echo \"\ud83d\udd04 Auto-Compact Guidance (Context Window Full):\"; echo \"\ud83d\udccb CRITICAL: Before compacting, ensure you understand:\"; echo \"   \u2022 All 54 agents available in .claude/agents/ directory\"; echo \"   \u2022 Concurrent execution patterns from CLAUDE.md\"; echo \"   \u2022 Batchtools optimization for 300% performance gains\"; echo \"   \u2022 Swarm coordination strategies for complex tasks\"; echo \"\u26a1 Apply GOLDEN RULE: Always batch operations in single messages\"; echo \"\u2705 Auto-compact proceeding with full agent context\"'"
+            "command": "python3 /Users/jeremyparker/.claude/hooks/subagent_stop.py",
+            "timeout": 30
           }
         ]
       }
@@ -368,6 +392,12 @@
           {
             "type": "command",
             "command": "python3 /Users/jeremyparker/.claude/hooks/stop.py --notify"
+          },
+          {
+            "type": "command",
+            "command": "python3 /Users/jeremyparker/.claude/hooks/session_end.py",
+            "async": true,
+            "timeout": 30
           }
         ]
       }
