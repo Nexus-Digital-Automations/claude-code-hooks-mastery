@@ -1025,6 +1025,7 @@ def main():
             _requests.append({
                 "prompt": prompt[:2000],
                 "timestamp": datetime.now().isoformat(),
+                "task_id": task_id,       # enables task-scoped filtering in reviewer
                 "prompt_id": prompt_id,
             })
             _req_file.write_text(json.dumps(_requests, indent=2))

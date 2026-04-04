@@ -95,10 +95,12 @@ def run_sandbox_checks(
     project_root: Path,
     config: dict,
     reviewer_config: ReviewerConfig | None = None,
+    task_started_at: str = "",
 ) -> dict[str, SandboxResult]:
     """Run ALL required check commands independently in subprocess sandbox.
 
     Does NOT trust Claude Code's VR. Runs checks fresh and captures raw output.
+    task_started_at scopes the git log to commits made during the current task.
     """
     if reviewer_config is None:
         reviewer_config = load_reviewer_config()
@@ -179,11 +181,17 @@ def run_sandbox_checks(
             )
 
     # Always run git checks (read-only)
+    # Scope git log to commits since the current task started (if known)
+    _git_log_cmd = (
+        f'git log --oneline --after="{task_started_at}" -20'
+        if task_started_at
+        else "git log --oneline -5"
+    )
     for git_key, git_cmd in [
         ("_git_status", "git status --porcelain"),
         ("_git_diff", "git diff --stat"),
         ("_git_diff_content", "git diff HEAD"),
-        ("_git_log", "git log --oneline -5"),
+        ("_git_log", _git_log_cmd),
         ("_git_show_stat", "git show HEAD --stat"),
         ("_git_show_content", "git show HEAD"),
     ]:
@@ -212,6 +220,10 @@ def run_sandbox_checks(
 @dataclass
 class ReviewPacket:
     session_id: str = ""
+    task_id: str = ""
+    prompt_id: str = ""
+    agent_id: str = ""
+    task_started_at: str = ""
     user_requests: list[dict] = field(default_factory=list)
     spec_status: list[dict] = field(default_factory=list)
     sandbox_results: dict[str, dict] = field(default_factory=dict)
@@ -269,11 +281,35 @@ def build_review_packet(
         timestamp=datetime.now().isoformat(),
     )
 
-    # 1. User requests
+    # 0. Task identity — load from current_task_{session_id}.json
+    current_task: dict = {}
+    try:
+        task_file = _DATA_DIR / f"current_task_{session_id}.json"
+        if task_file.exists():
+            current_task = json.loads(task_file.read_text())
+    except Exception:
+        pass
+    packet.task_id = current_task.get("task_id", "")
+    packet.prompt_id = current_task.get("prompt_id", "")
+    packet.agent_id = current_task.get("agent_id", "")
+    packet.task_started_at = current_task.get("task_started_at", "")
+
+    # 1. User requests — filtered to current task only
     try:
         req_file = _DATA_DIR / f"user_requests_{session_id}.json"
         if req_file.exists():
-            packet.user_requests = json.loads(req_file.read_text())
+            all_requests = json.loads(req_file.read_text())
+            if packet.task_id:
+                # Primary: match task_id (entries written after this fix have this field)
+                task_reqs = [r for r in all_requests if r.get("task_id") == packet.task_id]
+                # Fallback: old entries lack task_id — filter by timestamp >= task_started_at
+                if not task_reqs and packet.task_started_at:
+                    task_reqs = [r for r in all_requests
+                                 if r.get("timestamp", "") >= packet.task_started_at]
+                # Always include at least the most-recent request as last resort
+                packet.user_requests = task_reqs if task_reqs else all_requests[-1:]
+            else:
+                packet.user_requests = all_requests
     except Exception:
         pass
 
@@ -332,8 +368,9 @@ def build_review_packet(
                       "has_app", "has_typecheck")
         }
 
-        # Run sandbox checks
-        sandbox = run_sandbox_checks(project_root, config)
+        # Run sandbox checks (pass task_started_at to scope git log)
+        sandbox = run_sandbox_checks(project_root, config,
+                                     task_started_at=packet.task_started_at)
         for key, result in sandbox.items():
             packet.sandbox_results[key] = asdict(result)
 
@@ -392,8 +429,20 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
     """Convert ReviewPacket into structured text for the LLM prompt."""
     sections = []
 
+    # ── TASK CONTEXT (scope boundary for this review) ──
+    sections.append("## TASK CONTEXT")
+    sections.append(f"task_id:         {packet.task_id or '(unknown)'}")
+    sections.append(f"prompt_id:       {packet.prompt_id or '(unknown)'}")
+    sections.append(f"agent_id:        {packet.agent_id or '(unknown)'}")
+    sections.append(f"task_started_at: {packet.task_started_at or '(unknown)'}")
+    sections.append(f"session_id:      {packet.session_id}")
+    sections.append(
+        "\n> SCOPE: Only requests and commits since task_started_at are included below. "
+        "Do NOT flag issues from prior tasks or sessions."
+    )
+
     # ── MOST RECENT USER REQUEST (top of packet — primary review target) ──
-    sections.append("## ⚠ MOST RECENT USER REQUEST (PRIMARY REVIEW TARGET)")
+    sections.append("\n## ⚠ MOST RECENT USER REQUEST (PRIMARY REVIEW TARGET)")
     if packet.user_requests:
         last_req = packet.user_requests[-1]
         last_ts = last_req.get("timestamp", "?")
@@ -415,8 +464,8 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
     else:
         sections.append("(Not captured)")
 
-    # All user requests (full history)
-    sections.append("\n## ALL USER REQUESTS (full history)")
+    # All user requests (current task only)
+    sections.append("\n## ALL USER REQUESTS (current task only — filtered by task_id)")
     if packet.user_requests:
         for i, req in enumerate(packet.user_requests, 1):
             ts = req.get("timestamp", "?")
