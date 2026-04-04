@@ -377,20 +377,37 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
     """Convert ReviewPacket into structured text for the LLM prompt."""
     sections = []
 
+    # ── MOST RECENT USER REQUEST (top of packet — primary review target) ──
+    sections.append("## ⚠ MOST RECENT USER REQUEST (PRIMARY REVIEW TARGET)")
+    if packet.user_requests:
+        last_req = packet.user_requests[-1]
+        last_ts = last_req.get("timestamp", "?")
+        last_prompt = last_req.get("prompt", "(empty)")
+        sections.append(f"Timestamp: {last_ts}")
+        sections.append(f"\n{last_prompt}")
+    else:
+        sections.append("(No user requests captured — cannot verify completion)")
+    sections.append(
+        "\n> CRITICAL: Your verdict MUST explicitly state whether this specific request "
+        "was completed fully (PASS) or not (FAIL). If it was not addressed, that alone "
+        "is grounds for FINDINGS regardless of other criteria."
+    )
+
     # Last assistant message (for Execute-Don't-Recommend check)
-    sections.append("## LAST ASSISTANT MESSAGE")
+    sections.append("\n## LAST ASSISTANT MESSAGE")
     if packet.last_assistant_message:
         sections.append(packet.last_assistant_message)
     else:
         sections.append("(Not captured)")
 
-    # User requests
-    sections.append("\n## USER REQUESTS")
+    # All user requests (full history)
+    sections.append("\n## ALL USER REQUESTS (full history)")
     if packet.user_requests:
         for i, req in enumerate(packet.user_requests, 1):
             ts = req.get("timestamp", "?")
             prompt = req.get("prompt", "(empty)")
-            sections.append(f"### Message {i} [{ts}]")
+            marker = " ← MOST RECENT" if i == len(packet.user_requests) else ""
+            sections.append(f"### Message {i} [{ts}]{marker}")
             sections.append(prompt)
     else:
         sections.append("(No user requests captured)")
@@ -724,11 +741,24 @@ def run_review(
     # Build messages
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend(history)
+    # Extract last user request for explicit instruction
+    last_request_text = "(no request captured)"
+    if packet.user_requests:
+        last_req = packet.user_requests[-1]
+        last_request_text = last_req.get("prompt", "(empty)")[:300]
+
     messages.append({
         "role": "user",
         "content": (
             f"## REVIEW ROUND {round_count}\n\n"
             f"Review the following work for protocol compliance.\n\n"
+            f"**MANDATORY PASS/FAIL CHECK:** The most recent user request was:\n"
+            f"> {last_request_text}\n\n"
+            f"Your response MUST include an explicit line:\n"
+            f"  LAST REQUEST: PASS — <brief explanation>\n"
+            f"  OR\n"
+            f"  LAST REQUEST: FAIL — <what is missing or incomplete>\n\n"
+            f"If the last request is FAIL, the overall verdict MUST be FINDINGS.\n\n"
             f"{packet_text}"
         ),
     })
