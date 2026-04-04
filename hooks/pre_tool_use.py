@@ -38,10 +38,22 @@ def get_current_focus(cwd):
     return None
 
 
+_CODING_STANDARDS = """\
+CODE STANDARDS (enforced):
+Architecture: dependencies point inward — UI/DB depend on business logic, never reverse. Cross boundaries with DTOs not entities.
+Functions: one thing, one abstraction level. ~40 lines max. No bool flag params. Commands change state OR return data, never both.
+Names: precise nouns (classes), strong verbs (methods). Never: data, manager, processor, handler as a full name.
+Comments: explain WHY (business rule, algorithmic choice). Never explain WHAT the code does mechanically — that's noise.
+Errors: throw exceptions, not error codes. Never swallow exceptions silently. Crash early on invalid state.
+Null: never return null/None. Use Optional, empty collection, or Special Case pattern.
+State: no shared mutable state in concurrent code. Prefer immutable data + pure transformations.\
+"""
+
+
 def get_context_injection(cwd, tool_name, tool_input=None):
     """
     Build lightweight context injection: current task, security reminder,
-    and tool-specific docs only. Speculative context sources removed.
+    coding standards, and tool-specific docs only.
     """
     docs_dir = Path(cwd) / "docs" / "development"
     hooks_dir = docs_dir / "hooks"
@@ -52,9 +64,10 @@ def get_context_injection(cwd, tool_name, tool_input=None):
     if current_task:
         injections.append(f"CURRENT TASK: {current_task}")
 
-    # 2. Security reminder for Write/Edit operations
+    # 2. Security reminder + coding standards for Write/Edit operations
     if tool_name in ['Write', 'Edit', 'MultiEdit']:
         injections.append("SECURITY: Never write secrets (API keys, passwords, tokens) outside of .env files or gitignored files")
+        injections.append(_CODING_STANDARDS)
 
     # 3. Inject tool-specific context if exists
     tool_map = {

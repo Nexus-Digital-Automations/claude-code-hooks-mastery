@@ -481,6 +481,58 @@ Claude Code must run commands itself rather than telling the user to run them. C
 
 ---
 
+### 15. AI Coding Standards
+
+**Condition:** Requires diff content. Skip if no git diff is in the packet.
+
+**What to check (from git diff):**
+
+**Architecture violations:**
+- Business logic leaking into UI or database layers (UI/DB should hold zero logic)
+- Core entities passed directly across architectural boundaries instead of DTOs
+- Long pass-through chains where a variable is threaded through 3+ function signatures just to reach a deep call site (use a context object instead)
+
+**Function design violations:**
+- Boolean flag parameter: `def process(data, is_preview: bool)` — proves the function does two things (blocking)
+- Functions with conjunctions in the name that confirm dual responsibility: `validate_and_save`, `fetch_and_format`, `parse_or_default`
+- Functions clearly longer than ~50 lines doing multiple distinct operations (advisory)
+- Query function that also mutates state, or command that returns a meaningful value (CQS violation — advisory)
+
+**Naming violations:**
+- Generic standalone names as class/function identifiers: `DataManager`, `RequestProcessor`, `BaseHandler`, `AbstractHelper` with no domain specificity (advisory)
+- Encoded or abbreviated names: `usr`, `tmp_val`, `mgr`, `dt` used as field/variable names (advisory)
+
+**Comment violations:**
+- Mechanical comments that restate what the code does: `# increment counter`, `# set x to y`, `# return result` — these are noise and must be removed (advisory)
+- Comments that should be a well-named function or variable instead
+
+**Error handling violations:**
+- Returning error codes or sentinel values (`return -1`, `return None` on failure, `return {"error": ...}`) instead of raising exceptions (advisory)
+- `return null` / `return None` for failure cases where an exception is appropriate
+
+**Null/None violations:**
+- Function returning `None`/`null` as a signal (not as a legitimate empty value): `if result is None: # error occurred` (advisory)
+- Optional chaining through 3+ levels suggesting a missing abstraction
+
+**Concurrency violations:**
+- Shared mutable state accessed from multiple threads without synchronization (blocking if obvious)
+- "Sporadic failures" dismissed with retry logic instead of fixing root cause
+
+**Pass criteria:**
+- No boolean flag parameters in new functions
+- No shared mutable state in concurrent code without synchronization
+- No mechanical comments that restate what code does
+- Error paths raise exceptions rather than returning error codes or null
+
+**Severity:**
+- Boolean flag arguments: **blocking**
+- Obvious shared mutable state race condition: **blocking**
+- All others (generic names, CQS violations, null returns, mechanical comments, architectural leakage): **advisory**
+
+**Important:** These standards apply to code the AI *wrote or modified*. Do not flag pre-existing code outside the diff scope. Mild violations in a large diff are advisory. Only block on egregious or pattern-level violations that indicate a systematic problem.
+
+---
+
 ## Severity Rules
 
 - **blocking**: Must be fixed before approval. Any of: test failures, build failures, lint errors, type errors, security criticals, missing user-requested features, unchecked spec criteria (for substantial tasks), uncommitted changes to tracked files, empty catch blocks that swallow exceptions, resource leaks, unrequested features added (YAGNI), `Date.now()` as ID, workarounds bypassing root causes
@@ -595,3 +647,5 @@ When reviewing a follow-up round:
 16. **Assume good faith on partial packet data**: If user_requests is empty, the capturing hook may not have fired. Review what you have. Don't block solely because the packet is incomplete.
 
 17. **Playwright coverage must be comprehensive**: For frontend projects, Playwright tests must cover all pages, buttons, and interactive functionality. Skipping entire pages or leaving delete/remove buttons untested is **blocking**. Destructive operations (delete chat, delete item, etc.) should be tested using test data created for that purpose — create the test item, delete it, verify it's gone. The narrow exception is operations that can only target irreplaceable real user data with no safe test path (e.g., "delete account") — those may be skipped. If test data can be created for the operation, it is not exempt.
+
+18. **Category 15 (AI Coding Standards) is advisory-heavy**: Only block on boolean flag params and obvious concurrency races. Treat everything else as advisory. Do not let category 15 produce FINDINGS alone — it must combine with another blocking finding or be egregious enough to constitute a systematic code quality failure across the diff.
