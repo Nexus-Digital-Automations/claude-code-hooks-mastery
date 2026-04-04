@@ -302,11 +302,10 @@ def build_review_packet(
             if packet.task_id:
                 # Primary: match task_id (entries written after this fix have this field)
                 task_reqs = [r for r in all_requests if r.get("task_id") == packet.task_id]
-                # Fallback: old entries lack task_id — filter by timestamp >= task_started_at
-                if not task_reqs and packet.task_started_at:
-                    task_reqs = [r for r in all_requests
-                                 if r.get("timestamp", "") >= packet.task_started_at]
-                # Always include at least the most-recent request as last resort
+                # Fallback for old entries without task_id: use only the most-recent request.
+                # Do NOT filter by task_started_at — it is unreliable for follow-up tasks
+                # because is_followup=True causes it to be inherited from an earlier task,
+                # which would include requests from prior tasks in the same session.
                 packet.user_requests = task_reqs if task_reqs else all_requests[-1:]
             else:
                 packet.user_requests = all_requests
@@ -565,29 +564,38 @@ def _conversation_file(session_id: str) -> Path:
     return _DATA_DIR / f"review_conversation_{session_id}.json"
 
 
-def load_conversation(session_id: str) -> list[dict]:
-    """Load conversation history, clearing it if the project root has changed.
+def load_conversation(session_id: str, task_id: str = "") -> list[dict]:
+    """Load conversation history, clearing it if project root or task_id changed.
 
-    Conversation files store the project root they were built for. If the
-    current get_git_root() differs from the stored root, the history is from
-    a different project and must be discarded — keeping it would inject stale
-    cross-project sandbox data into the LLM context.
+    Clears on project-root change (cross-project contamination) and on task_id
+    change (cross-task contamination within the same session). Both cases would
+    inject stale context from a different review scope into the LLM.
 
     Backward compat: files written in the old plain-list format are returned
-    as-is (no root check) and will be migrated to the wrapper format on the
-    next save_conversation() call.
+    as-is (no root/task check) and migrated to the wrapper format on next save.
     """
     try:
         f = _conversation_file(session_id)
         if not f.exists():
             return []
         raw = json.loads(f.read_text())
-        # Old format: plain list — return as-is, no root check possible
+        # Old format: plain list — return as-is, no root/task check possible
         if isinstance(raw, list):
             return raw
-        # New format: {"project_root": "...", "messages": [...]}
+        # New format: {"project_root": "...", "task_id": "...", "messages": [...]}
         if isinstance(raw, dict) and "messages" in raw:
             stored_root = raw.get("project_root", "")
+            stored_task = raw.get("task_id", "")
+            # Clear if task changed (cross-task contamination within same session)
+            if task_id and stored_task and stored_task != task_id:
+                print(
+                    f"[reviewer] Clearing stale conversation — "
+                    f"task changed ({stored_task[:8]!r} → {task_id[:8]!r})",
+                    file=sys.stderr,
+                )
+                f.unlink(missing_ok=True)
+                return []
+            # Clear if project root changed (cross-project contamination)
             if stored_root:
                 try:
                     from project_config import get_git_root
@@ -608,11 +616,11 @@ def load_conversation(session_id: str) -> list[dict]:
     return []
 
 
-def save_conversation(session_id: str, messages: list[dict]) -> None:
-    """Persist conversation history with project root metadata.
+def save_conversation(session_id: str, messages: list[dict], task_id: str = "") -> None:
+    """Persist conversation history with project root and task_id metadata.
 
-    Stores the current get_git_root() alongside the messages so that
-    load_conversation() can detect cross-project contamination on reload.
+    Stores both so that load_conversation() can detect cross-project and
+    cross-task contamination on reload.
     """
     try:
         _DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -623,7 +631,10 @@ def save_conversation(session_id: str, messages: list[dict]) -> None:
         except Exception:
             pass
         _conversation_file(session_id).write_text(
-            json.dumps({"project_root": project_root, "messages": messages}, indent=2)
+            json.dumps(
+                {"project_root": project_root, "task_id": task_id, "messages": messages},
+                indent=2,
+            )
         )
     except Exception:
         pass
@@ -842,8 +853,8 @@ def run_review(
     packet = build_review_packet(session_id, last_assistant_message=last_assistant_message)
     packet_text = format_packet_for_prompt(packet)
 
-    # Load conversation history
-    history = load_conversation(session_id)
+    # Load conversation history — scoped by task_id to prevent cross-task contamination
+    history = load_conversation(session_id, task_id=packet.task_id)
     round_count = len([m for m in history if m.get("role") == "user"]) + 1
 
     if round_count > config.max_rounds:
@@ -890,7 +901,7 @@ def run_review(
         "role": "assistant",
         "content": json.dumps(response),
     })
-    save_conversation(session_id, history)
+    save_conversation(session_id, history, task_id=packet.task_id)
 
     # Process response
     if response.get("verdict") == "ERROR":
