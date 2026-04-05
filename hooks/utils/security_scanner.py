@@ -247,7 +247,10 @@ def scan_semgrep(cwd: Path, timeout: int) -> list:
         return []
     rc, out, _err = _run(
         [semgrep, "--config=auto", "--json", "--timeout=25",
-         "--max-memory=500", "--no-git-ignore", str(cwd)],
+         "--max-memory=500", "--no-git-ignore",
+         "--exclude-dir=output", "--exclude-dir=coverage",
+         "--exclude-dir=node_modules", "--exclude-dir=tests/output",
+         str(cwd)],
         cwd, timeout,
     )
     findings = []
@@ -277,6 +280,8 @@ _SKIP_DIRS = frozenset({
     "dist", "build", "target", ".next", ".worktrees",
     # Third-party upstream source (gitignored, not application code)
     ".searxng",
+    # Generated output directories — scraped content, coverage reports, build artifacts
+    "output", "coverage",
 })
 _SKIP_PATH_FRAGMENTS = (
     "/.claude/agents/", "/.claude/skills/", "/.claude/commands/",
