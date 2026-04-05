@@ -474,17 +474,46 @@ Comprehensive coverage means:
 If agent mode is `claude`: **SKIP this entire category entirely**. No delegation checks for claude mode.
 
 **What to check:**
+
+#### 8a. Delegation used for large backend tasks
 - Tasks touching 5+ backend files should have been delegated to DeepSeek
 - Look at the git diff file count — if 5+ backend files were modified, was delegation used?
 - Delegated output should have been reviewed (evidence: Claude Code read the files after delegation)
 
+#### 8b. Plan inspection evidence *(blocking)*
+Check the `DELEGATION METADATA` section in this packet. If `delegation_meta` is present:
+- `plan_reviewed: false` → delegation output was approved without the plan being inspected. **Blocking.**
+- `plan_file_changes` is non-empty → cross-reference every path against the git diff and git show output. Any file in `plan_file_changes` absent from the diff = incomplete delegation output that Claude Code should have caught. **Blocking.**
+- `plan_reviewed: true` with an empty `plan_file_changes` list → plan data was not captured (metadata gap); treat as advisory, not blocking.
+
+#### 8c. Verification steps were run *(blocking)*
+If `plan_verification_steps` is non-empty, Claude Code must have run each command after `poll()` completed. Evidence: commands appear in `verification_artifacts` (output/*.txt) or in `sandbox_results`. If the list is non-empty and no evidence exists that any of the commands ran, flag as **blocking** — these are the plan's own postconditions.
+
+#### 8d. Profile selection appropriateness *(advisory)*
+Check `delegation_meta.profile` against the task type in user_requests:
+- Auth / security / race condition / deadlock tasks → should use `deep-reason`
+- Rename-all / migrate-all / systematic refactor tasks → should use `batch-refactor`
+- Bug fix / crash / small isolated fix → `quick-fix` appropriate
+- New features → `default-delegation` appropriate
+
+If the task clearly involves auth, security, or concurrency but `quick-fix` or `default-delegation` was used, flag as advisory.
+
+#### 8e. LIMIT_REACHED terminal state *(blocking)*
+If `terminal_state: limit_reached` appears in delegation metadata, the agent exhausted its budget before completing execution. Verify the git diff covers every path in `plan_file_changes`. Any plan path absent from the diff = incomplete work. **Blocking.**
+
 **Pass criteria:**
 - Large backend tasks were delegated (if applicable)
-- Delegation output was reviewed after execution
+- `plan_reviewed: true` for every delegation
+- Every file in `plan_file_changes` is present in the git diff
+- `plan_verification_steps` commands were run (evidence in artifacts)
+- `terminal_state` is `completed` (or null when metadata unavailable)
 
 **Common violations:**
 - 5+ backend files modified directly without delegation in deepseek mode
-- Delegation used but output not reviewed
+- Delegation used but `plan_reviewed: false` (plan approved without inspection)
+- Files in `plan_file_changes` absent from git diff (incomplete output not caught)
+- `plan_verification_steps` non-empty but no evidence any were run
+- `terminal_state: limit_reached` with partial diff
 
 ---
 
@@ -910,3 +939,7 @@ When reviewing a follow-up round:
 19. **Category 16 (AI-Agent Codebase Legibility) is advisory-only**: Never block on category 16 findings. Its purpose is to surface legibility debt as advisory notes — missing docstrings, undocumented state machines, missing cross-references. A single missing annotation in a large diff is not worth noting. Flag only when the pattern is systemic (e.g., 5+ new public functions all missing failure mode docs).
 
 20. **Category 17 (Pre-Execution Reasoning) is diagnostic, not gatekeeping**: Never block on missing reasoning. Use it to annotate the *cause* of other blocking findings when the root cause was clearly insufficient upfront analysis — e.g., "agent skipped scope analysis, which explains why the implementation was over-scoped." If the implementation is correct and complete, skip category 17 entirely.
+
+21. **LIMIT_REACHED means incomplete**: If `delegation_meta.terminal_state == "limit_reached"` for any delegation in this task, the agent ran out of budget before completing. Do not approve unless the git diff confirms every file in `plan_file_changes` was actually modified. A partial diff against a complete plan is a blocking finding regardless of what else passed.
+
+22. **`ask_supervisor_occurred` requires evidence of an answer**: If `delegation_meta.ask_supervisor_occurred == true`, the agent paused to ask Claude Code a question mid-execution. If the agent reached `completed` state but no answer is visible in the session (the agent simply continued), the implementation choices may be uninformed. Flag as **advisory** — it does not block alone, but warrants a note in the summary.

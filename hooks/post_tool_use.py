@@ -512,6 +512,139 @@ def _track_deepseek_result(session_id, tool_name, tool_input, tool_result):
     ds_log.write_text(json.dumps(entries, indent=2))
 
 
+def _safe_parse_result(tool_result):
+    """Return a dict from a tool result regardless of format (dict/str/MCP content list)."""
+    if isinstance(tool_result, dict):
+        return tool_result
+    if isinstance(tool_result, str):
+        try:
+            parsed = json.loads(tool_result)
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            pass
+    if isinstance(tool_result, list):
+        # MCP content items: [{"type": "text", "text": "..."}]
+        for item in tool_result:
+            if isinstance(item, dict) and item.get("type") == "text":
+                try:
+                    parsed = json.loads(item.get("text", ""))
+                    if isinstance(parsed, dict):
+                        return parsed
+                except Exception:
+                    pass
+    return {}
+
+
+def _find_delegation_entry(entries, agent_id, task_id):
+    """Return the most recent list entry matching agent_id, falling back to task_id.
+
+    Returns the actual dict object (not a copy) so callers can mutate it in place.
+    """
+    if agent_id:
+        for e in reversed(entries):
+            if e.get("agent_id") == agent_id:
+                return e
+    if task_id:
+        for e in reversed(entries):
+            if e.get("task_id") == task_id:
+                return e
+    return None
+
+
+def _capture_delegation_metadata(session_id, tool_name, tool_input, tool_result):
+    """Capture structured DeepSeek delegation metadata keyed by session + task.
+
+    Writes/updates ~/.claude/data/delegation_meta_{session_id}.json.
+    Each entry tracks one agent: plan file_changes, verification_steps,
+    plan_reviewed/approved flags, terminal state, and ask_supervisor events.
+    All JSON parsing is wrapped in try/except — never crashes the hook.
+    """
+    data_dir = Path.home() / ".claude" / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    meta_file = data_dir / f"delegation_meta_{session_id}.json"
+
+    # Resolve current task_id for scoping
+    task_id = ""
+    try:
+        task_file = data_dir / f"current_task_{session_id}.json"
+        if task_file.exists():
+            task_id = json.loads(task_file.read_text()).get("task_id", "")
+    except Exception:
+        pass
+
+    # Load existing entries
+    entries = []
+    if meta_file.exists():
+        try:
+            entries = json.loads(meta_file.read_text())
+            if not isinstance(entries, list):
+                entries = []
+        except Exception:
+            entries = []
+
+    action = tool_name.rsplit("__", 1)[-1] if "__" in tool_name else tool_name
+    result_dict = _safe_parse_result(tool_result)
+
+    if action == "run":
+        agent_id = result_dict.get("agent_id", tool_input.get("agent_id", ""))
+        entry = {
+            "task_id": task_id,
+            "agent_id": agent_id,
+            "task_snippet": str(tool_input.get("task", tool_input.get("prompt", "")))[:300],
+            "profile": tool_input.get("profile", "default-delegation"),
+            "working_dir": tool_input.get("working_dir", ""),
+            "plan_reviewed": False,
+            "plan_approved": False,
+            "plan_file_changes": [],
+            "plan_verification_steps": [],
+            "plan_files_read": [],
+            "terminal_state": None,
+            "ask_supervisor_occurred": False,
+        }
+        entries.append(entry)
+
+    elif action == "review":
+        review_action = tool_input.get("action", "")
+        agent_id = tool_input.get("agent_id", "")
+        entry = _find_delegation_entry(entries, agent_id, task_id)
+        if entry is None:
+            return
+
+        if review_action == "get":
+            entry["plan_reviewed"] = True
+            entry["plan_file_changes"] = result_dict.get("file_changes", [])
+            entry["plan_verification_steps"] = result_dict.get("verification_steps", [])
+            codebase = result_dict.get("codebase_analysis", {})
+            if isinstance(codebase, dict):
+                entry["plan_files_read"] = codebase.get("files_read", [])
+
+        elif review_action == "approve":
+            entry["plan_approved"] = True
+
+    elif action == "poll":
+        agent_id = tool_input.get("agent_id", "")
+        entry = _find_delegation_entry(entries, agent_id, task_id)
+        if entry is None:
+            return
+
+        state = result_dict.get("state", "")
+        if state in {"completed", "limit_reached", "error", "stopped"}:
+            entry["terminal_state"] = state
+
+        # Detect ask_supervisor mid-execution
+        pending = result_dict.get("pending_tool_call", {})
+        if isinstance(pending, dict) and pending.get("tool") == "ask_supervisor":
+            entry["ask_supervisor_occurred"] = True
+
+    else:
+        return  # setup/configure/queue/agent — not tracked here
+
+    # Keep ring buffer at 20 entries (richer data than deepseek_delegations.json)
+    entries = entries[-20:]
+    meta_file.write_text(json.dumps(entries, indent=2))
+
+
 def lint_file(file_path):
     """
     Run appropriate linter on file based on extension.
@@ -586,6 +719,10 @@ def main():
         if tool_name.startswith('mcp__deepseek-agent__'):
             try:
                 _track_deepseek_result(session_id, tool_name, tool_input, tool_result)
+            except Exception:
+                pass
+            try:
+                _capture_delegation_metadata(session_id, tool_name, tool_input, tool_result)
             except Exception:
                 pass
 
