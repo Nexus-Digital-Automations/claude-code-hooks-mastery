@@ -827,8 +827,23 @@ def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
     except Exception:
         has_changes = True  # Assume changes if detection fails
 
+    # Detect if upstream remote exists (fork scenario)
+    has_upstream = False
+    try:
+        _remotes = subprocess.run(
+            ["git", "remote"], capture_output=True, text=True, timeout=5,
+            cwd=get_git_root(),
+        )
+        has_upstream = "upstream" in _remotes.stdout.split()
+    except Exception:
+        pass  # No upstream = skip sync
+
     from project_config import get_required_checks
     required = get_required_checks(config, files_modified=has_changes)
+
+    # Remove upstream_sync if no upstream remote exists
+    if not has_upstream and "upstream_sync" in required:
+        required = [r for r in required if r != "upstream_sync"]
 
     try:
         record = json.loads(vr_file.read_text())
