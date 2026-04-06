@@ -1036,8 +1036,8 @@ def main():
                     _req_entry["preceding_context"] = _last_msg[:5000]
             _requests.append(_req_entry)
             _req_file.write_text(json.dumps(_requests, indent=2))
-        except Exception:
-            pass  # Never block prompt submission
+        except (json.JSONDecodeError, OSError, TypeError) as exc:
+            print(f"[user_prompt_submit] request log write failed: {exc}", file=sys.stderr)
 
         # Reset verification state for new task (per-prompt isolation)
         # Skips reset if this is a follow-up prompt with existing check progress.
