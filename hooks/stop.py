@@ -835,8 +835,8 @@ def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
             cwd=get_git_root(),
         )
         has_upstream = "upstream" in _remotes.stdout.split()
-    except Exception:
-        pass  # No upstream = skip sync
+    except (subprocess.TimeoutExpired, OSError) as exc:
+        print(f"  [phase6] upstream remote detection failed ({exc}), skipping sync", file=sys.stderr)
 
     from project_config import get_required_checks
     required = get_required_checks(config, files_modified=has_changes)
