@@ -954,7 +954,7 @@ def _phase_7_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[
             resolved_sid, "--json",
         ]
         if _last_msg:
-            _rev_cmd.extend(["--last-message", _last_msg[:3000]])
+            _rev_cmd.extend(["--last-message", _last_msg])
 
         _rev_proc = subprocess.run(
             _rev_cmd,

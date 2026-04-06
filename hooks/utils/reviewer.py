@@ -339,7 +339,7 @@ def build_review_packet(
     session_id = _resolve_session_id(session_id)
     packet = ReviewPacket(
         session_id=session_id,
-        last_assistant_message=last_assistant_message[:3000] if last_assistant_message else "",
+        last_assistant_message=last_assistant_message or "",
         timestamp=datetime.now().isoformat(),
     )
 
