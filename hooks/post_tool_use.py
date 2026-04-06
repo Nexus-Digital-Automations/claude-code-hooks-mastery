@@ -387,11 +387,24 @@ def _invalidate_stale_checks(session_id: str, file_path: str) -> None:
 
         ext = Path(file_path).suffix.lower()
         name = Path(file_path).name
+        parts = Path(file_path).parts
+
+        # Detect if this is a test file (smarter regression)
+        _is_test_file = (
+            "test" in name.lower()
+            or "spec" in name.lower()
+            or any(p in ("tests", "test", "__tests__", "spec", "specs") for p in parts)
+        )
 
         # Determine which checks to invalidate
         to_invalidate: set[str] = set()
         if ext in _SOURCE_EXTS:
-            to_invalidate.update(["tests", "typecheck", "execution", "happy_path", "security"])
+            if _is_test_file:
+                # Test file edits only invalidate tests — not lint/typecheck/build
+                to_invalidate.add("tests")
+            else:
+                # Production source edits invalidate more broadly
+                to_invalidate.update(["tests", "typecheck", "execution", "happy_path", "security"])
         if ext in _FRONTEND_EXTS:
             to_invalidate.add("frontend")
         if name in _CONFIG_FILES:

@@ -37,13 +37,14 @@ VR_CHECK_KEYS = {k for k, _ in VR_CHECKS_ORDER}
 # required_check_keys=None means the phase uses custom logic (not VR checks).
 
 PHASE_DEFINITIONS: list[tuple[int, str, str, list[str] | None]] = [
-    (1, "implement",       "Complete the user's request",           None),  # spec + root cleanliness
-    (2, "static_analysis", "Lint and type checking",                ["lint", "typecheck"]),
-    (3, "tests",           "Unit and integration tests",            ["tests"]),
-    (4, "build",           "Build verification and app startup",    ["build", "app_starts"]),
-    (5, "frontend",        "Frontend validation via Playwright",    ["frontend", "happy_path"]),
-    (6, "ship",            "Security, commit, and push",            ["security", "commit_push", "upstream_sync", "execution"]),
-    (7, "reviewer",        "Protocol compliance review (GPT-5 Mini)", None),  # external LLM reviewer
+    (1, "implement",       "Complete the user's request",              None),  # spec + root cleanliness
+    (2, "static_analysis", "Lint and type checking",                   ["lint", "typecheck"]),
+    (3, "build",           "Build verification",                       ["build"]),
+    (4, "tests",           "Unit and integration tests",               ["tests"]),
+    (5, "smoke_test",      "Execution and app startup verification",   ["execution", "app_starts"]),
+    (6, "frontend",        "Frontend validation via Playwright",       ["frontend", "happy_path"]),
+    (7, "ship",            "Security, commit, and push",               ["security", "commit_push", "upstream_sync"]),
+    (8, "reviewer",        "Protocol compliance review (GPT-5 Mini)",  None),  # external LLM reviewer
 ]
 
 PHASE_COUNT = len(PHASE_DEFINITIONS)

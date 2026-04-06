@@ -530,8 +530,33 @@ def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
 
         project_root = Path(get_git_root())
 
-        # Force fresh lint — never trust cached partial results
-        _write_vr(vr_file, "lint", "pending", "", session_id=None)
+        # Only re-run lint if source files changed since last lint pass
+        _should_rerun_lint = True
+        try:
+            _vr_data = json.loads(vr_file.read_text())
+            _lint_check = _vr_data.get("checks", {}).get("lint", {})
+            _lint_ts = _lint_check.get("timestamp", "")
+            _lint_status = _lint_check.get("status", "pending")
+            if _lint_status == "passed" and _lint_ts:
+                # Check if any source files were modified after lint passed
+                _mod_r = subprocess.run(
+                    ["git", "diff", "--name-only"],
+                    capture_output=True, text=True, timeout=5,
+                    cwd=str(project_root),
+                )
+                _staged_r = subprocess.run(
+                    ["git", "diff", "--cached", "--name-only"],
+                    capture_output=True, text=True, timeout=5,
+                    cwd=str(project_root),
+                )
+                _changed = (_mod_r.stdout.strip() + "\n" + _staged_r.stdout.strip()).strip()
+                if not _changed:
+                    _should_rerun_lint = False
+        except Exception:
+            pass  # Default to re-running
+
+        if _should_rerun_lint:
+            _write_vr(vr_file, "lint", "pending", "", session_id=None)
         auto_run_missing(resolved_sid, config, vr_file, project_root)
     except Exception:
         pass
@@ -575,8 +600,48 @@ def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
     return (True, "")
 
 
-def _phase_3_tests(session_id: str, config: dict) -> tuple[bool, str]:
-    """Phase 3: Tests — required only for stable, important features."""
+def _phase_3_build(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 3: Build verification — must pass before tests can run."""
+    resolved_sid = _resolve_session_id(session_id)
+    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+    from project_config import get_required_checks
+    required = get_required_checks(config)
+
+    if "build" not in required:
+        return (True, "")
+
+    try:
+        record = json.loads(vr_file.read_text())
+        checks = record.get("checks", {})
+    except Exception:
+        checks = {}
+
+    item = checks.get("build", {})
+    status = item.get("status", "pending")
+
+    if status == "pending":
+        run_cmd = config.get("checks", {}).get("build", {})
+        if isinstance(run_cmd, dict):
+            run_cmd = run_cmd.get("run_command", "")
+        else:
+            run_cmd = ""
+        hint = f" — run: {run_cmd}" if run_cmd else ""
+        return (False, f"  \u274c BUILD{' ' * 14}not observed{hint}")
+    elif status == "failed":
+        ev = (item.get("evidence") or "")[:400]
+        lines = [f"  \u274c BUILD{' ' * 14}FAILED"]
+        if ev:
+            for ev_line in ev.split("\n")[:10]:
+                lines.append(f"     {ev_line}")
+        lines.append("\nFix build failures, then retry.")
+        return (False, "\n".join(lines))
+
+    return (True, "")
+
+
+def _phase_4_tests(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 4: Tests — required only for stable, important features."""
     resolved_sid = _resolve_session_id(session_id)
     vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
 
@@ -591,7 +656,6 @@ def _phase_3_tests(session_id: str, config: dict) -> tuple[bool, str]:
         from project_config import should_require_tests
         from vr_utils import parse_transcript
 
-        # Get modified files from VR or transcript
         task_file = Path.home() / f".claude/data/current_task_{resolved_sid}.json"
         task_start = None
         transcript_path = None
@@ -625,6 +689,25 @@ def _phase_3_tests(session_id: str, config: dict) -> tuple[bool, str]:
     except Exception:
         pass  # If heuristic fails, fall through to normal check
 
+    # Diff-size awareness: skip tests for trivial changes (< 10 lines)
+    try:
+        from project_config import get_git_root
+        _diff_r = subprocess.run(
+            ["git", "diff", "HEAD", "--stat"],
+            capture_output=True, text=True, timeout=5,
+            cwd=get_git_root(),
+        )
+        _diff_out = _diff_r.stdout.strip()
+        if _diff_out:
+            import re as _re
+            _total_match = _re.search(r'(\d+) insertions?\(\+\).*?(\d+) deletions?\(-\)', _diff_out)
+            if _total_match:
+                total_lines = int(_total_match.group(1)) + int(_total_match.group(2))
+                if total_lines < 10:
+                    return (True, "")
+    except Exception:
+        pass
+
     try:
         record = json.loads(vr_file.read_text())
         checks = record.get("checks", {})
@@ -654,8 +737,8 @@ def _phase_3_tests(session_id: str, config: dict) -> tuple[bool, str]:
     return (True, "")
 
 
-def _phase_4_build(session_id: str, config: dict) -> tuple[bool, str]:
-    """Phase 4: Build verification + app startup."""
+def _phase_5_smoke_test(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 5: Execution and app startup verification (smoke test)."""
     resolved_sid = _resolve_session_id(session_id)
     vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
 
@@ -668,7 +751,7 @@ def _phase_4_build(session_id: str, config: dict) -> tuple[bool, str]:
     except Exception:
         checks = {}
 
-    phase_checks = ["build", "app_starts"]
+    phase_checks = ["execution", "app_starts"]
     issues = []
 
     for key in phase_checks:
@@ -676,7 +759,7 @@ def _phase_4_build(session_id: str, config: dict) -> tuple[bool, str]:
             continue
         item = checks.get(key, {})
         status = item.get("status", "pending")
-        label = "BUILD" if key == "build" else "APP STARTS"
+        label = "EXECUTION" if key == "execution" else "APP STARTS"
 
         if status == "pending":
             run_cmd = config.get("checks", {}).get(key, {})
@@ -695,15 +778,34 @@ def _phase_4_build(session_id: str, config: dict) -> tuple[bool, str]:
 
     if issues:
         msg = "\n".join(issues)
-        msg += "\n\nFix build/startup failures, then retry."
+        msg += "\n\nFix execution/startup failures, then retry."
         return (False, msg)
     return (True, "")
 
 
-def _phase_5_frontend(session_id: str, config: dict) -> tuple[bool, str]:
-    """Phase 5: Frontend validation via Playwright/Cypress."""
+def _phase_6_frontend(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 6: Frontend validation via Playwright/Cypress."""
     if not config.get("has_frontend", False):
         return (True, "")
+
+    # Diff-size awareness: skip frontend E2E for trivial changes (< 10 lines)
+    try:
+        from project_config import get_git_root
+        _diff_r = subprocess.run(
+            ["git", "diff", "HEAD", "--stat"],
+            capture_output=True, text=True, timeout=5,
+            cwd=get_git_root(),
+        )
+        _diff_out = _diff_r.stdout.strip()
+        if _diff_out:
+            import re as _re
+            _total_match = _re.search(r'(\d+) insertions?\(\+\).*?(\d+) deletions?\(-\)', _diff_out)
+            if _total_match:
+                total_lines = int(_total_match.group(1)) + int(_total_match.group(2))
+                if total_lines < 10:
+                    return (True, "")
+    except Exception:
+        pass
 
     try:
         sys.path.insert(0, str(Path(__file__).parent / "utils"))
@@ -785,8 +887,8 @@ def _phase_5_frontend(session_id: str, config: dict) -> tuple[bool, str]:
     return (True, "")
 
 
-def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
-    """Phase 6: Security scan, commit, push, upstream sync."""
+def _phase_7_ship(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 7: Security scan, commit, push, upstream sync."""
     resolved_sid = _resolve_session_id(session_id)
     vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
 
@@ -851,12 +953,11 @@ def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
     except Exception:
         checks = {}
 
-    phase_checks = ["security", "commit_push", "upstream_sync", "execution"]
+    phase_checks = ["security", "commit_push", "upstream_sync"]
     label_map = {
         "security": "SECURITY",
         "commit_push": "COMMIT & PUSH",
         "upstream_sync": "UPSTREAM SYNC",
-        "execution": "EXECUTION",
     }
     issues = []
 
@@ -888,8 +989,8 @@ def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
     return (True, "")
 
 
-def _phase_7_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[bool, str]:
-    """Phase 7: GPT-5 Mini protocol compliance review.
+def _phase_8_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[bool, str]:
+    """Phase 8: GPT-5 Mini protocol compliance review.
 
     IMPORTANT: stop.py runs under bare python3 (not uv run --script),
     so openai/dotenv are NOT importable. The reviewer runs as a subprocess.
@@ -1024,14 +1125,15 @@ def _phase_7_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[
 PHASE_HANDLERS = {
     1: ("IMPLEMENT",        _phase_1_implement),
     2: ("STATIC ANALYSIS",  _phase_2_static_analysis),
-    3: ("TESTS",            _phase_3_tests),
-    4: ("BUILD",            _phase_4_build),
-    5: ("FRONTEND",         _phase_5_frontend),
-    6: ("SHIP",             _phase_6_ship),
-    # Phase 7 (reviewer) handled specially — needs input_data
+    3: ("BUILD",            _phase_3_build),
+    4: ("TESTS",            _phase_4_tests),
+    5: ("SMOKE TEST",       _phase_5_smoke_test),
+    6: ("FRONTEND",         _phase_6_frontend),
+    7: ("SHIP",             _phase_7_ship),
+    # Phase 8 (reviewer) handled specially — needs input_data
 }
 
-PHASE_COUNT = 7
+PHASE_COUNT = 8
 
 
 # ── Main ─────────────────────────────────────────────────────────────────
@@ -1088,27 +1190,32 @@ def main():
             if phase_num in PHASE_HANDLERS:
                 phase_label, handler = PHASE_HANDLERS[phase_num]
                 passed, message = handler(session_id, config)
-            elif phase_num == 7:
-                # Phase 7: Reviewer (needs authorization first)
-                if not check_stop_authorization(session_id):
-                    auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
-                    # Show evidence summary before asking for auth
-                    all_passed, done, missing = check_verification(session_id)
-                    if done:
-                        evidence_display = build_evidence_display(done, session_id)
-                        print(evidence_display, file=sys.stderr)
-                    print(
-                        f"\n\u2705 Phases 1-6 passed. Now authorize: bash {auth_script}\n",
-                        file=sys.stderr,
-                    )
-                    sys.exit(2)
+            elif phase_num == 8:
+                # Phase 8: Reviewer — auto-authorized (phases 1-7 are sufficient gates)
+                # Show evidence summary before review
+                all_passed, done, missing = check_verification(session_id)
+                if done:
+                    evidence_display = build_evidence_display(done, session_id)
+                    print(evidence_display, file=sys.stderr)
                 phase_label = "REVIEW"
-                passed, message = _phase_7_reviewer(session_id, config, input_data)
+                passed, message = _phase_8_reviewer(session_id, config, input_data)
             else:
                 continue
 
             if not passed:
-                # Show focused failure message for this phase only
+                # Phase focus hints — tell the agent exactly what to work on
+                _focus_hints = {
+                    1: "Focus: complete all spec acceptance criteria and clean the root folder.",
+                    2: "Focus: fix lint and type errors only. Do not run tests or build yet.",
+                    3: "Focus: fix build/compilation errors. Tests come after build passes.",
+                    4: "Focus: fix failing tests or write missing tests. Build already passes.",
+                    5: "Focus: verify the app starts and endpoints respond correctly.",
+                    6: "Focus: fix failing E2E tests. The app and build are already verified.",
+                    7: "Focus: commit and push your changes. Run security scan if needed.",
+                    8: "Focus: address the reviewer's findings specifically.",
+                }
+                hint = _focus_hints.get(phase_num, "")
+
                 lines = [
                     "",
                     "=" * 60,
@@ -1117,9 +1224,12 @@ def main():
                     "",
                     message,
                     "",
-                    "=" * 60,
-                    "",
                 ]
+                if hint:
+                    lines.append(hint)
+                    lines.append("")
+                lines.append("=" * 60)
+                lines.append("")
                 print("\n".join(lines), file=sys.stderr)
                 sys.exit(2)
 

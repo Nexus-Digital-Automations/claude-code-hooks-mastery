@@ -74,6 +74,42 @@ def load_reviewer_config() -> ReviewerConfig:
 
 # ── Agent Commentary Summarization (Ollama local model) ──────────────
 
+def _redact_secrets(text: str) -> str:
+    """Redact potential secrets and PII from text before forwarding.
+
+    Patterns: API keys, tokens, passwords, emails, private keys, JWTs.
+    """
+    import re
+
+    patterns = [
+        # API keys and tokens (generic long hex/base64 strings after key= or token=)
+        (r'(?i)(api[_-]?key|token|secret|password|passwd|auth)\s*[=:]\s*["\']?([A-Za-z0-9_\-/.+]{20,})["\']?',
+         r'\1=***REDACTED***'),
+        # Bearer tokens
+        (r'(?i)(Bearer\s+)([A-Za-z0-9_\-/.+]{20,})',
+         r'\1***REDACTED***'),
+        # AWS keys
+        (r'(AKIA[0-9A-Z]{16})', '***AWS_KEY_REDACTED***'),
+        # Private key blocks
+        (r'-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----',
+         '***PRIVATE_KEY_REDACTED***'),
+        # JWTs (eyJ...)
+        (r'eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}',
+         '***JWT_REDACTED***'),
+        # Email addresses
+        (r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',
+         '***EMAIL_REDACTED***'),
+        # Generic long secrets (32+ char hex strings)
+        (r'(?<![a-fA-F0-9])[a-fA-F0-9]{32,}(?![a-fA-F0-9])',
+         '***HEX_REDACTED***'),
+    ]
+
+    result = text
+    for pattern, replacement in patterns:
+        result = re.sub(pattern, replacement, result)
+    return result
+
+
 def _extract_assistant_text(transcript_path: str, task_started_at: str = "") -> str:
     """Extract all assistant text messages from the JSONL transcript.
 
@@ -171,6 +207,9 @@ def summarize_agent_commentary(transcript_path: str, task_started_at: str = "") 
     raw_text = _extract_assistant_text(transcript_path, task_started_at)
     if not raw_text:
         return ""
+
+    # Redact secrets/PII before sending to local model
+    raw_text = _redact_secrets(raw_text)
 
     return _summarize_with_ollama(raw_text)
 
