@@ -100,12 +100,21 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
         last_prompt = last_req.get("prompt", "(empty)")
         sections.append(f"Timestamp: {last_ts}")
         sections.append(f"\n{last_prompt}")
+        # If the user message is short, show what they were approving
+        preceding = last_req.get("preceding_context", "")
+        if preceding:
+            sections.append(
+                f"\n> **This was a short confirmation. The user was responding to:**\n"
+                f"> {preceding}"
+            )
     else:
         sections.append("(No user requests captured — cannot verify completion)")
     sections.append(
         "\n> CRITICAL: Your verdict MUST explicitly state whether this specific request "
         "was completed fully (PASS) or not (FAIL). If it was not addressed, that alone "
-        "is grounds for FINDINGS regardless of other criteria."
+        "is grounds for FINDINGS regardless of other criteria. "
+        "NOTE: Short user messages like 'do these', 'yes', 'go ahead' are confirmations "
+        "of the FULL preceding assistant proposal — not just a subset."
     )
 
     # Last assistant message (for Execute-Don't-Recommend check)
@@ -131,6 +140,13 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
             marker = " ← MOST RECENT" if i == len(packet.user_requests) else ""
             sections.append(f"### Message {i} [{ts}]{marker}")
             sections.append(prompt)
+            # Show what the user was responding to (for short confirmations)
+            preceding = req.get("preceding_context", "")
+            if preceding:
+                sections.append(
+                    f"\n> **Preceding assistant message (user was responding to this):**\n"
+                    f"> {preceding}"
+                )
     else:
         sections.append("(No user requests captured)")
 

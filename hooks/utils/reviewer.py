@@ -740,7 +740,7 @@ def run_review(
     history = load_conversation(session_id, task_id=packet.task_id)
     round_count = len([m for m in history if m.get("role") == "user"]) + 1
 
-    if round_count > config.max_rounds:
+    if round_count >= config.max_rounds:
         return ReviewResult(
             approved=True,
             summary=f"Max review rounds ({config.max_rounds}) reached — auto-approving",

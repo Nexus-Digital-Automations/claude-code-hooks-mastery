@@ -1022,12 +1022,19 @@ def main():
                     _requests = json.loads(_req_file.read_text())
                 except Exception:
                     _requests = []
-            _requests.append({
+            _req_entry = {
                 "prompt": prompt[:2000],
                 "timestamp": datetime.now().isoformat(),
                 "task_id": task_id,       # enables task-scoped filtering in reviewer
                 "prompt_id": prompt_id,
-            })
+            }
+            # For short confirmations (< 100 chars), include the preceding
+            # assistant message as context so the reviewer knows what was approved.
+            if len(prompt.strip()) < 100:
+                _last_msg = input_data.get("last_assistant_message", "")
+                if _last_msg:
+                    _req_entry["preceding_context"] = _last_msg[:5000]
+            _requests.append(_req_entry)
             _req_file.write_text(json.dumps(_requests, indent=2))
         except Exception:
             pass  # Never block prompt submission
