@@ -552,8 +552,8 @@ def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
                 _changed = (_mod_r.stdout.strip() + "\n" + _staged_r.stdout.strip()).strip()
                 if not _changed:
                     _should_rerun_lint = False
-        except Exception:
-            pass  # Default to re-running
+        except (subprocess.TimeoutExpired, OSError, json.JSONDecodeError) as exc:
+            print(f"  [phase2] lint cache check failed ({exc}), re-running", file=sys.stderr)
 
         if _should_rerun_lint:
             _write_vr(vr_file, "lint", "pending", "", session_id=None)
@@ -705,8 +705,8 @@ def _phase_4_tests(session_id: str, config: dict) -> tuple[bool, str]:
                 total_lines = int(_total_match.group(1)) + int(_total_match.group(2))
                 if total_lines < 10:
                     return (True, "")
-    except Exception:
-        pass
+    except (subprocess.TimeoutExpired, OSError) as exc:
+        print(f"  [phase4] diff-size check failed ({exc}), requiring tests", file=sys.stderr)
 
     try:
         record = json.loads(vr_file.read_text())
@@ -804,8 +804,8 @@ def _phase_6_frontend(session_id: str, config: dict) -> tuple[bool, str]:
                 total_lines = int(_total_match.group(1)) + int(_total_match.group(2))
                 if total_lines < 10:
                     return (True, "")
-    except Exception:
-        pass
+    except (subprocess.TimeoutExpired, OSError) as exc:
+        print(f"  [phase6] diff-size check failed ({exc}), requiring frontend tests", file=sys.stderr)
 
     try:
         sys.path.insert(0, str(Path(__file__).parent / "utils"))
