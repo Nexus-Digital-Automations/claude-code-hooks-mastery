@@ -1064,19 +1064,19 @@ def _phase_8_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[
         )
 
         if _rev_proc.returncode == 1:
-            # FINDINGS
+            # FINDINGS — distinguish blocking vs advisory
             lines = []
+            has_blocking = False
             try:
                 _rev_data = json.loads(_rev_proc.stdout)
                 _round = _rev_data.get("round_count", "?")
                 lines.append(f"Round {_round} of {_rev_max_rounds}")
                 lines.append("")
                 for _finding in _rev_data.get("findings", []):
-                    _sev_icon = (
-                        "\U0001f6ab"
-                        if _finding.get("severity") == "blocking"
-                        else "\u26a0\ufe0f"
-                    )
+                    _is_blocking = _finding.get("severity") == "blocking"
+                    if _is_blocking:
+                        has_blocking = True
+                    _sev_icon = "\U0001f6ab" if _is_blocking else "\u26a0\ufe0f"
                     _cat = _finding.get("category", "?")
                     _desc = _finding.get("description", "")
                     lines.append(f"  {_sev_icon} [{_cat}] {_desc}")
@@ -1088,9 +1088,20 @@ def _phase_8_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[
                 lines.append("  (Could not parse reviewer output)")
                 if _rev_proc.stdout:
                     lines.append(f"  stdout: {_rev_proc.stdout[:500]}")
-            lines.append("")
-            lines.append("Address the findings, then retry stop.")
-            return (False, "\n".join(lines))
+                has_blocking = True  # Assume blocking if can't parse
+
+            if has_blocking:
+                lines.append("")
+                lines.append("Address the blocking (\U0001f6ab) findings, then retry stop.")
+                return (False, "\n".join(lines))
+            else:
+                # Advisory-only findings — warn but don't block
+                print(
+                    "\n  [reviewer] Advisory findings (non-blocking):\n"
+                    + "\n".join(f"  {ln}" for ln in lines) + "\n",
+                    file=sys.stderr,
+                )
+                return (True, "")
 
         elif _rev_proc.returncode == 0:
             try:
@@ -1233,7 +1244,8 @@ def main():
                 print("\n".join(lines), file=sys.stderr)
                 sys.exit(2)
 
-            # Phase passed — advance
+            # Phase passed — show progress and advance
+            print(f"  \u2705 Phase {phase_num}/{PHASE_COUNT} \u2014 {phase_label}", file=sys.stderr)
             try:
                 if phase_num < PHASE_COUNT:
                     advance_phase(vr_file, phase_num + 1)

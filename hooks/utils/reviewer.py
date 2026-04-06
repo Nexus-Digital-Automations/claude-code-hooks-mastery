@@ -510,7 +510,17 @@ def build_review_packet(
     except Exception as exc:
         print(f"  [reviewer] Commentary summarization failed: {exc}", file=sys.stderr)
 
-    # 6. Verification artifacts from output/ (committed .txt/.diff files)
+    # 6. Approved plan file (most recently modified plan from ~/.claude/plans/)
+    try:
+        plans_dir = _CLAUDE_DIR / "plans"
+        if plans_dir.is_dir():
+            plan_files = sorted(plans_dir.glob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+            if plan_files:
+                packet.plan_content = plan_files[0].read_text(errors="replace")
+    except (OSError, PermissionError) as exc:
+        print(f"  [reviewer] Plan file load failed: {exc}", file=sys.stderr)
+
+    # 7. Verification artifacts from output/ (committed .txt/.diff files)
     try:
         output_dir = project_root / "output"
         if output_dir.is_dir():
@@ -747,9 +757,36 @@ def run_review(
             round_count=round_count,
         )
 
-    # Build messages
+    # Build messages — summarize stale history after 3 rounds to reduce context pollution
     messages = [{"role": "system", "content": system_prompt}]
-    messages.extend(history)
+    if round_count >= 3 and history:
+        # Condense prior rounds into a summary instead of full history
+        prior_findings = []
+        for msg in history:
+            if msg.get("role") == "assistant":
+                content = msg.get("content", "")
+                try:
+                    data = json.loads(content)
+                    for f in data.get("findings", []):
+                        cat = f.get("category", "?")
+                        sev = f.get("severity", "?")
+                        desc = f.get("description", "")[:100]
+                        prior_findings.append(f"[{sev}] {cat}: {desc}")
+                except (json.JSONDecodeError, TypeError):
+                    pass
+        if prior_findings:
+            summary = (
+                f"PRIOR ROUNDS SUMMARY (rounds 1-{round_count - 1}):\n"
+                f"The following findings were raised in prior rounds. "
+                f"Some may have been resolved since then — evaluate the "
+                f"CURRENT packet fresh, not based on prior findings:\n\n"
+                + "\n".join(f"- {f}" for f in prior_findings)
+            )
+            messages.append({"role": "user", "content": summary})
+            messages.append({"role": "assistant", "content": '{"verdict": "FINDINGS", "summary": "See prior rounds."}'})
+    else:
+        messages.extend(history)
+
     # Extract last user request for explicit instruction
     last_request_text = "(no request captured)"
     if packet.user_requests:

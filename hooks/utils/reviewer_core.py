@@ -70,6 +70,7 @@ class ReviewPacket:
     root_violations: list[str] = field(default_factory=list)
     last_assistant_message: str = ""
     agent_commentary_summary: str = ""
+    plan_content: str = ""
     timestamp: str = ""
     verification_artifacts: dict[str, str] = field(default_factory=dict)
 
@@ -163,6 +164,17 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
                 sections.append(f"\n```\n{body}\n```")
     else:
         sections.append("(No active specs found)")
+
+    # Approved plan (pre-implementation — proves spec-before-code compliance)
+    sections.append("\n## APPROVED PLAN (pre-implementation)")
+    if packet.plan_content:
+        sections.append(
+            "> This plan was approved BEFORE implementation began. "
+            "It authorizes the features and approach described within."
+        )
+        sections.append(f"\n{packet.plan_content}")
+    else:
+        sections.append("(No plan file found — task may not have required a plan)")
 
     # Project config
     sections.append("\n## PROJECT CONFIG")
