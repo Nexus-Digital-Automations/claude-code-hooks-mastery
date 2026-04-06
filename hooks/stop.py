@@ -800,8 +800,35 @@ def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
     except Exception:
         pass
 
+    # Detect if there are actual uncommitted or unpushed changes
+    has_changes = False
+    try:
+        from project_config import get_git_root
+        _root = get_git_root()
+        _kw = dict(capture_output=True, text=True, timeout=5, cwd=_root)
+        # Uncommitted tracked changes?
+        _diff = subprocess.run(["git", "diff", "HEAD", "--name-only"], **_kw)
+        if _diff.stdout.strip():
+            has_changes = True
+        # Staged but uncommitted?
+        if not has_changes:
+            _staged = subprocess.run(["git", "diff", "--cached", "--name-only"], **_kw)
+            if _staged.stdout.strip():
+                has_changes = True
+        # Unpushed commits?
+        if not has_changes:
+            _branch = subprocess.run(["git", "branch", "--show-current"], **_kw)
+            _b = _branch.stdout.strip() or "main"
+            _rev = subprocess.run(
+                ["git", "rev-list", f"origin/{_b}...HEAD", "--count"], **_kw,
+            )
+            if _rev.returncode == 0 and int(_rev.stdout.strip() or "0") > 0:
+                has_changes = True
+    except Exception:
+        has_changes = True  # Assume changes if detection fails
+
     from project_config import get_required_checks
-    required = get_required_checks(config)
+    required = get_required_checks(config, files_modified=has_changes)
 
     try:
         record = json.loads(vr_file.read_text())
