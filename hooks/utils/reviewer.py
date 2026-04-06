@@ -348,31 +348,7 @@ def build_review_packet(
     except Exception:
         pass
 
-    # 4. Agent mode
-    try:
-        mode_file = _DATA_DIR / "agent_mode.json"
-        if mode_file.exists():
-            packet.agent_mode = json.loads(mode_file.read_text()).get("mode", "claude")
-    except Exception:
-        pass
-
-    # 4b. Delegation metadata (deepseek tasks only)
-    try:
-        dm_file = _DATA_DIR / f"delegation_meta_{session_id}.json"
-        if dm_file.exists():
-            all_entries = json.loads(dm_file.read_text())
-            if isinstance(all_entries, list):
-                if packet.task_id:
-                    packet.delegation_meta = [
-                        e for e in all_entries
-                        if e.get("task_id") == packet.task_id
-                    ]
-                else:
-                    packet.delegation_meta = all_entries[-3:]
-    except Exception:
-        pass
-
-    # 5. Root cleanliness (reuse stop.py logic inline)
+    # 4. Root cleanliness (reuse stop.py logic inline)
     try:
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from stop import check_root_cleanliness

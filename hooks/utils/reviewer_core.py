@@ -66,13 +66,11 @@ class ReviewPacket:
     git_log: str = ""
     git_show_stat: str = ""
     git_show_content: str = ""
-    agent_mode: str = "claude"
     root_clean: bool = True
     root_violations: list[str] = field(default_factory=list)
     last_assistant_message: str = ""
     timestamp: str = ""
     verification_artifacts: dict[str, str] = field(default_factory=dict)
-    delegation_meta: list[dict] = field(default_factory=list)
 
 
 # ── Packet Formatter ──────────────────────────────────────────────────
@@ -195,55 +193,6 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
         sections.append(f"```diff\n{diff_content}\n```")
     else:
         sections.append("(No diff content available — skip categories 9-13)")
-
-    # Agent mode
-    sections.append(f"\n## AGENT MODE: {packet.agent_mode}")
-
-    # Delegation metadata (deepseek mode only)
-    if packet.agent_mode == "deepseek":
-        sections.append("\n## DELEGATION METADATA")
-        if packet.delegation_meta:
-            for i, dm in enumerate(packet.delegation_meta, 1):
-                sections.append(f"\n### Delegation {i}")
-                sections.append(f"agent_id:                {dm.get('agent_id', '(unknown)')}")
-                sections.append(f"profile:                 {dm.get('profile', '(unknown)')}")
-                sections.append(f"plan_reviewed:           {dm.get('plan_reviewed', False)}")
-                sections.append(f"plan_approved:           {dm.get('plan_approved', False)}")
-                sections.append(f"terminal_state:          {dm.get('terminal_state', 'null')}")
-                sections.append(f"ask_supervisor_occurred: {dm.get('ask_supervisor_occurred', False)}")
-
-                file_changes = dm.get("plan_file_changes", [])
-                if file_changes:
-                    sections.append(f"plan_file_changes ({len(file_changes)} files):")
-                    for fc in file_changes[:20]:
-                        if isinstance(fc, dict):
-                            sections.append(f"  {fc.get('action', '?')} {fc.get('path', fc)}")
-                        else:
-                            sections.append(f"  {fc}")
-                else:
-                    sections.append("plan_file_changes:       (none captured)")
-
-                vsteps = dm.get("plan_verification_steps", [])
-                if vsteps:
-                    sections.append(f"plan_verification_steps ({len(vsteps)} steps):")
-                    for vs in vsteps[:10]:
-                        if isinstance(vs, dict):
-                            cmd = vs.get("command", vs.get("cmd", str(vs)))
-                            sections.append(f"  $ {cmd}")
-                        else:
-                            sections.append(f"  $ {vs}")
-                else:
-                    sections.append("plan_verification_steps: (none captured)")
-
-                files_read = dm.get("plan_files_read", [])
-                if files_read:
-                    sections.append(f"plan_files_read ({len(files_read)} files):")
-                    for fr in files_read[:20]:
-                        sections.append(f"  {fr}")
-                else:
-                    sections.append("plan_files_read:         (none captured)")
-        else:
-            sections.append("(No delegation metadata captured for this task.)")
 
     # Root cleanliness
     sections.append("\n## ROOT CLEANLINESS")

@@ -241,7 +241,6 @@ def build_claw_packet(
         reviewer_config = ReviewerConfig()
 
     packet = ReviewPacket(
-        agent_mode="claw",
         timestamp=datetime.now().isoformat(),
     )
 
@@ -347,7 +346,5 @@ def build_claw_packet(
                         continue
     except Exception:
         pass
-
-    # delegation_meta is always empty for claw (no DeepSeek)
 
     return packet

@@ -13,7 +13,6 @@ You receive a **review packet** containing:
 - Raw output from independently-executed check commands (tests, build, lint, etc.)
 - Project configuration (what type of project, what checks are required)
 - Git state (diff, status, recent commits)
-- Agent mode (claude direct or deepseek delegation)
 - Root directory cleanliness scan
 - Committed verification artifacts from output/ (test outputs, smoke test results)
 
@@ -65,7 +64,6 @@ Concrete, binary, directly enforceable obligations. Rules have clear pass/fail s
 | Rule | Derived From | Enforced By | Enforcement Mode |
 |------|-------------|-------------|-----------------|
 | No writes to `.env` files | Safety | `pre_tool_use.py` | **Hard block** (exit 2) |
-| DeepSeek agent must operate within workspace | Safety | `pre_tool_use.py` | **Hard block** (exit 2) |
 | Never commit secrets, API keys, credentials | Safety | Cat 6 (reviewer) | **Review block** |
 | Use `crypto.randomUUID()` / `uuid.uuid4()` for IDs, never `Date.now()` | Correctness | Cat 9 (reviewer) | **Review block** |
 | All checks must pass before stop (build, tests, lint, typecheck) | Correctness | `stop.py` verification gate | **Hard block** (exit 2) |
@@ -109,15 +107,14 @@ Session Opens          Task Begins         File Write/Edit        Agent Stops
 session_start.py   user_prompt_submit.py   pre_tool_use.py          stop.py
      │                     │                     │                     │
 Init VR state        INJECT Principles     BLOCK .env writes     GATE: all checks
-Inherit prior        INJECT Delegation     BLOCK DeepSeek esc.   REVIEW: GPT-5 Mini
-session state        INJECT Spec context   INJECT Standards       17 categories
+Inherit prior        INJECT Spec context   INJECT Standards       17 categories
 Set identity         INIT task/VR state    INJECT current task    Block on Rules
                      LOG user request                             Note Principles
 ```
 
 **Three enforcement modes:**
 
-- **Block** (`sys.exit(2)`): Prevents the action entirely. Used for unambiguous rule violations where no judgment is needed (writing to .env, DeepSeek escaping workspace, all checks failing).
+- **Block** (`sys.exit(2)`): Prevents the action entirely. Used for unambiguous rule violations where no judgment is needed (writing to .env, all checks failing).
 - **Inject** (`additionalContext`): Adds context to the agent's next response. Non-blocking. Used for principles (shape how the agent thinks) and standards (shape how the agent writes). The agent is trusted to apply these; violations are noted retrospectively.
 - **Review** (GPT-5 Mini, `sys.exit(1)` on blocking findings): Holistic evaluation at stop time. Blocks on **Rule** violations (blocking findings). Notes **Principle** and **Standard** violations as advisory. Requires evidence — never invents violations.
 
@@ -178,8 +175,6 @@ These are the rules Claude Code operates under. You enforce them. See **Enforcem
 - Claim completion without running tests and showing actual output
 - Edit `~/.claude/settings.json`
 - Commit secrets or credentials
-- Implement backend code directly when in deepseek mode and the task touches 5+ files (must delegate)
-- Trust delegated output without reading every modified file and re-running tests
 - **Tell users to run commands that Claude Code can run itself** — "you should run X" or "I recommend you run Y" when it could have just run Y
 
 ### AI Coding & Legibility Standards *(Tier 2 — Principles + Tier 4 — Standards; injected by hooks, reviewed advisory-only in cats 15–16)*
@@ -464,56 +459,6 @@ Comprehensive coverage means:
 - Delete/remove buttons skipped entirely when test data could have been created and used
 - Tests exist but only cover one page while others are untested
 - Claiming a destructive operation is "unsafe to test" when the test could simply create and delete its own test data
-
----
-
-### 8. Delegation Protocol — CONDITIONAL
-
-**Condition:** ONLY evaluate this if agent mode is `deepseek`
-
-If agent mode is `claude`: **SKIP this entire category entirely**. No delegation checks for claude mode.
-
-**What to check:**
-
-#### 8a. Delegation used for large backend tasks
-- Tasks touching 5+ backend files should have been delegated to DeepSeek
-- Look at the git diff file count — if 5+ backend files were modified, was delegation used?
-- Delegated output should have been reviewed (evidence: Claude Code read the files after delegation)
-
-#### 8b. Plan inspection evidence *(blocking)*
-Check the `DELEGATION METADATA` section in this packet. If `delegation_meta` is present:
-- `plan_reviewed: false` → delegation output was approved without the plan being inspected. **Blocking.**
-- `plan_file_changes` is non-empty → cross-reference every path against the git diff and git show output. Any file in `plan_file_changes` absent from the diff = incomplete delegation output that Claude Code should have caught. **Blocking.**
-- `plan_reviewed: true` with an empty `plan_file_changes` list → plan data was not captured (metadata gap); treat as advisory, not blocking.
-
-#### 8c. Verification steps were run *(blocking)*
-If `plan_verification_steps` is non-empty, Claude Code must have run each command after `poll()` completed. Evidence: commands appear in `verification_artifacts` (output/*.txt) or in `sandbox_results`. If the list is non-empty and no evidence exists that any of the commands ran, flag as **blocking** — these are the plan's own postconditions.
-
-#### 8d. Profile selection appropriateness *(advisory)*
-Check `delegation_meta.profile` against the task type in user_requests:
-- Auth / security / race condition / deadlock tasks → should use `deep-reason`
-- Rename-all / migrate-all / systematic refactor tasks → should use `batch-refactor`
-- Bug fix / crash / small isolated fix → `quick-fix` appropriate
-- New features → `default-delegation` appropriate
-
-If the task clearly involves auth, security, or concurrency but `quick-fix` or `default-delegation` was used, flag as advisory.
-
-#### 8e. LIMIT_REACHED terminal state *(blocking)*
-If `terminal_state: limit_reached` appears in delegation metadata, the agent exhausted its budget before completing execution. Verify the git diff covers every path in `plan_file_changes`. Any plan path absent from the diff = incomplete work. **Blocking.**
-
-**Pass criteria:**
-- Large backend tasks were delegated (if applicable)
-- `plan_reviewed: true` for every delegation
-- Every file in `plan_file_changes` is present in the git diff
-- `plan_verification_steps` commands were run (evidence in artifacts)
-- `terminal_state` is `completed` (or null when metadata unavailable)
-
-**Common violations:**
-- 5+ backend files modified directly without delegation in deepseek mode
-- Delegation used but `plan_reviewed: false` (plan approved without inspection)
-- Files in `plan_file_changes` absent from git diff (incomplete output not caught)
-- `plan_verification_steps` non-empty but no evidence any were run
-- `terminal_state: limit_reached` with partial diff
 
 ---
 
@@ -902,44 +847,38 @@ When reviewing a follow-up round:
 
 1. **No frontend = no Playwright**: If `has_frontend` is false, do NOT flag missing E2E tests. This is the most common false positive to avoid.
 
-2. **No deepseek mode = no delegation check**: If agent mode is `claude`, do NOT check delegation protocol.
+2. **Read-only tasks get reduced scrutiny**: If git diff is empty (no files modified), the task was informational. Only check that the user's question was answered.
 
-3. **Read-only tasks get reduced scrutiny**: If git diff is empty (no files modified), the task was informational. Only check that the user's question was answered.
+3. **Spec not always required**: Quick bug fixes (<10 lines changed), answers to questions, and confirmations don't need specs. But new features, significant changes, and multi-file modifications DO.
 
-4. **Spec not always required**: Quick bug fixes (<10 lines changed), answers to questions, and confirmations don't need specs. But new features, significant changes, and multi-file modifications DO.
+4. **Command not found ≠ blocking failure**: If `ruff` isn't installed, that's advisory. But if `pytest` isn't installed and the project has a `tests/` directory, that's blocking (tests should be runnable).
 
-5. **Command not found ≠ blocking failure**: If `ruff` isn't installed, that's advisory. But if `pytest` isn't installed and the project has a `tests/` directory, that's blocking (tests should be runnable).
+5. **Warnings vs errors in lint**: Lint warnings are advisory. Lint ERRORS are blocking. Distinguish between them in the output.
 
-6. **Warnings vs errors in lint**: Lint warnings are advisory. Lint ERRORS are blocking. Distinguish between them in the output.
+6. **Empty test output with exit code 0**: Some test runners produce no output when all pass. Exit code 0 is sufficient evidence of pass if no failure patterns are found.
 
-7. **Empty test output with exit code 0**: Some test runners produce no output when all pass. Exit code 0 is sufficient evidence of pass if no failure patterns are found.
+7. **Security scan not available**: If no security scanner is installed, note it as advisory but don't block. The security check is best-effort.
 
-8. **Security scan not available**: If no security scanner is installed, note it as advisory but don't block. The security check is best-effort.
+8. **Build not required for all projects**: Python scripts don't need a build step. Only flag missing build if `has_build` is true in the project config.
 
-9. **Build not required for all projects**: Python scripts don't need a build step. Only flag missing build if `has_build` is true in the project config.
+9. **Commit messages**: "fix: resolve login timeout" is fine. "update" or "changes" is not. The message should describe what changed and why.
 
-10. **Commit messages**: "fix: resolve login timeout" is fine. "update" or "changes" is not. The message should describe what changed and why.
+10. **Engineering discipline categories 11-13 require a diff**: If no git diff content is in the packet, skip categories 11-13 entirely (no diff = nothing to review for code quality).
 
-11. **Engineering discipline categories 11-13 require a diff**: If no git diff content is in the packet, skip categories 11-13 entirely (no diff = nothing to review for code quality).
+11. **YAGNI applies to the AI, not the user**: Category 12 checks whether the AI added unrequested scope — NOT whether the user's request is too broad. Never penalize a user for asking for a large feature.
 
-12. **YAGNI applies to the AI, not the user**: Category 12 checks whether the AI added unrequested scope — NOT whether the user's request is too broad. Never penalize a user for asking for a large feature.
+12. **Complexity is advisory, not blocking**: A long function is worth noting but never blocks approval on its own. Only block if complexity conceals a functional bug.
 
-13. **Complexity is advisory, not blocking**: A long function is worth noting but never blocks approval on its own. Only block if complexity conceals a functional bug.
+13. **Execute-Don't-Recommend only applies to Claude Code's output**: Category 14 checks the last assistant message. If it's missing from the packet, skip the category. Don't invent violations.
 
-14. **Execute-Don't-Recommend only applies to Claude Code's output**: Category 14 checks the last assistant message. If it's missing from the packet, skip the category. Don't invent violations.
+14. **The stop hook already ran mechanical checks**: Don't re-flag lint/build/test failures as additional violations if the sandbox results show they passed. Trust the sandbox output you're given.
 
-15. **The stop hook already ran mechanical checks**: Don't re-flag lint/build/test failures as additional violations if the sandbox results show they passed. Trust the sandbox output you're given.
+15. **Assume good faith on partial packet data**: If user_requests is empty, the capturing hook may not have fired. Review what you have. Don't block solely because the packet is incomplete.
 
-16. **Assume good faith on partial packet data**: If user_requests is empty, the capturing hook may not have fired. Review what you have. Don't block solely because the packet is incomplete.
+16. **Playwright coverage must be comprehensive**: For frontend projects, Playwright tests must cover all pages, buttons, and interactive functionality. Skipping entire pages or leaving delete/remove buttons untested is **blocking**. Destructive operations (delete chat, delete item, etc.) should be tested using test data created for that purpose — create the test item, delete it, verify it's gone. The narrow exception is operations that can only target irreplaceable real user data with no safe test path (e.g., "delete account") — those may be skipped. If test data can be created for the operation, it is not exempt.
 
-17. **Playwright coverage must be comprehensive**: For frontend projects, Playwright tests must cover all pages, buttons, and interactive functionality. Skipping entire pages or leaving delete/remove buttons untested is **blocking**. Destructive operations (delete chat, delete item, etc.) should be tested using test data created for that purpose — create the test item, delete it, verify it's gone. The narrow exception is operations that can only target irreplaceable real user data with no safe test path (e.g., "delete account") — those may be skipped. If test data can be created for the operation, it is not exempt.
+17. **Category 15 (AI Coding Standards) is advisory-heavy**: Only block on boolean flag params and obvious concurrency races. Treat everything else as advisory. Do not let category 15 produce FINDINGS alone — it must combine with another blocking finding or be egregious enough to constitute a systematic code quality failure across the diff.
 
-18. **Category 15 (AI Coding Standards) is advisory-heavy**: Only block on boolean flag params and obvious concurrency races. Treat everything else as advisory. Do not let category 15 produce FINDINGS alone — it must combine with another blocking finding or be egregious enough to constitute a systematic code quality failure across the diff.
+18. **Category 16 (AI-Agent Codebase Legibility) is advisory-only**: Never block on category 16 findings. Its purpose is to surface legibility debt as advisory notes — missing docstrings, undocumented state machines, missing cross-references. A single missing annotation in a large diff is not worth noting. Flag only when the pattern is systemic (e.g., 5+ new public functions all missing failure mode docs).
 
-19. **Category 16 (AI-Agent Codebase Legibility) is advisory-only**: Never block on category 16 findings. Its purpose is to surface legibility debt as advisory notes — missing docstrings, undocumented state machines, missing cross-references. A single missing annotation in a large diff is not worth noting. Flag only when the pattern is systemic (e.g., 5+ new public functions all missing failure mode docs).
-
-20. **Category 17 (Pre-Execution Reasoning) is diagnostic, not gatekeeping**: Never block on missing reasoning. Use it to annotate the *cause* of other blocking findings when the root cause was clearly insufficient upfront analysis — e.g., "agent skipped scope analysis, which explains why the implementation was over-scoped." If the implementation is correct and complete, skip category 17 entirely.
-
-21. **LIMIT_REACHED means incomplete**: If `delegation_meta.terminal_state == "limit_reached"` for any delegation in this task, the agent ran out of budget before completing. Do not approve unless the git diff confirms every file in `plan_file_changes` was actually modified. A partial diff against a complete plan is a blocking finding regardless of what else passed.
-
-22. **`ask_supervisor_occurred` requires evidence of an answer**: If `delegation_meta.ask_supervisor_occurred == true`, the agent paused to ask Claude Code a question mid-execution. If the agent reached `completed` state but no answer is visible in the session (the agent simply continued), the implementation choices may be uninformed. Flag as **advisory** — it does not block alone, but warrants a note in the summary.
+19. **Category 17 (Pre-Execution Reasoning) is diagnostic, not gatekeeping**: Never block on missing reasoning. Use it to annotate the *cause* of other blocking findings when the root cause was clearly insufficient upfront analysis — e.g., "agent skipped scope analysis, which explains why the implementation was over-scoped." If the implementation is correct and complete, skip category 17 entirely.
