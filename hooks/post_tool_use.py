@@ -443,6 +443,19 @@ def _invalidate_stale_checks(session_id: str, file_path: str) -> None:
         if changed:
             record["checks"] = checks
             vr_file.write_text(json.dumps(record, indent=2))
+
+            # Regress phase when checks are invalidated
+            try:
+                from utils.vr_utils import regress_phase
+            except ImportError:
+                try:
+                    from vr_utils import regress_phase
+                except ImportError:
+                    regress_phase = None
+            if regress_phase:
+                for key in to_invalidate:
+                    if checks.get(key, {}).get("status") == "pending":
+                        regress_phase(vr_file, key)
     except Exception:
         pass  # Never block
 

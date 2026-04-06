@@ -490,6 +490,508 @@ def build_evidence_display(done: list, session_id: str) -> str:
     return "\n".join(lines)
 
 
+# ── Phase handlers ──────────────────────────────────────────────────────
+# Each returns (passed: bool, message: str). Message is shown only on failure.
+
+def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 1: Implementation complete — spec criteria + root cleanliness."""
+    issues = []
+
+    # Root cleanliness
+    is_clean, violations = check_root_cleanliness()
+    if not is_clean:
+        issues.append("Root folder not clean:")
+        issues.extend(violations)
+        issues.append("")
+        issues.append("Move/delete violations, then retry.")
+
+    # Spec acceptance criteria
+    spec_done, spec_summary = check_spec_completion()
+    if not spec_done:
+        issues.append("Spec acceptance criteria incomplete:")
+        issues.extend(spec_summary)
+        issues.append("")
+        issues.append("Complete all acceptance criteria before proceeding.")
+
+    if issues:
+        return (False, "\n".join(issues))
+    return (True, "")
+
+
+def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 2: Lint + typecheck must pass (zero errors)."""
+    resolved_sid = _resolve_session_id(session_id)
+    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+    try:
+        sys.path.insert(0, str(Path(__file__).parent / "utils"))
+        from project_config import get_git_root, auto_run_missing
+        from vr_utils import write_vr as _write_vr
+
+        project_root = Path(get_git_root())
+
+        # Force fresh lint — never trust cached partial results
+        _write_vr(vr_file, "lint", "pending", "", session_id=None)
+        auto_run_missing(resolved_sid, config, vr_file, project_root)
+    except Exception:
+        pass
+
+    try:
+        record = json.loads(vr_file.read_text())
+        checks = record.get("checks", {})
+    except Exception:
+        checks = {}
+
+    from project_config import get_required_checks
+    required = get_required_checks(config)
+
+    issues = []
+    phase_checks = ["lint", "typecheck"]
+
+    for key in phase_checks:
+        if key not in required:
+            continue
+        item = checks.get(key, {})
+        status = item.get("status", "pending")
+        if status == "pending":
+            run_cmd = config.get("checks", {}).get(key, {})
+            if isinstance(run_cmd, dict):
+                run_cmd = run_cmd.get("run_command", "")
+            else:
+                run_cmd = ""
+            hint = f" — run: {run_cmd}" if run_cmd else ""
+            issues.append(f"  \u274c {key.upper():<18} not observed{hint}")
+        elif status == "failed":
+            ev = (item.get("evidence") or "")[:400]
+            issues.append(f"  \u274c {key.upper():<18} FAILED")
+            if ev:
+                for ev_line in ev.split("\n")[:10]:
+                    issues.append(f"     {ev_line}")
+
+    if issues:
+        msg = "\n".join(issues)
+        msg += "\n\nFix all errors, then retry."
+        return (False, msg)
+    return (True, "")
+
+
+def _phase_3_tests(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 3: Tests — required only for stable, important features."""
+    resolved_sid = _resolve_session_id(session_id)
+    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+    from project_config import get_required_checks
+
+    required = get_required_checks(config)
+    if "tests" not in required:
+        return (True, "")
+
+    # Apply test necessity heuristic
+    try:
+        from project_config import should_require_tests
+        from vr_utils import parse_transcript
+
+        # Get modified files from VR or transcript
+        task_file = Path.home() / f".claude/data/current_task_{resolved_sid}.json"
+        task_start = None
+        transcript_path = None
+        if task_file.exists():
+            try:
+                task_data = json.loads(task_file.read_text())
+                task_start = task_data.get("started_at")
+                transcript_path = task_data.get("transcript_path")
+            except Exception:
+                pass
+
+        modified_files = []
+        if transcript_path:
+            modified_files, _, _ = parse_transcript(transcript_path, task_start)
+
+        # Check for active spec
+        has_active_spec = False
+        specs_dir = Path.cwd() / "specs"
+        if specs_dir.is_dir():
+            for sf in specs_dir.glob("*.md"):
+                try:
+                    content = sf.read_text(errors="replace")
+                    if "status: active" in content or "status: in-progress" in content:
+                        has_active_spec = True
+                        break
+                except Exception:
+                    continue
+
+        if not should_require_tests(config, modified_files, has_active_spec):
+            return (True, "")
+    except Exception:
+        pass  # If heuristic fails, fall through to normal check
+
+    try:
+        record = json.loads(vr_file.read_text())
+        checks = record.get("checks", {})
+    except Exception:
+        checks = {}
+
+    item = checks.get("tests", {})
+    status = item.get("status", "pending")
+
+    if status == "pending":
+        run_cmd = config.get("checks", {}).get("tests", {})
+        if isinstance(run_cmd, dict):
+            run_cmd = run_cmd.get("run_command", "")
+        else:
+            run_cmd = ""
+        hint = f"\n\nRun: {run_cmd}" if run_cmd else ""
+        return (False, f"  \u274c TESTS not run yet.{hint}")
+    elif status == "failed":
+        ev = (item.get("evidence") or "")[:500]
+        msg = "  \u274c TESTS FAILED\n"
+        if ev:
+            for ev_line in ev.split("\n")[:15]:
+                msg += f"     {ev_line}\n"
+        msg += "\nFix failing tests, then retry."
+        return (False, msg)
+
+    return (True, "")
+
+
+def _phase_4_build(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 4: Build verification + app startup."""
+    resolved_sid = _resolve_session_id(session_id)
+    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+    from project_config import get_required_checks
+    required = get_required_checks(config)
+
+    try:
+        record = json.loads(vr_file.read_text())
+        checks = record.get("checks", {})
+    except Exception:
+        checks = {}
+
+    phase_checks = ["build", "app_starts"]
+    issues = []
+
+    for key in phase_checks:
+        if key not in required:
+            continue
+        item = checks.get(key, {})
+        status = item.get("status", "pending")
+        label = "BUILD" if key == "build" else "APP STARTS"
+
+        if status == "pending":
+            run_cmd = config.get("checks", {}).get(key, {})
+            if isinstance(run_cmd, dict):
+                run_cmd = run_cmd.get("run_command", "")
+            else:
+                run_cmd = ""
+            hint = f" — run: {run_cmd}" if run_cmd else ""
+            issues.append(f"  \u274c {label:<18} not observed{hint}")
+        elif status == "failed":
+            ev = (item.get("evidence") or "")[:400]
+            issues.append(f"  \u274c {label:<18} FAILED")
+            if ev:
+                for ev_line in ev.split("\n")[:10]:
+                    issues.append(f"     {ev_line}")
+
+    if issues:
+        msg = "\n".join(issues)
+        msg += "\n\nFix build/startup failures, then retry."
+        return (False, msg)
+    return (True, "")
+
+
+def _phase_5_frontend(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 5: Frontend validation via Playwright/Cypress."""
+    if not config.get("has_frontend", False):
+        return (True, "")
+
+    try:
+        sys.path.insert(0, str(Path(__file__).parent / "utils"))
+        from project_config import get_git_root
+        project_root = Path(get_git_root())
+    except Exception:
+        project_root = Path.cwd()
+
+    # Check E2E framework exists
+    _pw_configs = ("playwright.config.ts", "playwright.config.js",
+                   "playwright.config.mjs", "playwright.config.cjs")
+    _cy_configs = ("cypress.config.ts", "cypress.config.js",
+                   "cypress.config.mjs", "cypress.config.cjs")
+    _has_e2e = (any((project_root / f).exists() for f in _pw_configs) or
+                any((project_root / f).exists() for f in _cy_configs))
+
+    if not _has_e2e:
+        return (False,
+            "Frontend detected but no E2E test framework configured.\n"
+            "Set up Playwright: npx playwright init\n"
+            "Write and pass ALL E2E tests before stopping."
+        )
+
+    resolved_sid = _resolve_session_id(session_id)
+    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+    from project_config import get_required_checks
+    required = get_required_checks(config)
+
+    try:
+        record = json.loads(vr_file.read_text())
+        checks = record.get("checks", {})
+    except Exception:
+        checks = {}
+
+    phase_checks = ["frontend", "happy_path"]
+    issues = []
+
+    for key in phase_checks:
+        if key not in required:
+            continue
+        item = checks.get(key, {})
+        status = item.get("status", "pending")
+        label = "FRONTEND" if key == "frontend" else "HAPPY PATH"
+
+        if status == "pending":
+            run_cmd = config.get("checks", {}).get(key, {})
+            if isinstance(run_cmd, dict):
+                run_cmd = run_cmd.get("run_command", "")
+            else:
+                run_cmd = ""
+            hint = f" — run: {run_cmd}" if run_cmd else ""
+            issues.append(f"  \u274c {label:<18} not observed{hint}")
+        elif status == "failed":
+            ev = (item.get("evidence") or "")[:500]
+            issues.append(f"  \u274c {label:<18} FAILED")
+            if ev:
+                for ev_line in ev.split("\n")[:10]:
+                    issues.append(f"     {ev_line}")
+
+    if issues:
+        msg = "\n".join(issues)
+        msg += "\n\nFix frontend failures. All E2E tests must pass."
+        return (False, msg)
+
+    # Belt-and-suspenders: verify Playwright evidence has zero failures
+    import re as _re
+    fe_check = checks.get("frontend", {})
+    fe_evidence = fe_check.get("evidence", "")
+    if fe_evidence:
+        fail_match = _re.search(r'(\d+)\s+failed', fe_evidence)
+        if fail_match and int(fail_match.group(1)) > 0:
+            return (False,
+                f"{fail_match.group(1)} Playwright test(s) failed.\n"
+                "ALL tests must pass. Zero failures tolerated.\n"
+                "Fix and re-run: npx playwright test"
+            )
+
+    return (True, "")
+
+
+def _phase_6_ship(session_id: str, config: dict) -> tuple[bool, str]:
+    """Phase 6: Security scan, commit, push, upstream sync."""
+    resolved_sid = _resolve_session_id(session_id)
+    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+    try:
+        sys.path.insert(0, str(Path(__file__).parent / "utils"))
+        from project_config import get_git_root, auto_run_missing
+        project_root = Path(get_git_root())
+
+        # Auto-run security and upstream_sync
+        auto_run_missing(resolved_sid, config, vr_file, project_root)
+    except Exception:
+        pass
+
+    from project_config import get_required_checks
+    required = get_required_checks(config)
+
+    try:
+        record = json.loads(vr_file.read_text())
+        checks = record.get("checks", {})
+    except Exception:
+        checks = {}
+
+    phase_checks = ["security", "commit_push", "upstream_sync", "execution"]
+    label_map = {
+        "security": "SECURITY",
+        "commit_push": "COMMIT & PUSH",
+        "upstream_sync": "UPSTREAM SYNC",
+        "execution": "EXECUTION",
+    }
+    issues = []
+
+    for key in phase_checks:
+        if key not in required:
+            continue
+        item = checks.get(key, {})
+        status = item.get("status", "pending")
+        label = label_map.get(key, key.upper())
+
+        if status == "pending":
+            if key == "commit_push":
+                issues.append(f"  \u274c {label:<18} — commit and push your changes")
+            elif key == "security":
+                issues.append(f"  \u274c {label:<18} — security scan not run")
+            else:
+                issues.append(f"  \u274c {label:<18} — not verified")
+        elif status == "failed":
+            ev = (item.get("evidence") or "")[:300]
+            issues.append(f"  \u274c {label:<18} FAILED")
+            if ev:
+                for ev_line in ev.split("\n")[:8]:
+                    issues.append(f"     {ev_line}")
+
+    if issues:
+        msg = "\n".join(issues)
+        msg += "\n\nFix issues, commit, push, then retry."
+        return (False, msg)
+    return (True, "")
+
+
+def _phase_7_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[bool, str]:
+    """Phase 7: GPT-5 Mini protocol compliance review.
+
+    IMPORTANT: stop.py runs under bare python3 (not uv run --script),
+    so openai/dotenv are NOT importable. The reviewer runs as a subprocess.
+    """
+    resolved_sid = _resolve_session_id(session_id)
+
+    try:
+        _reviewer_script = Path(__file__).parent / "utils" / "reviewer.py"
+        _data_dir = Path.home() / ".claude" / "data"
+
+        # Check if reviewer is enabled
+        _rev_enabled = True
+        _rev_max_rounds = 5
+        _rev_config_file = _data_dir / "reviewer_config.json"
+        if _rev_config_file.exists():
+            try:
+                _rev_conf = json.loads(_rev_config_file.read_text())
+                _rev_enabled = _rev_conf.get("enabled", True)
+                _rev_max_rounds = _rev_conf.get("max_rounds", 5)
+            except Exception:
+                pass
+
+        if not _rev_enabled:
+            print("  [reviewer] Disabled in config \u2014 skipping", file=sys.stderr)
+            return (True, "")
+        if not _reviewer_script.exists():
+            print("  [reviewer] reviewer.py not found \u2014 skipping", file=sys.stderr)
+            return (True, "")
+
+        # Check for existing approval
+        _approval_file = _data_dir / f"reviewer_approval_{resolved_sid}.json"
+        if _approval_file.exists():
+            try:
+                if json.loads(_approval_file.read_text()).get("approved", False):
+                    return (True, "")
+            except Exception:
+                pass
+
+        # Check OPENAI_API_KEY
+        _has_api_key = bool(os.getenv("OPENAI_API_KEY"))
+        if not _has_api_key:
+            _env_file = Path.home() / ".claude" / ".env"
+            if _env_file.exists():
+                try:
+                    for _line in _env_file.read_text().splitlines():
+                        _line = _line.strip()
+                        if _line.startswith("OPENAI_API_KEY=") and len(_line) > 15:
+                            _has_api_key = True
+                            break
+                except Exception:
+                    pass
+
+        if not _has_api_key:
+            print("  [reviewer] OPENAI_API_KEY not set \u2014 skipping (non-blocking)", file=sys.stderr)
+            return (True, "")
+
+        # Call reviewer
+        print("\n  Running GPT-5 Mini protocol review (Phase 7)...\n", file=sys.stderr)
+        _last_msg = input_data.get("last_assistant_message", "")
+        _rev_cmd = [
+            "uv", "run", "--script", str(_reviewer_script),
+            resolved_sid, "--json",
+        ]
+        if _last_msg:
+            _rev_cmd.extend(["--last-message", _last_msg[:3000]])
+
+        _rev_proc = subprocess.run(
+            _rev_cmd,
+            capture_output=True, text=True, timeout=180,
+            cwd=os.getcwd(),
+        )
+
+        if _rev_proc.returncode == 1:
+            # FINDINGS
+            lines = []
+            try:
+                _rev_data = json.loads(_rev_proc.stdout)
+                _round = _rev_data.get("round_count", "?")
+                lines.append(f"Round {_round} of {_rev_max_rounds}")
+                lines.append("")
+                for _finding in _rev_data.get("findings", []):
+                    _sev_icon = (
+                        "\U0001f6ab"
+                        if _finding.get("severity") == "blocking"
+                        else "\u26a0\ufe0f"
+                    )
+                    _cat = _finding.get("category", "?")
+                    _desc = _finding.get("description", "")
+                    lines.append(f"  {_sev_icon} [{_cat}] {_desc}")
+                    if _finding.get("evidence_needed"):
+                        lines.append(f"     \u2192 {_finding['evidence_needed']}")
+                    lines.append("")
+                lines.append(f"Summary: {_rev_data.get('summary', '')}")
+            except Exception:
+                lines.append("  (Could not parse reviewer output)")
+                if _rev_proc.stdout:
+                    lines.append(f"  stdout: {_rev_proc.stdout[:500]}")
+            lines.append("")
+            lines.append("Address the findings, then retry stop.")
+            return (False, "\n".join(lines))
+
+        elif _rev_proc.returncode == 0:
+            try:
+                _rev_data = json.loads(_rev_proc.stdout)
+                _summary = _rev_data.get("summary", "Approved")
+                print(f"  [reviewer] APPROVED: {_summary}", file=sys.stderr)
+            except Exception:
+                print("  [reviewer] APPROVED", file=sys.stderr)
+            return (True, "")
+        else:
+            _err = (_rev_proc.stderr or _rev_proc.stdout or "")[:300]
+            print(f"  [reviewer] Error (non-blocking, exit {_rev_proc.returncode}): {_err}", file=sys.stderr)
+            return (True, "")
+
+    except subprocess.TimeoutExpired:
+        print("  [reviewer] Timed out after 180s (non-blocking)", file=sys.stderr)
+        return (True, "")
+    except FileNotFoundError:
+        print("  [reviewer] uv not found \u2014 skipping (non-blocking)", file=sys.stderr)
+        return (True, "")
+    except Exception as _rev_exc:
+        print(
+            f"  [reviewer] Error (non-blocking): {type(_rev_exc).__name__}: "
+            f"{str(_rev_exc)[:200]}",
+            file=sys.stderr,
+        )
+        return (True, "")
+
+
+# ── Phase dispatcher ────────────────────────────────────────────────────
+
+PHASE_HANDLERS = {
+    1: ("IMPLEMENT",        _phase_1_implement),
+    2: ("STATIC ANALYSIS",  _phase_2_static_analysis),
+    3: ("TESTS",            _phase_3_tests),
+    4: ("BUILD",            _phase_4_build),
+    5: ("FRONTEND",         _phase_5_frontend),
+    6: ("SHIP",             _phase_6_ship),
+    # Phase 7 (reviewer) handled specially — needs input_data
+}
+
+PHASE_COUNT = 7
+
+
 # ── Main ─────────────────────────────────────────────────────────────────
 
 def main():
@@ -503,13 +1005,12 @@ def main():
 
         session_id = input_data.get("session_id", "default")
 
-        # 1. Rate limit bypass
+        # ── Phase 0: Bypass gates (rate limit + emergency) ──────────────
         is_rate_limited, detail = detect_rate_limit(input_data)
         if is_rate_limited:
-            print(f"\nSTOP ALLOWED — RATE LIMIT DETECTED\n{detail}\n", file=sys.stderr)
+            print(f"\nSTOP ALLOWED \u2014 RATE LIMIT DETECTED\n{detail}\n", file=sys.stderr)
             sys.exit(0)
 
-        # 2. Emergency mode detection
         attempts = record_stop_attempt()
         is_emergency, attempt_count, span = detect_emergency_mode(attempts)
         if is_emergency and not check_stop_authorization(session_id):
@@ -521,37 +1022,7 @@ def main():
             )
             sys.exit(2)
 
-        # 3. Root cleanliness
-        is_clean, violations = check_root_cleanliness()
-        if not is_clean:
-            print(
-                "\nSTOP BLOCKED — ROOT FOLDER NOT CLEAN\n"
-                + "\n".join(violations) + "\n"
-                "\nMove/delete violations, then retry.\n",
-                file=sys.stderr,
-            )
-            sys.exit(2)
-
-        # 3b. Spec acceptance criteria check (informational — warns but doesn't block)
-        spec_done, spec_summary = check_spec_completion()
-        if spec_summary:
-            lines = [
-                "",
-                "=" * 60,
-                "SPEC COMPLETION STATUS",
-                "=" * 60,
-                "",
-            ]
-            lines.extend(spec_summary)
-            if not spec_done:
-                lines.append("")
-                lines.append("WARNING: Some spec acceptance criteria are incomplete.")
-                lines.append("Verify all requirements are met before stopping.")
-            lines.append("")
-            lines.append("=" * 60)
-            print("\n".join(lines), file=sys.stderr)
-
-        # Load project config (used by verification gate and security scan)
+        # ── Load project config ─────────────────────────────────────────
         try:
             sys.path.insert(0, str(Path(__file__).parent / "utils"))
             from project_config import get_git_root, load_config
@@ -559,291 +1030,65 @@ def main():
         except Exception:
             config = {}
 
-        # 4a. Force fresh full-project lint — never trust a cached partial result
+        # ── Resolve session and VR ──────────────────────────────────────
         resolved_sid = _resolve_session_id(session_id)
+        vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+
+        # Read current phase from VR (defaults to 1)
         try:
-            from project_config import auto_run_missing, get_git_root
-            from vr_utils import write_vr as _write_vr
-            _vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
-            # Reset lint to pending so auto_run_missing always re-runs it project-wide
-            _write_vr(_vr_file, "lint", "pending", "", session_id=None)
-            auto_run_missing(resolved_sid, config, _vr_file, Path(get_git_root()))
+            from vr_utils import get_current_phase, advance_phase
+            current_phase, current_phase_name = get_current_phase(vr_file)
         except Exception:
-            pass  # Never block on errors; check_verification will catch any failure
+            current_phase = 1
 
-        # 4b. Config-driven verification gate
-        all_passed, done, missing = check_verification(session_id)
-        if not all_passed:
-            print(build_blocked_message(done, missing, config), file=sys.stderr)
-            sys.exit(2)
+        # ── Phase loop: auto-advance through passing phases ─────────────
+        for phase_num in range(current_phase, PHASE_COUNT + 1):
+            if phase_num in PHASE_HANDLERS:
+                phase_label, handler = PHASE_HANDLERS[phase_num]
+                passed, message = handler(session_id, config)
+            elif phase_num == 7:
+                # Phase 7: Reviewer (needs authorization first)
+                if not check_stop_authorization(session_id):
+                    auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
+                    # Show evidence summary before asking for auth
+                    all_passed, done, missing = check_verification(session_id)
+                    if done:
+                        evidence_display = build_evidence_display(done, session_id)
+                        print(evidence_display, file=sys.stderr)
+                    print(
+                        f"\n\u2705 Phases 1-6 passed. Now authorize: bash {auth_script}\n",
+                        file=sys.stderr,
+                    )
+                    sys.exit(2)
+                phase_label = "REVIEW"
+                passed, message = _phase_7_reviewer(session_id, config, input_data)
+            else:
+                continue
 
-        # 4c. Perfection gate — every completed check must PASS, not just complete
-        failed_checks = [
-            (key, label, status, ts_short, ev)
-            for key, label, status, ts_short, ev in done
-            if status == "failed"
-        ]
-        if failed_checks:
-            lines = [
-                "",
-                "=" * 60,
-                "STOP BLOCKED \u2014 PERFECTION REQUIRED",
-                "=" * 60,
-                "",
-                "All verification checks must PASS. The following failed:",
-                "",
-            ]
-            for key, label, status, ts_short, ev in failed_checks:
-                ev_display = f' \u2014 "{ev}"' if ev else ""
-                lines.append(f"  \u274c {label:<18} [{status} @ {ts_short}]{ev_display}")
-            lines += [
-                "",
-                "Fix ALL failures and re-run checks. No exceptions.",
-                "=" * 60,
-                "",
-            ]
-            print("\n".join(lines), file=sys.stderr)
-            sys.exit(2)
-
-        # 4d. Frontend Playwright enforcement — if frontend exists, E2E tests are mandatory
-        if config.get("has_frontend", False):
-            try:
-                from project_config import get_git_root
-                _project_root = Path(get_git_root())
-            except Exception:
-                _project_root = Path.cwd()
-            _pw_configs = ("playwright.config.ts", "playwright.config.js",
-                           "playwright.config.mjs", "playwright.config.cjs")
-            _cy_configs = ("cypress.config.ts", "cypress.config.js",
-                           "cypress.config.mjs", "cypress.config.cjs")
-            _has_e2e = (any((_project_root / f).exists() for f in _pw_configs) or
-                        any((_project_root / f).exists() for f in _cy_configs))
-            if not _has_e2e:
-                print(
-                    "\n" + "=" * 60 +
-                    "\nSTOP BLOCKED \u2014 PLAYWRIGHT TESTS REQUIRED\n" +
-                    "=" * 60 +
-                    "\n\nFrontend detected but no E2E test framework configured.\n"
-                    "Set up Playwright: npx playwright init\n"
-                    "Write and pass ALL E2E tests before stopping.\n\n" +
-                    "=" * 60 + "\n",
-                    file=sys.stderr,
-                )
+            if not passed:
+                # Show focused failure message for this phase only
+                lines = [
+                    "",
+                    "=" * 60,
+                    f"PHASE {phase_num}/{PHASE_COUNT} \u2014 {phase_label}",
+                    "=" * 60,
+                    "",
+                    message,
+                    "",
+                    "=" * 60,
+                    "",
+                ]
+                print("\n".join(lines), file=sys.stderr)
                 sys.exit(2)
 
-            # Belt-and-suspenders: verify Playwright evidence has zero failures
-            _resolved = _resolve_session_id(session_id)
-            _vr_path = Path.home() / f".claude/data/verification_record_{_resolved}.json"
+            # Phase passed — advance
             try:
-                import re as _re
-                _vr_data = json.loads(_vr_path.read_text())
-                _fe_check = _vr_data.get("checks", {}).get("frontend", {})
-                _fe_evidence = _fe_check.get("evidence", "")
-                if _fe_evidence:
-                    _fail_match = _re.search(r'(\d+)\s+failed', _fe_evidence)
-                    if _fail_match and int(_fail_match.group(1)) > 0:
-                        print(
-                            "\n" + "=" * 60 +
-                            "\nSTOP BLOCKED \u2014 PLAYWRIGHT FAILURES\n" +
-                            "=" * 60 +
-                            f"\n\n{_fail_match.group(1)} Playwright test(s) failed.\n"
-                            "ALL tests must pass. Zero failures tolerated.\n"
-                            "Fix and re-run: npx playwright test\n\n" +
-                            "=" * 60 + "\n",
-                            file=sys.stderr,
-                        )
-                        sys.exit(2)
+                if phase_num < PHASE_COUNT:
+                    advance_phase(vr_file, phase_num + 1)
             except Exception:
-                pass  # VR read errors should not block
+                pass
 
-        # 5. Show evidence summary (Round 1 output)
-        evidence_display = build_evidence_display(done, session_id)
-        print(evidence_display, file=sys.stderr)
-
-        # 6. Authorization check — Round 1 gate (mechanical checks + explicit auth)
-        if not check_stop_authorization(session_id):
-            auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
-            print(
-                f"\nAll checks passed. Now authorize: bash {auth_script}\n",
-                file=sys.stderr,
-            )
-            sys.exit(2)
-
-        # 7. GPT-5 Mini protocol reviewer — Round 2 gate
-        #    Only runs after Round 1 passes (all mechanical checks + auth).
-        #    Evaluates all 14 protocol categories from protocol-compliance-reference.md.
-        #
-        #    IMPORTANT: stop.py is invoked via bare `python3` (not `uv run --script`),
-        #    so `openai` and `python-dotenv` are NOT available as imports. The reviewer
-        #    must be called as a subprocess via `uv run --script reviewer.py --json`,
-        #    which gives it its own dependency environment.
-        try:
-            _reviewer_script = Path(__file__).parent / "utils" / "reviewer.py"
-            _data_dir = Path.home() / ".claude" / "data"
-
-            # Check if reviewer is enabled (read config directly — no import needed)
-            _rev_enabled = True
-            _rev_max_rounds = 5
-            _rev_config_file = _data_dir / "reviewer_config.json"
-            if _rev_config_file.exists():
-                try:
-                    _rev_conf = json.loads(_rev_config_file.read_text())
-                    _rev_enabled = _rev_conf.get("enabled", True)
-                    _rev_max_rounds = _rev_conf.get("max_rounds", 5)
-                except Exception:
-                    pass
-
-            if not _rev_enabled:
-                print("  [reviewer] Disabled in config — skipping", file=sys.stderr)
-            elif not _reviewer_script.exists():
-                print("  [reviewer] reviewer.py not found — skipping", file=sys.stderr)
-            else:
-                # Check for existing approval (skip reviewer if already approved)
-                _approval_file = _data_dir / f"reviewer_approval_{resolved_sid}.json"
-                _already_approved = False
-                if _approval_file.exists():
-                    try:
-                        _already_approved = json.loads(
-                            _approval_file.read_text()
-                        ).get("approved", False)
-                    except Exception:
-                        pass
-
-                if _already_approved:
-                    pass  # Reviewer already approved this session
-                else:
-                    # Check OPENAI_API_KEY availability
-                    # (dotenv not available under bare python3 — parse .env manually)
-                    _has_api_key = bool(os.getenv("OPENAI_API_KEY"))
-                    if not _has_api_key:
-                        _env_file = Path.home() / ".claude" / ".env"
-                        if _env_file.exists():
-                            try:
-                                for _line in _env_file.read_text().splitlines():
-                                    _line = _line.strip()
-                                    if _line.startswith("OPENAI_API_KEY=") and len(_line) > 15:
-                                        _has_api_key = True
-                                        break
-                            except Exception:
-                                pass
-
-                    if not _has_api_key:
-                        print(
-                            "  [reviewer] OPENAI_API_KEY not set — skipping (non-blocking)",
-                            file=sys.stderr,
-                        )
-                    else:
-                        # Call reviewer.py via uv run --script (gives it openai + dotenv)
-                        print(
-                            "\n  Running GPT-5 Mini protocol review (Round 2)...\n",
-                            file=sys.stderr,
-                        )
-                        _last_msg = input_data.get("last_assistant_message", "")
-                        _rev_cmd = [
-                            "uv", "run", "--script", str(_reviewer_script),
-                            resolved_sid, "--json",
-                        ]
-                        if _last_msg:
-                            _rev_cmd.extend(["--last-message", _last_msg[:3000]])
-
-                        _rev_proc = subprocess.run(
-                            _rev_cmd,
-                            capture_output=True, text=True, timeout=180,
-                            cwd=os.getcwd(),
-                        )
-
-                        if _rev_proc.returncode == 1:
-                            # FINDINGS — reviewer returned blocking issues
-                            _rev_lines = [
-                                "",
-                                "=" * 60,
-                                "STOP BLOCKED \u2014 PROTOCOL REVIEWER FINDINGS",
-                                "=" * 60,
-                                "",
-                            ]
-                            try:
-                                _rev_data = json.loads(_rev_proc.stdout)
-                                _round = _rev_data.get("round_count", "?")
-                                _rev_lines.append(
-                                    f"Round {_round} of {_rev_max_rounds}"
-                                )
-                                _rev_lines.append("")
-                                for _finding in _rev_data.get("findings", []):
-                                    _sev_icon = (
-                                        "\U0001f6ab"
-                                        if _finding.get("severity") == "blocking"
-                                        else "\u26a0\ufe0f"
-                                    )
-                                    _cat = _finding.get("category", "?")
-                                    _desc = _finding.get("description", "")
-                                    _rev_lines.append(
-                                        f"  {_sev_icon} [{_cat}] {_desc}"
-                                    )
-                                    if _finding.get("evidence_needed"):
-                                        _rev_lines.append(
-                                            f"     \u2192 {_finding['evidence_needed']}"
-                                        )
-                                    _rev_lines.append("")
-                                _rev_lines.append(
-                                    f"Summary: {_rev_data.get('summary', '')}"
-                                )
-                            except (json.JSONDecodeError, Exception):
-                                _rev_lines.append(
-                                    "  (Could not parse reviewer output)"
-                                )
-                                if _rev_proc.stdout:
-                                    _rev_lines.append(
-                                        f"  stdout: {_rev_proc.stdout[:500]}"
-                                    )
-                            _rev_lines += [
-                                "",
-                                "Address the blocking findings, then retry stop.",
-                                "=" * 60,
-                                "",
-                            ]
-                            print("\n".join(_rev_lines), file=sys.stderr)
-                            sys.exit(2)
-
-                        elif _rev_proc.returncode == 0:
-                            # APPROVED — reviewer.py wrote the approval file
-                            try:
-                                _rev_data = json.loads(_rev_proc.stdout)
-                                _summary = _rev_data.get("summary", "Approved")
-                                print(
-                                    f"  [reviewer] APPROVED: {_summary}",
-                                    file=sys.stderr,
-                                )
-                            except Exception:
-                                print(
-                                    "  [reviewer] APPROVED",
-                                    file=sys.stderr,
-                                )
-                        else:
-                            # ERROR (exit 2+) — non-blocking
-                            _err = (_rev_proc.stderr or _rev_proc.stdout or "")[:300]
-                            print(
-                                f"  [reviewer] Error (non-blocking, exit {_rev_proc.returncode}): {_err}",
-                                file=sys.stderr,
-                            )
-        except subprocess.TimeoutExpired:
-            print(
-                "  [reviewer] Timed out after 120s (non-blocking)",
-                file=sys.stderr,
-            )
-        except FileNotFoundError:
-            print(
-                "  [reviewer] uv not found — skipping (non-blocking)",
-                file=sys.stderr,
-            )
-        except Exception as _rev_exc:
-            # Log but don't block — reviewer infra failure should not prevent stop
-            print(
-                f"  [reviewer] Error (non-blocking): {type(_rev_exc).__name__}: "
-                f"{str(_rev_exc)[:200]}",
-                file=sys.stderr,
-            )
-
-        # 7. Final reset — one-time use
+        # ── All phases passed — final reset ─────────────────────────────
         auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"
         try:
             auth_file.write_text(json.dumps({"authorized": False}))
@@ -858,23 +1103,25 @@ def main():
         except Exception:
             pass
 
-        # Reset VR for next task
+        # Reset VR for next task (all checks pending, phase 1)
         try:
             from datetime import datetime as _dt
             from utils.vr_utils import VR_CHECKS_ORDER
-            vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
             all_pending = {
                 k: {"status": "pending", "evidence": None, "timestamp": None, "skip_reason": None}
                 for k, _ in VR_CHECKS_ORDER
             }
             vr_file.write_text(json.dumps({
                 "reset_at": _dt.now().isoformat(),
+                "phase": 1,
+                "phase_name": "implement",
+                "phase_history": [],
                 "checks": all_pending,
             }))
         except Exception:
             pass
 
-        # 9. Logging
+        # ── Logging ─────────────────────────────────────────────────────
         parser = argparse.ArgumentParser()
         parser.add_argument('--chat', action='store_true')
         parser.add_argument('--notify', action='store_true')

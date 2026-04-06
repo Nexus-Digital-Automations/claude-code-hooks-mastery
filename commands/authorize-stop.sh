@@ -1,6 +1,6 @@
 #!/bin/bash
 # Authorize a one-time stop.
-# Reads project config, auto-runs missing checks, then authorizes if all pass.
+# Phase-aware: auto-runs missing checks for the current phase, then authorizes.
 
 VR_UTILS="$HOME/.claude/hooks/utils"
 
@@ -13,7 +13,7 @@ AUTH_FILE="$HOME/.claude/data/stop_authorization_${SESSION_ID}.json"
 VR_FILE="$HOME/.claude/data/verification_record_${SESSION_ID}.json"
 mkdir -p "$HOME/.claude/data"
 
-# Single Python call: auto-run missing, then gate check
+# Single Python call: phase-aware auto-run + gate check
 python3 - "$SESSION_ID" "$VR_FILE" "$AUTH_FILE" "$VR_UTILS" << 'PYEOF'
 import sys, json
 from pathlib import Path
@@ -22,14 +22,18 @@ session_id, vr_path_str, auth_path_str, utils_dir = sys.argv[1:5]
 sys.path.insert(0, utils_dir)
 
 from project_config import get_git_root, load_config, get_required_checks, auto_run_missing
-from vr_utils import VR_CHECKS_ORDER
+from vr_utils import VR_CHECKS_ORDER, get_current_phase, PHASE_DEFINITIONS
 
 project_root = Path(get_git_root())
 config = load_config(project_root)
 vr_file = Path(vr_path_str)
 auth_file = Path(auth_path_str)
 
-# Auto-run missing checks (lint, upstream_sync, tests if run_command configured)
+# Read current phase
+phase_num, phase_name = get_current_phase(vr_file)
+print(f"\n  Current phase: {phase_num}/7 ({phase_name})")
+
+# Auto-run missing checks (still runs all required checks)
 results = auto_run_missing(session_id, config, vr_file, project_root)
 for k, v in results.items():
     print(f"  auto-ran {k}: {v}")
@@ -83,7 +87,7 @@ try:
 except Exception:
     state = {}
 
-lines = [f"\n\u2705 All {len(done)} required checks verified"]
+lines = [f"\n\u2705 All {len(done)} required checks verified (phase {phase_num})"]
 for key, label, status, ts_short, ev in done:
     mark = "\u2705" if status in ("done", "passed") else "\u23ed "
     lines.append(f'   {mark} {label:<18} [{status} @ {ts_short}] — "{ev}"')

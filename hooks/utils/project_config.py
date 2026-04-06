@@ -555,6 +555,114 @@ def auto_run_missing(
     return results
 
 
+def should_require_tests(
+    config: dict,
+    modified_files: list[str],
+    has_active_spec: bool = False,
+) -> bool:
+    """Determine whether tests should be required for this change.
+
+    Heuristic: tests are required for stable, important features but not
+    for docs-only, config-only, or trivial changes.
+
+    Args:
+        config: Project config from load_config().
+        modified_files: List of file paths modified in this task.
+        has_active_spec: Whether an active spec exists (spec-driven work is important).
+
+    Returns:
+        True if tests should be required, False to skip.
+    """
+    # No test infrastructure at all → skip
+    if not config.get("has_tests", False):
+        return False
+
+    # Explicit project override
+    checks_conf = config.get("checks", {})
+    tests_conf = checks_conf.get("tests", {})
+    if isinstance(tests_conf, dict) and "required" in tests_conf:
+        return bool(tests_conf["required"])
+
+    if not modified_files:
+        return False
+
+    # Classify modified files
+    source_exts = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".rb",
+                   ".java", ".kt", ".swift", ".c", ".cpp", ".cs"}
+    doc_exts = {".md", ".txt", ".rst", ".adoc"}
+    config_names = {
+        "package.json", "tsconfig.json", "pyproject.toml", "Cargo.toml",
+        "go.mod", "Dockerfile", "docker-compose.yml", "docker-compose.yaml",
+        ".gitignore", ".eslintrc.json", ".prettierrc", "vite.config.js",
+        "webpack.config.js", ".github", "Makefile",
+    }
+    core_dirs = {"src", "lib", "app", "pkg", "internal", "core", "server", "api"}
+
+    source_files = []
+    doc_only = True
+    config_only = True
+
+    for f in modified_files:
+        p = Path(f)
+        ext = p.suffix.lower()
+        name = p.name
+
+        if ext in source_exts:
+            source_files.append(f)
+            doc_only = False
+            config_only = False
+        elif ext in doc_exts:
+            pass  # Still doc_only
+        elif name in config_names or f.startswith("."):
+            doc_only = False
+        else:
+            doc_only = False
+            config_only = False
+
+    # Docs-only changes → no tests
+    if doc_only:
+        return False
+
+    # Config-only changes → no tests
+    if config_only:
+        return False
+
+    # Spec-driven work is always important → require tests
+    if has_active_spec:
+        return True
+
+    # 3+ source files modified → substantial change → require tests
+    if len(source_files) >= 3:
+        return True
+
+    # Changes touch core directories → require tests
+    for f in source_files:
+        parts = Path(f).parts
+        if any(part in core_dirs for part in parts):
+            return True
+
+    # Check if modified files have existing test counterparts
+    for f in source_files:
+        p = Path(f)
+        stem = p.stem
+        parent = p.parent
+        # Common test file patterns
+        test_patterns = [
+            parent / f"test_{stem}{p.suffix}",
+            parent / f"{stem}_test{p.suffix}",
+            parent.parent / "tests" / f"test_{stem}{p.suffix}",
+            parent.parent / "tests" / f"{stem}_test{p.suffix}",
+            parent.parent / "__tests__" / f"{stem}.test{p.suffix}",
+            parent.parent / "__tests__" / f"{stem}.spec{p.suffix}",
+        ]
+        for tp in test_patterns:
+            if tp.exists():
+                return True
+
+    # Small change to untested code → skip tests
+    return False
+
+
 def _run_security_scan(project_root: Path, config: dict) -> tuple[str, str]:
     """Run the security scanner. Returns (status, evidence)."""
     try:

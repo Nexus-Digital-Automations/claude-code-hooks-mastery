@@ -32,6 +32,111 @@ VR_CHECKS_ORDER: list[tuple[str, str]] = [
 VR_CHECK_KEYS = {k for k, _ in VR_CHECKS_ORDER}
 
 
+# ── Phase definitions ────────────────────────────────────────────────────
+# Each phase: (phase_number, name, description, required_check_keys)
+# required_check_keys=None means the phase uses custom logic (not VR checks).
+
+PHASE_DEFINITIONS: list[tuple[int, str, str, list[str] | None]] = [
+    (1, "implement",       "Complete the user's request",           None),  # spec + root cleanliness
+    (2, "static_analysis", "Lint and type checking",                ["lint", "typecheck"]),
+    (3, "tests",           "Unit and integration tests",            ["tests"]),
+    (4, "build",           "Build verification and app startup",    ["build", "app_starts"]),
+    (5, "frontend",        "Frontend validation via Playwright",    ["frontend", "happy_path"]),
+    (6, "ship",            "Security, commit, and push",            ["security", "commit_push", "upstream_sync", "execution"]),
+    (7, "reviewer",        "Protocol compliance review (GPT-5 Mini)", None),  # external LLM reviewer
+]
+
+PHASE_COUNT = len(PHASE_DEFINITIONS)
+
+# Map each check key to the phase it belongs to (for regression)
+CHECK_TO_PHASE: dict[str, int] = {}
+for _phase_num, _phase_name, _phase_desc, _phase_checks in PHASE_DEFINITIONS:
+    if _phase_checks:
+        for _ck in _phase_checks:
+            CHECK_TO_PHASE[_ck] = _phase_num
+
+
+def get_current_phase(vr_file: Path) -> tuple[int, str]:
+    """Read the current phase from the VR file. Returns (phase_number, phase_name).
+
+    Defaults to (1, "implement") if the file doesn't exist or has no phase field.
+    """
+    try:
+        record = json.loads(vr_file.read_text())
+        phase = record.get("phase", 1)
+        phase_name = record.get("phase_name", "implement")
+        return (phase, phase_name)
+    except Exception:
+        return (1, "implement")
+
+
+def advance_phase(vr_file: Path, new_phase: int) -> None:
+    """Advance the VR to a new phase, recording history."""
+    try:
+        try:
+            record = json.loads(vr_file.read_text())
+        except Exception:
+            record = {"reset_at": datetime.now().isoformat(), "checks": {}}
+
+        old_phase = record.get("phase", 1)
+        if new_phase <= old_phase:
+            return  # Don't go backward via advance
+
+        # Find the phase name
+        phase_name = "unknown"
+        for pnum, pname, _pdesc, _pchecks in PHASE_DEFINITIONS:
+            if pnum == new_phase:
+                phase_name = pname
+                break
+
+        # Record history
+        history = record.get("phase_history", [])
+        history.append({
+            "phase": old_phase,
+            "passed_at": datetime.now().isoformat(),
+        })
+        record["phase"] = new_phase
+        record["phase_name"] = phase_name
+        record["phase_history"] = history
+        vr_file.write_text(json.dumps(record, indent=2))
+    except Exception:
+        pass  # Never block
+
+
+def regress_phase(vr_file: Path, invalidated_check: str) -> None:
+    """Regress to an earlier phase when a check is invalidated by a file edit.
+
+    Only regresses if the current phase is ahead of the check's phase.
+    """
+    target_phase = CHECK_TO_PHASE.get(invalidated_check)
+    if target_phase is None:
+        return  # Check not mapped to a phase (e.g. custom checks)
+
+    try:
+        try:
+            record = json.loads(vr_file.read_text())
+        except Exception:
+            return
+
+        current_phase = record.get("phase", 1)
+        if current_phase <= target_phase:
+            return  # Already at or before the target phase
+
+        # Find the phase name
+        phase_name = "unknown"
+        for pnum, pname, _pdesc, _pchecks in PHASE_DEFINITIONS:
+            if pnum == target_phase:
+                phase_name = pname
+                break
+
+        record["phase"] = target_phase
+        record["phase_name"] = phase_name
+        # Don't clear history — it's useful for debugging
+        vr_file.write_text(json.dumps(record, indent=2))
+    except Exception:
+        pass  # Never block
+
+
 # ── VR read/write helpers ─────────────────────────────────────────────────
 
 def write_vr(

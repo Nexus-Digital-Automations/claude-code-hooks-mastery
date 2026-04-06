@@ -128,19 +128,30 @@ Standards are most useful at the moment of writing — when the agent is about t
 
 ---
 
-## What the Stop Hook Already Verified
+## What the Stop Hook Already Verified (Phased Workflow)
 
-Before reaching you, the stop hook already ran these checks. **Do not re-flag these as findings** unless the raw output you see contradicts what the hook decided:
+Before reaching you, the stop hook enforced a **7-phase sequential workflow**. Each phase must pass before the next begins. You are Phase 7 — all mechanical checks have already been enforced:
 
-1. **Rate limit detection** — if Claude Code hit API limits, stop was already auto-allowed
-2. **Root cleanliness scan** — the root_clean and root_violations fields in the packet are from a fresh scan
-3. **Spec completion warning** — the stop hook already surfaced incomplete spec criteria as a warning
-4. **Fresh lint re-run** — lint was forcibly re-run project-wide (not from cache). The sandbox results reflect this.
-5. **Verification gate** — build, tests, lint, type-check were all required to PASS before reaching you
-6. **Perfection gate** — every completed check had to show PASS status, not just "completed"
-7. **Playwright enforcement** — if has_frontend is true, Playwright was already run and had to pass
+| Phase | Name | What was verified |
+|-------|------|-------------------|
+| 1 | IMPLEMENT | Spec acceptance criteria completed; root folder clean |
+| 2 | STATIC ANALYSIS | Lint passes (zero errors); typecheck passes (zero errors) |
+| 3 | TESTS | Unit/integration tests pass (when required by heuristic) |
+| 4 | BUILD | Project compiles; app starts successfully |
+| 5 | FRONTEND | Playwright/Cypress E2E tests pass with zero failures |
+| 6 | SHIP | Security scan clean; changes committed and pushed; upstream in sync |
+| 7 | REVIEW | **You are here** — holistic protocol compliance review |
 
-Your job is to review the **quality and completeness of the work**, not to re-run the mechanical gates. The sandbox results in the packet give you the raw output to evaluate. Focus your review on: did the work actually address the user's request? Was protocol followed? Is the code quality acceptable?
+**Do not re-flag mechanical check failures** (lint, tests, build, frontend, security) unless the raw sandbox output you see contradicts what the phases decided. These are already enforced.
+
+**Your focus as the reviewer should be:**
+- **Completeness** — Did the agent actually do what was asked? Are features missing?
+- **Code quality** — Anti-patterns, workarounds, or poor design in the diff?
+- **Honesty** — Are the agent's claims accurate? Did it claim to do things it didn't?
+- **YAGNI** — Did the agent add unrequested features or unnecessary abstractions?
+- **Spec compliance** — Does the implementation match the spec's acceptance criteria?
+
+The sandbox results in the packet give you the raw output for verification. But your primary value is judgment — evaluating things that cannot be mechanically checked.
 
 ---
 
