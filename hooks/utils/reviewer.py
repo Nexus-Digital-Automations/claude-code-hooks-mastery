@@ -72,6 +72,109 @@ def load_reviewer_config() -> ReviewerConfig:
     return ReviewerConfig()
 
 
+# ── Agent Commentary Summarization (Ollama local model) ──────────────
+
+def _extract_assistant_text(transcript_path: str, task_started_at: str = "") -> str:
+    """Extract all assistant text messages from the JSONL transcript.
+
+    Filters to entries after task_started_at. Returns concatenated text.
+    """
+    if not transcript_path or not Path(transcript_path).exists():
+        return ""
+
+    texts: list[str] = []
+    try:
+        with open(transcript_path) as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except Exception:
+                    continue
+
+                if task_started_at:
+                    entry_ts = entry.get("timestamp", "")
+                    if entry_ts and entry_ts < task_started_at:
+                        continue
+
+                msg = entry.get("message", {})
+                if msg.get("role") != "assistant":
+                    continue
+
+                content = msg.get("content", [])
+                if isinstance(content, str):
+                    if content.strip():
+                        texts.append(content.strip())
+                elif isinstance(content, list):
+                    for block in content:
+                        if isinstance(block, dict) and block.get("type") == "text":
+                            text = (block.get("text") or "").strip()
+                            if text:
+                                texts.append(text)
+    except Exception:
+        pass
+
+    return "\n\n---\n\n".join(texts)
+
+
+def _summarize_with_ollama(text: str) -> str:
+    """Summarize text using llama3.2:1b via Ollama. Returns summary or empty string."""
+    import urllib.request
+    import urllib.error
+
+    if not text.strip():
+        return ""
+
+    prompt = (
+        "Summarize the key actions, decisions, and claims this AI coding agent made "
+        "during its work session. Focus on:\n"
+        "- What the agent said it did (files created, modified, fixed)\n"
+        "- Decisions it made and why\n"
+        "- Status updates and completion claims\n"
+        "- Any errors it encountered and how it handled them\n\n"
+        "Be thorough but organized. Use bullet points.\n\n"
+        "AGENT MESSAGES:\n" + text
+    )
+
+    payload = json.dumps({
+        "model": "llama3.2:1b",
+        "prompt": prompt,
+        "stream": False,
+    }).encode()
+
+    req = urllib.request.Request(
+        "http://localhost:11434/api/generate",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = json.loads(resp.read().decode())
+            return result.get("response", "").strip()
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        print(f"  [reviewer] Ollama summarization failed ({exc}), skipping", file=sys.stderr)
+        return ""
+    except Exception as exc:
+        print(f"  [reviewer] Ollama error: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return ""
+
+
+def summarize_agent_commentary(transcript_path: str, task_started_at: str = "") -> str:
+    """Extract and summarize agent commentary from the session transcript.
+
+    Uses llama3.2:1b via Ollama for local, free summarization.
+    Returns empty string on any failure (non-blocking).
+    """
+    raw_text = _extract_assistant_text(transcript_path, task_started_at)
+    if not raw_text:
+        return ""
+
+    return _summarize_with_ollama(raw_text)
+
+
 # ── Sandbox Check Execution ───────────────────────────────────────────
 
 # SandboxResult is imported from reviewer_core
@@ -357,6 +460,16 @@ def build_review_packet(
         packet.root_violations = violations
     except Exception:
         pass
+
+    # 5. Agent commentary summary (Ollama local model)
+    try:
+        transcript_path = current_task.get("transcript_path", "")
+        if transcript_path:
+            packet.agent_commentary_summary = summarize_agent_commentary(
+                transcript_path, packet.task_started_at,
+            )
+    except Exception as exc:
+        print(f"  [reviewer] Commentary summarization failed: {exc}", file=sys.stderr)
 
     # 6. Verification artifacts from output/ (committed .txt/.diff files)
     try:

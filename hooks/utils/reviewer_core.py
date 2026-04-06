@@ -69,6 +69,7 @@ class ReviewPacket:
     root_clean: bool = True
     root_violations: list[str] = field(default_factory=list)
     last_assistant_message: str = ""
+    agent_commentary_summary: str = ""
     timestamp: str = ""
     verification_artifacts: dict[str, str] = field(default_factory=dict)
 
@@ -113,6 +114,13 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
         sections.append(packet.last_assistant_message)
     else:
         sections.append("(Not captured)")
+
+    # Agent commentary summary (local model summary of all assistant messages)
+    sections.append("\n## AGENT COMMENTARY SUMMARY (all assistant messages, summarized by local model)")
+    if packet.agent_commentary_summary:
+        sections.append(packet.agent_commentary_summary)
+    else:
+        sections.append("(Not available — Ollama may be offline or transcript empty)")
 
     # All user requests (current task only)
     sections.append("\n## ALL USER REQUESTS (current task only — filtered by task_id)")
