@@ -374,8 +374,9 @@ def build_review_packet(
 
     Reads user requests, specs, project config, runs sandbox checks,
     checks git state and root cleanliness. Never raises.
+
+    NOTE: session_id is treated as authoritative (already resolved by caller).
     """
-    session_id = _resolve_session_id(session_id)
     packet = ReviewPacket(
         session_id=session_id,
         last_assistant_message=last_assistant_message or "",
@@ -656,7 +657,6 @@ def _approval_file(session_id: str) -> Path:
 
 def check_approval(session_id: str) -> bool:
     """Check if reviewer has already approved this session."""
-    session_id = _resolve_session_id(session_id)
     try:
         f = _approval_file(session_id)
         if f.exists():
@@ -668,7 +668,6 @@ def check_approval(session_id: str) -> bool:
 
 def write_approval(session_id: str, result: dict) -> None:
     """Write reviewer approval file."""
-    session_id = _resolve_session_id(session_id)
     try:
         _DATA_DIR.mkdir(parents=True, exist_ok=True)
         _approval_file(session_id).write_text(json.dumps({
@@ -684,7 +683,6 @@ def write_approval(session_id: str, result: dict) -> None:
 
 def reset_approval(session_id: str) -> None:
     """Clear reviewer approval (called on stop reset / session start)."""
-    session_id = _resolve_session_id(session_id)
     try:
         f = _approval_file(session_id)
         if f.exists():
@@ -717,8 +715,13 @@ def run_review(
     5. If APPROVED: write approval file
     6. If FINDINGS: return findings (caller shows them)
     7. If ERROR: return with error detail
+
+    NOTE: session_id is treated as authoritative (already resolved by
+    stop.py). Do NOT re-resolve — _resolve_session_id here previously
+    caused mismatches because it lacks the VR-file-existence guard that
+    stop.py's version has, leading to approval files written under the
+    wrong session ID.
     """
-    session_id = _resolve_session_id(session_id)
     config = load_reviewer_config()
 
     if not config.enabled:
