@@ -37,6 +37,23 @@ Invoke this skill whenever a change **could surface in the browser** — not jus
 
 ---
 
+## Complete Flow Rule (MANDATORY)
+
+Every tested feature MUST be verified end-to-end — not just "the button fired an API call":
+
+- **Create/Add**: After submitting, navigate to the result page (list, detail, dashboard) and assert the new item is visible there.
+- **Edit**: Before editing, CREATE dummy test data first. Edit that data, then verify the changed value appears on the page. Never edit existing production-like data.
+- **Delete**: Before deleting, CREATE dummy test data first. Delete it, then verify it is gone from the list/page. Never delete real data.
+- **Multi-step workflows**: Complete each step in sequence. Don't stop at "modal opened" or "API returned 200" — continue until the final state is visible in the UI.
+
+**Dummy data pattern:**
+1. Use the UI (or a setup API call) to create a test item with a clearly fake name (e.g. `PLAYWRIGHT_TEST_item_DO_NOT_USE`)
+2. Perform the edit/delete on that item
+3. Verify the result in the UI
+4. Clean up (delete the dummy item if it wasn't already deleted by the test)
+
+---
+
 ## Step-by-Step Protocol
 
 ### 1. Install browser if needed

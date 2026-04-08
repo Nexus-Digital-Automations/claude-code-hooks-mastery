@@ -1,5 +1,73 @@
 # Changelog
 
+## 2.1.94
+
+- Added support for Amazon Bedrock powered by Mantle, set `CLAUDE_CODE_USE_MANTLE=1`
+- Changed default effort level from medium to high for API-key, Bedrock/Vertex/Foundry, Team, and Enterprise users (control this with `/effort`)
+- Added compact `Slacked #channel` header with a clickable channel link for Slack MCP send-message tool calls
+- Added `keep-coding-instructions` frontmatter field support for plugin output styles
+- Added `hookSpecificOutput.sessionTitle` to `UserPromptSubmit` hooks for setting the session title
+- Plugin skills declared via `"skills": ["./"]` now use the skill's frontmatter `name` for the invocation name instead of the directory basename, giving a stable name across install methods
+- Fixed agents appearing stuck after a 429 rate-limit response with a long Retry-After header — the error now surfaces immediately instead of silently waiting
+- Fixed Console login on macOS silently failing with "Not logged in" when the login keychain is locked or its password is out of sync — the error is now surfaced and `claude doctor` diagnoses the fix
+- Fixed plugin skill hooks defined in YAML frontmatter being silently ignored
+- Fixed plugin hooks failing with "No such file or directory" when `CLAUDE_PLUGIN_ROOT` was not set
+- Fixed `${CLAUDE_PLUGIN_ROOT}` resolving to the marketplace source directory instead of the installed cache for local-marketplace plugins on startup
+- Fixed scrollback showing the same diff repeated and blank pages in long-running sessions
+- Fixed multiline user prompts in the transcript indenting wrapped lines under the `❯` caret instead of under the text
+- Fixed Shift+Space inserting the literal word "space" instead of a space character in search inputs
+- Fixed hyperlinks opening two browser tabs when clicked inside tmux running in an xterm.js-based terminal (VS Code, Hyper, Tabby)
+- Fixed an alt-screen rendering bug where content height changes mid-scroll could leave compounding ghost lines
+- Fixed `FORCE_HYPERLINK` environment variable being ignored when set via `settings.json` `env`
+- Fixed native terminal cursor not tracking the selected tab in dialogs, so screen readers and magnifiers can follow tab navigation
+- Fixed Bedrock invocation of Sonnet 3.5 v2 by using the `us.` inference profile ID
+- Fixed SDK/print mode not preserving the partial assistant response in conversation history when interrupted mid-stream
+- Improved `--resume` to resume sessions from other worktrees of the same repo directly instead of printing a `cd` command
+- Fixed CJK and other multibyte text being corrupted with U+FFFD in stream-json input/output when chunk boundaries split a UTF-8 sequence
+- [VSCode] Reduced cold-open subprocess work on starting a session
+- [VSCode] Fixed dropdown menus selecting the wrong item when the mouse was over the list while typing or using arrow keys
+- [VSCode] Added a warning banner when `settings.json` files fail to parse, so users know their permission rules are not being applied
+
+## 2.1.92
+
+- Added `forceRemoteSettingsRefresh` policy setting: when set, the CLI blocks startup until remote managed settings are freshly fetched, and exits if the fetch fails (fail-closed)
+- Added interactive Bedrock setup wizard accessible from the login screen when selecting "3rd-party platform" — guides you through AWS authentication, region configuration, credential verification, and model pinning
+- Added per-model and cache-hit breakdown to `/cost` for subscription users
+- `/release-notes` is now an interactive version picker
+- Remote Control session names now use your hostname as the default prefix (e.g. `myhost-graceful-unicorn`), overridable with `--remote-control-session-name-prefix`
+- Pro users now see a footer hint when returning to a session after the prompt cache has expired, showing roughly how many tokens the next turn will send uncached
+- Fixed subagent spawning permanently failing with "Could not determine pane count" after tmux windows are killed or renumbered during a long-running session
+- Fixed prompt-type Stop hooks incorrectly failing when the small fast model returns `ok:false`, and restored `preventContinuation:true` semantics for non-Stop prompt-type hooks
+- Fixed tool input validation failures when streaming emits array/object fields as JSON-encoded strings
+- Fixed an API 400 error that could occur when extended thinking produced a whitespace-only text block alongside real content
+- Fixed accidental feedback survey submissions from auto-pilot keypresses and consecutive-prompt digit collisions
+- Fixed misleading "esc to interrupt" hint appearing alongside "esc to clear" when a text selection exists in fullscreen mode during processing
+- Fixed Homebrew install update prompts to use the cask's release channel (`claude-code` → stable, `claude-code@latest` → latest)
+- Fixed `ctrl+e` jumping to the end of the next line when already at end of line in multiline prompts
+- Fixed an issue where the same message could appear at two positions when scrolling up in fullscreen mode (iTerm2, Ghostty, and other terminals with DEC 2026 support)
+- Fixed idle-return "/clear to save X tokens" hint showing cumulative session tokens instead of current context size
+- Fixed plugin MCP servers stuck "connecting" on session start when they duplicate a claude.ai connector that is unauthenticated
+- Improved Write tool diff computation speed for large files (60% faster on files with tabs/`&`/`$`)
+- Removed `/tag` command
+- Removed `/vim` command (toggle vim mode via `/config` → Editor mode)
+- Linux sandbox now ships the `apply-seccomp` helper in both npm and native builds, restoring unix-socket blocking for sandboxed commands
+
+## 2.1.91
+
+- Added MCP tool result persistence override via `_meta["anthropic/maxResultSizeChars"]` annotation (up to 500K), allowing larger results like DB schemas to pass through without truncation
+- Added `disableSkillShellExecution` setting to disable inline shell execution in skills, custom slash commands, and plugin commands
+- Added support for multi-line prompts in `claude-cli://open?q=` deep links (encoded newlines `%0A` no longer rejected)
+- Plugins can now ship executables under `bin/` and invoke them as bare commands from the Bash tool
+- Fixed transcript chain breaks on `--resume` that could lose conversation history when async transcript writes fail silently
+- Fixed `cmd+delete` not deleting to start of line on iTerm2, kitty, WezTerm, Ghostty, and Windows Terminal
+- Fixed plan mode in remote sessions losing track of the plan file after a container restart, which caused permission prompts on plan edits and an empty plan-approval modal
+- Fixed JSON schema validation for `permissions.defaultMode: "auto"` in settings.json
+- Fixed Windows version cleanup not protecting the active version's rollback copy
+- `/feedback` now explains why it's unavailable instead of disappearing from the slash menu
+- Improved `/claude-api` skill guidance for agent design patterns including tool surface decisions, context management, and caching strategy
+- Improved performance: faster `stripAnsi` on Bun by routing through `Bun.stripANSI`
+- Edit tool now uses shorter `old_string` anchors, reducing output tokens
+
 ## 2.1.90
 
 - Added `/powerup` — interactive lessons teaching Claude Code features with animated demos

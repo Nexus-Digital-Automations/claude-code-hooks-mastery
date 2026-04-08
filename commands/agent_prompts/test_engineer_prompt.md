@@ -23,6 +23,8 @@ When invoked, you must follow these steps:
    - **Error cases**: Invalid inputs, network failures, exceptions
    - **State variations**: Different starting states
    - **Concurrent scenarios**: Race conditions, parallel execution
+   - **Complete user flow (E2E)**: Every E2E test must follow the action through to its visible result in the UI. "API returned 200" is not sufficient — navigate to the destination page and assert the outcome is visible there.
+   - **Destructive operations (edit/delete)**: Always create dedicated dummy test data first (labeled `PLAYWRIGHT_TEST_*`), operate on it, then verify the result. Never edit or delete real/pre-existing data.
 
 4. **Write Tests**
    - Use AAA pattern: Arrange, Act, Assert
