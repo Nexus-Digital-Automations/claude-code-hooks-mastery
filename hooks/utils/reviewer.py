@@ -316,7 +316,7 @@ def run_sandbox_checks(
         else "git log --oneline -5"
     )
     for git_key, git_cmd in [
-        ("_git_status", "git status --porcelain"),
+        ("_git_status", "git status --porcelain --ignore-submodules"),
         ("_git_diff", "git diff --stat"),
         ("_git_diff_content", "git diff HEAD"),
         ("_git_log", _git_log_cmd),
