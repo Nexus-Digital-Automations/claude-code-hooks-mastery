@@ -212,8 +212,8 @@ class ConfigLoader:
         return {
             "mode": "claude",
             "last_switched": None,
-            "deepseek_profile": "standard",
-            "deepseek_plan_mode": True,
+            "qwen_profile": "standard",
+            "qwen_plan_mode": True,
             "delegation_policy": {
                 "code_tasks": True,
                 "research_tasks": False,
@@ -239,9 +239,9 @@ class ConfigLoader:
 
         return ConfigLoader._mode_cache
 
-    def is_deepseek_mode(self) -> bool:
-        """Check if the current agent mode is deepseek."""
-        return self.get_agent_mode().get("mode") == "deepseek"
+    def is_qwen_mode(self) -> bool:
+        """Check if the current agent mode is qwen."""
+        return self.get_agent_mode().get("mode") == "qwen"
 
 
 # Convenience function for quick access

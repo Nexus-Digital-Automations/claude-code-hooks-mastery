@@ -1,0 +1,50 @@
+# Multi-skill integration tests
+# Verifies tasks that trigger multiple skills work coherently together
+
+tests:
+  - description: "API + DB + Auth + Async: full backend system"
+    vars:
+      prompt: "Build a REST API with PostgreSQL for a task management app. Include JWT authentication, role-based access control, and a background job queue for sending notification emails when tasks are assigned."
+    assert:
+      - type: not-contains
+        value: "import React"
+      - type: llm-rubric
+        value: >
+          The response must coherently combine multiple backend concerns:
+          (1) REST API endpoints for tasks (CRUD) with proper status codes and error format,
+          (2) PostgreSQL schema with migrations for tasks and users tables,
+          (3) JWT authentication middleware with bcrypt password hashing,
+          (4) Role-based access control checking permissions before business logic,
+          (5) Background job queue for notification emails (idempotent, with retry),
+          (6) No frontend code whatsoever.
+          The implementation should show clear separation of concerns (routes, services, middleware, models).
+
+  - description: "CLI + Data Processing: ETL tool"
+    vars:
+      prompt: "Build a CLI tool that imports CSV files into a PostgreSQL database with validation, batch processing, and progress reporting"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response must combine CLI and data processing patterns:
+          (1) Proper argument parsing with --help (argparse, click, etc.),
+          (2) Streaming CSV parsing (not loading entire file into memory),
+          (3) Batch inserts with configurable batch size,
+          (4) Per-row validation with error reporting (skip bad rows, log reason),
+          (5) Progress tracking with counts logged,
+          (6) Exit codes (0 success, 1 error),
+          (7) Database connection with proper cleanup.
+
+  - description: "API + Middleware + Error Handling: production API"
+    vars:
+      prompt: "Create a production-ready Express API with CORS, rate limiting, request validation, structured logging, and comprehensive error handling"
+    assert:
+      - type: llm-rubric
+        value: >
+          The response must demonstrate proper middleware patterns:
+          (1) Middleware in correct order (CORS → request ID → logging → rate limit → auth → validation → handler → error handler),
+          (2) CORS with specific origin whitelist (not wildcard),
+          (3) Rate limiting with 429 + Retry-After,
+          (4) Request validation middleware before handlers,
+          (5) Structured JSON logging with request_id correlation,
+          (6) Catch-all error middleware returning consistent error envelope,
+          (7) No secrets in logs.

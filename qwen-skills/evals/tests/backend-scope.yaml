@@ -1,0 +1,51 @@
+# Backend-scope enforcement tests
+# Verifies DeepSeek refuses/redirects frontend tasks
+
+tests:
+  - description: "Frontend-only task: React component"
+    vars:
+      prompt: "Create a React component for user login with email and password fields"
+    assert:
+      - type: not-contains
+        value: "import React"
+      - type: not-contains
+        value: "useState"
+      - type: not-contains
+        value: "jsx"
+      - type: llm-rubric
+        value: "The response should NOT contain any React/JSX code. It should either decline the frontend task or describe only the backend API portion (login endpoint, JWT, password hashing)."
+
+  - description: "Frontend-only task: CSS layout"
+    vars:
+      prompt: "Build a CSS grid layout for a product listing page"
+    assert:
+      - type: not-contains
+        value: "display: grid"
+      - type: not-contains
+        value: "grid-template"
+      - type: not-contains
+        value: "<div"
+      - type: llm-rubric
+        value: "The response should NOT contain CSS or HTML code. It should either decline the frontend task or describe only what backend API the product listing page would need."
+
+  - description: "Full-stack task: only backend portion"
+    vars:
+      prompt: "Build a user dashboard showing profile info and recent orders"
+    assert:
+      - type: not-contains
+        value: "import React"
+      - type: not-contains
+        value: "className"
+      - type: contains
+        value: "endpoint"
+      - type: llm-rubric
+        value: "The response should implement only API endpoints (GET /api/profile, GET /api/orders) without any frontend code. It should define request/response schemas and implement the backend logic."
+
+  - description: "Backend task: not affected by scope constraint"
+    vars:
+      prompt: "Create a REST API endpoint for user registration with email validation"
+    assert:
+      - type: not-contains
+        value: "import React"
+      - type: llm-rubric
+        value: "The response should contain a complete backend implementation: route handler, input validation, password hashing, database insertion, and appropriate status codes."

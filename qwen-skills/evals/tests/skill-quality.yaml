@@ -1,0 +1,71 @@
+# Per-skill quality tests
+# Verifies each skill produces correct, high-quality output
+
+tests:
+  # api-builder
+  - description: "api-builder: paginated REST endpoint"
+    vars:
+      prompt: "Create a paginated REST endpoint for listing users with search and sorting"
+    assert:
+      - type: llm-rubric
+        value: "The response must include: (1) proper REST endpoint (GET /users or /api/users), (2) pagination implementation (cursor or offset with next/has_more), (3) consistent error response format with error.code and error.message, (4) appropriate HTTP status codes (200, 400, 500), (5) input validation for query params."
+
+  # database-patterns
+  - description: "database-patterns: migration for orders table"
+    vars:
+      prompt: "Write a database migration to add an orders table with user_id foreign key, status, total, and timestamps"
+    assert:
+      - type: llm-rubric
+        value: "The response must include: (1) timestamped migration file naming, (2) id/created_at/updated_at columns, (3) foreign key to users with ON DELETE behavior, (4) appropriate column types (not varchar for everything), (5) indexes on foreign key and commonly queried columns, (6) a reversible down/rollback migration."
+
+  # auth-security
+  - description: "auth-security: JWT authentication"
+    vars:
+      prompt: "Implement JWT authentication for a Node.js Express API"
+    assert:
+      - type: not-contains
+        value: "md5"
+      - type: not-contains
+        value: "sha1"
+      - type: llm-rubric
+        value: "The response must include: (1) bcrypt or argon2 for password hashing, (2) JWT with short expiry (<=30 min), (3) refresh token mechanism, (4) secrets from environment variables not hardcoded, (5) middleware that validates token on protected routes."
+
+  # middleware-patterns
+  - description: "middleware-patterns: request validation"
+    vars:
+      prompt: "Add request validation middleware to an Express API"
+    assert:
+      - type: llm-rubric
+        value: "The response must include: (1) validation before the route handler (middleware pattern), (2) schema-based validation (Joi, Zod, or express-validator), (3) 400/422 error responses with field-level errors, (4) validation of body, params, and query separately."
+
+  # error-handling
+  - description: "error-handling: structured errors for Express"
+    vars:
+      prompt: "Add structured error handling to this Express app with logging and retries"
+    assert:
+      - type: llm-rubric
+        value: "The response must include: (1) consistent error envelope format with code/message/request_id, (2) error classification (client vs server), (3) structured JSON logging with context fields, (4) catch-all error middleware, (5) no secrets in logs."
+
+  # async-patterns
+  - description: "async-patterns: background job queue"
+    vars:
+      prompt: "Add a background job queue for sending welcome emails after user registration"
+    assert:
+      - type: llm-rubric
+        value: "The response must include: (1) a job queue library (Bull, BullMQ, Celery, etc.), (2) idempotent job design, (3) retry with backoff for transient failures, (4) job status tracking, (5) error handling for failed jobs."
+
+  # tdd-workflow
+  - description: "tdd-workflow: test-first user service"
+    vars:
+      prompt: "Use TDD to build a user service with create, get, and delete operations"
+    assert:
+      - type: llm-rubric
+        value: "The response must demonstrate: (1) writing a failing test BEFORE the implementation code, (2) red-green-refactor cycle (test fails, minimal code to pass, then cleanup), (3) multiple cycles showing incremental development, (4) both happy path and error case tests."
+
+  # fix-bug
+  - description: "fix-bug: root cause investigation"
+    vars:
+      prompt: "Debug why GET /api/users returns 500 Internal Server Error with 'Cannot read properties of undefined'"
+    assert:
+      - type: llm-rubric
+        value: "The response must demonstrate: (1) investigating the root cause BEFORE proposing a fix, (2) checking server logs and stack trace, (3) identifying which layer the bug is in (route/service/data), (4) a specific hypothesis about the cause, (5) minimal fix with verification steps."

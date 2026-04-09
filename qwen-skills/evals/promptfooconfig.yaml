@@ -1,0 +1,32 @@
+# DeepSeek Skills Evaluation Suite
+# Tests backend-scope enforcement, skill quality, combinations, and token budget
+#
+# Run: promptfoo eval --config ~/.claude/deepseek-skills/evals/promptfooconfig.yaml
+# View: promptfoo view
+
+description: "DeepSeek Backend Skills Evaluation"
+
+providers:
+  - id: "file://providers/deepseek-with-skills.py"
+    label: "DeepSeek with Skills"
+    config:
+      max_tokens: 2048
+      temperature: 0.0
+
+prompts:
+  - "{{prompt}}"
+
+# Merge all test files
+tests:
+  - file://tests/backend-scope.yaml
+  - file://tests/skill-quality.yaml
+  - file://tests/skill-combinations.yaml
+  - file://tests/token-budget.yaml
+
+# Default assertion config
+defaultTest:
+  options:
+    provider: "openai:gpt-4o-mini"  # For llm-rubric evaluations
+
+# Output
+outputPath: "results/eval-results.json"

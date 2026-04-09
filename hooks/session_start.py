@@ -159,6 +159,26 @@ def reset_verification_record(session_id: str = "unknown") -> None:
     _claude_data = Path.home() / ".claude" / "data"
     _claude_data.mkdir(parents=True, exist_ok=True)
 
+    # Build set of session IDs to protect (current + all other active sessions).
+    # This prevents a new session from destroying state of concurrent sessions.
+    _protected_sessions: set[str] = set()
+    if session_id != "unknown":
+        _protected_sessions.add(session_id)
+    try:
+        _sessions_file = _claude_data / "active_sessions.json"
+        if _sessions_file.exists():
+            _active = json.loads(_sessions_file.read_text())
+            if isinstance(_active, dict):
+                for _sid in _active.values():
+                    if isinstance(_sid, str) and _sid:
+                        _protected_sessions.add(_sid)
+    except Exception:
+        pass  # Never block session start; fall back to protecting only current session
+
+    def _is_protected(file_path_str: str) -> bool:
+        """Return True if file belongs to any active session."""
+        return any(sid in file_path_str for sid in _protected_sessions)
+
     # Read previous agent identity (session-scoped) for targeted cleanup
     _old_agent_id = None
     _identity_file = _claude_data / f"agent_identity_{session_id}.json"
@@ -192,8 +212,10 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         except Exception:
             pass
 
-    # Delete all task-scoped VR files (fresh start)
+    # Delete stale task-scoped VR files (skip active sessions)
     for p in _glob.glob(str(_claude_data / "verification_record_*.json")):
+        if _is_protected(p):
+            continue
         try:
             Path(p).unlink(missing_ok=True)
         except Exception:
@@ -231,8 +253,8 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         "user_requests_*.json",          # Session-scoped user request log
     ]:
         for _path_str in _glob.glob(str(_claude_data / _pattern)):
-            # Keep the current session's files
-            if session_id != "unknown" and session_id in _path_str:
+            # Keep files belonging to any active session
+            if _is_protected(_path_str):
                 continue
             try:
                 Path(_path_str).unlink(missing_ok=True)

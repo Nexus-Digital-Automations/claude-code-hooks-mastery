@@ -64,25 +64,25 @@ Never:
 - Spec edit approval: `bash ~/.claude/commands/approve-spec-edit.sh`
 - Stop authorization: `bash ~/.claude/commands/authorize-stop.sh`
 - Suggest improvement: `bash ~/.claude/commands/suggest-improvement.sh <type> "<title>" "<desc>"`
-- Hooks: PreToolUse (env protection + DeepSeek confinement) · Stop (lint + security + reviewer gate) · SessionStart (loads specs + mode)
+- Hooks: PreToolUse (env protection + Qwen confinement) · Stop (lint + security + reviewer gate) · SessionStart (loads specs + mode)
 - Reviewer enforces all rules at stop time — see `~/.claude/docs/protocol-compliance-reference.md`
 - Complex work: SPARC (Spec → Pseudocode → Architecture → Refinement → Completion)
 - Agents/MCP/plugins: `~/.claude/docs/tools-and-plugins-overview.md`
 
 ---
 
-## Delegation Protocol (DeepSeek Mode — ACTIVE)
+## Delegation Protocol (Qwen Mode — ACTIVE)
 
-**MANDATORY**: Delegate backend tasks (5+ files) to DeepSeek via `mcp__deepseek-agent__run`. Direct implementation is a protocol violation. Full details: `~/.claude/docs/delegation-protocol.md`
+**MANDATORY**: Delegate backend tasks (5+ files) to Qwen via `mcp__qwen-agent__run`. Direct implementation is a protocol violation. Full details: `~/.claude/docs/delegation-protocol.md`
 
 ### Routing
 | Task | Owner |
 |------|-------|
-| Backend code (5+ files) | DeepSeek — MUST delegate |
+| Backend code (5+ files) | Qwen — MUST delegate |
 | Backend code (1-4 files) | You — implement directly |
 | Frontend UI | You — never delegate |
 | Security | You — never delegate |
-| Full-stack | Split: DeepSeek backend, you frontend + qualification |
+| Full-stack | Split: Qwen backend, you frontend + qualification |
 
 ### Quick Workflow
 1. **Describe** → `run(task, working_dir, profile="default-delegation")`
@@ -95,8 +95,8 @@ Never:
 ### Mode Switch
 `bash ~/.claude/commands/toggle-mode.sh claude`
 
-### Additional Prohibitions (DeepSeek Mode)
+### Additional Prohibitions (Qwen Mode)
 Never:
 - Trust delegated output without reading every file and running tests
-- Implement backend code directly when in deepseek mode (delegate via mcp__deepseek-agent__run)
+- Implement backend code directly when in qwen mode (delegate via mcp__qwen-agent__run)
 - Rationalize around delegation ("this is simple enough") for tasks touching 5+ backend files

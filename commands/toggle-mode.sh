@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Toggle between claude and deepseek agent modes.
-# Usage: bash toggle-mode.sh [claude|deepseek]
+# Toggle between claude and qwen agent modes.
+# Usage: bash toggle-mode.sh [claude|qwen]
 #   No argument → toggle current mode
 #   Argument    → set explicitly
 
@@ -21,18 +21,18 @@ fi
 # Determine new mode
 if [[ $# -ge 1 ]]; then
     case "$1" in
-        claude|deepseek)
+        claude|qwen)
             NEW="$1"
             ;;
         *)
-            echo "Usage: toggle-mode.sh [claude|deepseek]" >&2
+            echo "Usage: toggle-mode.sh [claude|qwen]" >&2
             exit 1
             ;;
     esac
 else
     # Toggle
     if [[ "$CURRENT" == "claude" ]]; then
-        NEW="deepseek"
+        NEW="qwen"
     else
         NEW="claude"
     fi
@@ -55,8 +55,8 @@ else:
 
 data['mode'] = '$NEW'
 data['last_switched'] = datetime.now().isoformat()
-data.setdefault('deepseek_profile', 'standard')
-data.setdefault('deepseek_plan_mode', True)
+data.setdefault('qwen_profile', 'standard')
+data.setdefault('qwen_plan_mode', True)
 data.setdefault('delegation_policy', {
     'code_tasks': True,
     'research_tasks': False,

@@ -1,0 +1,48 @@
+# Token budget validation tests
+# Verifies injected skill content stays within budget for various task types
+
+tests:
+  - description: "Minimal task: only always-include skills"
+    vars:
+      prompt: "Print hello world"
+    assert:
+      - type: javascript
+        value: |
+          // Only backend-scope + code-standards should match (~637 tokens)
+          const metadata = output.metadata || {};
+          const estimate = metadata.skill_token_estimate || 0;
+          return estimate < 800;
+
+  - description: "Single keyword-matched skill"
+    vars:
+      prompt: "Fix the bug in the login handler"
+    assert:
+      - type: javascript
+        value: |
+          // backend-scope + code-standards + fix-bug (~1100 tokens)
+          const metadata = output.metadata || {};
+          const estimate = metadata.skill_token_estimate || 0;
+          return estimate < 1500;
+
+  - description: "Worst case: many skills matched"
+    vars:
+      prompt: "Build REST API with PostgreSQL database, JWT auth, background async workers, and middleware rate limiting"
+    assert:
+      - type: javascript
+        value: |
+          // Up to 7-8 skills matched — must stay under 3500 tokens
+          const metadata = output.metadata || {};
+          const estimate = metadata.skill_token_estimate || 0;
+          return estimate < 3500;
+
+  - description: "All possible keywords in one task"
+    vars:
+      prompt: "Build a REST API with database schema migration, JWT auth security, middleware CORS rate limit, data import ETL CSV batch, CLI script argparse, Docker infrastructure health check, async queue WebSocket event, error handling logging retry circuit breaker, refactor service, TDD test-driven testing"
+    assert:
+      - type: javascript
+        value: |
+          // All 15 skills matched — absolute maximum budget
+          const metadata = output.metadata || {};
+          const estimate = metadata.skill_token_estimate || 0;
+          // Even all 15 skills should be < 6000 tokens
+          return estimate < 6000;
