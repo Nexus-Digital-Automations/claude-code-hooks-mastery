@@ -85,12 +85,12 @@ Never:
 | Full-stack | Split: Qwen backend, you frontend + qualification |
 
 ### Quick Workflow
-1. **Describe** → `run(task, working_dir, profile="default-delegation")`
+1. **Describe** → `run(task, working_dir, profile="qwen3-delegation")`
 2. **Review plan** → `review(agent_id, "get")` — required before approve
 3. **Approve** → `review(agent_id, "approve")`
 4. **Validate** → read every file, re-run build+lint+test, Playwright final gate
 
-**Budget:** `default-delegation` — 200 iterations, $0.50 cap
+**Budget:** `qwen3-delegation` — 200 iterations, $3.00 cap
 
 ### Mode Switch
 `bash ~/.claude/commands/toggle-mode.sh claude`
