@@ -816,7 +816,7 @@ if __name__ == "__main__":
     parser.add_argument("--context-file",
                         help="Path to qwen_context.json (optional)")
     parser.add_argument("--state-file",
-                        default=".claude/data/deepseek_review_state.json",
+                        default=".claude/data/qwen_review_state.json",
                         help="Path to persist conversation state")
     args = parser.parse_args()
 
@@ -837,26 +837,26 @@ if __name__ == "__main__":
 
     state_path = Path(args.state_file)
 
-    result = verify_with_deepseek(checks, context, state_file=state_path)
+    result = verify_with_llm(checks, context, state_file=state_path)
 
     if result.get("skipped"):
-        print(f"⏭  DeepSeek review skipped: {result['skip_reason']}")
+        print(f"⏭  LLM review skipped: {result['skip_reason']}")
         sys.exit(0)
 
     if result.get("pending"):
         print("\n" + "=" * 70)
-        print("DEEPSEEK REVIEWER HAS A QUESTION")
+        print("LLM REVIEWER HAS A QUESTION")
         print("=" * 70)
         print(f"\n{result['questions']}")
         print("\nAnswer with:")
-        print('  bash ~/.claude/commands/answer-deepseek.sh "your answer"')
+        print('  bash ~/.claude/commands/answer-qwen.sh "your answer"')
         print("Then re-run authorize-stop.")
         print("=" * 70 + "\n")
         sys.exit(1)
 
     if not result["approved"]:
         print("\n" + "=" * 70)
-        print("DEEPSEEK REVIEWER REJECTED — EVIDENCE INSUFFICIENT")
+        print("LLM REVIEWER REJECTED — EVIDENCE INSUFFICIENT")
         print("=" * 70)
         print(f"\nVerdict: {result['verdict']}")
         if result.get("suspicious_steps"):
@@ -864,11 +864,11 @@ if __name__ == "__main__":
         if result.get("instructions"):
             print(f"\nRequired actions:\n{result['instructions']}")
         print("\nTo provide additional context and continue the conversation:")
-        print('  bash ~/.claude/commands/answer-deepseek.sh "your response"')
+        print('  bash ~/.claude/commands/answer-qwen.sh "your response"')
         print("Then re-run authorize-stop.")
         print("=" * 70 + "\n")
         sys.exit(1)
 
     # Approved
-    print(f"\n✅ DeepSeek review passed: {result['verdict']}\n")
+    print(f"\n✅ LLM review passed: {result['verdict']}\n")
     sys.exit(0)

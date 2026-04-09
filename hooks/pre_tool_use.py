@@ -99,10 +99,10 @@ def get_context_injection(cwd, tool_name, tool_input=None):
     return "\n".join(injections) if injections else None
 
 
-# IMP-9: Read from the same env var that the DeepSeek server uses so the two
+# IMP-9: Read from the same env var that the Qwen server uses so the two
 # systems never drift apart.  Falls back to the historical default.
-DEEPSEEK_BASE_PATH = os.environ.get(
-    "DEEPSEEK_PROJECTS_ROOT",
+QWEN_BASE_PATH = os.environ.get(
+    "QWEN_PROJECTS_ROOT",
     "/Users/jeremyparker/Desktop/Claude Coding Projects",
 )
 
@@ -113,10 +113,10 @@ def _path_within_base(path_str: str, base: str) -> bool:
     return resolved != base and resolved.startswith(base + "/")
 
 
-def check_deepseek_working_dir(tool_name, tool_input):
+def check_qwen_working_dir(tool_name, tool_input):
     """
-    Block mcp__deepseek-agent__run calls whose working_dir (or allowed_dirs)
-    fall outside DEEPSEEK_BASE_PATH.
+    Block mcp__qwen-agent__run calls whose working_dir (or allowed_dirs)
+    fall outside QWEN_BASE_PATH.
 
     Allowed without working_dir:
       - agent_id is set (reusing an existing agent — working_dir already locked in)
@@ -124,10 +124,10 @@ def check_deepseek_working_dir(tool_name, tool_input):
 
     Returns (blocked: bool, reason: str | None).
     """
-    if tool_name != "mcp__deepseek-agent__run":
+    if tool_name != "mcp__qwen-agent__run":
         return False, None
 
-    base = str(Path(DEEPSEEK_BASE_PATH).resolve())
+    base = str(Path(QWEN_BASE_PATH).resolve())
 
     # IMP-10: Reusing an existing agent — working_dir was validated at creation.
     if tool_input.get("agent_id"):
@@ -146,20 +146,20 @@ def check_deepseek_working_dir(tool_name, tool_input):
             return False, None
 
         return True, (
-            "BLOCKED: mcp__deepseek-agent__run requires a working_dir "
+            "BLOCKED: mcp__qwen-agent__run requires a working_dir "
             "(or agent_id to reuse an existing agent).\n"
-            f"working_dir must be a subdirectory of: {DEEPSEEK_BASE_PATH}\n"
+            f"working_dir must be a subdirectory of: {QWEN_BASE_PATH}\n"
             "Example: working_dir=\"/Users/jeremyparker/Desktop/Claude Coding Projects/my-project\"\n"
-            "Tip: set DEEPSEEK_PROJECTS_ROOT env var to change the allowed root."
+            "Tip: set QWEN_PROJECTS_ROOT env var to change the allowed root."
         )
 
     # Validate working_dir is strictly inside base
     if not _path_within_base(working_dir, base):
         return True, (
             f"BLOCKED: working_dir '{working_dir}' is outside the allowed workspace.\n"
-            f"Allowed: subdirectories of {DEEPSEEK_BASE_PATH}\n"
+            f"Allowed: subdirectories of {QWEN_BASE_PATH}\n"
             "The base path itself is not a valid working directory — specify a named subproject.\n"
-            "Tip: set DEEPSEEK_PROJECTS_ROOT env var to change the allowed root."
+            "Tip: set QWEN_PROJECTS_ROOT env var to change the allowed root."
         )
 
     return False, None
@@ -211,8 +211,8 @@ def main():
             print("Reading .env is allowed; use .env.sample for templates", file=sys.stderr)
             sys.exit(2)  # Exit code 2 blocks tool call and shows error to Claude
 
-        # Enforce DeepSeek working_dir confinement
-        ds_blocked, ds_reason = check_deepseek_working_dir(tool_name, tool_input)
+        # Enforce Qwen working_dir confinement
+        ds_blocked, ds_reason = check_qwen_working_dir(tool_name, tool_input)
         if ds_blocked:
             print(ds_reason, file=sys.stderr)
             sys.exit(2)

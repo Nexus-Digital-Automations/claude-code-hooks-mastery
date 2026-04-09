@@ -507,9 +507,9 @@ def update_tool_tracking(session_id: str, tool_name: str, tool_input: dict) -> N
         pass
 
 
-def _track_deepseek_result(session_id, tool_name, tool_input, tool_result):
-    """Log DeepSeek MCP tool calls to a ring buffer (last 50 entries)."""
-    ds_log = Path.home() / ".claude" / "data" / "deepseek_delegations.json"
+def _track_qwen_result(session_id, tool_name, tool_input, tool_result):
+    """Log Qwen MCP tool calls to a ring buffer (last 50 entries)."""
+    ds_log = Path.home() / ".claude" / "data" / "qwen_delegations.json"
     ds_log.parent.mkdir(parents=True, exist_ok=True)
 
     entries = []
@@ -519,7 +519,7 @@ def _track_deepseek_result(session_id, tool_name, tool_input, tool_result):
         except Exception:
             entries = []
 
-    # Extract action from tool name (e.g. mcp__deepseek-agent__run → run)
+    # Extract action from tool name (e.g. mcp__qwen-agent__run → run)
     action = tool_name.rsplit("__", 1)[-1] if "__" in tool_name else tool_name
 
     entry = {
@@ -579,7 +579,7 @@ def _find_delegation_entry(entries, agent_id, task_id):
 
 
 def _capture_delegation_metadata(session_id, tool_name, tool_input, tool_result):
-    """Capture structured DeepSeek delegation metadata keyed by session + task.
+    """Capture structured Qwen delegation metadata keyed by session + task.
 
     Writes/updates ~/.claude/data/delegation_meta_{session_id}.json.
     Each entry tracks one agent: plan file_changes, verification_steps,
@@ -666,7 +666,7 @@ def _capture_delegation_metadata(session_id, tool_name, tool_input, tool_result)
     else:
         return  # setup/configure/queue/agent — not tracked here
 
-    # Keep ring buffer at 20 entries (richer data than deepseek_delegations.json)
+    # Keep ring buffer at 20 entries (richer data than qwen_delegations.json)
     entries = entries[-20:]
     meta_file.write_text(json.dumps(entries, indent=2))
 
@@ -737,14 +737,14 @@ def main():
         if session_id and tool_name == "Bash":
             observe_bash_check(session_id, tool_input, tool_result)
 
-        # Track tool usage for DeepSeek context enrichment
+        # Track tool usage for Qwen context enrichment
         if session_id and tool_name in ("Write", "Edit", "MultiEdit", "Bash", "Read"):
             update_tool_tracking(session_id, tool_name, tool_input)
 
-        # Track DeepSeek MCP delegations
-        if tool_name.startswith('mcp__deepseek-agent__'):
+        # Track Qwen MCP delegations
+        if tool_name.startswith('mcp__qwen-agent__'):
             try:
-                _track_deepseek_result(session_id, tool_name, tool_input, tool_result)
+                _track_qwen_result(session_id, tool_name, tool_input, tool_result)
             except Exception:
                 pass
             try:
