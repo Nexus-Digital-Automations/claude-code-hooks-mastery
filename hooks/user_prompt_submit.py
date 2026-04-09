@@ -674,8 +674,8 @@ DO NOT DELEGATE: questions, explanations, git ops, reviews, validation, security
 If Qwen is unavailable, implement directly yourself."""
 
 
-def build_deepseek_delegation_directive(prompt, mode_config, working_dir: str = ""):
-    """Returns a DeepSeek delegation directive string, or None for non-delegatable prompts."""
+def build_qwen_delegation_directive(prompt, mode_config, working_dir: str = ""):
+    """Returns a Qwen delegation directive string, or None for non-delegatable prompts."""
     prompt_stripped = prompt.strip()
     # Skip very short prompts, slash commands, simple acks
     if len(prompt_stripped) < 15 or prompt_stripped.startswith('/'):
@@ -698,21 +698,21 @@ def build_deepseek_delegation_directive(prompt, mode_config, working_dir: str = 
     if is_frontend and not is_backend:
         # Pure frontend: handle directly, no delegation
         return ("TASK ROUTING: This is a frontend task. "
-                "Handle it yourself — do NOT delegate to DeepSeek. "
-                "DeepSeek is weak at frontend/UI work. "
+                "Handle it yourself — do NOT delegate to Qwen. "
+                "Qwen is weak at frontend/UI work. "
                 "Use impeccable skills (/frontend-design, /audit, /polish) for design quality.")
 
     if is_frontend and is_backend:
         # Mixed: split the work
         return ("TASK ROUTING: This is a full-stack task. "
-                "Delegate the backend/API portion to DeepSeek via mcp__deepseek-agent__run. "
+                "Delegate the backend/API portion to Qwen via mcp__qwen-agent__run. "
                 "Handle the frontend/UI portion yourself using impeccable skills. "
-                "DeepSeek is not good at frontend work.")
+                "Qwen is not good at frontend work.")
 
     if is_backend and not is_frontend:
-        # Pure backend: always delegate in deepseek mode
+        # Pure backend: always delegate in qwen mode
         profile = "confined"
-        plan_mode = mode_config.get('deepseek_plan_mode', True)
+        plan_mode = mode_config.get('qwen_plan_mode', True)
         directive = _build_delegation_directive(profile, plan_mode)
         if working_dir:
             dir_tree = _get_dir_tree(working_dir)
@@ -739,8 +739,8 @@ def build_deepseek_delegation_directive(prompt, mode_config, working_dir: str = 
     if not policy_key or not policy.get(policy_key, False):
         return None  # Not a delegatable task type per policy
 
-    profile = "confined"  # Always use confined profile — scopes DeepSeek to Claude Coding Projects
-    plan_mode = mode_config.get('deepseek_plan_mode', True)
+    profile = "confined"  # Always use confined profile — scopes Qwen to Claude Coding Projects
+    plan_mode = mode_config.get('qwen_plan_mode', True)
 
     directive = _build_delegation_directive(profile, plan_mode)
     if working_dir:
@@ -1079,12 +1079,12 @@ def main():
         # Build additional context with recommendations
         context_parts = []
 
-        # Prepend routing directive — deepseek delegation or normal agent routing
+        # Prepend routing directive — qwen delegation or normal agent routing
         try:
             from utils.config_loader import get_config
             mode_config = get_config().get_agent_mode()
-            if mode_config.get("mode") == "deepseek":
-                directive = build_deepseek_delegation_directive(prompt, mode_config, working_dir=cwd)
+            if mode_config.get("mode") in ("deepseek", "qwen"):
+                directive = build_qwen_delegation_directive(prompt, mode_config, working_dir=cwd)
                 if directive:
                     context_parts.insert(0, directive)
             else:
