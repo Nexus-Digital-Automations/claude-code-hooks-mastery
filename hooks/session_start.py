@@ -400,14 +400,14 @@ def load_development_context(source, agent_id=""):
     except Exception:
         pass
 
-    # Inject DeepSeek supervisor context if in deepseek mode
+    # Inject Qwen supervisor context if in qwen mode
     try:
         from utils.config_loader import get_config
-        if get_config().is_deepseek_mode():
+        if get_config().is_qwen_mode():
             session_rules_ds = """
-DEEPSEEK DELEGATION MODE — THIS OVERRIDES CLAUDE.md'S "AUTONOMOUS OPERATION" RULE
+QWEN DELEGATION MODE — THIS OVERRIDES CLAUDE.md'S "AUTONOMOUS OPERATION" RULE
 
-You are the architect and quality gate. DeepSeek builds code but is not as
+You are the architect and quality gate. Qwen builds code but is not as
 strong a coder as you — expect mistakes. Its code will often have missing error
 handling, wrong variable names, logic bugs, and incomplete implementations.
 Thorough review and testing catch real problems every time.
@@ -418,19 +418,19 @@ BEFORE DELEGATING — WRITE A TASK DESCRIPTION (not a full plan):
 - Verification criteria: how you will validate each feature
 Scale to the task: 5-10 lines for a bug fix, 15-20 for a feature.
 Do NOT include architecture, function signatures, or file-by-file instructions.
-DeepSeek investigates the codebase and produces its own comprehensive plan.
+Qwen investigates the codebase and produces its own comprehensive plan.
 
 DIVISION OF LABOR:
 - You (Claude Code): task description, plan review, verify build/lint/type-check, final Playwright gate, frontend UI, security
-- DeepSeek Agent: codebase investigation, planning, code building, first-pass mechanical checks (build/lint/type-check/Playwright, budget-capped), Playwright test writing
+- Qwen Agent: codebase investigation, planning, code building, first-pass mechanical checks (build/lint/type-check/Playwright, budget-capped), Playwright test writing
 - Both: Playwright test coverage — comprehensive E2E tests mandatory for every frontend feature
 
 DELEGATION PROTOCOL:
-- Write the task description, then delegate via mcp__deepseek-agent__run
+- Write the task description, then delegate via mcp__qwen-agent__run
 - Use profile="default-delegation" — plan mode is enabled by default
-- DeepSeek investigates the codebase with read-only tools and produces a comprehensive plan
+- Qwen investigates the codebase with read-only tools and produces a comprehensive plan
 - Returns state="awaiting_approval" — review the plan before any code is written
-- Monitor with mcp__deepseek-agent__poll
+- Monitor with mcp__qwen-agent__poll
 
 PLAN REVIEW (mandatory — before approving):
 - plan(agent_id, "get") to inspect the plan
@@ -457,18 +457,18 @@ AFTER AGENT COMPLETES (mandatory — every time):
 TASKS YOU KEEP (do NOT delegate):
 - Plan review and approval — investigate anything suspicious
 - Test qualification — re-run build/lint/type-check, final Playwright gate, unit/integration tests
-- ALL frontend UI work — use impeccable skills (DeepSeek writes Playwright tests for features it adds, not UI code)
+- ALL frontend UI work — use impeccable skills (Qwen writes Playwright tests for features it adds, not UI code)
 - Questions, explanations, read-only reviews
 - Git operations, security audits
 - ALL security work — scanning, auditing, vulnerability review, hardening
 - Stop authorization and verification
 
 DELEGATION THRESHOLD:
-- Only deploy DeepSeek for tasks touching ~5+ files
+- Only deploy Qwen for tasks touching ~5+ files
 - Small tasks (~5 files or fewer): implement directly yourself
 - Delegation overhead (run, poll, review, fix) exceeds direct implementation for small changes
 
-FALLBACK: If DeepSeek is unavailable, implement directly yourself.
+FALLBACK: If Qwen is unavailable, implement directly yourself.
 
 You are the architect and the quality gate. Every deliverable gets verified.
 """

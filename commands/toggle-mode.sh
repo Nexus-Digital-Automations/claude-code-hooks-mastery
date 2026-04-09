@@ -55,7 +55,8 @@ else:
 
 data['mode'] = '$NEW'
 data['last_switched'] = datetime.now().isoformat()
-data.setdefault('qwen_profile', 'standard')
+data['preferred_provider'] = 'qwen' if '$NEW' == 'qwen' else ''
+data.setdefault('qwen_profile', 'qwen3-delegation')
 data.setdefault('qwen_plan_mode', True)
 data.setdefault('delegation_policy', {
     'code_tasks': True,

@@ -1083,7 +1083,7 @@ def main():
         try:
             from utils.config_loader import get_config
             mode_config = get_config().get_agent_mode()
-            if mode_config.get("mode") in ("deepseek", "qwen"):
+            if mode_config.get("mode") == "qwen":
                 directive = build_qwen_delegation_directive(prompt, mode_config, working_dir=cwd)
                 if directive:
                     context_parts.insert(0, directive)
