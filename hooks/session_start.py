@@ -110,7 +110,7 @@ def _generate_agent_identity(session_id: str) -> str:
     """Generate a unique agent_id for this session and persist it.
 
     The agent_id is a UUID that uniquely identifies this session's agent.
-    It scopes all DeepSeek reviewer state files and prevents cross-session
+    It scopes all Qwen reviewer state files and prevents cross-session
     contamination. Written to ~/.claude/data/agent_identity_{session_id}.json
     (session-scoped to avoid clobbering across concurrent sessions).
 
@@ -153,7 +153,7 @@ def reset_verification_record(session_id: str = "unknown") -> None:
     """Clean up stale state files from previous sessions.
 
     Deletes VR files, legacy global files, stale session-scoped identity/task
-    files, and orphaned DeepSeek files so the new session starts clean.
+    files, and orphaned Qwen files so the new session starts clean.
     """
     import glob as _glob
     _claude_data = Path.home() / ".claude" / "data"
@@ -195,9 +195,9 @@ def reset_verification_record(session_id: str = "unknown") -> None:
     # Targeted cleanup: delete state files belonging to the old agent
     if _old_agent_id:
         for _suffix in [
-            f"deepseek_context_{_old_agent_id}.json",
-            f"deepseek_review_state_{_old_agent_id}.json",
-            f"deepseek_review_state_{_old_agent_id}.rejections",
+            f"qwen_context_{_old_agent_id}.json",
+            f"qwen_review_state_{_old_agent_id}.json",
+            f"qwen_review_state_{_old_agent_id}.rejections",
         ]:
             try:
                 (_claude_data / _suffix).unlink(missing_ok=True)
@@ -272,16 +272,16 @@ def reset_verification_record(session_id: str = "unknown") -> None:
         except Exception:
             pass
 
-    # Clean up orphaned DeepSeek files — only delete files older than 1 hour
+    # Clean up orphaned Qwen files — only delete files older than 1 hour
     # to avoid racing with concurrent sessions.
     import time as _time
     _one_hour_ago = _time.time() - 3600
     for _pattern in [
-        "deepseek_context.json",
-        "deepseek_context_*.json",
-        "deepseek_review_state_*.json",
-        "deepseek_review_state_*.rejections",
-        "deepseek_run_snapshot.json",
+        "qwen_context.json",
+        "qwen_context_*.json",
+        "qwen_review_state_*.json",
+        "qwen_review_state_*.rejections",
+        "qwen_run_snapshot.json",
     ]:
         for _path_str in _glob.glob(str(_claude_data / _pattern)):
             try:
@@ -579,7 +579,7 @@ def main():
         # Create default VR so stop.py always has a well-formed file
         _create_default_vr(session_id)
 
-        # Generate unique agent identity for this session (scopes DeepSeek state)
+        # Generate unique agent identity for this session (scopes Qwen state)
         agent_id = _generate_agent_identity(session_id)
 
         # Register this session in active_sessions.json for shell script lookups
