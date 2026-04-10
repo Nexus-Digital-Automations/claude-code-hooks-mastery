@@ -5,7 +5,7 @@
 # Usage: bash ~/.claude/commands/qwen-parse-output.sh <path-to-output-file>
 #
 # When run() hits the token limit the full output is written to a file
-# (e.g. tool-results/mcp-deepseek-agent-run-*.txt) and the tool returns a
+# (e.g. tool-results/mcp-qwen-agent-run-*.txt) and the tool returns a
 # file-path error. This script reads that file and prints a clean summary
 # instead of requiring manual jq queries.
 set -euo pipefail
