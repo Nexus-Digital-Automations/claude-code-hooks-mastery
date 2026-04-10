@@ -288,7 +288,7 @@ _SKIP_PATH_FRAGMENTS = (
     # Promptfoo eval results contain LLM text outputs from security test scenarios;
     # fake credentials in those outputs are intentional test fixtures, not real secrets.
     "tests/promptfoo/results/",
-    # DeepSeek Agent MCP eval suite — YAML test fixtures and LLM result outputs;
+    # Qwen Agent MCP eval suite — YAML test fixtures and LLM result outputs;
     # example credentials in test scenarios and code review tasks are intentional.
     "/evals/results/",
     "/evals/",

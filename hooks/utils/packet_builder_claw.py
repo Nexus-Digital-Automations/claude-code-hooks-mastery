@@ -9,7 +9,7 @@ Key differences from Claude Code assembly:
 - No task scoping — no task_id, no current_task file
 - Agent mode is hardcoded "claw"
 - Conversation persistence uses {project}/.claw/data/
-- No delegation metadata (claw does not use DeepSeek)
+- No delegation metadata (claw does not use Qwen)
 """
 from __future__ import annotations
 
