@@ -1,7 +1,7 @@
-"""Custom promptfoo provider that injects deepseek-skills like server.py does.
+"""Custom promptfoo provider that injects qwen-skills like server.py does.
 
 Reads index.json, matches keywords against the prompt, prepends matched skill
-content, then sends to DeepSeek-V3 via OpenAI-compatible API.
+content, then sends to Qwen-V3 via OpenAI-compatible API.
 """
 
 import json
@@ -10,13 +10,13 @@ import re
 from pathlib import Path
 
 
-SKILLS_DIR = Path.home() / ".claude" / "deepseek-skills"
+SKILLS_DIR = Path.home() / ".claude" / "qwen-skills"
 INDEX_PATH = SKILLS_DIR / "index.json"
 
-# DeepSeek API config — set DEEPSEEK_API_KEY env var
-API_BASE = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
-API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
-MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+# Qwen API config — set QWEN_API_KEY env var
+API_BASE = os.environ.get("QWEN_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+API_KEY = os.environ.get("QWEN_API_KEY", "")
+MODEL = os.environ.get("QWEN_MODEL", "qwen-coder-plus-latest")
 
 
 def _load_index():
@@ -85,7 +85,7 @@ def call_api(prompt, options, context):
     # If no API key, return skill injection metadata only (dry-run mode)
     if not API_KEY:
         return {
-            "output": f"[DRY RUN — no DEEPSEEK_API_KEY set]\n\nSkills injected: {', '.join(skill_names)}\nEst. skill tokens: {skill_token_estimate}\n\nFull prompt ({len(full_prompt)} chars) would be sent to {MODEL}.",
+            "output": f"[DRY RUN — no QWEN_API_KEY set]\n\nSkills injected: {', '.join(skill_names)}\nEst. skill tokens: {skill_token_estimate}\n\nFull prompt ({len(full_prompt)} chars) would be sent to {MODEL}.",
             "tokenUsage": {"total": 0, "prompt": skill_token_estimate, "completion": 0},
             "metadata": {
                 "skills_injected": skill_names,
@@ -93,7 +93,7 @@ def call_api(prompt, options, context):
             },
         }
 
-    # Call DeepSeek API
+    # Call Qwen API
     try:
         import openai
 
