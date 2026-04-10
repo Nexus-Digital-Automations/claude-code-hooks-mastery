@@ -14,14 +14,14 @@ author: Claude Flow
 ---
 
 ---
-## ⚠️ Deepseek Mode — Awareness Note
+## ⚠️ Qwen Mode — Awareness Note
 
 Read `~/.claude/data/agent_mode.json`.
 
-**If `mode == "deepseek"`:**
+**If `mode == "qwen"`:**
 This skill handles non-code work (analysis / coordination / git ops / docs / validation) — safe to run directly.
 However: if this skill leads to a code implementation step (writing/modifying files), that step
-MUST use `mcp__deepseek-agent__run` rather than direct code writing. You supervise; DeepSeek executes.
+MUST use `mcp__qwen-agent__run` rather than direct code writing. You supervise; Qwen executes.
 
 **If `mode == "claude"`:** No change — proceed normally with this skill.
 

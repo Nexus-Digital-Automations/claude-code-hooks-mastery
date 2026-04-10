@@ -4,16 +4,16 @@ description: AI-assisted pair programming with multiple modes (driver/navigator/
 ---
 
 ---
-## ⚠️ Deepseek Mode — Check Before Proceeding
+## ⚠️ Qwen Mode — Check Before Proceeding
 
 Read `~/.claude/data/agent_mode.json`.
 
-**If `mode == "deepseek"`:**
-This skill writes or modifies code/files. Code work MUST be delegated in deepseek mode.
+**If `mode == "qwen"`:**
+This skill writes or modifies code/files. Code work MUST be delegated in qwen mode.
 - Do NOT execute this skill's implementation steps directly
-- Call `mcp__deepseek-agent__run` with a precise task description (include file paths, constraints, acceptance criteria)
-- After DeepSeek completes: read every changed file yourself and validate
-- You are supervisor; DeepSeek is the worker
+- Call `mcp__qwen-agent__run` with a precise task description (include file paths, constraints, acceptance criteria)
+- After Qwen completes: read every changed file yourself and validate
+- You are supervisor; Qwen is the worker
 
 **If `mode == "claude"`:** Proceed normally with this skill.
 
