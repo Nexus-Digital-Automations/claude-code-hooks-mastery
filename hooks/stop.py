@@ -343,13 +343,14 @@ def _resolve_session_id(session_id: str) -> str:
                     resolved = sessions.get(lookup_dir, "")
                     if resolved and (Path.home() / f".claude/data/verification_record_{resolved}.json").exists():
                         return resolved
-            except Exception:
+            except Exception as exc:
+                print(f"  [session] git_root lookup failed, falling back to cwd: {exc}", file=sys.stderr)
                 cwd = os.getcwd()
                 resolved = sessions.get(cwd, "")
                 if resolved and (Path.home() / f".claude/data/verification_record_{resolved}.json").exists():
                     return resolved
-    except Exception:
-        pass
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"  [session] active_sessions.json read failed: {exc}", file=sys.stderr)
     return session_id
 
 
