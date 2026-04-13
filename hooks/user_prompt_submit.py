@@ -113,7 +113,18 @@ def _record_task_start(session_id: str, prompt: str, working_dir: str = "") -> t
             ),
             "prompt": prompt[:500],
             "is_followup": is_followup,
+            "plan_file": existing_data.get("plan_file", "") if is_followup else "",
         }, indent=2))
+
+        # Clear stale reviewer approval when starting a genuinely new task
+        if not is_followup:
+            try:
+                approval_file = Path.home() / f".claude/data/reviewer_approval_{session_id}.json"
+                if approval_file.exists():
+                    approval_file.unlink(missing_ok=True)
+            except Exception as exc:
+                print(f"[user_prompt_submit] Failed to clear stale approval: {exc}", file=sys.stderr)
+
         return task_id, prompt_id, is_followup
     except Exception:
         return str(uuid.uuid4()), str(uuid.uuid4()), False  # Never block prompt submission

@@ -320,12 +320,17 @@ def detect_rate_limit(input_data):
 def _resolve_session_id(session_id: str) -> str:
     """Resolve the canonical session ID for VR/auth file lookups.
 
-    Prefers active_sessions.json (authoritative for the current session) over
-    stale VR files from prior sessions. Old VR files persist after session
-    restarts, causing the harness-provided session_id to resolve to a stale
-    session while authorize-stop.sh writes auth for the current one.
+    Prefers the harness-provided session_id when its VR file exists (prevents
+    cross-session contamination when multiple sessions share a working dir).
+    Falls back to active_sessions.json for compact/restart scenarios where the
+    harness-provided ID has no VR file yet.
     """
-    # 1. Check active_sessions.json first — most authoritative for current session
+    # 1. Harness-provided ID is authoritative if its VR file exists —
+    #    this prevents active_sessions.json overwrites from concurrent sessions
+    if (Path.home() / f".claude/data/verification_record_{session_id}.json").exists():
+        return session_id
+    # 2. Fallback: active_sessions.json (handles compact/restart where VR
+    #    was written under a different session ID)
     try:
         sessions_file = Path.home() / ".claude/data/active_sessions.json"
         if sessions_file.exists():
@@ -345,9 +350,6 @@ def _resolve_session_id(session_id: str) -> str:
                     return resolved
     except Exception:
         pass
-    # 2. Fall back to harness-provided session_id if its VR file exists
-    if (Path.home() / f".claude/data/verification_record_{session_id}.json").exists():
-        return session_id
     return session_id
 
 
@@ -1005,14 +1007,31 @@ def _phase_8_reviewer(session_id: str, config: dict, input_data: dict) -> tuple[
             print("  [reviewer] reviewer.py not found \u2014 skipping", file=sys.stderr)
             return (True, "")
 
-        # Check for existing approval
+        # Check for existing approval — verify task_id to prevent cross-task bleed
         _approval_file = _data_dir / f"reviewer_approval_{resolved_sid}.json"
         if _approval_file.exists():
             try:
-                if json.loads(_approval_file.read_text()).get("approved", False):
-                    return (True, "")
-            except Exception:
-                pass
+                _approval = json.loads(_approval_file.read_text())
+                if _approval.get("approved", False):
+                    # Verify the approval is for the current task
+                    _current_task_id = ""
+                    _task_file = _data_dir / f"current_task_{resolved_sid}.json"
+                    if _task_file.exists():
+                        try:
+                            _current_task_id = json.loads(
+                                _task_file.read_text()
+                            ).get("task_id", "")
+                        except (json.JSONDecodeError, OSError) as exc:
+                            print(f"  [reviewer] Failed to read current_task for approval check: {exc}", file=sys.stderr)
+                    _approval_task_id = _approval.get("task_id", "")
+                    # Accept if: no task_id in approval (old format), no current task,
+                    # or task_ids match. Reject if both exist and differ.
+                    if (not _approval_task_id or not _current_task_id
+                            or _approval_task_id == _current_task_id):
+                        return (True, "")
+                    # else: stale approval from a different task — re-review
+            except (json.JSONDecodeError, OSError) as exc:
+                print(f"  [reviewer] Approval file read failed: {exc}", file=sys.stderr)
 
         # Check OPENAI_API_KEY
         _has_api_key = bool(os.getenv("OPENAI_API_KEY"))

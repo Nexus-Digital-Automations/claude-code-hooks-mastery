@@ -344,7 +344,15 @@ def run_sandbox_checks(
 
 
 def _resolve_session_id(session_id: str) -> str:
-    """Resolve canonical session ID (mirrors stop.py logic)."""
+    """Resolve canonical session ID (mirrors stop.py logic).
+
+    Prefers harness-provided ID when its VR exists to prevent cross-session
+    contamination from concurrent sessions overwriting active_sessions.json.
+    """
+    # 1. Harness-provided ID is authoritative if its VR file exists
+    if (_DATA_DIR / f"verification_record_{session_id}.json").exists():
+        return session_id
+    # 2. Fallback: active_sessions.json (compact/restart)
     try:
         sessions_file = _DATA_DIR / "active_sessions.json"
         if sessions_file.exists():
@@ -354,12 +362,12 @@ def _resolve_session_id(session_id: str) -> str:
                 git_root = get_git_root()
                 for lookup_dir in [git_root, os.getcwd()]:
                     resolved = sessions.get(lookup_dir, "")
-                    if resolved:
+                    if resolved and (_DATA_DIR / f"verification_record_{resolved}.json").exists():
                         return resolved
             except Exception:
                 cwd = os.getcwd()
                 resolved = sessions.get(cwd, "")
-                if resolved:
+                if resolved and (_DATA_DIR / f"verification_record_{resolved}.json").exists():
                     return resolved
     except Exception:
         pass
@@ -511,13 +519,33 @@ def build_review_packet(
     except Exception as exc:
         print(f"  [reviewer] Commentary summarization failed: {exc}", file=sys.stderr)
 
-    # 6. Approved plan file (most recently modified plan from ~/.claude/plans/)
+    # 6. Approved plan file — scoped to current task (prevents cross-session contamination)
     try:
-        plans_dir = _CLAUDE_DIR / "plans"
-        if plans_dir.is_dir():
-            plan_files = sorted(plans_dir.glob("*.md"), key=lambda p: p.stat().st_mtime, reverse=True)
-            if plan_files:
-                packet.plan_content = plan_files[0].read_text(errors="replace")
+        plan_path_str = current_task.get("plan_file", "")
+        if plan_path_str:
+            plan_path = Path(plan_path_str)
+            if plan_path.exists():
+                packet.plan_content = plan_path.read_text(errors="replace")
+        else:
+            # Fallback: newest plan whose mtime predates this task's start time
+            # (backward compat for tasks without plan_file set)
+            plans_dir = _CLAUDE_DIR / "plans"
+            if plans_dir.is_dir():
+                task_start = packet.task_started_at
+                plan_files = sorted(
+                    plans_dir.glob("*.md"),
+                    key=lambda p: p.stat().st_mtime,
+                    reverse=True,
+                )
+                for pf in plan_files:
+                    if not task_start:
+                        # No task timestamp — use newest (legacy behavior)
+                        packet.plan_content = pf.read_text(errors="replace")
+                        break
+                    pf_mtime = datetime.fromtimestamp(pf.stat().st_mtime).isoformat()
+                    if pf_mtime <= task_start:
+                        packet.plan_content = pf.read_text(errors="replace")
+                        break
     except (OSError, PermissionError) as exc:
         print(f"  [reviewer] Plan file load failed: {exc}", file=sys.stderr)
 
@@ -655,23 +683,31 @@ def _approval_file(session_id: str) -> Path:
     return _DATA_DIR / f"reviewer_approval_{session_id}.json"
 
 
-def check_approval(session_id: str) -> bool:
-    """Check if reviewer has already approved this session."""
+def check_approval(session_id: str, task_id: str = "") -> bool:
+    """Check if reviewer has already approved this session's current task."""
     try:
         f = _approval_file(session_id)
         if f.exists():
-            return json.loads(f.read_text()).get("approved", False)
+            data = json.loads(f.read_text())
+            if not data.get("approved", False):
+                return False
+            # Verify task_id matches — prevents cross-task approval bleed
+            stored_task = data.get("task_id", "")
+            if task_id and stored_task and stored_task != task_id:
+                return False
+            return True
     except Exception:
         pass
     return False
 
 
-def write_approval(session_id: str, result: dict) -> None:
-    """Write reviewer approval file."""
+def write_approval(session_id: str, result: dict, task_id: str = "") -> None:
+    """Write reviewer approval file, scoped to the current task_id."""
     try:
         _DATA_DIR.mkdir(parents=True, exist_ok=True)
         _approval_file(session_id).write_text(json.dumps({
             "approved": True,
+            "task_id": task_id,
             "timestamp": datetime.now().isoformat(),
             "round_count": result.get("round_count", 1),
             "summary": result.get("summary", ""),
@@ -845,7 +881,7 @@ def run_review(
             "round_count": round_count,
             "summary": response.get("summary", ""),
             "model": config.model,
-        })
+        }, task_id=packet.task_id)
         return result
 
     # FINDINGS

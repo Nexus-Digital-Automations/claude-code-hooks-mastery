@@ -733,6 +733,20 @@ def main():
         if session_id and tool_name in ("Write", "Edit", "MultiEdit"):
             _invalidate_stale_checks(session_id, tool_input.get("file_path", ""))
 
+        # Track plan file writes — record path in current_task for session isolation
+        if session_id and tool_name == "Write":
+            _written = tool_input.get("file_path", "")
+            _plans_prefix = str(Path.home() / ".claude/plans/")
+            if _written.startswith(_plans_prefix) and _written.endswith(".md"):
+                try:
+                    _task_f = Path.home() / f".claude/data/current_task_{session_id}.json"
+                    if _task_f.exists():
+                        _tdata = json.loads(_task_f.read_text())
+                        _tdata["plan_file"] = _written
+                        _task_f.write_text(json.dumps(_tdata, indent=2))
+                except Exception as exc:
+                    print(f"[post_tool_use] Failed to record plan_file: {exc}", file=sys.stderr)
+
         # Auto-observe Bash commands for verification checks
         if session_id and tool_name == "Bash":
             observe_bash_check(session_id, tool_input, tool_result)
