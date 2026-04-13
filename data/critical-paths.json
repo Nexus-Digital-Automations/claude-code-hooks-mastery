@@ -1,0 +1,85 @@
+{
+  "description": "Defines critical business domains that require unit/integration tests. Changes to files matching these patterns MUST have tests run. Changes to files NOT matching any pattern auto-pass test checks.",
+  "domains": {
+    "payments": {
+      "description": "Payment processing, checkout, billing integrations",
+      "patterns": [
+        "**/payment*",
+        "**/billing*",
+        "**/checkout*",
+        "**/stripe*",
+        "**/paypal*",
+        "**/invoice*",
+        "**/subscription*",
+        "**/charge*",
+        "**/refund*",
+        "**/pricing*"
+      ]
+    },
+    "auth": {
+      "description": "Authentication, authorization, session management",
+      "patterns": [
+        "**/auth*",
+        "**/login*",
+        "**/signup*",
+        "**/register*",
+        "**/session*",
+        "**/token*",
+        "**/oauth*",
+        "**/jwt*",
+        "**/password*",
+        "**/rbac*",
+        "**/permissions*",
+        "**/middleware/auth*"
+      ]
+    },
+    "data-integrity": {
+      "description": "Database migrations, models, data transformations",
+      "patterns": [
+        "**/migration*",
+        "**/models*",
+        "**/schema*",
+        "**/seeds*",
+        "**/fixtures*",
+        "**/db/**",
+        "**/database*"
+      ]
+    },
+    "financial": {
+      "description": "Financial calculations, transactions, ledger",
+      "patterns": [
+        "**/transaction*",
+        "**/ledger*",
+        "**/balance*",
+        "**/wallet*",
+        "**/transfer*",
+        "**/accounting*",
+        "**/portfolio*",
+        "**/trade*"
+      ]
+    },
+    "security": {
+      "description": "Security-critical code paths",
+      "patterns": [
+        "**/crypto*",
+        "**/encrypt*",
+        "**/decrypt*",
+        "**/sanitiz*",
+        "**/validat*",
+        "**/cors*",
+        "**/csp*",
+        "**/firewall*"
+      ]
+    }
+  },
+  "always_test_dirs": [
+    "src/core",
+    "src/api",
+    "lib/core",
+    "app/core"
+  ],
+  "playwright": {
+    "policy": "comprehensive",
+    "description": "Playwright E2E tests always run fully when frontend changes are detected. No diff-size shortcuts."
+  }
+}

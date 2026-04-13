@@ -6,6 +6,7 @@ Falls back to auto-detection from filesystem markers when no config exists.
 """
 from __future__ import annotations
 
+import fnmatch
 import json
 import os
 import re
@@ -555,6 +556,44 @@ def auto_run_missing(
     return results
 
 
+def _load_critical_paths() -> dict:
+    """Load the critical-paths config from ~/.claude/data/critical-paths.json."""
+    cp_file = Path.home() / ".claude" / "data" / "critical-paths.json"
+    try:
+        return json.loads(cp_file.read_text())
+    except Exception:
+        return {}
+
+
+def _matches_critical_path(filepath: str, critical_config: dict) -> str | None:
+    """Check if a file path matches any critical domain pattern.
+
+    Returns the domain name if matched, None otherwise.
+    Patterns use ``**/name*`` convention — we match the leaf pattern
+    against every path component and the filename.
+    """
+    filepath_lower = filepath.lower()
+    parts = Path(filepath_lower).parts
+    name = parts[-1] if parts else ""
+
+    for domain, info in critical_config.get("domains", {}).items():
+        for pattern in info.get("patterns", []):
+            # Strip leading **/ for component matching
+            leaf = pattern.lstrip("*").lstrip("/").lower()
+            # Match leaf against filename or any path component
+            if fnmatch.fnmatch(name, leaf) or fnmatch.fnmatch(name, f"*{leaf}*"):
+                return domain
+            for part in parts:
+                if fnmatch.fnmatch(part, leaf):
+                    return domain
+
+    for dir_pattern in critical_config.get("always_test_dirs", []):
+        if dir_pattern in filepath:
+            return "core"
+
+    return None
+
+
 def should_require_tests(
     config: dict,
     modified_files: list[str],
@@ -562,13 +601,14 @@ def should_require_tests(
 ) -> bool:
     """Determine whether tests should be required for this change.
 
-    Heuristic: tests are required for stable, important features but not
-    for docs-only, config-only, or trivial changes.
+    Policy: tests are required ONLY when changes touch critical business
+    domains (payments, auth, billing, data integrity, security) as defined
+    in ~/.claude/data/critical-paths.json. Non-critical changes auto-pass.
 
     Args:
         config: Project config from load_config().
         modified_files: List of file paths modified in this task.
-        has_active_spec: Whether an active spec exists (spec-driven work is important).
+        has_active_spec: Whether an active spec exists (spec-driven work).
 
     Returns:
         True if tests should be required, False to skip.
@@ -596,7 +636,6 @@ def should_require_tests(
         ".gitignore", ".eslintrc.json", ".prettierrc", "vite.config.js",
         "webpack.config.js", ".github", "Makefile",
     }
-    core_dirs = {"src", "lib", "app", "pkg", "internal", "core", "server", "api"}
 
     source_files = []
     doc_only = True
@@ -627,39 +666,40 @@ def should_require_tests(
     if config_only:
         return False
 
-    # Spec-driven work is always important → require tests
-    if has_active_spec:
-        return True
+    # ── Critical-path check ──────────────────────────────────────────
+    # Only require tests when modified source files touch a critical
+    # business domain (payments, auth, billing, data integrity, etc.)
+    critical_config = _load_critical_paths()
+    if critical_config:
+        matched_domains = set()
+        for f in source_files:
+            domain = _matches_critical_path(f, critical_config)
+            if domain:
+                matched_domains.add(domain)
 
-    # 3+ source files modified → substantial change → require tests
-    if len(source_files) >= 3:
-        return True
-
-    # Changes touch core directories → require tests
-    for f in source_files:
-        parts = Path(f).parts
-        if any(part in core_dirs for part in parts):
+        if matched_domains:
+            import sys
+            print(
+                f"  [tests] Critical path matched: {', '.join(sorted(matched_domains))} "
+                f"— tests required",
+                file=sys.stderr,
+            )
             return True
 
-    # Check if modified files have existing test counterparts
-    for f in source_files:
-        p = Path(f)
-        stem = p.stem
-        parent = p.parent
-        # Common test file patterns
-        test_patterns = [
-            parent / f"test_{stem}{p.suffix}",
-            parent / f"{stem}_test{p.suffix}",
-            parent.parent / "tests" / f"test_{stem}{p.suffix}",
-            parent.parent / "tests" / f"{stem}_test{p.suffix}",
-            parent.parent / "__tests__" / f"{stem}.test{p.suffix}",
-            parent.parent / "__tests__" / f"{stem}.spec{p.suffix}",
-        ]
-        for tp in test_patterns:
-            if tp.exists():
-                return True
+        # No critical paths matched → skip tests
+        import sys
+        print(
+            f"  [tests] No critical paths matched ({len(source_files)} source file(s)) "
+            f"— tests skipped",
+            file=sys.stderr,
+        )
+        return False
 
-    # Small change to untested code → skip tests
+    # Fallback if no critical-paths.json exists: use legacy heuristic
+    if has_active_spec:
+        return True
+    if len(source_files) >= 3:
+        return True
     return False
 
 

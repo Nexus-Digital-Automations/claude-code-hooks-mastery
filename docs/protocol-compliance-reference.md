@@ -366,6 +366,11 @@ The review packet includes raw stdout/stderr from independently-executed command
 - If a linter isn't installed: advisory only — note it, don't block
 - If the command timed out: blocking — the check didn't actually complete
 
+**Critical-path testing policy:**
+Unit/integration tests are only required when changes touch critical business domains defined in `~/.claude/data/critical-paths.json` (payments, auth, billing, data integrity, security). Non-critical changes (cleanup, config, docs, refactoring non-critical code) legitimately skip tests — this is NOT a finding. Do not flag missing tests when the stop hook skipped them due to no critical path match. The stop hook logs which domains matched or that none matched.
+
+Playwright E2E tests always run comprehensively when frontend changes are detected — no diff-size shortcuts. Missing Playwright runs for frontend projects IS a finding.
+
 **Note:** The stop hook's verification gate already required these to pass. If sandbox results show failures here, the stop hook had a bug — still flag them but note the discrepancy.
 
 ---

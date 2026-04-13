@@ -784,28 +784,13 @@ def _phase_5_smoke_test(session_id: str, config: dict) -> tuple[bool, str]:
 
 
 def _phase_6_frontend(session_id: str, config: dict) -> tuple[bool, str]:
-    """Phase 6: Frontend validation via Playwright/Cypress."""
+    """Phase 6: Frontend validation via Playwright/Cypress.
+
+    Policy: Playwright tests always run comprehensively when frontend is
+    detected. No diff-size shortcuts — E2E coverage is non-negotiable.
+    """
     if not config.get("has_frontend", False):
         return (True, "")
-
-    # Diff-size awareness: skip frontend E2E for trivial changes (< 10 lines)
-    try:
-        from project_config import get_git_root
-        _diff_r = subprocess.run(
-            ["git", "diff", "HEAD", "--stat"],
-            capture_output=True, text=True, timeout=5,
-            cwd=get_git_root(),
-        )
-        _diff_out = _diff_r.stdout.strip()
-        if _diff_out:
-            import re as _re
-            _total_match = _re.search(r'(\d+) insertions?\(\+\).*?(\d+) deletions?\(-\)', _diff_out)
-            if _total_match:
-                total_lines = int(_total_match.group(1)) + int(_total_match.group(2))
-                if total_lines < 10:
-                    return (True, "")
-    except (subprocess.TimeoutExpired, OSError) as exc:
-        print(f"  [phase6] diff-size check failed ({exc}), requiring frontend tests", file=sys.stderr)
 
     try:
         sys.path.insert(0, str(Path(__file__).parent / "utils"))
