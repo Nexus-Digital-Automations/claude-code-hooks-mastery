@@ -1,0 +1,36 @@
+Security-Ignore Feature Verification
+=====================================
+Date: 2026-04-13 21:56
+Command: python3 -c "from security_scanner import run_security_scan; ..."
+
+Test setup: Temporary project with intentional findings in app.py, vendor/legacy.py, tests/test_helpers.py
+
+.security-ignore used:
+  # Third-party vendored code — pre-audited, not maintained by us
+  vendor/**
+  # Fake credentials in test fixtures — intentional test data
+  [category:openai-key] tests/test_helpers.py
+  # Debug mode is intentional for local dev config
+  [category:debug-mode] app.py
+
+RUN 1: WITHOUT .security-ignore
+  Critical: 5, Warnings: 8, Suppressed: 0
+
+RUN 2: WITH .security-ignore
+  Critical: 3, Warnings: 4, Suppressed: 6
+
+SUPPRESSED FINDINGS (6):
+  1. debug-mode [warning] app.py:3 — "Debug mode is intentional for local dev config"
+  2. openai-key [critical] tests/test_helpers.py:2 — "Fake credentials in test fixtures"
+  3. hardcoded-credential [critical] vendor/legacy.py:2 — "Third-party vendored code"
+  4. dynamic-code-evaluation [warning] vendor/legacy.py:5 — "Third-party vendored code"
+  5. B105 [warning] vendor/legacy.py:2 — "Third-party vendored code"
+  6. B307 [warning] vendor/legacy.py:5 — "Third-party vendored code"
+
+VERIFIED:
+  - Suppressed findings appear in dedicated "Suppressed Findings" report section
+  - Suppressed findings are excluded from critical/warning counts
+  - Each suppressed finding shows the ignore reason from .security-ignore
+  - vendor/** matched all 4 findings across pattern-scanner and bandit (post-filter works cross-tool)
+  - [category:openai-key] scoped to specific file only suppressed openai-key, not hardcoded-credential
+  - [category:debug-mode] scoped to app.py only suppressed debug-mode warning
