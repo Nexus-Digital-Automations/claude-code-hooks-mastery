@@ -31,50 +31,40 @@ EXCLUDE_PATTERNS: set[str] = {
     ".claude-flow/",
 }
 
-EXCLUDE_SUFFIXES: tuple[str, ...] = (
-    ".min.js",
-    ".min.css",
-    ".map",
-    ".pyc",
-    ".pyo",
-    ".bundle.js",
-    ".bundle.css",
-    ".chunk.js",
-    ".chunk.css",
-    ".json",
-    ".jsonl",
-    ".csv",
-    ".xml",
-    ".svg",
-    ".lock",
-)
-
-EXCLUDE_FILENAMES: set[str] = {
-    "package-lock.json",
-    "yarn.lock",
-    "pnpm-lock.yaml",
-    "Pipfile.lock",
-    "poetry.lock",
-    "Gemfile.lock",
-    "composer.lock",
-    "Cargo.lock",
-    "go.sum",
+# Only scan these source code extensions
+CODE_EXTENSIONS: set[str] = {
+    ".py", ".js", ".ts", ".tsx", ".jsx",
+    ".go", ".rs", ".rb", ".java", ".kt",
+    ".c", ".cpp", ".cc", ".h", ".hpp",
+    ".cs", ".swift", ".m", ".mm",
+    ".php", ".pl", ".pm", ".lua",
+    ".sh", ".bash", ".zsh",
+    ".ex", ".exs", ".erl",
+    ".hs", ".ml", ".mli",
+    ".r", ".R", ".jl",
+    ".scala", ".clj", ".cljs",
+    ".vue", ".svelte",
 }
 
 
-def _is_excluded(rel_path: str) -> bool:
-    """Check if a relative path should be excluded from scanning."""
+def _is_scannable(rel_path: str) -> bool:
+    """Check if a file is source code worth scanning."""
     for pattern in EXCLUDE_PATTERNS:
         if pattern in rel_path:
-            return True
-    filename = rel_path.rsplit("/", 1)[-1] if "/" in rel_path else rel_path
-    if filename in EXCLUDE_FILENAMES:
-        return True
-    if rel_path.endswith(EXCLUDE_SUFFIXES):
-        return True
-    if "/migrations/" in rel_path and filename != "__init__.py":
-        return True
-    return False
+            return False
+    if "/migrations/" in rel_path:
+        filename = rel_path.rsplit("/", 1)[-1] if "/" in rel_path else rel_path
+        if filename != "__init__.py":
+            return False
+    dot = rel_path.rfind(".")
+    if dot == -1:
+        return False
+    ext = rel_path[dot:]
+    if ext not in CODE_EXTENSIONS:
+        return False
+    if ext in (".js", ".css") and (".min." in rel_path or ".bundle." in rel_path or ".chunk." in rel_path):
+        return False
+    return True
 
 
 def _count_lines(filepath: Path) -> int | None:
@@ -109,7 +99,7 @@ def scan_oversized_files(
 
     oversized: list[tuple[str, int]] = []
     for rel_path in files:
-        if _is_excluded(rel_path):
+        if not _is_scannable(rel_path):
             continue
         count = _count_lines(project_root / rel_path)
         if count is not None and count > threshold:
