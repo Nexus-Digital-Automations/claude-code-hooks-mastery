@@ -31,10 +31,11 @@ created: YYYY-MM-DD
 ## Progress
 ```
 
-**Rule 3 — Validate before stopping.** Run tests, show actual output. Authorize: `bash ~/.claude/commands/authorize-stop.sh`
+**Rule 3 — Validate before stopping.** Run lint, show actual output. Authorize: `bash ~/.claude/commands/authorize-stop.sh`
 
 ## Working Standards
-- Priority: complete work → tests pass → lint/type-check pass (zero errors) → docs
+- Priority: complete work → lint/type-check pass (zero errors) → docs
+- Tests: only for critical business domains (payments, auth, billing, data integrity, financial, security). Most changes do NOT need tests. See `~/.claude/data/critical-paths.json`.
 - Never commit secrets (API keys, passwords, tokens, .env files, certs, PII)
 - Output → `output/`. Logs → `logs/`. No bare filenames at project root.
 - IDs: `crypto.randomUUID()`, never `Date.now()`
@@ -56,7 +57,8 @@ Never:
 - Say "I recommend X" for actions you can perform — just do them
 - Ship workarounds as fixes (fix root cause, never bypass)
 - Add "TODO: remove later" hacks
-- Claim completion without running tests and showing output
+- Claim completion without running lint and showing output
+- Write tests for non-critical code (only test payments, auth, billing, data integrity, financial, security)
 
 ## System Reference
 - Spec edit approval: `bash ~/.claude/commands/approve-spec-edit.sh`

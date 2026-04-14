@@ -46,7 +46,7 @@ NAMES: Precise nouns (classes), strong verbs (methods). Generic names forbidden:
 COMMENTS: Explain WHY (business rule, algorithm choice). Never explain WHAT mechanically — delete those. No encoded/abbreviated names.
 ERRORS: Throw exceptions, not error codes. Never swallow exceptions silently. Crash early and loudly on invalid state. Never return null/None as an error signal — use Optional, empty collection, or Special Case.
 CONCURRENCY: No shared mutable state. Use actor models, immutable structures, or pure transformations. Sporadic failures indicate threading defects — fix root cause, never retry-loop.
-TESTING: Write the failing test first (Red-Green-Refactor). Tests must be Fast, Independent, Repeatable, Self-Validating (boolean pass/fail). Cover boundary conditions and data states, not just lines. Enforce preconditions and postconditions on complex logic.
+TESTING: Only write tests for critical business domains (payments, auth, billing, data integrity, financial, security). Most code does NOT need tests. When tests ARE needed, they must be Fast, Independent, Repeatable, Self-Validating. Cover boundary conditions and data states. See ~/.claude/data/critical-paths.json.
 DOCUMENTATION (AI-agent legibility — future agents must be able to navigate this codebase):
   • Every new file: opening docstring stating what it owns, what it explicitly does NOT own, and what calls it vs. what it calls.
   • Every public function with non-obvious failure modes: document raises, never-returns-null guarantees, and what callers must NOT assume.

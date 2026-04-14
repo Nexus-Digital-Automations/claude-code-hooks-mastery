@@ -423,7 +423,7 @@ Qwen investigates the codebase and produces its own comprehensive plan.
 DIVISION OF LABOR:
 - You (Claude Code): task description, plan review, verify build/lint/type-check, final Playwright gate, frontend UI, security
 - Qwen Agent: codebase investigation, planning, code building, first-pass mechanical checks (build/lint/type-check/Playwright, budget-capped), Playwright test writing
-- Both: Playwright test coverage — comprehensive E2E tests mandatory for every frontend feature
+- Playwright: runs comprehensively when frontend changes detected. Unit/integration tests only for critical business domains (payments, auth, billing, data integrity, financial, security). Most code does NOT need tests.
 
 DELEGATION PROTOCOL:
 - Write the task description, then delegate via mcp__qwen-agent__run

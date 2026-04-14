@@ -49,7 +49,7 @@ High-level design guidance derived from values. Principles are **injected** at t
 | **Design Twice** — Evaluate ≥2 approaches before writing for complex features | Mindfulness | `user_prompt_submit.py` (`_EXECUTION_RULES`) | Cat 17 (advisory) |
 | **Tracer Code** — Write skeleton first to validate architecture on large tasks | Mindfulness | `user_prompt_submit.py` (`_EXECUTION_RULES`) | Cat 17 (advisory) |
 | **Boy Scout** — Leave every modified file cleaner than you found it | Craft | `user_prompt_submit.py` (`_EXECUTION_RULES`) | Cat 9, Cat 15 (advisory) |
-| **TDD** — Failing test first, then implementation, then refactor | Correctness | `user_prompt_submit.py` (`_EXECUTION_RULES`) | Cat 15 (advisory) |
+| **Critical-Path Testing** — Only test critical business domains (payments, auth, billing, data integrity, financial, security). Most code does NOT need tests. | Correctness | `user_prompt_submit.py` (`_EXECUTION_RULES`) | Cat 15 (advisory) |
 | **Ubiquitous Language** — One concept = one name; check codebase before naming anything | Craft | `user_prompt_submit.py` (`_EXECUTION_RULES`) | Cat 16 (advisory) |
 | **Execute, Don't Recommend** — Run commands yourself; never tell the user to run things you can run | Honesty | CLAUDE.md | Cat 14 (advisory unless it's the primary verification step) |
 | **AI-Agent Legibility** — Future agents with no session history must navigate this codebase | Craft | `pre_tool_use.py` (DOCUMENTATION section) | Cat 16 (advisory) |
@@ -223,10 +223,10 @@ These are the rules Claude Code operates under. You enforce them. See **Enforcem
 - **No Shared Mutable State:** Concurrency code uses actor models, immutable structures, or pure transformations; sporadic failures = threading defect, fix root cause, never retry-loop
 
 #### 6. Validation & Testing
-- **Red-Green-Refactor:** Write the failing test first, then minimal code to pass, then refactor — never write implementation before the test exists
-- **F.I.R.S.T.:** Tests are Fast, Independent (no guaranteed order), Repeatable in any environment, Self-Validating (boolean pass/fail), Timely
-- **State Coverage:** Test boundary conditions, edge cases, and the properties/states data can reside in — not just lines
-- **Design by Contract:** Enforce and test preconditions (what must be true to execute) and postconditions (what is guaranteed on return) for complex logic
+- **Critical-Path Only:** Tests are only required for critical business domains: payments, auth, billing, data integrity, financial transactions, security. Most code does NOT need tests. The domains are defined in `~/.claude/data/critical-paths.json`.
+- **When tests ARE written:** They must be Fast, Independent, Repeatable, Self-Validating. Cover boundary conditions and data states. Test names as specifications.
+- **Do NOT flag missing tests** for non-critical code. This is intentional policy, not an oversight.
+- **Playwright E2E:** Runs comprehensively when frontend changes are detected. No shortcuts.
 
 #### AI-Agent Legibility (cat 16)
 - Every new file: opening docstring stating what it owns and what it does NOT own
@@ -681,8 +681,8 @@ Claude Code must run commands itself rather than telling the user to run them. C
 - Sporadic failures wrapped in retry logic without fixing root cause (advisory)
 
 **Testing violations:**
-- New functionality added with no corresponding test in the diff — "implementation without test" (advisory unless spec requires TDD)
-- Tests that only exercise the happy path with no boundary/edge-case coverage (advisory)
+- IMPORTANT: Missing tests are ONLY a violation when the change touches a critical business domain (payments, auth, billing, data integrity, financial, security). Most code intentionally has no tests — this is policy, not an oversight. See `~/.claude/data/critical-paths.json`.
+- For critical-path code: tests that only exercise the happy path with no boundary/edge-case coverage (advisory)
 - Test functions that depend on execution order or shared mutable state — violates Independence (advisory)
 - Preconditions and postconditions missing on complex algorithmic functions — Design by Contract violation (advisory)
 

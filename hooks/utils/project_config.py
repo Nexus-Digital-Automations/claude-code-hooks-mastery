@@ -667,12 +667,13 @@ def should_require_tests(
         return False
 
     # ── Critical-path check ──────────────────────────────────────────
-    # Only require tests when modified source files touch a critical
-    # business domain (payments, auth, billing, data integrity, etc.)
+    # Only require tests when modified files touch a critical business
+    # domain (payments, auth, billing, data integrity, etc.)
+    # Check ALL modified files, not just source — .sql migrations, etc.
     critical_config = _load_critical_paths()
     if critical_config:
         matched_domains = set()
-        for f in source_files:
+        for f in modified_files:
             domain = _matches_critical_path(f, critical_config)
             if domain:
                 matched_domains.add(domain)
