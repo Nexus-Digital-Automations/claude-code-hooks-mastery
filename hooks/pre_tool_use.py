@@ -78,6 +78,19 @@ def get_context_injection(cwd, tool_name, tool_input=None):
         injections.append("SECURITY: Never write secrets (API keys, passwords, tokens) outside of .env files or gitignored files")
         injections.append(_CODING_STANDARDS)
 
+        # 2b. Warn when modifying .security-ignore (reviewer will audit this)
+        file_path = (tool_input or {}).get('file_path', '')
+        if file_path.endswith('.security-ignore'):
+            injections.append(
+                "WARNING: You are modifying .security-ignore. The reviewer "
+                "(Phase 8) will audit this change. Every rule MUST have a "
+                "preceding comment explaining WHY the suppression is justified. "
+                "Do NOT add broad patterns (src/**, *.py, [severity:critical]). "
+                "Do NOT suppress credential categories (hardcoded-secret, "
+                "hardcoded-aws-key, github-pat, openai-key). Suppressions must "
+                "be file-specific and narrow."
+            )
+
     # 3. Inject tool-specific context if exists
     tool_map = {
         'Bash': 'bash.md',

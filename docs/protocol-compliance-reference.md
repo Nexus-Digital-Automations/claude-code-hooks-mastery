@@ -96,6 +96,7 @@ Craft and style requirements. Standards are **injected** at code-generation time
 | Test names as behavioral specs; FIRST properties | Craft | `pre_tool_use.py` (TESTING / DOCUMENTATION) | Cat 15/16 advisory |
 | JS/TS: ESLint + strict + Prettier, 80-char, semicolons, single quotes | Craft | CLAUDE.md | Cat 3 advisory |
 | Python: Black + Ruff + mypy strict, 88-char, snake_case/PascalCase | Craft | CLAUDE.md | Cat 3 advisory |
+| `.security-ignore` rules must have reason comments and be file-specific | Safety | Cat 18 (reviewer) | **Review block** |
 
 ---
 
@@ -780,9 +781,48 @@ Look for structured reasoning *before* any tool call output or implementation �
 
 ---
 
+### 18. Security Ignore File Audit — CONDITIONAL
+
+**Condition:** ONLY evaluate this category if the git diff shows modifications to `.security-ignore`. If `.security-ignore` is not in the diff, **SKIP this entire category**.
+
+**What to check (from git diff):**
+
+**Overly broad patterns (blocking):**
+- Ignoring entire source directories: `src/**`, `app/**`, `lib/**`, `api/**`
+- Ignoring all files of a language: `*.py`, `*.js`, `*.ts`, `*.rb`, `*.go`
+- Ignoring all findings of critical severity: `[severity:critical] **` or similar
+- Ignoring security-sensitive paths: `auth/**`, `payment/**`, `billing/**`, `crypto/**`, `security/**`
+
+**Missing reason comments (blocking):**
+- Every ignore rule MUST be preceded by a `#` comment explaining WHY the suppression is justified
+- Rules without a preceding comment are blocking findings
+
+**Suspicious suppression patterns (blocking):**
+- Suppressing `hardcoded-secret` or `hardcoded-credential` categories broadly (not scoped to a specific test fixture file)
+- Suppressing `hardcoded-aws-key`, `github-pat`, or `openai-key` categories at all
+- Adding rules that suppress the same finding category being reported in the current security scan (the agent may be suppressing real findings to pass the gate)
+
+**Legitimate suppressions (not violations):**
+- Test fixture files containing intentional fake credentials with a clear reason
+- Vendored/third-party code with an explanation of pre-audit status
+- Specific false positives scoped to a single file with an explanation of why the pattern is safe
+- Category-scoped rules for warnings (not critical) on generated or config files
+
+**Pass criteria:**
+- Every rule has a preceding reason comment
+- No overly broad patterns (directory-level or language-level wildcards for source code)
+- No suppression of credential categories without extreme justification
+- Suppressions are file-specific, not blanket
+
+**Severity:** Overly broad patterns, missing reasons, and credential category suppression are **blocking**. Legitimate narrow suppressions are not findings.
+
+**Why this category exists:** An AI agent may attempt to suppress security findings to pass the security gate. The reviewer must independently verify that suppressions are justified, not evasive.
+
+---
+
 ## Severity Rules
 
-- **blocking**: Must be fixed before approval. Any of: test failures, build failures, lint errors, type errors, security criticals, missing user-requested features, unchecked spec criteria (for substantial tasks), uncommitted changes to tracked files, empty catch blocks that swallow exceptions, resource leaks, unrequested features added (YAGNI), `Date.now()` as ID, workarounds bypassing root causes, boolean flag parameters in new functions (cat 15), obvious shared mutable state race in concurrent code (cat 15)
+- **blocking**: Must be fixed before approval. Any of: test failures, build failures, lint errors, type errors, security criticals, missing user-requested features, unchecked spec criteria (for substantial tasks), uncommitted changes to tracked files, empty catch blocks that swallow exceptions, resource leaks, unrequested features added (YAGNI), `Date.now()` as ID, workarounds bypassing root causes, boolean flag parameters in new functions (cat 15), obvious shared mutable state race in concurrent code (cat 15), overly broad .security-ignore patterns or missing reason comments (cat 18)
 - **advisory**: Should be noted but does not block approval. Any of: missing docs, style suggestions, minor code quality notes, lint warnings (not errors), missing edge case tests, mild over-engineering, complexity suggestions, missing push when no remote, telling user to run a non-critical command, all cat 15 findings except bool flags and concurrency races, all cat 16 findings, all cat 17 findings
 
 **You MUST have at least one `blocking` finding to return a `FINDINGS` verdict.** If all findings are `advisory`, return `APPROVED` with the advisory items in the `advisory` array.
@@ -898,3 +938,5 @@ When reviewing a follow-up round:
 18. **Category 16 (AI-Agent Codebase Legibility) is advisory-only**: Never block on category 16 findings. Its purpose is to surface legibility debt as advisory notes — missing docstrings, undocumented state machines, missing cross-references. A single missing annotation in a large diff is not worth noting. Flag only when the pattern is systemic (e.g., 5+ new public functions all missing failure mode docs).
 
 19. **Category 17 (Pre-Execution Reasoning) is diagnostic, not gatekeeping**: Never block on missing reasoning. Use it to annotate the *cause* of other blocking findings when the root cause was clearly insufficient upfront analysis — e.g., "agent skipped scope analysis, which explains why the implementation was over-scoped." If the implementation is correct and complete, skip category 17 entirely.
+
+20. **Category 18 (Security Ignore File Audit) is conditional**: Only evaluate when `.security-ignore` is in the git diff. When present, treat overly broad patterns (`src/**`, `*.py`, `[severity:critical]`), missing reason comments, and credential category suppression as **blocking**. Narrow, file-specific suppressions with clear reasons are legitimate and should not be flagged. If the diff does not touch `.security-ignore`, skip category 18 entirely.

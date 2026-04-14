@@ -35,6 +35,8 @@ class Finding:
     description: str
     tool: str
     cve: Optional[str] = None
+    ignored: bool = False              # True when suppressed by .security-ignore
+    ignore_reason: Optional[str] = None  # preceding comment from the matching rule
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -379,6 +381,128 @@ def _should_skip(path: Path) -> bool:
     return False
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# .security-ignore support (post-filter for all scanner findings)
+# ─────────────────────────────────────────────────────────────────────────────
+
+_QUALIFIER_RE = re.compile(r'^\[([^\]]+)\]\s+(.+)$')
+
+
+@dataclass
+class IgnoreRule:
+    """A single rule parsed from .security-ignore."""
+    pattern: str
+    category: Optional[str] = None
+    severity: Optional[str] = None
+    tool: Optional[str] = None
+    line_number: int = 0
+    reason: Optional[str] = None  # preceding comment text
+
+
+def _glob_match(path: str, pattern: str) -> bool:
+    """Match a relative file path against a glob pattern.
+
+    - vendor/**      -> matches any file under vendor/ at any depth
+    - **/test.py     -> matches test.py at any depth
+    - tests/*.py     -> matches .py files directly in tests/ (not subdirs)
+    - src/**/test.py -> matches src/test.py and src/a/b/test.py
+    - exact.py       -> matches only exact.py
+
+    * matches within a single directory level (never crosses /).
+    ** matches zero or more directory levels.
+    """
+    regex = re.escape(pattern)
+    # re.escape turns * into \*, so ** becomes \*\*
+    # Order matters: handle ** before *, since ** contains *
+    # Handle \*\*/ at start -> optional leading path (zero or more dirs)
+    regex = re.sub(r'^(\\\*\\\*/)+', '(.+/)?', regex)
+    # Handle /\*\* at end -> anything below
+    regex = re.sub(r'/\\\*\\\*$', '/.*', regex)
+    # Handle internal /\*\*/ -> zero or more middle dirs
+    regex = regex.replace(r'/\*\*/', '/(.+/)?')
+    # Replace remaining \* with single-level wildcard (no /)
+    regex = regex.replace(r'\*', '[^/]*')
+    # Replace \? with single-char match (no /)
+    regex = regex.replace(r'\?', '[^/]')
+    return bool(re.fullmatch(regex, path))
+
+
+def _load_security_ignore(cwd: Path) -> list:
+    """Parse .security-ignore from project root. Returns [] if missing or invalid."""
+    ignore_file = cwd / ".security-ignore"
+    if not ignore_file.exists():
+        return []
+    try:
+        content = ignore_file.read_text(encoding="utf-8", errors="ignore")
+    except OSError:
+        return []
+
+    rules = []
+    prev_comment = None
+    for line_no, raw_line in enumerate(content.splitlines(), start=1):
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith('#'):
+            # Track the most recent comment (strip leading # and whitespace)
+            prev_comment = line.lstrip('#').strip()
+            continue
+
+        # Parse optional qualifier bracket prefix
+        category = None
+        severity = None
+        tool = None
+        pattern = line
+
+        m = _QUALIFIER_RE.match(line)
+        if m:
+            qualifier_str, pattern = m.group(1), m.group(2).strip()
+            for kv in qualifier_str.split(','):
+                kv = kv.strip()
+                if ':' in kv:
+                    key, val = kv.split(':', 1)
+                    key, val = key.strip().lower(), val.strip().lower()
+                    if key == 'category':
+                        category = val
+                    elif key == 'severity':
+                        severity = val
+                    elif key == 'tool':
+                        tool = val
+
+        if pattern:
+            rules.append(IgnoreRule(
+                pattern=pattern,
+                category=category,
+                severity=severity,
+                tool=tool,
+                line_number=line_no,
+                reason=prev_comment,
+            ))
+        prev_comment = None  # consume: each comment attaches to the next rule only
+
+    return rules
+
+
+def _apply_ignore_rules(findings: list, rules: list) -> None:
+    """Mark findings that match .security-ignore rules as ignored (in-place)."""
+    if not rules:
+        return
+    for finding in findings:
+        for rule in rules:
+            if not _glob_match(finding.file, rule.pattern):
+                continue
+            if rule.category and rule.category != finding.category.lower():
+                continue
+            if rule.severity and rule.severity != finding.severity.lower():
+                continue
+            if rule.tool and rule.tool != finding.tool.lower():
+                continue
+            # All qualifiers matched — suppress this finding
+            finding.ignored = True
+            finding.ignore_reason = rule.reason
+            break  # first matching rule wins
+
+
 def scan_pattern_based(cwd: Path, timeout: int) -> list:
     findings = []
     try:
@@ -638,8 +762,9 @@ def _write_report(
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / f"{timestamp}.md"
 
-    critical = [f for f in findings if f.severity == "critical"]
-    warnings = [f for f in findings if f.severity == "warning"]
+    critical = [f for f in findings if f.severity == "critical" and not f.ignored]
+    warnings = [f for f in findings if f.severity == "warning" and not f.ignored]
+    ignored = [f for f in findings if f.ignored]
 
     lines = [
         "# Security Scan Report",
@@ -654,6 +779,7 @@ def _write_report(
         "|--------|-------|",
         f"| Critical findings | {len(critical)} |",
         f"| Warning findings | {len(warnings)} |",
+        f"| Suppressed (.security-ignore) | {len(ignored)} |",
         f"| Tools run | {', '.join(tools_run) if tools_run else 'none'} |",
         f"| Tools failed/skipped | {', '.join(tools_failed) if tools_failed else 'none'} |",
         f"| Scan duration | {duration_s:.1f}s |",
@@ -691,6 +817,27 @@ def _write_report(
             ]
     else:
         lines += ["## Warning Findings", "", "None found.", ""]
+
+    # Suppressed findings (transparency — show what .security-ignore suppressed)
+    if ignored:
+        lines += [
+            f"## Suppressed Findings ({len(ignored)})",
+            "",
+            "*These findings matched rules in `.security-ignore` and are "
+            "excluded from counts.*",
+            "",
+        ]
+        for i, f in enumerate(ignored, 1):
+            loc = f"{f.file}:{f.line}" if f.line else f.file
+            reason = f.ignore_reason or "(no reason given)"
+            lines += [
+                f"### {i}. {f.category} [{f.severity}]",
+                f"- **File:** `{loc}`",
+                f"- **Tool:** {f.tool}",
+                f"- **Description:** {f.description}",
+                f"- **Ignore reason:** {reason}",
+                "",
+            ]
 
     # Patching instructions (only when critical findings exist)
     if critical:
@@ -752,6 +899,7 @@ def run_security_scan(
         start = datetime.now()
         project_types = _detect_project_types(cwd)
         is_dot_claude = _is_dot_claude(cwd)
+        ignore_rules = _load_security_ignore(cwd)
         semgrep_timeout = 30
 
         # Build scanner task list: (name, func, args)
@@ -836,8 +984,13 @@ def run_security_scan(
                             tools_failed.append(name)
 
         duration = (datetime.now() - start).total_seconds()
-        critical = [f for f in all_findings if f.severity == "critical"]
-        warnings = [f for f in all_findings if f.severity == "warning"]
+
+        # Apply .security-ignore rules (post-filter: mark, don't remove)
+        _apply_ignore_rules(all_findings, ignore_rules)
+
+        # Only count non-ignored findings for pass/fail decisions
+        critical = [f for f in all_findings if f.severity == "critical" and not f.ignored]
+        warnings = [f for f in all_findings if f.severity == "warning" and not f.ignored]
 
         report_path = _write_report(
             cwd=cwd,
