@@ -73,6 +73,7 @@ class ReviewPacket:
     plan_content: str = ""
     timestamp: str = ""
     verification_artifacts: dict[str, str] = field(default_factory=dict)
+    oversized_files: list[tuple[str, int]] = field(default_factory=list)
 
 
 # ── Packet Formatter ──────────────────────────────────────────────────
@@ -229,6 +230,14 @@ def format_packet_for_prompt(packet: ReviewPacket) -> str:
         sections.append(f"```diff\n{diff_content}\n```")
     else:
         sections.append("(No diff content available — skip categories 9-13)")
+
+    # Oversized files advisory
+    sections.append("\n## OVERSIZED FILES (>400 lines)")
+    if packet.oversized_files:
+        for path, count in packet.oversized_files:
+            sections.append(f"  {path}: {count} lines")
+    else:
+        sections.append("None — all files under threshold")
 
     # Root cleanliness
     sections.append("\n## ROOT CLEANLINESS")
