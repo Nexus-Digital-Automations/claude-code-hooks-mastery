@@ -40,6 +40,8 @@ def get_current_focus(cwd):
 
 _CODING_STANDARDS = """\
 CODE STANDARDS (enforced at every Write/Edit):
+SIMPLICITY: No abstractions for single-use code. No "flexibility" or "configurability" not requested. If 200 lines could be 50, rewrite. Ask: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+SURGICAL: Every changed line must trace to the user's request. Match existing style (quotes, spacing, patterns). Remove only orphans YOUR changes created. Unrelated dead code: mention it, don't delete it.
 ARCHITECTURE: Dependencies point inward — UI/DB depend on business logic, never reverse. Cross boundaries with DTOs, not entities. Strip all logic out of UI/DB classes (Humble Objects). No pass-through layers that only delegate.
 FUNCTIONS: One thing, one abstraction level. ~40 lines max. No bool flag params (proves two responsibilities). Commands change state OR return data, never both (CQS). Prefer data-transformation pipelines over stateful class hierarchies.
 NAMES: Precise nouns (classes), strong verbs (methods). Generic names forbidden: data, manager, processor, handler, helper, util as the full identifier. One concept = one name everywhere — never use synonyms for the same domain entity.

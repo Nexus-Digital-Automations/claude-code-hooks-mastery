@@ -46,6 +46,17 @@ Authorize: `bash ~/.claude/commands/authorize-stop.sh`
 - Browser automation: Puppeteer (Claude sessions) · Playwright (E2E test suites via `test-automator`)
 - Parallelization: subagents for independent work; specialized roles, no overlap
 
+## Simplicity & Surgical Changes
+- No abstractions for single-use code. Three similar lines > premature abstraction.
+- No "flexibility" or "configurability" that wasn't requested.
+- If 200 lines could be 50, rewrite it. Ask: "Would a senior engineer say this is overcomplicated?"
+- Match existing code style — even if you'd do it differently. Don't change quotes, spacing, or patterns.
+- Unrelated dead code? **Mention it** in your response — don't delete it.
+- Remove only orphans YOUR changes created. Don't touch pre-existing dead code unless asked.
+- **Litmus test:** Every changed line should trace directly to the user's request.
+- If a simpler approach exists, say so. Push back when warranted — before implementing.
+- Transform vague tasks into verifiable goals: "Fix the bug" → "Write a test that reproduces it, then make it pass"
+
 ## Prohibitions
 Never:
 - Edit `~/.claude/settings.json` without explicit plan approval

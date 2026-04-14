@@ -661,6 +661,17 @@ Claude Code must run commands itself rather than telling the user to run them. C
 - Self-contained component with no clear boundary — a change to it requires changes in sibling modules (orthogonality violation) (advisory)
 - Illegal states representable: type or enum allows values that are never valid, with no guard enforcing this at the boundary (advisory)
 
+**Simplicity violations (Karpathy principles):**
+- Abstract class/strategy pattern/factory for code used exactly once — premature abstraction (advisory)
+- "Configurability" or "flexibility" parameters not in the user's request — speculative features (advisory)
+- Implementation is 3x+ longer than necessary — e.g., 200 lines that could be 50 (advisory)
+
+**Surgical change violations (Karpathy principles):**
+- Changed lines that don't trace to the user's request — style drift, reformatting, drive-by improvements (advisory)
+- Existing code style not matched — changed quote style, added type hints to untouched functions, reformatted whitespace (advisory)
+- Pre-existing dead code deleted without being asked — should be mentioned, not removed (advisory)
+- Imports/variables made unused by OTHER code (not the current change) cleaned up — only clean orphans from YOUR changes (advisory)
+
 **Code structure violations:**
 - New file with high-level orchestration buried below low-level detail — violates Newspaper structure (advisory)
 - Transformational logic implemented as nested stateful mutations instead of a pipeline of pure transformations (advisory)
