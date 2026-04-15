@@ -310,8 +310,11 @@ def ensure_artifacts_directory() -> Path:
     """
     Ensure .validation-artifacts directory exists.
     CRITICAL: All evidence must be logged for future reference.
+
+    Writes to ~/.claude/.validation-artifacts/ (absolute) so that session
+    telemetry never dirties whichever project repo happens to be cwd.
     """
-    artifacts_dir = Path(".validation-artifacts")
+    artifacts_dir = Path.home() / ".claude" / ".validation-artifacts"
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     return artifacts_dir
 
@@ -669,7 +672,8 @@ def preserve_architectural_decisions(analysis: Dict[str, Any]) -> Tuple[bool, st
     "Document why, not just what. Future maintainers need context."
     """
     try:
-        decisions_file = Path("architectural_decisions.json")
+        decisions_file = Path.home() / ".claude" / ".validation-artifacts" / "architectural_decisions.json"
+        decisions_file.parent.mkdir(parents=True, exist_ok=True)
 
         # Load existing decisions
         existing_decisions = []
