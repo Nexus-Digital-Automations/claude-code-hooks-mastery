@@ -47,6 +47,9 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
+# Add hooks directory to path for utils imports
+sys.path.insert(0, str(Path(__file__).parent))
+
 
 # ============================================================================
 # VALIDATION ARTIFACT MANAGEMENT
@@ -56,10 +59,12 @@ def ensure_artifacts_directory() -> Path:
     """
     Ensure .validation-artifacts directory exists.
     CRITICAL: All evidence must be logged for audit trail.
+
+    Delegates to the canonical helper in utils.artifacts so every hook
+    writes to the same absolute directory under ~/.claude regardless of cwd.
     """
-    artifacts_dir = Path(".validation-artifacts")
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
-    return artifacts_dir
+    from utils.artifacts import get_validation_artifacts_dir
+    return get_validation_artifacts_dir()
 
 
 def log_validation_artifact(artifact_name: str, content: Any) -> Path:

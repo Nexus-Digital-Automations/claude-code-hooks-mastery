@@ -32,14 +32,21 @@ try:
 except ImportError:
     pass  # dotenv is optional
 
+# Add hooks directory to path for utils imports
+sys.path.insert(0, str(Path(__file__).parent))
+
 
 def log_to_validation_artifacts(category, data, operation="stop_check"):
     """
     PROVE IT - Store all evidence in .validation-artifacts/
     NEVER fail silently - but never break the hook either.
+
+    Uses the canonical helper so artifacts land at
+    ~/.claude/.validation-artifacts/<category>/ regardless of cwd.
     """
     try:
-        log_dir = Path(".validation-artifacts") / category
+        from utils.artifacts import get_validation_artifacts_dir
+        log_dir = get_validation_artifacts_dir() / category
         log_dir.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

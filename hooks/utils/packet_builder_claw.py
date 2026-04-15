@@ -24,6 +24,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from reviewer_core import ReviewPacket, ReviewerConfig, SandboxResult  # noqa: E402
+from artifacts import get_validation_artifacts_dir  # noqa: E402
 
 
 # ── Session Parsing ───────────────────────────────────────────────────
@@ -331,9 +332,12 @@ def build_claw_packet(
     except Exception:
         pass
 
-    # 6. Verification artifacts from output/ and .validation-artifacts/
+    # 6. Verification artifacts from output/ and canonical validation-artifacts dir
+    #    (reads from ~/.claude/.validation-artifacts/ — absolute path, matches
+    #    where session_end.py and the _standardized hooks write via the helper)
     try:
-        for search_dir in [working_dir / "output", working_dir / ".validation-artifacts"]:
+        canonical_artifacts_dir = get_validation_artifacts_dir()
+        for search_dir in [working_dir / "output", canonical_artifacts_dir]:
             if not search_dir.is_dir():
                 continue
             for pattern in ("*.txt", "*.diff"):
