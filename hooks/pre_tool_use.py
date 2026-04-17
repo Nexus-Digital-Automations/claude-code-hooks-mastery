@@ -238,6 +238,7 @@ def main():
         if context:
             output = {
                 "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
                     "additionalContext": context
                 }
             }

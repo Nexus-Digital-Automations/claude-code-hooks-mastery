@@ -1139,6 +1139,7 @@ def main():
         if context_parts:
             output = {
                 "hookSpecificOutput": {
+                    "hookEventName": "UserPromptSubmit",
                     "additionalContext": "\n".join(context_parts)
                 }
             }
