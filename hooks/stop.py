@@ -87,8 +87,10 @@ def record_stop_attempt():
 
 
 def detect_emergency_mode(attempts):
+    # 5-minute window catches reviewer loops where each round takes ~40-60s
+    # (3 rounds @ 30s window would never accumulate; @ 300s reliably triggers).
     now = time.time()
-    recent = [a for a in attempts if now - a.get("ts", 0) <= 30.0]
+    recent = [a for a in attempts if now - a.get("ts", 0) <= 300.0]
     count = len(recent)
     if count >= 3:
         earliest = min(a["ts"] for a in recent)
