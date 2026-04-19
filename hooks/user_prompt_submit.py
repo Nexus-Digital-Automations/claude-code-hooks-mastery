@@ -1084,8 +1084,8 @@ def main():
                 print(f"Prompt blocked: {reason}", file=sys.stderr)
                 sys.exit(2)
 
-        # Inject ambiguity detection context for substantial requests
-        ambiguity_context = inject_ambiguity_prompt(prompt)
+        # Protocol checkpoint injection disabled — caused excessive holding/clarify-first behavior
+        ambiguity_context = None
 
         # Build additional context with recommendations
         context_parts = []
