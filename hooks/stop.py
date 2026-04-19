@@ -598,6 +598,15 @@ def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
                 for ev_line in ev.split("\n")[:10]:
                     issues.append(f"     {ev_line}")
 
+    # ── Advisory: file-size warnings (never blocks) ─────────────────
+    try:
+        from file_size_scanner import scan_oversized_files, format_warning
+        oversized = scan_oversized_files(project_root)
+        if oversized:
+            print(format_warning(oversized), file=sys.stderr)
+    except Exception as exc:
+        print(f"  [file-size] scan error (non-blocking): {exc}", file=sys.stderr)
+
     if issues:
         msg = "\n".join(issues)
         msg += "\n\nFix all errors, then retry."
