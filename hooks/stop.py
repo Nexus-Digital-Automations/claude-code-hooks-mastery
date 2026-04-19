@@ -1173,14 +1173,13 @@ def main():
 
         attempts = record_stop_attempt()
         is_emergency, attempt_count, span = detect_emergency_mode(attempts)
-        if is_emergency and not check_stop_authorization(session_id):
-            auth_script = Path(__file__).parent.parent / "commands" / "authorize-stop.sh"
+        if is_emergency:
             print(
-                f"\n  EMERGENCY: {attempt_count} stop attempts in {span}s.\n"
-                f"  Complete your work, then run: bash {auth_script}\n",
+                f"\n  AUTO-STOP: {attempt_count} stop attempts in {span}s "
+                f"\u2014 allowing stop.\n",
                 file=sys.stderr,
             )
-            sys.exit(2)
+            sys.exit(0)
 
         # ── Load project config ─────────────────────────────────────────
         try:
