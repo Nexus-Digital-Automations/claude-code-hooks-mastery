@@ -16,6 +16,9 @@ Skip only for literal confirmations: "yes", "ok", "proceed", "approved", "go ahe
 After clarifying: create `specs/<name>.md` with requirements and testable acceptance criteria. Get user approval. Then build.
 Spec edits require approval: `bash ~/.claude/commands/approve-spec-edit.sh`
 
+**Rule 2b — Declare session scope.**
+Every session must write `~/.claude/data/session_scope_<session-key>.json` before the first stop. The session key is injected into the agent's context by `session_start.py`. Contents: `{"specs": ["<name>.md", ...]}` for spec-bound work, or `{"no_spec": true, "reason": "..."}` for trivial edits. Without this file, Stop hook Phase 1 fails — see `hooks/utils/session_scope.py`.
+
 **Spec template** — `specs/<kebab-case-name>.md`:
 ```
 ---
