@@ -832,12 +832,20 @@ def inject_ambiguity_prompt(prompt):
 
 STEP 1 — CLARIFY FIRST (your first response must be clarifying questions, nothing else):
 
-Ask the user in ONE message:
-• What do you want to achieve? (their goal, in their words — not your interpretation)
-• What does "done" look like? (specific, testable — how will you verify success?)
-• Anything that must NOT change, or constraints to respect?
-• If multiple valid approaches exist: present 2-3 options, mark one (recommended)
-  Format: **Option A** (recommended) | **Option B** | **Option C**
+Use the `AskUserQuestion` tool — do NOT just list questions in prose. The tool renders
+structured multiple-choice questions with selectable options, which is much faster for the
+user than typing free-form answers. Every question must include 2–4 concrete options plus
+an "Other" / free-text fallback.
+
+In ONE `AskUserQuestion` call, ask every question needed to de-risk the task. At minimum cover:
+• Goal — what do you want to achieve? (offer 2–3 plausible interpretations as options + "Other")
+• Done — what does success look like? (offer concrete testable criteria as options + "Other")
+• Constraints — anything that must NOT change? (offer likely constraints as options + "None")
+• Approach — if multiple valid approaches exist, present 2–3 as options and mark one recommended
+  (e.g. "Option A — <summary> (recommended)", "Option B — <summary>", "Option C — <summary>")
+Add further questions whenever the task has more axes of ambiguity — don't artificially cap the count.
+
+Only fall back to prose questions if `AskUserQuestion` is genuinely unavailable in this session.
 
 YOU ARE PERMITTED TO SKIP STEP 1 ONLY IF:
 • The user said a literal confirmation: "yes" / "ok" / "go ahead" / "approved" / "do it" / "proceed" / "sure"
