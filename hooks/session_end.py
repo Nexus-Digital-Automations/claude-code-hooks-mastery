@@ -310,10 +310,13 @@ def ensure_artifacts_directory() -> Path:
     """
     Ensure .validation-artifacts directory exists.
     CRITICAL: All evidence must be logged for future reference.
+
+    Delegates to the canonical helper in utils.artifacts so that every hook
+    (producers and consumers) writes to and reads from the same absolute
+    directory under ~/.claude, regardless of cwd.
     """
-    artifacts_dir = Path(".validation-artifacts")
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
-    return artifacts_dir
+    from utils.artifacts import get_validation_artifacts_dir
+    return get_validation_artifacts_dir()
 
 
 def log_validation_artifact(artifact_name: str, content: Any) -> Path:
@@ -669,7 +672,8 @@ def preserve_architectural_decisions(analysis: Dict[str, Any]) -> Tuple[bool, st
     "Document why, not just what. Future maintainers need context."
     """
     try:
-        decisions_file = Path("architectural_decisions.json")
+        from utils.artifacts import get_validation_artifacts_dir
+        decisions_file = get_validation_artifacts_dir() / "architectural_decisions.json"
 
         # Load existing decisions
         existing_decisions = []

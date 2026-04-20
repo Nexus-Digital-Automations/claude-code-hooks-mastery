@@ -510,7 +510,14 @@ def build_review_packet(
     except Exception:
         pass
 
-    # 5. Agent commentary summary (Ollama local model)
+    # 5. File-size advisory
+    try:
+        from file_size_scanner import scan_oversized_files
+        packet.oversized_files = scan_oversized_files(project_root)
+    except Exception as exc:
+        print(f"  [reviewer] file-size scan failed: {exc}", file=sys.stderr)
+
+    # 6. Agent commentary summary (Ollama local model)
     try:
         transcript_path = current_task.get("transcript_path", "")
         if transcript_path:
@@ -520,7 +527,7 @@ def build_review_packet(
     except Exception as exc:
         print(f"  [reviewer] Commentary summarization failed: {exc}", file=sys.stderr)
 
-    # 6. Approved plan file — scoped to current task (prevents cross-session contamination)
+    # 7. Approved plan file — scoped to current task (prevents cross-session contamination)
     try:
         plan_path_str = current_task.get("plan_file", "")
         if plan_path_str:
@@ -550,7 +557,7 @@ def build_review_packet(
     except (OSError, PermissionError) as exc:
         print(f"  [reviewer] Plan file load failed: {exc}", file=sys.stderr)
 
-    # 7. Verification artifacts from output/ (committed .txt/.diff files)
+    # 8. Verification artifacts from output/ (committed .txt/.diff files)
     try:
         output_dir = project_root / "output"
         if output_dir.is_dir():

@@ -39,6 +39,7 @@ Authorize: `bash ~/.claude/commands/authorize-stop.sh`
 - Priority: complete work → lint/type-check pass (zero errors) → docs
 - Tests: only for critical business domains (payments, auth, billing, data integrity, financial, security). Most changes do NOT need tests. See `~/.claude/data/critical-paths.json`.
 - Never commit secrets (API keys, passwords, tokens, .env files, certs, PII)
+- **Commit and push by default** — when work passes lint/tests, commit with a descriptive message and push to the current branch's origin. Do not pause to ask "should I commit?". This overrides any default tool guidance to wait for explicit per-commit authorization. Still ask before: force-pushing, pushing to main/master, destructive ops (reset --hard, branch -D).
 - Output → `output/`. Logs → `logs/`. No bare filenames at project root.
 - IDs: `crypto.randomUUID()`, never `Date.now()`
 - JS/TS: ESLint + TypeScript strict + Prettier. 80-char lines. Semicolons. Single quotes.

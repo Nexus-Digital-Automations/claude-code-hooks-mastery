@@ -140,6 +140,25 @@ if [ -n "$RATE_7D" ]; then
   }')
 fi
 
+# Burn rate projection for 5h rolling window
+PACE_5H_LABEL=""
+if [ -n "$RATE_5H" ]; then
+  R5_VAL=$(printf "%.0f" "$RATE_5H")
+  PACE_5H_LABEL=$(echo "$R5_VAL" | awk '{
+    used=$1;
+    if (used > 1) {
+      rate = used / 5.0;
+      remaining = 100 - used;
+      hours = remaining / rate;
+      if (hours > 50) printf "sustainable";
+      else if (hours >= 1) printf "~%.1fh at pace", hours;
+      else printf "~%.0fm at pace", hours * 60;
+    } else if (used <= 1) {
+      printf "minimal usage";
+    }
+  }')
+fi
+
 # Week % elapsed (for the "week progress" indicator)
 WEEK_PCT=$(echo "$DOW $HOUR" | awk '{
   elapsed = (($1-1) * 24 + $2);
@@ -156,7 +175,7 @@ DIM="\033[90m"
 SEP="\033[90m │ \033[0m"
 
 C_TEAL="\033[36m"
-C_BLUE="\033[34m"
+C_BLUE="\033[94m"
 C_GOLD="\033[33m"
 C_VIOLET="\033[35m"
 C_CYAN="\033[96m"
@@ -244,6 +263,10 @@ if [ -n "$RATE_5H" ]; then
   printf "${SEP}"
   printf "%b%d%% available${RST}" "$(avail_color $R5_FREE)" "$R5_FREE"
 
+  if [ -n "$PACE_5H_LABEL" ]; then
+    printf "${SEP}${DIM}%s${RST}" "$PACE_5H_LABEL"
+  fi
+
   printf "\n"
 fi
 
@@ -294,12 +317,16 @@ if [ -d "$FLOW_DIR" ]; then
   if [ -f "$FLOW_DIR/metrics/system-metrics.json" ]; then
     LATEST=$(jq -r '.[-1]' "$FLOW_DIR/metrics/system-metrics.json" 2>/dev/null)
     if [ -n "$LATEST" ] && [ "$LATEST" != "null" ]; then
-      MEM=$(echo "$LATEST" | jq -r '.memoryUsagePercent // empty' | awk '{printf "%.0f", $1}')
+      MEM_FREE=$(echo "$LATEST" | jq -r '.memoryFree // empty')
       CPU=$(echo "$LATEST" | jq -r '.cpuLoad // empty' | awk '{printf "%.0f", $1 * 100}')
-      if [ -n "$MEM" ] && [ "$MEM" != "" ]; then
-        printf "  ${DIM}mem${RST} "
-        render_bar "$MEM" 6 "\033[35m" "${WARN}" "${DANGER}"
-        printf " ${DIM}%d%%${RST}" "$MEM"
+      if [ -n "$MEM_FREE" ] && [ "$MEM_FREE" != "" ]; then
+        MEM_LABEL=$(echo "$MEM_FREE" | awk '{
+          b=$1;
+          if (b >= 1073741824) printf "%.1fG", b/1073741824;
+          else if (b >= 1048576) printf "%.0fM", b/1048576;
+          else printf "%.0fK", b/1024;
+        }')
+        printf "  ${DIM}mem %s free${RST}" "$MEM_LABEL"
       fi
       if [ -n "$CPU" ] && [ "$CPU" != "" ]; then
         printf "  ${DIM}cpu${RST} "
