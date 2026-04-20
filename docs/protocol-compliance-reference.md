@@ -102,6 +102,7 @@ Concrete, binary, directly enforceable obligations. Rules have clear pass/fail s
 
 | Rule | Derived From | Enforced By | Enforcement Mode |
 |------|-------------|-------------|-----------------|
+| Session scope declared before first stop | Honesty + Mindfulness | `stop.py` Phase 1 gate | **Hard block** (Phase 1 fails) |
 | No writes to `.env` files | Safety | `pre_tool_use.py` | **Hard block** (exit 2) |
 | Never commit secrets, API keys, credentials | Safety | Cat 6 (reviewer) | **Review block** |
 | Use `crypto.randomUUID()` / `uuid.uuid4()` for IDs, never `Date.now()` | Correctness | Cat 9 (reviewer) | **Review block** |
@@ -162,6 +163,7 @@ INJECT Session Rules LOG user request      INJECT current task   Note Principles
 | **VALIDATE** | Before declaring any task complete, run actual commands and show output. Format: `Command: X · Result: ✅/❌ · Output: <snippet>` |
 | **VERIFICATION PLAN** | State verification commands BEFORE implementing. Reading code is investigation, not verification. |
 | **ROOT CLEAN** | Never create files at project root except essential configs. |
+| **SCOPE** | Before your first stop, declare session scope by writing `~/.claude/data/session_scope_<session-key>.json`. Valid formats: `{"specs": ["<name>.md", ...]}` for spec-bound sessions, or `{"no_spec": true, "reason": "..."}` for trivial/no-spec work. The session key is printed at the top of `additionalContext` at session start. Phase 1 of the stop hook will not pass without this file. |
 | **STOP** | Use `/authorize-stop` only after presenting validation proof. |
 | **EXECUTE DON'T RECOMMEND** | If you can do it, do it. No "I recommend X" for actions within capability. |
 
@@ -194,7 +196,7 @@ Before reaching you, the stop hook enforced an **8-phase sequential workflow** (
 | Phase | Name | What was verified |
 |-------|------|-------------------|
 | 0 | EMERGENCY / RATE-LIMIT BYPASS | Auto-allows stop if recent messages show rate-limit patterns (so the user isn't trapped mid-outage). Tracks stop attempts — 3+ within 30s requires explicit `bash ~/.claude/commands/authorize-stop.sh`. A Phase-0 auto-allow is NOT a protocol violation. |
-| 1 | IMPLEMENT | Spec acceptance criteria completed; root folder clean |
+| 1 | IMPLEMENT | Session scope declared (`data/session_scope_{sid}.json` exists); spec acceptance criteria completed for declared specs only; root folder clean. Missing scope file → Phase 1 fails with instruction to write it. `no_spec: true` skips spec check; root cleanliness still runs. |
 | 2 | STATIC ANALYSIS | Lint passes (zero errors); typecheck passes (zero errors) |
 | 3 | BUILD | Project compiles successfully |
 | 4 | TESTS | Unit/integration tests pass (only when diff matches a critical-paths.json domain; otherwise auto-passed) |
@@ -225,6 +227,8 @@ These are the rules Claude Code operates under. You enforce them. See **Enforcem
 1. **Clarify first** — First response to any build/change/design request must be clarifying questions, not code. Skip only for literal confirmations ("yes", "ok", "go ahead"). *(Hard to verify at stop time — flag only if there's evidence it didn't happen, e.g., spec shows coding began before requirements were clear.)*
 
 2. **Spec before code** — A spec file in `specs/` must exist with acceptance criteria before any code is written. Spec must be approved before work begins.
+
+2b. **Session scope declaration** — Before the first stop of any session, write `~/.claude/data/session_scope_<session-key>.json` declaring the spec(s) being worked on (`{"specs": ["<name>.md", ...]}`) or that the session has no spec (`{"no_spec": true, "reason": "..."}`). The session key is injected by `session_start.py` into `additionalContext` at session open. Phase 1 of the stop hook will not pass without this file. *(Hard to verify at review time — Phase 1 already enforces it before you run. Only flag if Phase 1 was bypassed and the packet shows no scope evidence.)*
 
 3. **Validate before stopping** — Tests must be run and output shown. Every spec criterion must be verified with actual command output. Evidence must be real (command output), not claims.
 
@@ -1064,3 +1068,7 @@ When reviewing a follow-up round:
 23. **Round budget is finite**: You get at most 5 rounds before auto-approval. Be decisive by round 3 — promote ambiguous advisory notes to blocking only when evidence is strong. Don't hoard findings for later rounds; there may not be later rounds.
 
 24. **Task-scope filtering is already applied**: `user_requests` and approval artifacts in the packet are pre-filtered by `task_id`. If a user message or approval from a prior task somehow appears, flag it as a harness bug rather than a compliance issue — but do not use it as evidence for or against the current task.
+
+25. **Session scope is required by Phase 1 — and scopes the spec check**: The stop hook's Phase 1 reads `data/session_scope_{sid}.json` before evaluating spec completion. If the file is absent, Phase 1 fails immediately (before any spec check runs). If it contains `{"no_spec": true, ...}`, the spec check is skipped; only root cleanliness is enforced. If it contains `{"specs": [...]}`, only those listed spec files are checked — not all active specs in `specs/`. This means a reviewer should never see `flashcard-app-qwen-test.md` flagged in a session that only declared `ai-coding-standards-enforcement.md` in scope. The session key (`session_id`) is injected into `additionalContext` by `session_start.py` at every session open so the agent always has it available.
+
+26. **Clarify Before Coding uses `AskUserQuestion` — not prose**: When the PROTOCOL CHECKPOINT STEP 1 (clarification) fires, the agent is instructed to use the native `AskUserQuestion` tool, not to list questions as text. Every question must include 2–4 concrete selectable options plus an "Other / let me explain" fallback. There is no cap on the number of questions — the agent asks every question needed to de-risk the task. Failure to use the tool (listing questions as prose instead) is an advisory signal, not blocking, unless it caused requirements to be unclear.
