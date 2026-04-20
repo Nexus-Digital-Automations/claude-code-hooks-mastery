@@ -100,12 +100,17 @@ def detect_emergency_mode(attempts):
 
 # ── Spec acceptance criteria validation ──────────────────────────────────
 
-def check_spec_completion(cwd=None):
-    """Check active spec files for uncompleted acceptance criteria.
+def check_spec_completion(cwd=None, scope_specs=None):
+    """Check spec files for uncompleted acceptance criteria.
 
-    Returns (all_done, summary_lines) where summary_lines is a list of
-    human-readable strings describing spec completion status.
-    Never raises — informational only.
+    scope_specs: if provided, restricts the check to spec files whose
+    `name` is in the list. This is how a session declares "these are the
+    specs I'm working on" — see hooks/utils/session_scope.py and
+    _phase_1_implement below. When None, falls back to globbing all
+    status: active|in-progress specs (legacy behavior, used only when
+    session scope cannot be resolved).
+
+    Returns (all_done, summary_lines). Never raises — informational only.
     """
     try:
         specs_dir = Path(cwd or os.getcwd()) / "specs"
@@ -114,7 +119,10 @@ def check_spec_completion(cwd=None):
 
         results = []
         all_done = True
+        scope_set = set(scope_specs) if scope_specs is not None else None
         for spec_file in sorted(specs_dir.glob("*.md")):
+            if scope_set is not None and spec_file.name not in scope_set:
+                continue
             try:
                 content = spec_file.read_text(errors='replace')
                 if not content.startswith("---"):
@@ -499,10 +507,16 @@ def build_evidence_display(done: list, session_id: str) -> str:
 # Each returns (passed: bool, message: str). Message is shown only on failure.
 
 def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
-    """Phase 1: Implementation complete — spec criteria + root cleanliness."""
+    """Phase 1: Implementation complete — spec criteria + root cleanliness.
+
+    Spec scoping: the session must declare which specs are in scope by writing
+    ~/.claude/data/session_scope_{sid}.json (see hooks/utils/session_scope.py).
+    Without a declaration, Phase 1 fails. This prevents the hook from dumping
+    every status:active spec regardless of what the session is actually working
+    on — the failure mode that motivated this check.
+    """
     issues = []
 
-    # Root cleanliness
     is_clean, violations = check_root_cleanliness()
     if not is_clean:
         issues.append("Root folder not clean:")
@@ -510,13 +524,27 @@ def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
         issues.append("")
         issues.append("Move/delete violations, then retry.")
 
-    # Spec acceptance criteria
-    spec_done, spec_summary = check_spec_completion()
-    if not spec_done:
-        issues.append("Spec acceptance criteria incomplete:")
-        issues.extend(spec_summary)
-        issues.append("")
-        issues.append("Complete all acceptance criteria before proceeding.")
+    resolved_sid = _resolve_session_id(session_id)
+    sys.path.insert(0, str(Path(__file__).parent / "utils"))
+    from session_scope import load_session_scope, scope_path
+
+    scope = load_session_scope(resolved_sid)
+    if scope is None:
+        issues.append(
+            f"Session scope not declared. Write {scope_path(resolved_sid)} "
+            "with one of:"
+        )
+        issues.append('  {"specs": ["<spec-name>.md", ...]}  — specs this session works on')
+        issues.append('  {"no_spec": true, "reason": "<why>"}  — trivial/no-spec work')
+    elif not scope.get("no_spec"):
+        spec_done, spec_summary = check_spec_completion(
+            scope_specs=scope.get("specs", [])
+        )
+        if not spec_done:
+            issues.append("Spec acceptance criteria incomplete:")
+            issues.extend(spec_summary)
+            issues.append("")
+            issues.append("Complete all acceptance criteria before proceeding.")
 
     if issues:
         return (False, "\n".join(issues))

@@ -597,19 +597,33 @@ def main():
         # Log the session start event
         log_session_start(input_data)
 
-        # Load development context if requested
+        # Session key — the agent needs these in-context to declare scope
+        # (see hooks/utils/session_scope.py; consumed by stop.py:_phase_1_implement).
+        # Emitted on every session start, not just when --load-context is set,
+        # because without the key the agent can't satisfy Phase 1.
+        scope_file = Path.home() / f".claude/data/session_scope_{session_id}.json"
+        key_context = (
+            f"Session key: {session_id}\n"
+            f"Agent id: {agent_id}\n\n"
+            f"Before your first stop, declare this session's spec scope by writing\n"
+            f"{scope_file} with one of:\n"
+            f'  {{"specs": ["<spec-name>.md", ...]}}  — specs this session is working on\n'
+            f'  {{"no_spec": true, "reason": "<why>"}}  — trivial / no-spec work\n'
+            f"The Stop hook (Phase 1) will not pass without this file."
+        )
         if args.load_context:
-            context = load_development_context(source, agent_id=agent_id)
-            if context:
-                # Using JSON output to add context
-                output = {
-                    "hookSpecificOutput": {
-                        "hookEventName": "SessionStart",
-                        "additionalContext": context
-                    }
-                }
-                print(json.dumps(output))
-                sys.exit(0)
+            dev_context = load_development_context(source, agent_id=agent_id)
+            additional_context = (
+                f"{key_context}\n\n{dev_context}" if dev_context else key_context
+            )
+        else:
+            additional_context = key_context
+        print(json.dumps({
+            "hookSpecificOutput": {
+                "hookEventName": "SessionStart",
+                "additionalContext": additional_context,
+            }
+        }))
         
         # Announce session start if requested
         if args.announce:
