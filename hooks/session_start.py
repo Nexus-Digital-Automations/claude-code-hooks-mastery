@@ -404,7 +404,7 @@ def load_development_context(source, agent_id=""):
     try:
         from utils.config_loader import get_config
         if get_config().is_qwen_mode():
-            session_rules_ds = """
+            session_rules_qwen = """
 QWEN DELEGATION MODE — THIS OVERRIDES CLAUDE.md'S "AUTONOMOUS OPERATION" RULE
 
 You are the architect and quality gate. Qwen builds code but is not as
@@ -472,7 +472,7 @@ FALLBACK: If Qwen is unavailable, implement directly yourself.
 
 You are the architect and the quality gate. Every deliverable gets verified.
 """
-            context_parts.insert(0, session_rules_ds)  # Highest priority — must appear first
+            context_parts.insert(0, session_rules_qwen)  # Highest priority — must appear first
     except Exception:
         pass  # Graceful degradation
 

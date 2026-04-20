@@ -1,12 +1,12 @@
-description: "DeepSeek mode delegation — mode-specific CLAUDE.md files control behavior"
+description: "Qwen mode delegation — mode-specific CLAUDE.md files control behavior"
 
 # Tests that mode-specific CLAUDE.md files correctly control delegation behavior.
-# CLAUDE.claude.md: direct execution, no DeepSeek delegation
-# CLAUDE.deepseek.md: supervisor mode, code tasks delegate to DeepSeek
+# CLAUDE.claude.md: direct execution, no Qwen delegation
+# CLAUDE.qwen.md: supervisor mode, code tasks delegate to Qwen
 #
 # Guard blocks have been removed from SKILL.md files — CLAUDE.md is the single
-# source of truth for mode behavior. DeepSeek has its own skills in
-# ~/.claude/deepseek-skills/ that are automatically loaded by the MCP server.
+# source of truth for mode behavior. Qwen has its own skills in
+# ~/.claude/qwen-skills/ that are automatically loaded by the MCP server.
 
 providers:
   - id: openai:chat:gpt-4o-mini
@@ -45,25 +45,25 @@ prompts:
 
 tests:
   # ── GROUP 1: MODE-RULES-ONLY (no skill content) ──────────────────────────────
-  - description: "deepseek + code task → delegates via mcp__deepseek-agent__run"
+  - description: "qwen + code task → delegates via mcp__qwen-agent__run"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Create a Weather Dashboard web app"
       skill_section: ""
       claude_md_excerpt: |
         ## CORE IDENTITY
         You are a **capable engineering supervisor** who values:
-        - **Skepticism** - Never trust DeepSeek output without verification
+        - **Skepticism** - Never trust Qwen output without verification
         - **Quality** - Verify everything, fix what's broken
 
         ## DELEGATION PROTOCOL (MANDATORY)
-        You are in **deepseek mode**. This changes how you work.
+        You are in **qwen mode**. This changes how you work.
 
         ### Code Tasks — DELEGATE IMMEDIATELY
-        1. Call `mcp__deepseek-agent__run` with a precise task description
-        2. Monitor with `mcp__deepseek-agent__poll`
-        3. **Read every file DeepSeek touched** — line by line
-        4. Run tests and lint yourself — never trust DeepSeek's claims
+        1. Call `mcp__qwen-agent__run` with a precise task description
+        2. Monitor with `mcp__qwen-agent__poll`
+        3. **Read every file Qwen touched** — line by line
+        4. Run tests and lint yourself — never trust Qwen's claims
         5. Rate: "high confidence" / "needs fixes" / "redo"
 
         Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
@@ -72,37 +72,37 @@ tests:
         Questions, explanations, git ops, reviews, validation, architecture decisions.
 
         ### Skills — Code Skills Delegate
-        ALL skills that produce code delegate to DeepSeek. Do NOT run brainstorming,
+        ALL skills that produce code delegate to Qwen. Do NOT run brainstorming,
         writing-plans, or any skill ceremony before delegating code tasks.
 
-        DeepSeek has its own skills (in ~/.claude/deepseek-skills/) that are
+        Qwen has its own skills (in ~/.claude/qwen-skills/) that are
         automatically loaded by the MCP server based on the task — you don't need
         to manage them.
 
         ## ABSOLUTE PROHIBITIONS
-        - **Write implementation code directly for code tasks** — delegate via `mcp__deepseek-agent__run`
-        - **Trust DeepSeek's output without verification** — always review every file
+        - **Write implementation code directly for code tasks** — delegate via `mcp__qwen-agent__run`
+        - **Trust Qwen's output without verification** — always review every file
     assert:
       - type: llm-rubric
         value: >
-          Pass if: the response mentions calling mcp__deepseek-agent__run (or describes
-          delegating to DeepSeek) as the FIRST action. Must NOT write code directly or
+          Pass if: the response mentions calling mcp__qwen-agent__run (or describes
+          delegating to Qwen) as the FIRST action. Must NOT write code directly or
           run a brainstorming/design ceremony before delegating.
           Fail if: writes code directly, or runs brainstorming/design phases first.
         threshold: 0.75
-        metric: "deepseek_delegates_code_task"
+        metric: "qwen_delegates_code_task"
 
-  - description: "deepseek + non-code question → answers directly, no delegation"
+  - description: "qwen + non-code question → answers directly, no delegation"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "What is async/await in Python and when should I use it?"
       skill_section: ""
       claude_md_excerpt: |
         ## DELEGATION PROTOCOL (MANDATORY)
-        You are in **deepseek mode**.
+        You are in **qwen mode**.
 
         ### Code Tasks — DELEGATE IMMEDIATELY
-        Call `mcp__deepseek-agent__run` for code tasks.
+        Call `mcp__qwen-agent__run` for code tasks.
         Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
 
         ### Non-Code Tasks — HANDLE DIRECTLY
@@ -110,13 +110,13 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: directly answers the async/await question without delegating to DeepSeek.
+          Pass if: directly answers the async/await question without delegating to Qwen.
           Non-code questions stay local regardless of mode.
-          Fail if: calls mcp__deepseek-agent__run for this explanation question.
+          Fail if: calls mcp__qwen-agent__run for this explanation question.
         threshold: 0.75
-        metric: "deepseek_answers_question_locally"
+        metric: "qwen_answers_question_locally"
 
-  - description: "claude mode + code task → implements directly, no DeepSeek"
+  - description: "claude mode + code task → implements directly, no Qwen"
     vars:
       mode: "claude"
       user_task: "Create a Weather Dashboard web app"
@@ -137,16 +137,16 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          Pass if: does NOT call mcp__deepseek-agent__run. Claude mode means implement
-          directly or brainstorm first — all correct. Key requirement: no DeepSeek delegation.
-          Fail if: calls mcp__deepseek-agent__run or describes delegating to DeepSeek.
+          Pass if: does NOT call mcp__qwen-agent__run. Claude mode means implement
+          directly or brainstorm first — all correct. Key requirement: no Qwen delegation.
+          Fail if: calls mcp__qwen-agent__run or describes delegating to Qwen.
         threshold: 0.75
         metric: "claude_mode_no_delegation"
 
-  # ── GROUP 2: SKILL BEHAVIOR (no guards, CLAUDE.md controls, DeepSeek has own skills) ─
-  - description: "deepseek + brainstorming skill loaded + code task → skips skill, delegates"
+  # ── GROUP 2: SKILL BEHAVIOR (no guards, CLAUDE.md controls, Qwen has own skills) ─
+  - description: "qwen + brainstorming skill loaded + code task → skips skill, delegates"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Build a real-time chat application"
       skill_section: |
         ## Loaded Skill: brainstorming
@@ -154,34 +154,34 @@ tests:
         It asks clarifying questions and proposes design approaches.
       claude_md_excerpt: |
         ## DELEGATION PROTOCOL (MANDATORY)
-        You are in **deepseek mode**.
+        You are in **qwen mode**.
 
         ### Code Tasks — DELEGATE IMMEDIATELY
-        1. Call `mcp__deepseek-agent__run` with a precise task description
+        1. Call `mcp__qwen-agent__run` with a precise task description
         Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
 
         🚨 CRITICAL: Do NOT ask clarifying questions before delegating. Do NOT propose
         design approaches. Do NOT run any brainstorming ceremony. Delegate FIRST.
 
         ### Skills — Code Skills Delegate
-        ALL skills that produce code delegate to DeepSeek. Do NOT run brainstorming,
+        ALL skills that produce code delegate to Qwen. Do NOT run brainstorming,
         writing-plans, or any skill ceremony before delegating code tasks.
         This means: no clarifying questions, no design proposals, no architecture
         discussions. Just delegate the task immediately.
 
-        DeepSeek has its own skills (in ~/.claude/deepseek-skills/) that are
+        Qwen has its own skills (in ~/.claude/qwen-skills/) that are
         automatically loaded by the MCP server based on the task.
 
         ## ABSOLUTE PROHIBITIONS
-        - **Write implementation code directly for code tasks** — delegate via `mcp__deepseek-agent__run`
+        - **Write implementation code directly for code tasks** — delegate via `mcp__qwen-agent__run`
         - **Ask clarifying questions before delegating code tasks** — delegate first, refine later
         - **Run any skill ceremony (brainstorming, design, planning) before delegating code tasks**
     assert:
       - type: llm-rubric
         value: >
-          CLAUDE.md says: deepseek mode, code task "Build a chat app" → delegate immediately,
+          CLAUDE.md says: qwen mode, code task "Build a chat app" → delegate immediately,
           do NOT run brainstorming or any skill ceremony before delegating.
-          Pass if: delegates to DeepSeek without running the brainstorming ceremony.
+          Pass if: delegates to Qwen without running the brainstorming ceremony.
           Acknowledging the loaded skill but explaining why it's skipped is fine.
           Fail if: runs the brainstorming process — asks design questions, proposes approaches,
           or writes a design doc before delegating.
@@ -206,61 +206,61 @@ tests:
     assert:
       - type: llm-rubric
         value: >
-          The only test here: does the response call mcp__deepseek-agent__run or explicitly
-          delegate to DeepSeek?
-          Pass if: the response does NOT call mcp__deepseek-agent__run and does NOT say it
-          is delegating to DeepSeek. Implementing the code directly is fine. Brainstorming
+          The only test here: does the response call mcp__qwen-agent__run or explicitly
+          delegate to Qwen?
+          Pass if: the response does NOT call mcp__qwen-agent__run and does NOT say it
+          is delegating to Qwen. Implementing the code directly is fine. Brainstorming
           is fine. Asking clarifying questions is fine. All of these are correct claude-mode
           behavior.
-          Fail if: the response calls mcp__deepseek-agent__run or describes delegating the
-          task to DeepSeek.
+          Fail if: the response calls mcp__qwen-agent__run or describes delegating the
+          task to Qwen.
         threshold: 0.75
         metric: "brainstorm_claude_mode_runs_normally"
 
   # ── GROUP 3: EDGE CASES ──────────────────────────────────────────────────────
-  - description: "deepseek + executing-plans skill + code task → delegates"
+  - description: "qwen + executing-plans skill + code task → delegates"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Execute the implementation plan in docs/plan.md"
       skill_section: |
         ## Loaded Skill: executing-plans
         This skill executes written implementation plans step by step, writing code files.
       claude_md_excerpt: |
         ## DELEGATION PROTOCOL (MANDATORY)
-        You are in **deepseek mode**.
+        You are in **qwen mode**.
 
         ### Code Tasks — DELEGATE IMMEDIATELY
-        1. Call `mcp__deepseek-agent__run` with a precise task description
+        1. Call `mcp__qwen-agent__run` with a precise task description
         Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X",
         "Add feature X", "Execute [plan]", any task that results in writing or modifying files.
 
         🚨 CRITICAL: "Execute the implementation plan" = code task. Do NOT read plan files
-        and execute steps directly. Call mcp__deepseek-agent__run immediately with the plan path.
+        and execute steps directly. Call mcp__qwen-agent__run immediately with the plan path.
 
         ### Skills — Code Skills Delegate
-        ALL skills that write or modify code/files delegate to DeepSeek.
-        The executing-plans skill writes files → it MUST delegate in deepseek mode.
+        ALL skills that write or modify code/files delegate to Qwen.
+        The executing-plans skill writes files → it MUST delegate in qwen mode.
 
-        DeepSeek has its own skills (in ~/.claude/deepseek-skills/) that are
+        Qwen has its own skills (in ~/.claude/qwen-skills/) that are
         automatically loaded by the MCP server based on the task.
 
         ### Delegate-Then-Review — Never Execute Code Tasks Directly
-        - Delegate code tasks immediately via `mcp__deepseek-agent__run`
-        - Do NOT read plan files and execute tasks yourself — have DeepSeek do it
-        - The only code you write directly is small fixes to DeepSeek's output
+        - Delegate code tasks immediately via `mcp__qwen-agent__run`
+        - Do NOT read plan files and execute tasks yourself — have Qwen do it
+        - The only code you write directly is small fixes to Qwen's output
     assert:
       - type: llm-rubric
         value: >
-          CLAUDE.md says: deepseek mode, delegate code tasks. Executing a plan produces code.
-          Pass if: delegates to DeepSeek rather than executing the plan directly.
+          CLAUDE.md says: qwen mode, delegate code tasks. Executing a plan produces code.
+          Pass if: delegates to Qwen rather than executing the plan directly.
           Describing what the task description will include is fine.
           Fail if: starts reading plan files and executing tasks directly.
         threshold: 0.70
         metric: "guard_a_delegates_code_skill"
 
-  - description: "deepseek + debugging task → analyzes directly, does NOT delegate analysis"
+  - description: "qwen + debugging task → analyzes directly, does NOT delegate analysis"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "I have a test failure in tests/test_api.py — TypeError: NoneType is not subscriptable on line 42. Help me debug this."
       skill_section: |
         ## Loaded Skill: systematic-debugging
@@ -268,7 +268,7 @@ tests:
         investigate, fix, verify. It reads errors and examines code to form hypotheses.
       claude_md_excerpt: |
         ## DELEGATION PROTOCOL (MANDATORY)
-        You are in **deepseek mode**.
+        You are in **qwen mode**.
 
         ### Code Tasks — DELEGATE IMMEDIATELY
         Code triggers: "Build X", "Create X", "Implement X", "Fix X", "Refactor X", "Add feature X"
@@ -277,126 +277,126 @@ tests:
         Questions, explanations, git ops, reviews, validation, architecture decisions.
 
         ### 4. Delegate-Then-Review — Never Write Code Directly
-        - Delegate code tasks immediately via `mcp__deepseek-agent__run`
-        - The only code you write directly is small fixes to DeepSeek's output
+        - Delegate code tasks immediately via `mcp__qwen-agent__run`
+        - The only code you write directly is small fixes to Qwen's output
         - For non-code tasks: execute directly
     assert:
       - type: llm-rubric
         value: >
           Debugging analysis is non-code work: reading errors, forming hypotheses, examining
           code. CLAUDE.md says non-code tasks are handled directly. Only the eventual code
-          FIX (writing/modifying files) should go to DeepSeek.
+          FIX (writing/modifying files) should go to Qwen.
           Pass if: the response engages with the debugging task directly — analyzes the error
           (TypeError: NoneType), asks about the code at line 42, proposes hypotheses, or
-          starts investigating. The analysis step should NOT be delegated to DeepSeek.
-          Fail if: immediately delegates the entire debugging session to DeepSeek without
+          starts investigating. The analysis step should NOT be delegated to Qwen.
+          Fail if: immediately delegates the entire debugging session to Qwen without
           any analysis. That over-applies the delegation rule to non-code diagnostic work.
         threshold: 0.65
         metric: "guard_b_debug_runs_directly"
 
   # ── GROUP 4: DIVISION OF LABOR — testing & frontend stay local ─────────────
-  - description: "deepseek + testing/validation task → handles directly, never delegates"
+  - description: "qwen + testing/validation task → handles directly, never delegates"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Run the test suite and fix any failing tests in this project"
       skill_section: ""
       claude_md_excerpt: |
         ## Delegation Protocol
-        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        You are in **qwen mode**. Qwen builds code. You own ALL testing, validation, and frontend.
         ### Division of Labor
         | Role | Owner | Scope |
         |------|-------|-------|
-        | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools |
+        | **Code building** | Qwen Agent | Backend: APIs, databases, scripts, CLI tools |
         | **Testing** | Claude Code (you) | ALL tests — unit, integration, E2E. Run them yourself |
         | **Validation** | Claude Code (you) | ALL linting, type checking, build verification |
         ### Task Routing
         | **All testing** | You | Unit tests, integration tests, E2E, linting, type checks |
-        Never trust DeepSeek's test claims — run every test yourself.
+        Never trust Qwen's test claims — run every test yourself.
     assert:
       - type: llm-rubric
         value: >
           Pass if: handles the testing task directly — runs tests, examines failures,
-          fixes code. Does NOT delegate testing to DeepSeek via mcp__deepseek-agent__run.
+          fixes code. Does NOT delegate testing to Qwen via mcp__qwen-agent__run.
           Testing is explicitly Claude Code's responsibility per the Division of Labor.
-          Fail if: calls mcp__deepseek-agent__run for testing work.
+          Fail if: calls mcp__qwen-agent__run for testing work.
         threshold: 0.75
         metric: "testing_stays_local_not_delegated"
 
-  - description: "deepseek + frontend task → handles directly, never delegates frontend"
+  - description: "qwen + frontend task → handles directly, never delegates frontend"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Build a responsive navigation bar with hamburger menu for mobile"
       skill_section: ""
       claude_md_excerpt: |
         ## Delegation Protocol
-        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        You are in **qwen mode**. Qwen builds code. You own ALL testing, validation, and frontend.
         ### Division of Labor
         | Role | Owner | Scope |
         |------|-------|-------|
         | **Frontend** | Claude Code (you) | ALL UI — React, Vue, Angular, CSS, layouts, accessibility |
         ### Task Routing
         | **Frontend code** | You (with impeccable) | React/Vue/Angular, CSS/Tailwind, layouts, accessibility |
-        Never delegate frontend tasks to DeepSeek — even if the task seems simple.
+        Never delegate frontend tasks to Qwen — even if the task seems simple.
     assert:
       - type: llm-rubric
         value: >
-          Pass if: handles the frontend task directly. Does NOT delegate to DeepSeek
-          via mcp__deepseek-agent__run. May mention using impeccable skills or similar UI tools.
-          Fail if: calls mcp__deepseek-agent__run for frontend/UI work.
+          Pass if: handles the frontend task directly. Does NOT delegate to Qwen
+          via mcp__qwen-agent__run. May mention using impeccable skills or similar UI tools.
+          Fail if: calls mcp__qwen-agent__run for frontend/UI work.
         threshold: 0.75
         metric: "frontend_stays_local_not_delegated"
 
-  - description: "deepseek + security task → Claude Code handles directly"
+  - description: "qwen + security task → Claude Code handles directly"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Run a security audit on the authentication module and fix any vulnerabilities"
       skill_section: ""
       claude_md_excerpt: |
         ## Delegation Protocol
-        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        You are in **qwen mode**. Qwen builds code. You own ALL testing, validation, and frontend.
         ### Division of Labor
         | Role | Owner | Scope |
         |------|-------|-------|
-        | **Code building** | DeepSeek Agent | Backend: APIs, databases, scripts, CLI tools |
-        | **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to DeepSeek |
+        | **Code building** | Qwen Agent | Backend: APIs, databases, scripts, CLI tools |
+        | **Security** | Claude Code (you) | ALL security — scanning, auditing, vulnerability review, hardening. Never delegate security to Qwen |
         ### Task Routing
         | **Security** | You | Security scanning, vulnerability audits, hardening, secrets detection, OWASP review |
-        Never delegate security tasks to DeepSeek.
+        Never delegate security tasks to Qwen.
     assert:
       - type: llm-rubric
         value: >
           Pass if: handles the security audit directly — scans for vulnerabilities,
           reviews auth code, identifies issues, applies fixes. Does NOT delegate
-          security work to DeepSeek via mcp__deepseek-agent__run. Security is
+          security work to Qwen via mcp__qwen-agent__run. Security is
           explicitly Claude Code's responsibility per the Division of Labor.
-          Fail if: calls mcp__deepseek-agent__run for security audit work.
+          Fail if: calls mcp__qwen-agent__run for security audit work.
         threshold: 0.75
         metric: "security_stays_local_not_delegated"
 
-  - description: "deepseek + small task (~3 files) → Claude Code handles directly"
+  - description: "qwen + small task (~3 files) → Claude Code handles directly"
     vars:
-      mode: "deepseek"
+      mode: "qwen"
       user_task: "Rename the `getUserById` function to `findUserById` across 2 files"
       skill_section: ""
       claude_md_excerpt: |
         ## Delegation Protocol
-        You are in **deepseek mode**. DeepSeek builds code. You own ALL testing, validation, and frontend.
+        You are in **qwen mode**. Qwen builds code. You own ALL testing, validation, and frontend.
         ### Delegation Threshold
-        Only deploy DeepSeek for tasks that will touch roughly 5+ files. For smaller tasks,
+        Only deploy Qwen for tasks that will touch roughly 5+ files. For smaller tasks,
         implement directly yourself — the delegation overhead (run, poll, review, fix) costs
         more than just writing the code. Use your judgment: a 3-file refactor is yours;
-        a 10-file feature goes to DeepSeek.
+        a 10-file feature goes to Qwen.
         ### Task Routing
         | **Small tasks (~5 files)** | You | Changes touching ~5 or fewer files — handle directly |
     assert:
       - type: llm-rubric
         value: >
           Pass if: handles the small rename directly — the task only touches 2 files,
-          well below the ~5 file threshold. Does NOT delegate to DeepSeek via
-          mcp__deepseek-agent__run. The Delegation Threshold says small tasks should
+          well below the ~5 file threshold. Does NOT delegate to Qwen via
+          mcp__qwen-agent__run. The Delegation Threshold says small tasks should
           be handled directly because delegation overhead isn't worth it.
-          Fail if: calls mcp__deepseek-agent__run for this 2-file rename.
+          Fail if: calls mcp__qwen-agent__run for this 2-file rename.
         threshold: 0.75
         metric: "small_task_stays_local_not_delegated"
 
-outputPath: tests/promptfoo/results/14-deepseek-mode-delegation.json
+outputPath: tests/promptfoo/results/14-qwen-mode-delegation.json
