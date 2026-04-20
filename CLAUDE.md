@@ -103,8 +103,8 @@ Never:
 
 ### Quick Workflow
 1. **Describe** → `run(task, working_dir, profile="qwen3-delegation")`
-2. **Review plan** → `review(agent_id, "get")` — required before approve
-3. **Approve** → `review(agent_id, "approve")`
+2. **Review plan** → `plan(agent_id, "get")` — required before approve
+3. **Approve** → `plan(agent_id, "approve")`
 4. **Validate** → read every file, re-run build+lint+test, Playwright final gate
 
 **Budget:** `qwen3-delegation` — 200 iterations, $3.00 cap

@@ -630,7 +630,7 @@ def _capture_delegation_metadata(session_id, tool_name, tool_input, tool_result)
         }
         entries.append(entry)
 
-    elif action == "review":
+    elif action in ("review", "plan"):
         review_action = tool_input.get("action", "")
         agent_id = tool_input.get("agent_id", "")
         entry = _find_delegation_entry(entries, agent_id, task_id)
