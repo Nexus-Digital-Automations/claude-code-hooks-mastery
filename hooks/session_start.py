@@ -607,7 +607,7 @@ def main():
             f"Agent id: {agent_id}\n\n"
             f"Before your first stop, declare this session's spec scope by writing\n"
             f"{scope_file} with one of:\n"
-            f'  {{"specs": ["<spec-name>.md", ...]}}  — specs this session is working on\n'
+            f'  {{"specs": ["/absolute/path/to/project/specs/<name>.md", ...]}}  — specs this session is working on\n'
             f'  {{"no_spec": true, "reason": "<why>"}}  — trivial / no-spec work\n'
             f"The Stop hook (Phase 1) will not pass without this file."
         )

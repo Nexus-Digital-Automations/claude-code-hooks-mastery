@@ -113,16 +113,20 @@ def check_spec_completion(cwd=None, scope_specs=None):
     Returns (all_done, summary_lines). Never raises — informational only.
     """
     try:
-        specs_dir = Path(cwd or os.getcwd()) / "specs"
-        if not specs_dir.is_dir():
-            return (True, [])
+        # scope_specs are absolute paths — read directly so agents working in any
+        # project directory don't need to match cwd. Fall back to cwd glob only
+        # when no scope is declared (legacy / session scope missing).
+        if scope_specs:
+            spec_files: list[Path] = [p for s in scope_specs if (p := Path(s)).exists()]
+        else:
+            specs_dir = Path(cwd or os.getcwd()) / "specs"
+            if not specs_dir.is_dir():
+                return (True, [])
+            spec_files = sorted(specs_dir.glob("*.md"))
 
         results = []
         all_done = True
-        scope_set = set(scope_specs) if scope_specs is not None else None
-        for spec_file in sorted(specs_dir.glob("*.md")):
-            if scope_set is not None and spec_file.name not in scope_set:
-                continue
+        for spec_file in spec_files:
             try:
                 content = spec_file.read_text(errors='replace')
                 if not content.startswith("---"):
@@ -179,7 +183,7 @@ def check_root_cleanliness():
         '.prettierrc', '.prettierrc.json', '.prettierrc.js',
         '.editorconfig', '.nvmrc', '.node-version', '.python-version',
         'babel.config.js', '.babelrc', '.babelrc.json',
-        'README.md', 'README.txt', 'README.rst', 'CLAUDE.md',
+        'README.md', 'README.txt', 'README.rst', 'CLAUDE.md', 'AGENTS.md',
         'LICENSE', 'LICENSE.md', 'LICENSE.txt', 'NOTICE', 'CONTRIBUTING.md',
         'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'SECURITY.md', 'RELEASE_PROCESS.md',
         'Dockerfile', 'docker-compose.yml', 'docker-compose.yaml',
@@ -534,7 +538,7 @@ def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
             f"Session scope not declared. Write {scope_path(resolved_sid)} "
             "with one of:"
         )
-        issues.append('  {"specs": ["<spec-name>.md", ...]}  — specs this session works on')
+        issues.append('  {"specs": ["/abs/path/to/project/specs/<name>.md", ...]}  — specs this session works on')
         issues.append('  {"no_spec": true, "reason": "<why>"}  — trivial/no-spec work')
     elif not scope.get("no_spec"):
         spec_done, spec_summary = check_spec_completion(

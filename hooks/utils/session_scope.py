@@ -13,8 +13,11 @@ Called by: hooks/stop.py (reads).  Written by: the agent during a
 session, per the Rule 2 workflow in CLAUDE.md.
 
 Scope file schema (one of):
-    {"specs": ["name.md", ...]}           # agent is working on these specs
-    {"no_spec": true, "reason": "..."}    # session has no spec (trivial work)
+    {"specs": ["/abs/path/to/project/specs/name.md", ...]}  # agent is working on these specs
+    {"no_spec": true, "reason": "..."}                      # session has no spec (trivial work)
+
+Specs are identified by absolute path so the agent can declare specs in any
+project directory without the Stop hook having to guess which cwd/specs/ to use.
 """
 
 from __future__ import annotations

@@ -13,8 +13,11 @@ First response to any build/change/design/plan request = clarifying questions in
 Skip only for literal confirmations: "yes", "ok", "proceed", "approved", "go ahead", "do it", "sure".
 
 **Rule 2 — Spec before code.**
-After clarifying: create `specs/<name>.md` with requirements and testable acceptance criteria. Get user approval. Then build.
+After clarifying: create `specs/<name>.md` in the project root with requirements and testable acceptance criteria. Get user approval. Then build.
 Spec edits require approval: `bash ~/.claude/commands/approve-spec-edit.sh`
+
+**Rule 2b — Declare session scope.**
+Every session must write `~/.claude/data/session_scope_<session-key>.json` before the first stop. The session key is injected into the agent's context by `session_start.py`. Contents: `{"specs": ["/absolute/path/to/project/specs/<name>.md", ...]}` for spec-bound work, or `{"no_spec": true, "reason": "..."}` for trivial edits. Use the absolute path to the spec file so the Stop hook can find it regardless of which project directory the agent is working in. Without this file, Stop hook Phase 1 fails — see `hooks/utils/session_scope.py`.
 
 **Spec template** — `specs/<kebab-case-name>.md`:
 ```
