@@ -21,13 +21,12 @@ except ImportError:
 
 
 def log_pre_compact(input_data):
-    """Log pre-compact event to logs directory."""
-    # Ensure logs directory exists
-    log_dir = Path("logs")
+    """Log pre-compact event to ~/.claude/logs/ (absolute path to avoid dirtying project repos)."""
+    log_dir = Path.home() / ".claude" / "logs"
     log_dir.mkdir(parents=True, exist_ok=True)
+
+    # Structured JSON log (full payload)
     log_file = log_dir / 'pre_compact.json'
-    
-    # Read existing log data or initialize empty list
     if log_file.exists():
         with open(log_file, 'r') as f:
             try:
@@ -36,13 +35,23 @@ def log_pre_compact(input_data):
                 log_data = []
     else:
         log_data = []
-    
-    # Append the entire input data
     log_data.append(input_data)
-    
-    # Write back to file with formatting
     with open(log_file, 'w') as f:
         json.dump(log_data, f, indent=2)
+
+    # Human-readable log line so the configured threshold is easy to verify
+    threshold = os.environ.get("CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "unset")
+    threshold_str = f"{threshold}%" if threshold != "unset" else "unset"
+    session_id = input_data.get("session_id", "unknown")
+    trigger = input_data.get("trigger", "unknown")
+    transcript_path = input_data.get("transcript_path", "")
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = (
+        f"[{ts}] trigger={trigger}  threshold={threshold_str}"
+        f"  session={session_id[:8]}  transcript={transcript_path}\n"
+    )
+    with open(log_dir / "pre_compact.log", "a") as f:
+        f.write(line)
 
 
 def backup_transcript(transcript_path, trigger):
