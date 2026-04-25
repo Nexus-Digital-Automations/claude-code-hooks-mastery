@@ -641,7 +641,7 @@ def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
 
     if issues:
         msg = "\n".join(issues)
-        msg += "\n\nFix all errors, then retry."
+        msg += "\n\nFix all errors, then retry. If a finding is a genuine false positive, suppress it at the line (`# noqa: <rule>` / `// eslint-disable-next-line <rule>` / `# type: ignore[<rule>]`) with a comment explaining why."
         return (False, msg)
     return (True, "")
 
@@ -770,14 +770,14 @@ def _phase_4_tests(session_id: str, config: dict) -> tuple[bool, str]:
         else:
             run_cmd = ""
         hint = f"\n\nRun: {run_cmd}" if run_cmd else ""
-        return (False, f"  \u274c TESTS not run yet.{hint}")
+        return (False, f"  \u274c TESTS not run yet.{hint}\n     If this change isn't on a critical path, the heuristic is over-eager \u2014 narrow the patterns in `~/.claude/data/critical-paths.json`.")
     elif status == "failed":
         ev = (item.get("evidence") or "")[:500]
         msg = "  \u274c TESTS FAILED\n"
         if ev:
             for ev_line in ev.split("\n")[:15]:
                 msg += f"     {ev_line}\n"
-        msg += "\nFix failing tests, then retry."
+        msg += "\nFix failing tests, then retry. If a specific test is irrelevant or flaky, skip it (`pytest.skip(reason=...)` / `.skip()` / annotation) with a written reason — never delete coverage silently."
         return (False, msg)
 
     return (True, "")
@@ -1003,7 +1003,7 @@ def _phase_7_ship(session_id: str, config: dict) -> tuple[bool, str]:
             if key == "commit_push":
                 issues.append(f"  \u274c {label:<18} — commit and push your changes")
             elif key == "security":
-                issues.append(f"  \u274c {label:<18} — security scan not run")
+                issues.append(f"  \u274c {label:<18} — security scan not run (auto-runs on retry; persistent FPs → `.security-ignore`)")
             else:
                 issues.append(f"  \u274c {label:<18} — not verified")
         elif status == "failed":

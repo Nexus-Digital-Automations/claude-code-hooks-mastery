@@ -727,7 +727,9 @@ def _run_security_scan(project_root: Path, config: dict) -> tuple[str, str]:
 
     evidence = (
         f"Critical: {critical}, Warnings: {warnings}\n"
-        f"Report: {report_path}"
+        f"Report: {report_path}\n"
+        f"If findings are irrelevant/false positives, add globs to `.security-ignore` "
+        f"at project root (e.g. `vendor/**` or `[severity:warning] generated/**`)."
     )
 
     should_fail = critical > 0 or (block_on_warnings and warnings > max_warnings)
