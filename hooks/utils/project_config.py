@@ -14,30 +14,96 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-# ── Git root resolution ──────────────────────────────────────────────────
+# ── Git root + project-local data dir ────────────────────────────────────
+#
+# Per-session/per-task state lives at <git_root>/.claude/data/ so each
+# project owns its own scope/VR/identity files.  The ~/.claude meta-repo is
+# its own project, so its data continues at ~/.claude/data/ (no nesting).
+# Counterpart in bash: commands/authorize-stop.sh, commands/approve-spec-edit.sh.
 
 _git_root_cache: dict[str, str] = {}
 
 
-def get_git_root() -> str:
-    """Return the git repo root for the current working directory.
+# @stable — callers across hooks depend on the (cwd or os.getcwd()) contract.
+def get_git_root(cwd: str | None = None) -> str:
+    """Return the git repo root for *cwd* (defaults to ``os.getcwd()``).
 
-    Caches per-CWD to avoid repeated subprocess calls.  Falls back to CWD
-    if not inside a git repository.
+    Falls back to *cwd* itself when not inside a git repository.  Cached
+    per resolved cwd.
     """
-    cwd = os.getcwd()
+    cwd = cwd or os.getcwd()
     if cwd in _git_root_cache:
         return _git_root_cache[cwd]
     try:
         r = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
             capture_output=True, text=True, timeout=5,
+            cwd=cwd,
         )
         root = r.stdout.strip() if r.returncode == 0 else cwd
     except Exception:
         root = cwd
     _git_root_cache[cwd] = root
     return root
+
+
+# @stable — the canonical resolver for per-session state paths.  Every hook
+# that previously hardcoded ``Path.home() / ".claude/data"`` must call this
+# instead and pass the agent's cwd from its stdin input.
+def get_project_data_dir(cwd: str | None = None) -> Path:
+    """Return ``<git_root>/.claude/data`` for the project at *cwd*.
+
+    Special case: when ``git_root == ~/.claude`` the result is
+    ``~/.claude/data`` directly (the meta-repo IS its own project — no
+    ``.claude/.claude/data`` nesting).
+
+    Caller is responsible for ``mkdir(parents=True, exist_ok=True)``.
+    """
+    git_root = Path(get_git_root(cwd)).resolve()
+    home_claude = (Path.home() / ".claude").resolve()
+    if git_root == home_claude:
+        return home_claude / "data"
+    return git_root / ".claude" / "data"
+
+
+# Marker line written into project .gitignores so re-runs are idempotent
+# and the auto-added block is identifiable.
+_GITIGNORE_MARKER = "# Claude Code session state — auto-added"
+_GITIGNORE_BLOCK = (
+    f"\n{_GITIGNORE_MARKER}\n"
+    ".claude/data/\n"
+    ".claude/artifacts/\n"
+    ".claude/reports/\n"
+)
+
+
+def ensure_project_gitignore(cwd: str | None = None) -> None:
+    """Append the Claude state ignore block to the project's .gitignore.
+
+    No-op when:
+      • ``git_root == ~/.claude`` (meta-repo's .gitignore is hand-curated),
+      • the marker line is already present (idempotent),
+      • the project is not a git repo (``get_git_root`` fell back to cwd).
+    Never raises — gitignore maintenance must not block hook execution.
+    """
+    try:
+        git_root = Path(get_git_root(cwd)).resolve()
+    except Exception:
+        return
+    if git_root == (Path.home() / ".claude").resolve():
+        return
+    if not (git_root / ".git").exists():
+        return
+    gitignore = git_root / ".gitignore"
+    try:
+        existing = gitignore.read_text() if gitignore.exists() else ""
+        if _GITIGNORE_MARKER in existing:
+            return
+        with gitignore.open("a", encoding="utf-8") as f:
+            f.write(_GITIGNORE_BLOCK if existing.endswith("\n") or not existing
+                    else "\n" + _GITIGNORE_BLOCK)
+    except OSError:
+        return
 
 
 # ── Config loading ───────────────────────────────────────────────────────

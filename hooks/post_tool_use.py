@@ -13,11 +13,18 @@ from pathlib import Path
 
 # Add hooks directory to path for utils imports
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent / "utils"))
 
 # Fix Python environment warnings
 for var in ['PYTHONHOME', 'PYTHONPATH']:
     if var in os.environ:
         del os.environ[var]
+
+
+# Counterpart: hooks/utils/project_config.py:get_project_data_dir.
+def _data_dir(cwd: str | None = None) -> Path:
+    from project_config import get_project_data_dir
+    return get_project_data_dir(cwd)
 
 # Linter commands by file extension
 LINTER_MAP = {
@@ -139,7 +146,7 @@ def _detect_git_push_from_output(
             pass  # Proceed even if we can't verify rev-list
 
         # Load/update commit_push state
-        state_file = Path.home() / f".claude/data/commit_push_state_{session_id}.json"
+        state_file = _data_dir() / f"commit_push_state_{session_id}.json"
         state = {}
         if state_file.exists():
             try:
@@ -222,7 +229,7 @@ def observe_bash_check(session_id: str, tool_input: dict, tool_response) -> None
             return
 
         check_key, check_conf = result
-        vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+        vr_file = _data_dir() / f"verification_record_{session_id}.json"
 
         # commit_push needs both git commit + git push
         if check_key == "commit_push":
@@ -283,7 +290,7 @@ def _handle_commit_push(session_id: str, command: str, stdout: str, stderr: str,
     try:
         from utils.vr_utils import write_vr
 
-        state_file = Path.home() / f".claude/data/commit_push_state_{session_id}.json"
+        state_file = _data_dir() / f"commit_push_state_{session_id}.json"
         state_file.parent.mkdir(parents=True, exist_ok=True)
 
         state = {}
@@ -413,7 +420,7 @@ def _invalidate_stale_checks(session_id: str, file_path: str) -> None:
         if not to_invalidate:
             return
 
-        vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+        vr_file = _data_dir() / f"verification_record_{session_id}.json"
         if not vr_file.exists():
             return
 
@@ -474,9 +481,9 @@ def _invalidate_stale_checks(session_id: str, file_path: str) -> None:
 
 
 def update_tool_tracking(session_id: str, tool_name: str, tool_input: dict) -> None:
-    """Atomic read-modify-write to ~/.claude/data/sessions/{session_id}_tools.json. Never raises."""
+    """Atomic read-modify-write to <project>/.claude/data/sessions/{session_id}_tools.json. Never raises."""
     try:
-        tools_file = Path.home() / ".claude" / "data" / "sessions" / f"{session_id}_tools.json"
+        tools_file = _data_dir() / "sessions" / f"{session_id}_tools.json"
         data = {}
         if tools_file.exists():
             try:
@@ -509,7 +516,7 @@ def update_tool_tracking(session_id: str, tool_name: str, tool_input: dict) -> N
 
 def _track_qwen_result(session_id, tool_name, tool_input, tool_result):
     """Log Qwen MCP tool calls to a ring buffer (last 50 entries)."""
-    ds_log = Path.home() / ".claude" / "data" / "qwen_delegations.json"
+    ds_log = _data_dir() / "qwen_delegations.json"
     ds_log.parent.mkdir(parents=True, exist_ok=True)
 
     entries = []
@@ -581,12 +588,12 @@ def _find_delegation_entry(entries, agent_id, task_id):
 def _capture_delegation_metadata(session_id, tool_name, tool_input, tool_result):
     """Capture structured Qwen delegation metadata keyed by session + task.
 
-    Writes/updates ~/.claude/data/delegation_meta_{session_id}.json.
+    Writes/updates <project>/.claude/data/delegation_meta_{session_id}.json.
     Each entry tracks one agent: plan file_changes, verification_steps,
     plan_reviewed/approved flags, terminal state, and ask_supervisor events.
     All JSON parsing is wrapped in try/except — never crashes the hook.
     """
-    data_dir = Path.home() / ".claude" / "data"
+    data_dir = _data_dir()
     data_dir.mkdir(parents=True, exist_ok=True)
     meta_file = data_dir / f"delegation_meta_{session_id}.json"
 
@@ -739,7 +746,7 @@ def main():
             _plans_prefix = str(Path.home() / ".claude/plans/")
             if _written.startswith(_plans_prefix) and _written.endswith(".md"):
                 try:
-                    _task_f = Path.home() / f".claude/data/current_task_{session_id}.json"
+                    _task_f = _data_dir() / f"current_task_{session_id}.json"
                     if _task_f.exists():
                         _tdata = json.loads(_task_f.read_text())
                         _tdata["plan_file"] = _written
@@ -766,8 +773,8 @@ def main():
             except Exception:
                 pass
 
-        # Log to JSONL file (append-only, safe for concurrent access)
-        log_dir = Path.home() / '.claude' / 'logs'
+        # Per-project tool-use log. Counterpart: notification.py writes to cwd/logs/.
+        log_dir = _data_dir() / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
         log_path = log_dir / 'post_tool_use.jsonl'
 

@@ -285,8 +285,13 @@ def _build_user_message(checks: dict, context: dict | None = None) -> str:
                          f"Read count: {tool_summary.get('read_count', 0)}")
             lines.append("")
 
-        # Sandbox execution log (tamper-evident: command + exit code + output)
-        sandbox_log = Path.home() / ".claude/data/sandbox_executions.json"
+        # Sandbox execution log (tamper-evident: command + exit code + output).
+        # Project-local: see project_config.get_project_data_dir.
+        try:
+            from utils.project_config import get_project_data_dir as _gpdd
+        except ImportError:
+            from project_config import get_project_data_dir as _gpdd
+        sandbox_log = _gpdd() / "sandbox_executions.json"
         if sandbox_log.exists():
             try:
                 from datetime import datetime, timezone, timedelta
@@ -369,38 +374,31 @@ def _get_current_identity() -> tuple[str, str]:
     Used for ownership validation to prevent cross-session contamination.
     """
     from utils.vr_utils import get_session_id
+    try:
+        from utils.project_config import get_project_data_dir
+    except ImportError:
+        from project_config import get_project_data_dir
     sid = get_session_id()
+    data_dir = get_project_data_dir()
 
     agent_id = ""
     prompt_id = ""
-    # Try session-scoped current_task first
-    for _ct_path in [
-        Path.home() / f".claude/data/current_task_{sid}.json",
-        Path.home() / ".claude/data/current_task.json",
-    ]:
+    ct_path = data_dir / f"current_task_{sid}.json"
+    try:
+        if ct_path.exists():
+            ct = json.loads(ct_path.read_text())
+            agent_id = ct.get("agent_id", "")
+            prompt_id = ct.get("prompt_id", "")
+    except Exception:
+        pass
+    if not agent_id:
+        id_path = data_dir / f"agent_identity_{sid}.json"
         try:
-            if _ct_path.exists():
-                ct = json.loads(_ct_path.read_text())
-                agent_id = ct.get("agent_id", "")
-                prompt_id = ct.get("prompt_id", "")
-                if agent_id:
-                    break
+            if id_path.exists():
+                identity = json.loads(id_path.read_text())
+                agent_id = identity.get("agent_id", "")
         except Exception:
             pass
-    if not agent_id:
-        # Try session-scoped identity file
-        for _id_path in [
-            Path.home() / f".claude/data/agent_identity_{sid}.json",
-            Path.home() / ".claude/data/agent_identity.json",
-        ]:
-            try:
-                if _id_path.exists():
-                    identity = json.loads(_id_path.read_text())
-                    agent_id = identity.get("agent_id", "")
-                    if agent_id:
-                        break
-            except Exception:
-                pass
     return agent_id, prompt_id
 
 
@@ -432,10 +430,12 @@ def _load_state(state_file: Path) -> list:
         if saved_at:
             try:
                 from utils.vr_utils import get_session_id as _get_sid
+                try:
+                    from utils.project_config import get_project_data_dir as _gpdd
+                except ImportError:
+                    from project_config import get_project_data_dir as _gpdd
                 _sid = _get_sid()
-                _id_file = Path.home() / f".claude/data/agent_identity_{_sid}.json"
-                if not _id_file.exists():
-                    _id_file = Path.home() / ".claude/data/agent_identity.json"
+                _id_file = _gpdd() / f"agent_identity_{_sid}.json"
                 identity = json.loads(_id_file.read_text())
                 session_created = identity.get("created_at", "")
                 if session_created and saved_at < session_created:

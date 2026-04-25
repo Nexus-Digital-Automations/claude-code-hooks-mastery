@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/jvm-languages/agents/scala-pro.md

@@ -4,14 +4,24 @@
 
 VR_UTILS="$HOME/.claude/hooks/utils"
 
+# Per-session state lives at <git_root>/.claude/data/.
+# Special case: ~/.claude meta-repo → ~/.claude/data/ (no nesting).
+HOME_CLAUDE="$HOME/.claude"
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")
+if [ "$GIT_ROOT" = "$HOME_CLAUDE" ]; then
+    DATA_DIR="$HOME_CLAUDE/data"
+else
+    DATA_DIR="$GIT_ROOT/.claude/data"
+fi
+
 SESSION_ID=$(python3 -c "
 import sys; sys.path.insert(0, '$VR_UTILS')
 from vr_utils import get_session_id; print(get_session_id())
 " 2>/dev/null || echo "default")
 
-AUTH_FILE="$HOME/.claude/data/stop_authorization_${SESSION_ID}.json"
-VR_FILE="$HOME/.claude/data/verification_record_${SESSION_ID}.json"
-mkdir -p "$HOME/.claude/data"
+AUTH_FILE="$DATA_DIR/stop_authorization_${SESSION_ID}.json"
+VR_FILE="$DATA_DIR/verification_record_${SESSION_ID}.json"
+mkdir -p "$DATA_DIR"
 
 # Single Python call: phase-aware auto-run + gate check
 python3 - "$SESSION_ID" "$VR_FILE" "$AUTH_FILE" "$VR_UTILS" << 'PYEOF'

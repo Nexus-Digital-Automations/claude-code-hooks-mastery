@@ -1,19 +1,14 @@
 """Canonical validation-artifacts directory accessor.
 
 Session telemetry (summaries, lessons, task metrics, architectural decisions,
-error catalogs, etc.) lives at ``~/.claude/.validation-artifacts/`` — an
-absolute path that does NOT depend on the current working directory. This
-prevents hooks from dirtying whichever project repo Claude Code was invoked in.
+error catalogs, etc.) lives at ``<project>/.claude/artifacts/`` — a
+project-scoped path so each project owns its own telemetry.
 
-Historical bug: hooks used ``Path(".validation-artifacts")`` which resolved
-against cwd. When cwd was a project repo that didn't gitignore the path, the
-write polluted the project tree after every session end and created a chronic
-commit loop (see PR #1 — "fix: session_end telemetry writes must use absolute
-paths").
+Counterpart: ``project_config.get_project_data_dir`` (the per-project state
+directory; this module owns the sibling ``artifacts/`` directory).
 
 All producers and consumers MUST go through :func:`get_validation_artifacts_dir`
-so writers and readers stay in sync. Direct ``Path(".validation-artifacts")``
-uses in hook code are a regression of the same bug.
+so writers and readers stay in sync.
 """
 
 from __future__ import annotations
@@ -21,13 +16,16 @@ from __future__ import annotations
 from pathlib import Path
 
 
-def get_validation_artifacts_dir() -> Path:
-    """Return the canonical validation-artifacts directory, creating it if missing.
+def get_validation_artifacts_dir(cwd: str | None = None) -> Path:
+    """Return the validation-artifacts directory for the project at *cwd*.
 
-    Always returns an absolute path rooted at ``~/.claude/.validation-artifacts``.
-    The return value is independent of cwd — safe to call from any hook
-    regardless of which project Claude Code was invoked in.
+    Never writes to the global ``~/.claude/`` namespace (historical bug).
+    For the ``~/.claude`` meta-repo: returns ``~/.claude/artifacts/``.
+    For every other project: returns ``<git_root>/.claude/artifacts/``.
     """
-    artifacts_dir = Path.home() / ".claude" / ".validation-artifacts"
+    from project_config import get_project_data_dir
+    proj_data = get_project_data_dir(cwd)
+    # sibiling of .claude/data/ → .claude/artifacts/
+    artifacts_dir = proj_data.parent / "artifacts"
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     return artifacts_dir

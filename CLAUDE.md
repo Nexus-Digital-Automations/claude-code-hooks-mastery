@@ -17,7 +17,9 @@ After clarifying: create `specs/<name>.md` with requirements and testable accept
 Spec edits require approval: `bash ~/.claude/commands/approve-spec-edit.sh`
 
 **Rule 2b — Declare session scope.**
-Every session must write `~/.claude/data/session_scope_<session-key>.json` before the first stop. The session key is injected into the agent's context by `session_start.py`. Contents: `{"specs": ["<name>.md", ...]}` for spec-bound work, or `{"no_spec": true, "reason": "..."}` for trivial edits. Without this file, Stop hook Phase 1 fails — see `hooks/utils/session_scope.py`.
+Every session must write `<project>/.claude/data/session_scope_<session-key>.json` before the first stop. The session key is injected into the agent's context by `session_start.py`. Contents: `{"specs": ["<name>.md", ...]}` for spec-bound work, or `{"no_spec": true, "reason": "..."}` for trivial edits. Without this file, Stop hook Phase 1 fails — see `hooks/utils/session_scope.py`.
+
+Per-session state is project-local (see `hooks/utils/project_config.py:get_project_data_dir`). For the `~/.claude` meta-repo, `session_scope_*.json` lives at `~/.claude/data/`. For all other projects, it lives at `<git_root>/.claude/data/`. The helper handles both cases — agents should write the absolute path the helper would resolve.
 
 **Spec template** — `specs/<kebab-case-name>.md`:
 ```
@@ -102,12 +104,12 @@ Never:
 | Full-stack | Split: Qwen backend, you frontend + qualification |
 
 ### Quick Workflow
-1. **Describe** → `run(task, working_dir, profile="qwen3-delegation")`
+1. **Describe** → `run(task, working_dir, profile="deepseek-delegation")`
 2. **Review plan** → `plan(agent_id, "get")` — required before approve
 3. **Approve** → `plan(agent_id, "approve")`
 4. **Validate** → read every file, re-run build+lint+test, Playwright final gate
 
-**Budget:** `qwen3-delegation` — 200 iterations, $3.00 cap
+**Budget:** `deepseek-delegation` — 200 iterations, ~$0.14/$0.21 per 1M tokens (V4-Flash)
 
 ### Mode Switch
 `bash ~/.claude/commands/toggle-mode.sh claude`

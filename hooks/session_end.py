@@ -539,7 +539,10 @@ def store_lessons_to_knowledge_base(lessons: List[Dict[str, Any]]) -> Tuple[bool
     RETURNS: (success, message)
     """
     try:
-        lessons_file = Path("lessons.json")
+        from project_config import get_project_data_dir
+        proj_data = get_project_data_dir()
+        proj_data.mkdir(parents=True, exist_ok=True)
+        lessons_file = proj_data / "lessons.json"
 
         # Load existing lessons
         existing_lessons = []
@@ -587,7 +590,10 @@ def update_error_catalog(errors: List[Dict[str, Any]]) -> Tuple[bool, str]:
         return True, "No errors to catalog"
 
     try:
-        error_catalog_file = Path("error_catalog.json")
+        from project_config import get_project_data_dir
+        proj_data = get_project_data_dir()
+        proj_data.mkdir(parents=True, exist_ok=True)
+        error_catalog_file = proj_data / "error_catalog.json"
 
         # Load existing catalog
         existing_catalog = []

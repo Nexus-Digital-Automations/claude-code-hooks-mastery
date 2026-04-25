@@ -189,40 +189,42 @@ def is_pending(vr_file: Path, key: str) -> bool:
 # ── Task / Session ID helpers ─────────────────────────────────────────────
 
 def get_task_id() -> str:
-    """Read task_id from session-scoped current_task file. Returns 'default' on any error."""
+    """Read task_id from the project-local current_task file.
+
+    Returns 'default' on any error.
+    """
+    try:
+        from .project_config import get_project_data_dir
+    except ImportError:
+        from project_config import get_project_data_dir
     sid = get_session_id()
-    for _ct_path in [
-        Path.home() / f".claude/data/current_task_{sid}.json",
-        Path.home() / ".claude/data/current_task.json",
-    ]:
-        try:
-            if _ct_path.exists():
-                ct = json.loads(_ct_path.read_text())
-                return ct.get("task_id", "default") or "default"
-        except Exception:
-            continue
+    ct_path = get_project_data_dir() / f"current_task_{sid}.json"
+    try:
+        if ct_path.exists():
+            ct = json.loads(ct_path.read_text())
+            return ct.get("task_id", "default") or "default"
+    except Exception:
+        pass
     return "default"
 
 
 def get_session_id() -> str:
     """Read session_id for the current project (git root).
 
-    Primary: active_sessions.json (maps working_dir → session_id).
-    Uses git root resolution to avoid CWD-drift when Claude cd's into
-    subdirectories. Falls back to legacy current_task.json.
+    Primary: <project>/.claude/data/active_sessions.json (maps working_dir
+    → session_id). Uses git root resolution to avoid CWD-drift when Claude
+    cd's into subdirectories. Falls back to globbing current_task_*.json
+    in the same dir when active_sessions is missing or stale.
     """
     try:
-        from .project_config import get_git_root
+        from .project_config import get_git_root, get_project_data_dir
     except ImportError:
-        from project_config import get_git_root
+        from project_config import get_git_root, get_project_data_dir
     cwd = get_git_root()
+    data_dir = get_project_data_dir()
 
-    # Primary: active_sessions.json lookup by git root
     try:
-        sessions = json.loads(
-            (Path.home() / ".claude/data/active_sessions.json").read_text()
-        )
-        # Try git root first, then exact CWD
+        sessions = json.loads((data_dir / "active_sessions.json").read_text())
         import os
         for lookup_dir in [cwd, os.getcwd()]:
             sid = sessions.get(lookup_dir, "")
@@ -230,9 +232,8 @@ def get_session_id() -> str:
                 return sid
     except Exception:
         pass
-    # Fallback: session-scoped current_task files (glob for any)
     import glob as _g
-    for f in sorted(_g.glob(str(Path.home() / ".claude/data/current_task_*.json")),
+    for f in sorted(_g.glob(str(data_dir / "current_task_*.json")),
                     key=lambda p: Path(p).stat().st_mtime, reverse=True):
         try:
             ct = json.loads(Path(f).read_text())
@@ -241,12 +242,7 @@ def get_session_id() -> str:
                 return ct.get("session_id", "default") or "default"
         except Exception:
             continue
-    # Final fallback: legacy global file
-    try:
-        ct = json.loads((Path.home() / ".claude/data/current_task.json").read_text())
-        return ct.get("session_id", "default") or "default"
-    except Exception:
-        return "default"
+    return "default"
 
 
 # ── Transcript parsing ────────────────────────────────────────────────────
@@ -320,15 +316,17 @@ def parse_transcript(
 
 
 def get_agent_id() -> str:
-    """Read agent_id from session-scoped agent_identity file. Returns '' on error."""
+    """Read agent_id from the project-local agent_identity file.
+
+    Returns '' on error.
+    """
+    try:
+        from .project_config import get_project_data_dir
+    except ImportError:
+        from project_config import get_project_data_dir
     try:
         sid = get_session_id()
-        # Try session-scoped first
-        f = Path.home() / f".claude/data/agent_identity_{sid}.json"
-        if f.exists():
-            return json.loads(f.read_text()).get("agent_id", "")
-        # Fallback: legacy global file
-        f = Path.home() / ".claude/data/agent_identity.json"
+        f = get_project_data_dir() / f"agent_identity_{sid}.json"
         if f.exists():
             return json.loads(f.read_text()).get("agent_id", "")
         return ""

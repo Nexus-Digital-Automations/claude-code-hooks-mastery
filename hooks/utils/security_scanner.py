@@ -758,7 +758,8 @@ def _write_report(
     duration_s: float,
     timestamp: str,
 ) -> str:
-    report_dir = Path.home() / ".claude" / "reports" / "security"
+    from project_config import get_project_data_dir
+    report_dir = get_project_data_dir().parent / "reports" / "security"
     report_dir.mkdir(parents=True, exist_ok=True)
     report_path = report_dir / f"{timestamp}.md"
 

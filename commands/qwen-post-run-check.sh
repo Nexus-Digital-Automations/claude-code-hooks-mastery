@@ -10,7 +10,15 @@
 # so they can be reviewed and either reverted or committed before code review proceeds.
 set -euo pipefail
 
-SNAPSHOT_FILE="$HOME/.claude/data/qwen_run_snapshot.json"
+# Per-project state directory (see hooks/utils/project_config.py:get_project_data_dir)
+HOME_CLAUDE="$HOME/.claude"
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")
+if [ "$GIT_ROOT" = "$HOME_CLAUDE" ]; then
+    DATA_DIR="$HOME_CLAUDE/data"
+else
+    DATA_DIR="$GIT_ROOT/.claude/data"
+fi
+SNAPSHOT_FILE="$DATA_DIR/qwen_run_snapshot.json"
 ACTION="${1:---check}"
 
 case "$ACTION" in

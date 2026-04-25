@@ -10,16 +10,23 @@ set -euo pipefail
 
 HOOKS_DIR="$HOME/.claude/hooks"
 UTILS_DIR="$HOOKS_DIR/utils"
-DATA_DIR="$HOME/.claude/data"
+# Per-project data dir (see hooks/utils/project_config.py:get_project_data_dir)
+HOME_CLAUDE="$HOME/.claude"
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")
+if [ "$GIT_ROOT" = "$HOME_CLAUDE" ]; then
+    DATA_DIR="$HOME_CLAUDE/data"
+else
+    DATA_DIR="$GIT_ROOT/.claude/data"
+fi
 
 # Resolve session ID from active_sessions.json
 SESSION_ID="${1:-}"
 if [ -z "$SESSION_ID" ]; then
     SESSION_ID=$(python3 -c "
-import json, os, sys
-from pathlib import Path
-
-sessions_file = Path.home() / '.claude/data/active_sessions.json'
+import json, os, sys; sys.path.insert(0, '$UTILS_DIR')
+from project_config import get_project_data_dir
+data_dir = get_project_data_dir()
+sessions_file = data_dir / 'active_sessions.json'
 if not sessions_file.exists():
     print('default')
     sys.exit(0)

@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/python-development/agents/python-pro.md

@@ -111,14 +111,18 @@ def _generate_agent_identity(session_id: str) -> str:
 
     The agent_id is a UUID that uniquely identifies this session's agent.
     It scopes all Qwen reviewer state files and prevents cross-session
-    contamination. Written to ~/.claude/data/agent_identity_{session_id}.json
+    contamination.
+
+    Written to <project>/.claude/data/agent_identity_{session_id}.json
     (session-scoped to avoid clobbering across concurrent sessions).
 
     Returns the agent_id string.
     """
     import uuid
+    from project_config import get_project_data_dir
     agent_id = str(uuid.uuid4())
-    identity_file = Path.home() / f".claude/data/agent_identity_{session_id}.json"
+    data_dir = get_project_data_dir()
+    identity_file = data_dir / f"agent_identity_{session_id}.json"
     try:
         identity_file.parent.mkdir(parents=True, exist_ok=True)
         identity_file.write_text(json.dumps({
@@ -138,7 +142,9 @@ def _register_active_session(session_id: str, working_dir: str) -> None:
     session_id for the current working directory without a global singleton file.
     Multiple concurrent sessions write to different keys, avoiding clobber.
     """
-    sessions_file = Path.home() / ".claude/data/active_sessions.json"
+    from project_config import get_project_data_dir
+    data_dir = get_project_data_dir()
+    sessions_file = data_dir / "active_sessions.json"
     try:
         sessions = {}
         if sessions_file.exists():
@@ -154,9 +160,11 @@ def reset_verification_record(session_id: str = "unknown") -> None:
 
     Deletes VR files, legacy global files, stale session-scoped identity/task
     files, and orphaned Qwen files so the new session starts clean.
+    Scoped to the current project (see project_config.get_project_data_dir).
     """
     import glob as _glob
-    _claude_data = Path.home() / ".claude" / "data"
+    from project_config import get_project_data_dir
+    _claude_data = get_project_data_dir()
     _claude_data.mkdir(parents=True, exist_ok=True)
 
     # Build set of session IDs to protect (current + all other active sessions).
@@ -347,6 +355,39 @@ def load_active_specs(cwd):
     return "\n".join(lines)
 
 
+def _spawn_background_indexer(cwd: str) -> None:
+    """Spawn a detached background process to auto-index git repos.
+
+    Only fires for git repos to avoid indexing ~/.claude, /tmp, etc.
+    Reads MCP config from ~/.claude.json — single source of truth.
+    Fire-and-forget: hook returns immediately, indexing runs silently.
+    """
+    try:
+        result = subprocess.run(
+            ['git', 'rev-parse', '--git-dir'],
+            capture_output=True, timeout=3, cwd=cwd
+        )
+        if result.returncode != 0:
+            return
+    except Exception:
+        return
+
+    indexer = Path(__file__).parent / 'auto_index_codebase.py'
+    if not indexer.exists():
+        return
+
+    try:
+        subprocess.Popen(
+            [sys.executable, str(indexer), cwd],
+            start_new_session=True,
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        pass
+
+
 def load_development_context(source, agent_id=""):
     """Load relevant development context based on session source."""
     context_parts = []
@@ -532,7 +573,8 @@ def _create_default_vr(session_id: str) -> None:
     Ensures stop.py always has a well-formed VR to read, preventing
     the case where a missing file blocks stop forever.
     """
-    vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+    from project_config import get_project_data_dir
+    vr_file = get_project_data_dir() / f"verification_record_{session_id}.json"
     if vr_file.exists():
         return  # Don't overwrite existing
     check_keys = [
@@ -594,6 +636,13 @@ def main():
         except Exception:
             pass
 
+        # Ensure project .gitignore covers .claude/data/ .claude/artifacts/ .claude/reports/
+        try:
+            from project_config import ensure_project_gitignore
+            ensure_project_gitignore()
+        except Exception:
+            pass
+
         # Log the session start event
         log_session_start(input_data)
 
@@ -601,7 +650,8 @@ def main():
         # (see hooks/utils/session_scope.py; consumed by stop.py:_phase_1_implement).
         # Emitted on every session start, not just when --load-context is set,
         # because without the key the agent can't satisfy Phase 1.
-        scope_file = Path.home() / f".claude/data/session_scope_{session_id}.json"
+        from project_config import get_project_data_dir
+        scope_file = get_project_data_dir() / f"session_scope_{session_id}.json"
         key_context = (
             f"Session key: {session_id}\n"
             f"Agent id: {agent_id}\n\n"
@@ -618,6 +668,12 @@ def main():
             )
         else:
             additional_context = key_context
+        _spawn_background_indexer(os.getcwd())
+        try:
+            if subprocess.run(['git', 'rev-parse', '--git-dir'], capture_output=True, timeout=3).returncode == 0:
+                additional_context += '\nCode search: prefer `search_code` MCP tool for concept/semantic queries (e.g. "functions that handle auth"). Use grep/find only for exact string matches.'
+        except Exception:
+            pass
         print(json.dumps({
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",

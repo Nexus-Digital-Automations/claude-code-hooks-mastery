@@ -1,0 +1,1 @@
+/Users/jeremyparker/.claude/New Tools/agents/plugins/systems-programming/agents/golang-pro.md

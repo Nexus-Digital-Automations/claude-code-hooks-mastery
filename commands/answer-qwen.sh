@@ -8,6 +8,15 @@
 # Falls back to task_id for backward compatibility.
 VR_UTILS="$HOME/.claude/hooks/utils"
 
+# Resolve project-local data dir (see hooks/utils/project_config.py:get_project_data_dir)
+HOME_CLAUDE="$HOME/.claude"
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")
+if [ "$GIT_ROOT" = "$HOME_CLAUDE" ]; then
+    DATA_DIR="$HOME_CLAUDE/data"
+else
+    DATA_DIR="$GIT_ROOT/.claude/data"
+fi
+
 # Get session_id for session-scoped file lookup
 SESSION_ID=$(python3 -c "
 import sys; sys.path.insert(0, '$VR_UTILS')
@@ -16,13 +25,11 @@ from vr_utils import get_session_id; print(get_session_id())
 
 # Prefer agent_id from session-scoped identity file
 SCOPE_ID=$(python3 -c "
-import json
-from pathlib import Path
+import json, sys; sys.path.insert(0, '$VR_UTILS')
+from project_config import get_project_data_dir
+data_dir = get_project_data_dir()
 sid = '$SESSION_ID'
-# Try session-scoped first
-f = Path.home() / f'.claude/data/agent_identity_{sid}.json'
-if not f.exists():
-    f = Path.home() / '.claude/data/agent_identity.json'
+f = data_dir / f'agent_identity_{sid}.json'
 try:
     d = json.loads(f.read_text())
     aid = d.get('agent_id', '')
@@ -33,7 +40,7 @@ try:
 except Exception:
     print('default')
 " 2>/dev/null || echo "default")
-STATE_FILE="$HOME/.claude/data/qwen_review_state_${SCOPE_ID}.json"
+STATE_FILE="$DATA_DIR/qwen_review_state_${SCOPE_ID}.json"
 ANSWER="$1"
 
 if [ -z "$ANSWER" ]; then

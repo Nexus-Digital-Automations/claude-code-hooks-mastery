@@ -17,11 +17,20 @@ from pathlib import Path
 
 # Add hooks directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent / "utils"))
 
 # Fix Python environment warnings
 for var in ['PYTHONHOME', 'PYTHONPATH']:
     if var in os.environ:
         del os.environ[var]
+
+
+# Per-session state lives under <git_root>/.claude/data/.
+# Special case: ~/.claude meta-repo collapses to ~/.claude/data/ (no nesting).
+# Counterpart: hooks/utils/project_config.py:get_project_data_dir.
+def _data_dir(cwd: str | None = None) -> Path:
+    from project_config import get_project_data_dir
+    return get_project_data_dir(cwd)
 
 try:
     from dotenv import load_dotenv
@@ -341,12 +350,12 @@ def _resolve_session_id(session_id: str) -> str:
     """
     # 1. Harness-provided ID is authoritative if its VR file exists —
     #    this prevents active_sessions.json overwrites from concurrent sessions
-    if (Path.home() / f".claude/data/verification_record_{session_id}.json").exists():
+    if (_data_dir() / f"verification_record_{session_id}.json").exists():
         return session_id
     # 2. Fallback: active_sessions.json (handles compact/restart where VR
     #    was written under a different session ID)
     try:
-        sessions_file = Path.home() / ".claude/data/active_sessions.json"
+        sessions_file = _data_dir() / "active_sessions.json"
         if sessions_file.exists():
             sessions = json.loads(sessions_file.read_text())
             try:
@@ -355,13 +364,13 @@ def _resolve_session_id(session_id: str) -> str:
                 git_root = get_git_root()
                 for lookup_dir in [git_root, os.getcwd()]:
                     resolved = sessions.get(lookup_dir, "")
-                    if resolved and (Path.home() / f".claude/data/verification_record_{resolved}.json").exists():
+                    if resolved and (_data_dir() / f"verification_record_{resolved}.json").exists():
                         return resolved
             except Exception as exc:
                 print(f"  [session] git_root lookup failed, falling back to cwd: {exc}", file=sys.stderr)
                 cwd = os.getcwd()
                 resolved = sessions.get(cwd, "")
-                if resolved and (Path.home() / f".claude/data/verification_record_{resolved}.json").exists():
+                if resolved and (_data_dir() / f"verification_record_{resolved}.json").exists():
                     return resolved
     except (json.JSONDecodeError, OSError) as exc:
         print(f"  [session] active_sessions.json read failed: {exc}", file=sys.stderr)
@@ -370,7 +379,7 @@ def _resolve_session_id(session_id: str) -> str:
 
 def check_stop_authorization(session_id: str = "default"):
     session_id = _resolve_session_id(session_id)
-    auth_file = Path.home() / f".claude/data/stop_authorization_{session_id}.json"
+    auth_file = _data_dir() / f"stop_authorization_{session_id}.json"
     if not auth_file.exists():
         return False
     try:
@@ -396,7 +405,7 @@ def check_verification(session_id: str) -> tuple[bool, list, list]:
         return (True, [], [])
 
     session_id = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+    vr_file = _data_dir() / f"verification_record_{session_id}.json"
 
     try:
         record = json.loads(vr_file.read_text())
@@ -468,7 +477,7 @@ def build_blocked_message(done: list, missing: list, config: dict) -> str:
 def build_evidence_display(done: list, session_id: str) -> str:
     """Show evidence summary for all completed checks."""
     session_id = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{session_id}.json"
+    vr_file = _data_dir() / f"verification_record_{session_id}.json"
     try:
         checks = json.loads(vr_file.read_text()).get("checks", {})
     except Exception:
@@ -514,7 +523,7 @@ def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
     """Phase 1: Implementation complete — spec criteria + root cleanliness.
 
     Spec scoping: the session must declare which specs are in scope by writing
-    ~/.claude/data/session_scope_{sid}.json (see hooks/utils/session_scope.py).
+    <project>/.claude/data/session_scope_{sid}.json (see hooks/utils/session_scope.py).
     Without a declaration, Phase 1 fails. This prevents the hook from dumping
     every status:active spec regardless of what the session is actually working
     on — the failure mode that motivated this check.
@@ -558,7 +567,7 @@ def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
 def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
     """Phase 2: Lint + typecheck must pass (zero errors)."""
     resolved_sid = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+    vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
     try:
         sys.path.insert(0, str(Path(__file__).parent / "utils"))
@@ -649,7 +658,7 @@ def _phase_2_static_analysis(session_id: str, config: dict) -> tuple[bool, str]:
 def _phase_3_build(session_id: str, config: dict) -> tuple[bool, str]:
     """Phase 3: Build verification — must pass before tests can run."""
     resolved_sid = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+    vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
     from project_config import get_required_checks
     required = get_required_checks(config)
@@ -689,7 +698,7 @@ def _phase_3_build(session_id: str, config: dict) -> tuple[bool, str]:
 def _phase_4_tests(session_id: str, config: dict) -> tuple[bool, str]:
     """Phase 4: Tests — required only for stable, important features."""
     resolved_sid = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+    vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
     from project_config import get_required_checks
 
@@ -702,7 +711,7 @@ def _phase_4_tests(session_id: str, config: dict) -> tuple[bool, str]:
         from project_config import should_require_tests
         from vr_utils import parse_transcript
 
-        task_file = Path.home() / f".claude/data/current_task_{resolved_sid}.json"
+        task_file = _data_dir() / f"current_task_{resolved_sid}.json"
         task_start = None
         transcript_path = None
         if task_file.exists():
@@ -786,7 +795,7 @@ def _phase_4_tests(session_id: str, config: dict) -> tuple[bool, str]:
 def _phase_5_smoke_test(session_id: str, config: dict) -> tuple[bool, str]:
     """Phase 5: Execution and app startup verification (smoke test)."""
     resolved_sid = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+    vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
     from project_config import get_required_checks
     required = get_required_checks(config)
@@ -861,7 +870,7 @@ def _phase_6_frontend(session_id: str, config: dict) -> tuple[bool, str]:
         )
 
     resolved_sid = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+    vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
     from project_config import get_required_checks
     required = get_required_checks(config)
@@ -921,7 +930,7 @@ def _phase_6_frontend(session_id: str, config: dict) -> tuple[bool, str]:
 def _phase_7_ship(session_id: str, config: dict) -> tuple[bool, str]:
     """Phase 7: Security scan, commit, push, upstream sync."""
     resolved_sid = _resolve_session_id(session_id)
-    vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+    vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
     try:
         sys.path.insert(0, str(Path(__file__).parent / "utils"))
@@ -1234,7 +1243,7 @@ def main():
 
         # ── Resolve session and VR ──────────────────────────────────────
         resolved_sid = _resolve_session_id(session_id)
-        vr_file = Path.home() / f".claude/data/verification_record_{resolved_sid}.json"
+        vr_file = _data_dir() / f"verification_record_{resolved_sid}.json"
 
         # Read current phase from VR (defaults to 1)
         try:
@@ -1300,7 +1309,7 @@ def main():
                 pass
 
         # ── All phases passed — final reset ─────────────────────────────
-        auth_file = Path.home() / f".claude/data/stop_authorization_{resolved_sid}.json"
+        auth_file = _data_dir() / f"stop_authorization_{resolved_sid}.json"
         try:
             auth_file.write_text(json.dumps({"authorized": False}))
         except Exception:

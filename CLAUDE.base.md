@@ -19,7 +19,7 @@ Spec edits require approval: `bash ~/.claude/commands/approve-spec-edit.sh`
 **Rule 2b — Declare session scope.**
 Every session must write `~/.claude/data/session_scope_<session-key>.json` before the first stop. The session key is injected into the agent's context by `session_start.py`. Contents: `{"specs": ["/absolute/path/to/project/specs/<name>.md", ...]}` for spec-bound work, or `{"no_spec": true, "reason": "..."}` for trivial edits. Use the absolute path to the spec file so the Stop hook can find it regardless of which project directory the agent is working in. Without this file, Stop hook Phase 1 fails — see `hooks/utils/session_scope.py`.
 
-**Spec template** — `specs/<kebab-case-name>.md`:
+**Spec template** — `<project-root>/specs/<kebab-case-name>.md` (always under the current project root, never `~/.claude/specs/`):
 ```
 ---
 title: <title>
