@@ -669,9 +669,26 @@ def main():
         else:
             additional_context = key_context
         _spawn_background_indexer(os.getcwd())
+        # claude-mem is session-agnostic — inject always
+        additional_context += (
+            "\n\nMCP TOOLS — use these before falling back to grep/bash:\n"
+            "• Past work & memory: mcp__plugin_claude-mem_mcp-search__search query=<topic>"
+            "  → then mcp__plugin_claude-mem_mcp-search__timeline → mcp__plugin_claude-mem_mcp-search__get_observations\n"
+            "  Use for: finding past solutions, decisions, bugs fixed, patterns from prior sessions.\n"
+            "• Structural code exploration: mcp__plugin_claude-mem_mcp-search__smart_search query=<symbol/pattern> path=<dir>\n"
+            "  Use for: locating function signatures, class definitions, symbol locations.\n"
+            "  Follow with smart_outline (file skeleton) or smart_unfold (full function body)."
+        )
+        # claude-context semantic search only applies inside a git repo (codebase must be indexed)
         try:
             if subprocess.run(['git', 'rev-parse', '--git-dir'], capture_output=True, timeout=3).returncode == 0:
-                additional_context += '\nCode search: prefer `search_code` MCP tool for concept/semantic queries (e.g. "functions that handle auth"). Use grep/find only for exact string matches.'
+                additional_context += (
+                    "\n• Semantic code search: mcp__claude-context__search_code path=<abs_dir> query=<natural language>\n"
+                    "  Use for: finding relevant functions/patterns by concept (e.g. 'functions that handle auth').\n"
+                    "  If not yet indexed: mcp__claude-context__index_codebase path=<abs_dir> first, then\n"
+                    "  mcp__claude-context__get_indexing_status path=<abs_dir> before searching.\n"
+                    "  Prefer over grep for concept/semantic queries; use grep/find only for exact string matches."
+                )
         except Exception:
             pass
         print(json.dumps({

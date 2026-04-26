@@ -1072,3 +1072,30 @@ When reviewing a follow-up round:
 25. **Session scope is required by Phase 1 — and scopes the spec check**: The stop hook's Phase 1 reads `data/session_scope_{sid}.json` before evaluating spec completion. If the file is absent, Phase 1 fails immediately (before any spec check runs). If it contains `{"no_spec": true, ...}`, the spec check is skipped; only root cleanliness is enforced. If it contains `{"specs": [...]}`, only those listed spec files are checked — not all active specs in `specs/`. This means a reviewer should never see `flashcard-app-qwen-test.md` flagged in a session that only declared `ai-coding-standards-enforcement.md` in scope. The session key (`session_id`) is injected into `additionalContext` by `session_start.py` at every session open so the agent always has it available.
 
 26. **Clarify Before Coding uses `AskUserQuestion` — not prose**: When the PROTOCOL CHECKPOINT STEP 1 (clarification) fires, the agent is instructed to use the native `AskUserQuestion` tool, not to list questions as text. Every question must include 2–4 concrete selectable options plus an "Other / let me explain" fallback. There is no cap on the number of questions — the agent asks every question needed to de-risk the task. Failure to use the tool (listing questions as prose instead) is an advisory signal, not blocking, unless it caused requirements to be unclear.
+
+---
+
+## Available MCP Tools for Agents (quick reference)
+
+Two MCP servers provide semantic search and persistent memory. Agents should use these **before** resorting to repeated grep/bash exploration.
+
+| Need | Tool | When to prefer |
+|------|------|----------------|
+| Find past solutions / decisions | `mcp__plugin_claude-mem_mcp-search__search` | Before re-solving any problem that might have been solved before |
+| Locate function / class / symbol | `mcp__plugin_claude-mem_mcp-search__smart_search` | Before grep when exact spelling is unknown |
+| Understand a file's structure | `mcp__plugin_claude-mem_mcp-search__smart_outline` | Before reading an entire file — get skeleton first |
+| Read one specific function body | `mcp__plugin_claude-mem_mcp-search__smart_unfold` | Targeted reads — avoids loading the full file |
+| Semantic concept search | `mcp__claude-context__search_code` | When grep requires 3+ attempts to find the right file |
+| Index a repo for semantic search | `mcp__claude-context__index_codebase` | Once per repo, before first `search_code` call |
+
+**Memory workflow (token-efficient):** `search` → `timeline` → `get_observations`
+
+**Code exploration workflow:** `smart_search` → `smart_outline` → `smart_unfold`
+
+**Semantic search workflow:** `index_codebase` → `get_indexing_status` (wait 100%) → `search_code`
+
+### For the reviewer (Cat 10 / Cat 17)
+
+- Results from `search_code` or `smart_search` are **valid exploration evidence** for Cat 10 (Evidence Quality). Do not penalize an agent for skipping grep when MCP search was used instead.
+- An agent that uses these tools before grepping is demonstrating good pre-execution reasoning (Cat 17). Note it positively, never negatively.
+- If an agent ran 5+ grep/bash searches for the same concept without using `search_code`, that is a Cat 17 advisory signal (excessive investigation without leveraging available tools), but never blocking alone.

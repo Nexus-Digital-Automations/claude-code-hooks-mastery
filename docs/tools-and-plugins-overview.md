@@ -25,9 +25,10 @@ External MCP servers that extend Claude with real-time data and specialized capa
 
 | Server | Purpose |
 |--------|---------|
+| **claude-context** | Semantic + BM25 hybrid codebase search via Milvus vector DB (Zilliz `@zilliz/claude-context-mcp`) |
+| **mcp-search** (claude-mem) | Cross-session persistent memory, structural code exploration, knowledge corpora |
 | **claude-flow** | Swarm orchestration, task coordination, memory, neural pattern training |
 | **ruv-swarm** | Multi-agent swarm init/spawn, benchmarking, neural patterns, DAA agents |
-
 | **maverick-mcp** | Additional tool integrations |
 | **wrds-mcp** | Financial data — CRSP, Compustat, S&P 500, macro (FRED), Schwab trading, options analytics |
 | **ThetaData** | Real-time and historical US equity/options market data, Greeks, IV surfaces |
@@ -37,6 +38,54 @@ External MCP servers that extend Claude with real-time data and specialized capa
 | **ElevenLabs** | Text-to-speech audio generation and playback |
 | **firecrawl-mcp** | Web scraping and search |
 | **claude_ai_PubMed** | PubMed medical literature search and article retrieval |
+
+### 1a. Key MCP Tool Reference
+
+#### claude-context (`mcp__claude-context__*`)
+
+Semantic + BM25 hybrid search over indexed codebases. Backed by Milvus at `localhost:19530` with Ollama `nomic-embed-text` embeddings.
+
+| Tool | Key Parameters | When to Use |
+|------|---------------|-------------|
+| `index_codebase` | `path` (abs dir), `force` (bool) | Once per repo before first search. AST-based chunking, auto-fallback to char split. |
+| `get_indexing_status` | `path` (abs dir) | Check % complete before searching — avoids empty results mid-index. |
+| `search_code` | `path` (abs dir), `query` (natural language), `limit` (default 10) | Semantic/concept queries: "functions that validate auth tokens". Prefer over grep for concepts. |
+| `clear_index` | `path` (abs dir) | Remove a stale index (e.g. after major refactor). |
+
+**Workflow:** `index_codebase` → `get_indexing_status` (wait for 100%) → `search_code`
+
+#### claude-mem / mcp-search (`mcp__plugin_claude-mem_mcp-search__*`)
+
+Persistent cross-session memory (SQLite + Chroma), structural AST-based code exploration, and knowledge corpora. Web UI at `http://localhost:37777`.
+
+**Memory workflow (3-step, token-efficient):**
+
+| Step | Tool | What It Returns |
+|------|------|----------------|
+| 1 | `search` — `query`, optional `type`/`dateStart`/`dateEnd` | Index with IDs, timestamps, titles (~50–100 tokens/result) |
+| 2 | `timeline` — `anchor` (ID) or `query` | Chronological context window around a result |
+| 3 | `get_observations` — `ids` (array) | Full details: title, narrative, facts, files (~500–1000 tokens each) |
+
+**Structural code exploration:**
+
+| Tool | Key Parameters | When to Use |
+|------|---------------|-------------|
+| `smart_search` | `query`, `path` (dir), `max_results` | Find symbols by name/concept — faster than grep for unknown spellings |
+| `smart_outline` | `file_path` | Full file skeleton (functions, classes, imports) without loading body |
+| `smart_unfold` | `file_path`, `symbol_name` | Expand one specific function/class body |
+
+**Knowledge corpora:**
+
+| Tool | Purpose |
+|------|---------|
+| `build_corpus` | Assemble filtered observations into a topic "brain" |
+| `prime_corpus` | Load corpus into an AI session for Q&A |
+| `query_corpus` | Ask the primed corpus a question |
+| `reprime_corpus` | Reset Q&A context (when conversation drifts) |
+| `rebuild_corpus` | Re-run the filter to include new observations |
+| `list_corpora` | List all corpora with stats and priming status |
+
+**Slash command shortcuts:** `/mem-search`, `/smart-explore`, `/knowledge-agent`, `/make-plan`
 
 ---
 
