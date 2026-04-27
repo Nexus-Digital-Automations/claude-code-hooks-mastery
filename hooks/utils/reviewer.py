@@ -540,10 +540,12 @@ def build_review_packet(
     except Exception:
         pass
 
-    # 5. File-size advisory
+    # 5. File-size advisory + justification registry
     try:
         from file_size_scanner import scan_oversized_files
+        from file_size_registry import FileSizeRegistry
         packet.oversized_files = scan_oversized_files(project_root)
+        packet.file_size_reasons = FileSizeRegistry(project_root).load().as_review_dict()
     except Exception as exc:
         print(f"  [reviewer] file-size scan failed: {exc}", file=sys.stderr)
 

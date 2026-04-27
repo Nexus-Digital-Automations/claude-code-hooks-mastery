@@ -559,6 +559,30 @@ def _phase_1_implement(session_id: str, config: dict) -> tuple[bool, str]:
             issues.append("")
             issues.append("Complete all acceptance criteria before proceeding.")
 
+    # ── Hard gate: loud-tier files (>800 lines) need registered justification
+    try:
+        from project_config import get_git_root
+        from file_size_scanner import scan_oversized_files
+        from file_size_registry import FileSizeRegistry
+        project_root = Path(get_git_root())
+        oversized = scan_oversized_files(project_root)
+        registry = FileSizeRegistry(project_root).load()
+        unjustified = registry.unjustified_loud(oversized)
+        if unjustified:
+            issues.append("Loud-tier files (>800 lines) require a registered justification:")
+            issues.append("")
+            for rel_path, count in unjustified:
+                issues.append(f"  {rel_path:<60s} {count} lines")
+            issues.append("")
+            issues.append("Register a reason for each, then retry:")
+            for rel_path, _ in unjustified:
+                issues.append(
+                    f'  python3 ~/.claude/hooks/utils/file_size_registry.py'
+                    f' register {rel_path} "<why this file is large>"'
+                )
+    except Exception:
+        pass  # Never let registry errors block stop — gate is best-effort
+
     if issues:
         return (False, "\n".join(issues))
     return (True, "")

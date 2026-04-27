@@ -33,10 +33,13 @@ DEFAULT_THRESHOLD = 400
 LOUD_THRESHOLD = 800
 MAX_DISPLAY = 15
 
-# Directory fragments to exclude (auto-generated / vendored / build output)
+# Directory fragments to exclude (auto-generated / vendored / build output / cache)
 EXCLUDE_PATTERNS: set[str] = {
     "node_modules/",
     "vendor/",
+    "third_party/",
+    "plugins/cache/",
+    ".cache/",
     "__pycache__/",
     "coverage/",
     "build/",
