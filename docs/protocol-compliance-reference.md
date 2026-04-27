@@ -115,6 +115,10 @@ Concrete, binary, directly enforceable obligations. Rules have clear pass/fail s
 | Uncommitted changes to tracked files at stop time | Honesty | Cat 4 (reviewer) | **Review block** |
 | Workarounds that bypass root causes (`--no-verify`, disabled guards) | Correctness + Honesty | Cat 9 (reviewer) | **Review block** |
 | No `TODO: remove later` / `HACK:` / `FIXME: temporary` | Honesty | Cat 9 (reviewer) | **Review block** |
+| New API handlers must log request (method, path) and response (status code, error) | Correctness + Honesty | Cat 19 (reviewer) | **Review block** |
+| Auth/security events must always be logged (login, logout, permission denied, invalid token) | Safety + Correctness | Cat 19 (reviewer) | **Review block** |
+| Critical-path error handlers (payments, auth, billing, security) must log caught exceptions before re-raising or returning | Correctness | Cat 19 (reviewer) | **Review block** |
+| No PII in log messages — never log passwords, tokens, session keys, raw email addresses | Safety | Cat 19 (reviewer) | **Review block** |
 
 ---
 
@@ -139,6 +143,7 @@ Craft and style requirements. Standards are **injected** at code-generation time
 | JS/TS: ESLint + strict + Prettier, 80-char, semicolons, single quotes | Craft | CLAUDE.md | Cat 3 advisory |
 | Python: Black + Ruff + mypy strict, 88-char, snake_case/PascalCase | Craft | CLAUDE.md | Cat 3 advisory |
 | `.security-ignore` rules must have reason comments and be file-specific | Safety | Cat 18 (reviewer) | **Review block** |
+| Structured logging (key=value or JSON fields); use project logger, not print(); correct log levels (ERROR failures, INFO significant events, DEBUG internals) | Craft + Correctness | `pre_tool_use.py` (LOGGING) | Cat 19 advisory |
 
 ---
 
@@ -940,9 +945,49 @@ Look for structured reasoning *before* any tool call output or implementation �
 
 ---
 
+### 19. Logging & Observability
+
+**Condition:** Requires diff content. Skip if no git diff is in the packet.
+
+**What to check (from git diff):**
+
+**Missing critical logging (blocking):**
+- New HTTP route handler / API endpoint with zero logging calls — no request log, no error log, nothing
+- New auth or security code (login, token validation, permission check, session management) with no audit log of auth events
+- Critical-path code (payments, auth, billing, data integrity, security) where caught exceptions are handled but not logged — error is silently absorbed or re-raised with no log record
+- New background task, worker, or scheduled job that produces no log output on any failure path
+
+**PII in log messages (blocking):**
+- Log statement that includes raw passwords, tokens, session keys, private keys, or raw email addresses
+- Logging an entire request body or response payload without sanitization in a context where it could contain credentials
+
+**Logging quality issues (advisory):**
+- New public function with non-obvious failure modes that has no log statement on any error path
+- Using `print()` instead of the project's structured logger for anything that would be relevant in production
+- Log messages that are unstructured f-strings where structured key=value fields would be machine-parseable
+- Log level misuse: using `INFO` for recoverable errors that should be `ERROR` or `WARNING`
+- New stateful operation (status transition, ownership change, payment state) with no INFO-level log of the transition
+
+**Pass criteria:**
+- Every new API endpoint logs at minimum: HTTP method, path, response status, and any exception that caused a non-2xx response
+- Auth/security events are always logged with enough context to reconstruct what happened (user/session identifier, action, outcome)
+- Critical-path error handlers log the exception before re-raising or returning
+- No PII visible in log statements in the diff
+
+**Severity:**
+- New API handler with zero logging: **blocking**
+- New auth/security code with no audit log: **blocking**
+- Critical-path caught exceptions not logged: **blocking**
+- PII in log messages: **blocking**
+- Missing structured format, wrong log levels, missing debug logging in utilities: **advisory**
+
+**Important:** Apply only to code newly added or modified in the diff. Do not flag pre-existing log-free code outside the task scope. A single missing log statement in a large utility diff is advisory. Flag as blocking only when an entire new handler, auth flow, or background worker has zero logging coverage.
+
+---
+
 ## Severity Rules
 
-- **blocking**: Must be fixed before approval. Any of: test failures, build failures, lint errors, type errors, security criticals, missing user-requested features, unchecked spec criteria (for substantial tasks), uncommitted changes to tracked files, empty catch blocks that swallow exceptions, resource leaks, unrequested features added (YAGNI), `Date.now()` as ID, workarounds bypassing root causes, boolean flag parameters in new functions (cat 15), obvious shared mutable state race in concurrent code (cat 15), overly broad .security-ignore patterns or missing reason comments (cat 18)
+- **blocking**: Must be fixed before approval. Any of: test failures, build failures, lint errors, type errors, security criticals, missing user-requested features, unchecked spec criteria (for substantial tasks), uncommitted changes to tracked files, empty catch blocks that swallow exceptions, resource leaks, unrequested features added (YAGNI), `Date.now()` as ID, workarounds bypassing root causes, boolean flag parameters in new functions (cat 15), obvious shared mutable state race in concurrent code (cat 15), overly broad .security-ignore patterns or missing reason comments (cat 18), new API handler/endpoint with zero logging (cat 19), new auth/security code with no audit log (cat 19), critical-path caught exceptions not logged before raise/return (cat 19), PII (password, token, session key) visible in log statements (cat 19)
 - **advisory**: Should be noted but does not block approval. Any of: missing docs, style suggestions, minor code quality notes, lint warnings (not errors), missing edge case tests, mild over-engineering, complexity suggestions, missing push when no remote, telling user to run a non-critical command, all cat 15 findings except bool flags and concurrency races, all cat 16 findings, all cat 17 findings
 
 **You MUST have at least one `blocking` finding to return a `FINDINGS` verdict.** If all findings are `advisory`, return `APPROVED` with the advisory items in the `advisory` array.
@@ -1072,6 +1117,8 @@ When reviewing a follow-up round:
 25. **Session scope is required by Phase 1 — and scopes the spec check**: The stop hook's Phase 1 reads `data/session_scope_{sid}.json` before evaluating spec completion. If the file is absent, Phase 1 fails immediately (before any spec check runs). If it contains `{"no_spec": true, ...}`, the spec check is skipped; only root cleanliness is enforced. If it contains `{"specs": [...]}`, only those listed spec files are checked — not all active specs in `specs/`. This means a reviewer should never see `flashcard-app-qwen-test.md` flagged in a session that only declared `ai-coding-standards-enforcement.md` in scope. The session key (`session_id`) is injected into `additionalContext` by `session_start.py` at every session open so the agent always has it available.
 
 26. **Clarify Before Coding uses `AskUserQuestion` — not prose**: When the PROTOCOL CHECKPOINT STEP 1 (clarification) fires, the agent is instructed to use the native `AskUserQuestion` tool, not to list questions as text. Every question must include 2–4 concrete selectable options plus an "Other / let me explain" fallback. There is no cap on the number of questions — the agent asks every question needed to de-risk the task. Failure to use the tool (listing questions as prose instead) is an advisory signal, not blocking, unless it caused requirements to be unclear.
+
+27. **Cat 19 (Logging & Observability) applies to new code only**: Do not flag pre-existing functions that lack logging. Only new functions and modified handlers added in the diff are in scope. A utility helper used internally does not require logging; a new HTTP handler or auth flow always does. A single missing log statement in a large utility diff is advisory — flag as blocking only when an entire new handler, auth flow, or background worker has zero logging coverage.
 
 ---
 
