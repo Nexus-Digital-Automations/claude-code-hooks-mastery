@@ -340,6 +340,34 @@ def run_sandbox_checks(
         except Exception:
             pass
 
+    # Build session diff: all commits the agent made since task_started_at.
+    # git show HEAD only covers the last commit; this covers N commits in a session.
+    # Find the oldest task commit, then diff from its parent to HEAD.
+    if task_started_at:
+        try:
+            log_r = subprocess.run(
+                f'git log --after="{task_started_at}" --format="%H"',
+                shell=True, capture_output=True, text=True,
+                timeout=15, cwd=str(project_root),
+            )
+            hashes = [h.strip() for h in log_r.stdout.strip().splitlines() if h.strip()]
+            if hashes:
+                oldest = hashes[-1]  # git log is newest-first
+                diff_cmd = f"git diff {oldest}^..HEAD"
+                diff_r = subprocess.run(
+                    diff_cmd, shell=True, capture_output=True, text=True,
+                    timeout=30, cwd=str(project_root),
+                )
+                results["_session_diff"] = SandboxResult(
+                    check_key="_session_diff", command=diff_cmd,
+                    exit_code=diff_r.returncode,
+                    stdout=(diff_r.stdout or "")[:8000],
+                    stderr=(diff_r.stderr or "")[:500],
+                    passed=diff_r.returncode == 0,
+                )
+        except Exception:
+            pass
+
     return results
 
 
@@ -497,6 +525,8 @@ def build_review_packet(
             packet.git_show_stat = sandbox["_git_show_stat"].stdout
         if "_git_show_content" in sandbox:
             packet.git_show_content = sandbox["_git_show_content"].stdout
+        if "_session_diff" in sandbox:
+            packet.session_diff_content = sandbox["_session_diff"].stdout
     except Exception:
         pass
 
