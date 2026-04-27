@@ -23,7 +23,7 @@ from pathlib import Path
 # Ensure utils dir is on path so reviewer_core is importable
 sys.path.insert(0, str(Path(__file__).parent))
 
-from reviewer_core import ReviewPacket, ReviewerConfig, SandboxResult  # noqa: E402
+from review_types import ReviewPacket, ReviewerConfig, SandboxResult  # noqa: E402
 from artifacts import get_validation_artifacts_dir  # noqa: E402
 
 

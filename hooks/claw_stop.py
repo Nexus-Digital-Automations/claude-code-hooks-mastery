@@ -44,7 +44,7 @@ _HOOKS_DIR = Path(__file__).parent
 _UTILS_DIR = _HOOKS_DIR / "utils"
 sys.path.insert(0, str(_UTILS_DIR))
 
-from reviewer_core import (  # noqa: E402
+from review_types import (  # noqa: E402
     ReviewPacket,
     ReviewerConfig,
     call_reviewer,

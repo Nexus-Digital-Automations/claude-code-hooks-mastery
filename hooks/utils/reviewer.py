@@ -16,8 +16,7 @@ The reviewer does NOT trust Claude Code's self-reported verification record.
 It runs checks itself and lets the LLM evaluate the raw output.
 
 Shared logic (ReviewPacket, ReviewerConfig, format_packet_for_prompt,
-call_reviewer) lives in reviewer_core.py to allow reuse by other entry
-points (e.g. hooks/claw_stop.py for the claw-code-parity project).
+call_reviewer) lives in review_types.py. Also used by hooks/claw_stop.py.
 """
 from __future__ import annotations
 
@@ -45,7 +44,7 @@ except ImportError:
 # Add utils dir to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from reviewer_core import (  # noqa: E402
+from review_types import (  # noqa: E402
     ReviewPacket,
     ReviewerConfig,
     SandboxResult,
@@ -216,7 +215,7 @@ def summarize_agent_commentary(transcript_path: str, task_started_at: str = "") 
 
 # ── Sandbox Check Execution ───────────────────────────────────────────
 
-# SandboxResult is imported from reviewer_core
+# SandboxResult is imported from review_types
 
 
 def run_sandbox_checks(
@@ -606,7 +605,7 @@ def build_review_packet(
     return packet
 
 
-# format_packet_for_prompt is imported from reviewer_core
+# format_packet_for_prompt is imported from review_types
 
 
 # ── Conversation Management ───────────────────────────────────────────
@@ -714,7 +713,7 @@ def load_system_prompt() -> str | None:
     return None
 
 
-# call_reviewer is imported from reviewer_core
+# call_reviewer is imported from review_types
 
 
 # ── Approval Management ───────────────────────────────────────────────
