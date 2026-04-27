@@ -507,6 +507,33 @@ def evaluate_output(stdout: str, stderr: str, check_conf: dict) -> str:
 
 # ── Auto-run missing checks ─────────────────────────────────────────────
 
+def _maybe_invalidate_security_cache(vr_file: Path, project_root: Path) -> None:
+    """Reset the security VR entry to pending if .security-ignore was modified after the last scan.
+
+    WHY: auto_run_missing only re-runs the scan when the entry is pending.  If the user
+    creates or edits .security-ignore *after* a failed scan, the cached failure persists
+    until the session resets.  Comparing mtime vs. the stored timestamp catches that case
+    and forces a fresh scan on the same stop invocation.
+    """
+    ignore_file = project_root / ".security-ignore"
+    if not ignore_file.exists():
+        return
+    try:
+        record = json.loads(vr_file.read_text())
+        entry = record.get("checks", {}).get("security", {})
+        if entry.get("status", "pending") == "pending":
+            return  # Already pending — nothing to invalidate
+        scan_ts = entry.get("timestamp")
+        if not scan_ts:
+            return
+        scan_epoch = datetime.fromisoformat(scan_ts).timestamp()
+        if ignore_file.stat().st_mtime > scan_epoch:
+            record.setdefault("checks", {})["security"] = {"status": "pending"}
+            vr_file.write_text(json.dumps(record, indent=2))
+    except Exception:
+        pass  # Never block the stop hook
+
+
 def auto_run_missing(
     session_id: str,
     config: dict,
@@ -539,6 +566,8 @@ def auto_run_missing(
         results["upstream_sync"] = status
 
     # security is always auto-run (uses security_scanner, not a shell command)
+    if "security" in required:
+        _maybe_invalidate_security_cache(vr_file, project_root)
     if "security" in required and is_pending(vr_file, "security"):
         status, evidence = _run_security_scan(project_root, config)
         write_vr(vr_file, "security", status, evidence, session_id=session_id)
