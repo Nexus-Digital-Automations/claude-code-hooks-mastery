@@ -21,6 +21,7 @@ from claude_reviewer.core import (  # noqa: F401, E402
     ReviewPacket,
     ReviewerConfig,
     SandboxResult,
+    async_call_reviewer,
     call_reviewer,
     format_packet_for_prompt,
 )
