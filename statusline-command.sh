@@ -26,6 +26,16 @@ render_bar() {
 }
 
 # ---------------------------------------------------------------------------
+# API mode (proxy vs direct) — read from ~/.claude/settings.json
+# ---------------------------------------------------------------------------
+API_MODE="direct"
+_SETTINGS="$HOME/.claude/settings.json"
+if command -v jq &>/dev/null && [[ -f "$_SETTINGS" ]]; then
+  _BASE_URL=$(jq -r '.env.ANTHROPIC_BASE_URL // empty' "$_SETTINGS" 2>/dev/null)
+  [[ "$_BASE_URL" == http://127.0.0.1:* ]] && API_MODE="proxy"
+fi
+
+# ---------------------------------------------------------------------------
 # Data extraction
 # ---------------------------------------------------------------------------
 MODEL=$(echo "$INPUT"        | jq -r '.model.display_name // "Claude"')
@@ -206,6 +216,12 @@ if [ -n "$VIM_MODE" ]; then
     INSERT) printf " \033[32m[I]${RST}" ;;
     *)      printf " ${DIM}[%s]${RST}" "$VIM_MODE" ;;
   esac
+fi
+
+if [ "$API_MODE" = "proxy" ]; then
+  printf "${SEP}\033[38;5;214mproxy\033[0m"
+else
+  printf "${SEP}${DIM}direct${RST}"
 fi
 
 printf "${SEP}${C_BLUE}%s${RST}" "$DISPLAY_PATH"

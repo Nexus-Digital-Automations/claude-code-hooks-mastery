@@ -1,8 +1,8 @@
 ---
-description: Switch the next `cc` launch to proxy mode (free-claude-code server)
+description: Switch to proxy mode — sets ANTHROPIC_BASE_URL in settings.json
 allowed-tools: Bash
 ---
 
 Run this exact command and show the output verbatim. Do not add commentary:
 
-`"/Users/jeremyparker/Desktop/Claude Coding Projects/free-claude-code/scripts/cc-set-mode" proxy`
+`bash "/Users/jeremyparker/Desktop/Claude Coding Projects/free-claude-code/scripts/cc-set-api-mode.sh" proxy`
